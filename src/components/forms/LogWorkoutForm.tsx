@@ -32,6 +32,9 @@ export function LogWorkoutForm() {
   const isBodyweight = BODYWEIGHT_LIFTS.includes(lift)
 
   const onSubmit = async (data: WorkoutForm) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
     const sets = parseInt(data.sets)
     const reps = parseInt(data.reps)
     const weight = isBodyweight ? (parseFloat(data.bodyweight) || 0) : parseFloat(data.weight)
@@ -40,6 +43,7 @@ export function LogWorkoutForm() {
     const { data: inserted, error } = await supabase
       .from('lifting_log')
       .insert({
+        user_id: user.id,
         date: data.date,
         lift: data.lift,
         weight: isBodyweight ? null : weight,
@@ -53,7 +57,7 @@ export function LogWorkoutForm() {
 
     if (error || !inserted) return
 
-    const isPR = await checkForPR(supabase, data.lift, est1rm, data.date, inserted.id)
+    const isPR = await checkForPR(supabase, data.lift, est1rm, data.date, inserted.id, user.id)
 
     if (isPR) {
       await supabase.from('lifting_log').update({ is_pr: true }).eq('id', inserted.id)

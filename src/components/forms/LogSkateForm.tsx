@@ -23,8 +23,12 @@ export function LogSkateForm() {
   const refreshXP = useStore((s) => s.refreshXP)
 
   const onSubmit = async (data: SkateForm) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
     const miles = parseFloat(data.miles)
     await supabase.from('skate_sessions').insert({
+      user_id: user.id,
       date: data.date,
       miles,
       duration: data.duration || null,

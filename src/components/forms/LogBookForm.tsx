@@ -31,6 +31,9 @@ export function LogBookForm() {
   const customGenre = watch('customGenre')
 
   const onSubmit = async (data: BookForm) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
     const finalGenre = data.genre === 'Other' && data.customGenre.trim()
       ? data.customGenre.trim()
       : data.genre
@@ -44,6 +47,7 @@ export function LogBookForm() {
     }
 
     await supabase.from('books').insert({
+      user_id: user.id,
       date_finished: data.date_finished,
       title: data.title,
       author: data.author || null,

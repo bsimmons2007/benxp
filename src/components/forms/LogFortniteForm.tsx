@@ -27,7 +27,11 @@ export function LogFortniteForm() {
   const win = watch('win')
 
   const onSubmit = async (data: FortniteForm) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
     await supabase.from('fortnite_games').insert({
+      user_id: user.id,
       date: data.date,
       mode: data.mode,
       season: data.season || null,

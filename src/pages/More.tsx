@@ -35,7 +35,10 @@ function ToReadList() {
   useEffect(() => { load() }, [])
 
   const onSubmit = async (data: ToReadForm) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
     await supabase.from('to_read').insert({
+      user_id: user.id,
       title: data.title,
       author: data.author || null,
       genre: data.genre || null,
@@ -144,7 +147,10 @@ function MoodSection() {
   useEffect(() => { loadRecent() }, [])
 
   const onSubmit = async (data: MoodForm) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
     await supabase.from('mood_log').insert({
+      user_id: user.id,
       date: data.date,
       mood: parseInt(data.mood),
       energy: parseInt(data.energy),

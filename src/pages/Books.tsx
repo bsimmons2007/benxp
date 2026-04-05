@@ -202,11 +202,15 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
   const allGenres = [...BASE_GENRES.filter((g) => g !== 'Other'), ...extraGenres, 'Other']
 
   const onSubmit = async (data: BookForm) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
     const finalGenre = data.genre === 'Other' && data.customGenre.trim() ? data.customGenre.trim() : data.genre
     if (data.genre === 'Other' && data.customGenre.trim() && !BASE_GENRES.includes(data.customGenre.trim()) && !extraGenres.includes(data.customGenre.trim())) {
       setExtraGenres((p) => [...p, data.customGenre.trim()])
     }
     await supabase.from('books').insert({
+      user_id: user.id,
       date_finished: data.date_finished,
       title: data.title,
       author: data.author || null,
@@ -280,7 +284,9 @@ function ToReadSection() {
   useEffect(() => { load() }, [])
 
   const onSubmit = async (data: ToReadForm) => {
-    await supabase.from('to_read').insert({ title: data.title, author: data.author || null, genre: data.genre || null, priority: data.priority })
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('to_read').insert({ user_id: user.id, title: data.title, author: data.author || null, genre: data.genre || null, priority: data.priority })
     reset()
     setShowForm(false)
     load()

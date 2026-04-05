@@ -58,7 +58,8 @@ export async function checkForPR(
   lift: string,
   newEst1RM: number,
   date: string,
-  currentRowId: string
+  currentRowId: string,
+  userId: string
 ): Promise<boolean> {
   const { data: existing } = await supabase
     .from('lifting_log')
@@ -71,7 +72,7 @@ export async function checkForPR(
   const previousBest = existing?.[0]?.est_1rm ?? 0
 
   if (newEst1RM > previousBest) {
-    await supabase.from('pr_history').insert({ date, lift, est_1rm: newEst1RM })
+    await supabase.from('pr_history').insert({ user_id: userId, date, lift, est_1rm: newEst1RM })
     return true
   }
   return false

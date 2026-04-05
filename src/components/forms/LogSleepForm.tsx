@@ -20,7 +20,11 @@ export function LogSleepForm() {
   const [toast, setToast] = useState<string | null>(null)
 
   const onSubmit = async (data: SleepForm) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
     await supabase.from('sleep_log').insert({
+      user_id: user.id,
       date: data.date,
       bedtime: data.bedtime || null,
       hours_slept: data.hours_slept ? parseFloat(data.hours_slept) : null,
