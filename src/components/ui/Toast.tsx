@@ -20,8 +20,8 @@ export function Toast({ message, onDone }: ToastProps) {
     <div
       className="fixed bottom-24 left-1/2 -translate-x-1/2 px-5 py-3 rounded-xl font-semibold text-sm shadow-lg transition-all duration-300 z-50"
       style={{
-        background: '#F5A623',
-        color: '#1A1A2E',
+        background: 'var(--accent)',
+        color: 'var(--base-bg)',
         opacity: visible ? 1 : 0,
         transform: `translateX(-50%) translateY(${visible ? 0 : 10}px)`,
       }}

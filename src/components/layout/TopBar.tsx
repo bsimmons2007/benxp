@@ -1,19 +1,33 @@
+import { useNavigate } from 'react-router-dom'
+
 interface TopBarProps {
   title?: string
+  hideSettings?: boolean
 }
 
-export function TopBar({ title = 'BenXP' }: TopBarProps) {
+export function TopBar({ title = 'BenXP', hideSettings = false }: TopBarProps) {
+  const navigate = useNavigate()
+
   return (
     <header
       className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 py-3 z-40"
-      style={{ background: '#1A1A2E', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+      style={{ background: 'rgba(10,12,28,0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
     >
-      <span className="text-lg font-bold" style={{ color: '#F5A623' }}>
+      <span className="text-2xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
         {title}
       </span>
-      <button style={{ color: '#888888' }} aria-label="Settings">
-        ⚙️
-      </button>
+      {!hideSettings ? (
+        <button
+          onClick={() => navigate('/settings')}
+          className="text-xl p-1"
+          style={{ color: '#888888' }}
+          aria-label="Settings"
+        >
+          ⚙️
+        </button>
+      ) : (
+        <div style={{ width: 28 }} />
+      )}
     </header>
   )
 }

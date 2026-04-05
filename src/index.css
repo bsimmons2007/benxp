@@ -1,21 +1,136 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* ── CSS Theme Variables ── */
+:root {
+  --accent:    #F5A623;
+  --accent-dim: rgba(245,166,35,0.2);
+  --orb1:      rgba(123,47,190,0.22);
+  --orb2:      rgba(26,188,156,0.16);
+  --orb3:      rgba(245,166,35,0.07);
+  --card-bg:   rgba(16,24,52,0.65);
+  --nav-bg:    rgba(8,10,24,0.9);
+  --base-bg:   #0d0d1a;
+  --bg-mid:    #12152b;
+  --bg-deep:   #0a1020;
 }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body, #root {
   height: 100%;
-  background: #1A1A2E;
   color: #CCCCCC;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  background: var(--base-bg);
 }
 
-::-webkit-scrollbar {
-  display: none;
+/* ── Layered background ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10%  0%,  var(--orb1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%, var(--orb2) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 80%  10%, var(--orb3) 0%, transparent 50%),
+    linear-gradient(160deg, var(--base-bg) 0%, var(--bg-mid) 50%, var(--bg-deep) 100%);
+  pointer-events: none;
+  transition: background 0.6s ease;
 }
+
+/* Subtle grid for depth */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, black 30%, transparent 100%);
+}
+
+#root { position: relative; z-index: 1; }
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulseAccent {
+  0%,100% { box-shadow: 0 0 0 0 var(--accent-dim); }
+  50%      { box-shadow: 0 0 20px 6px var(--accent-dim); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.75); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes glowPulse {
+  0%,100% { text-shadow: 0 0 20px var(--accent-dim); }
+  50%      { text-shadow: 0 0 60px var(--accent), 0 0 100px var(--accent-dim); }
+}
+@keyframes orb {
+  0%,100% { transform: translateY(0px) scale(1); }
+  50%      { transform: translateY(-14px) scale(1.05); }
+}
+@keyframes borderGlow {
+  0%,100% { border-color: var(--accent-dim); }
+  50%      { border-color: var(--accent); }
+}
+@keyframes progressFill {
+  from { width: 0%; }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes starFill {
+  from { opacity: 0; transform: scale(0) rotate(-30deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.fade-in        { animation: fadeInUp 0.35s ease both; }
+.card-animate   { animation: fadeInUp 0.4s ease both; }
+.card-animate:nth-child(1) { animation-delay: 0.04s; }
+.card-animate:nth-child(2) { animation-delay: 0.08s; }
+.card-animate:nth-child(3) { animation-delay: 0.12s; }
+.card-animate:nth-child(4) { animation-delay: 0.16s; }
+.card-animate:nth-child(5) { animation-delay: 0.20s; }
+.card-animate:nth-child(6) { animation-delay: 0.24s; }
+
+.xp-number      { animation: countUp 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+.glow-pulse     { animation: glowPulse 3s ease-in-out infinite; }
+.pr-badge       { animation: pulseAccent 2.5s ease-in-out infinite; }
+.orb-float      { animation: orb 6s ease-in-out infinite; }
+.border-glow    { animation: borderGlow 2s ease-in-out infinite; }
+.slide-in       { animation: slideIn 0.3s ease both; }
+.pop-in         { animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
+.star-fill      { animation: starFill 0.2s ease both; }
+
+.progress-bar-fill { animation: progressFill 1s cubic-bezier(0.22,1,0.36,1) both; }
+
+.shimmer {
+  background: linear-gradient(90deg, #16213E 25%, #1e2d4a 50%, #16213E 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Accent-colored text utility */
+.accent { color: var(--accent) !important; }
+.accent-bg { background: var(--accent) !important; }
+.accent-border { border-color: var(--accent) !important; }
+
+::-webkit-scrollbar { display: none; }

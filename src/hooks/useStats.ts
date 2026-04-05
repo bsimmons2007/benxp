@@ -7,7 +7,7 @@ interface Stats {
   deadliftPR: number | null
   totalMiles: number
   books2026: number
-  winRate: number
+  winCount: number
 }
 
 export function useStats() {
@@ -17,7 +17,7 @@ export function useStats() {
     deadliftPR: null,
     totalMiles: 0,
     books2026: 0,
-    winRate: 0,
+    winCount: 0,
   })
   const [loading, setLoading] = useState(true)
 
@@ -45,8 +45,7 @@ export function useStats() {
 
       const totalMiles =
         skate.data?.reduce((sum: number, r: { miles: number }) => sum + r.miles, 0) ?? 0
-      const wins = games.data?.filter((g: { win: boolean }) => g.win).length ?? 0
-      const total = games.data?.length ?? 0
+      const winCount = games.data?.length ?? 0
 
       setStats({
         benchPR: prMap['Bench'] ?? null,
@@ -54,7 +53,7 @@ export function useStats() {
         deadliftPR: prMap['Deadlift'] ?? null,
         totalMiles,
         books2026: books.data?.length ?? 0,
-        winRate: total > 0 ? Math.round((wins / total) * 100) : 0,
+        winCount,
       })
       setLoading(false)
     }

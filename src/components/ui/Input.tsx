@@ -11,19 +11,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-1">
         {label && (
-          <label className="text-sm font-medium" style={{ color: '#888888' }}>
+          <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>
             {label}
           </label>
         )}
         <input
           ref={ref}
-          className={`px-3 py-2 rounded-lg text-white outline-none ${className}`}
+          className={`px-3 py-3 rounded-lg text-white outline-none text-base ${className}`}
           style={{
             background: '#0D1B2A',
             border: '1px solid rgba(255,255,255,0.1)',
           }}
           onFocus={(e) => {
-            e.target.style.border = '1px solid #F5A623'
+            e.target.style.border = '1px solid var(--accent)'
             props.onFocus?.(e)
           }}
           onBlur={(e) => {

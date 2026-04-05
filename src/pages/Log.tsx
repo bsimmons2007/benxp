@@ -1,49 +1,62 @@
 import { useState } from 'react'
 import { TopBar } from '../components/layout/TopBar'
-import { PageWrapper } from '../components/layout/PageWrapper'
 import { LogWorkoutForm } from '../components/forms/LogWorkoutForm'
 import { LogSkateForm } from '../components/forms/LogSkateForm'
 import { LogFortniteForm } from '../components/forms/LogFortniteForm'
 import { LogBookForm } from '../components/forms/LogBookForm'
 import { LogSleepForm } from '../components/forms/LogSleepForm'
 
-const TABS = ['Workout', 'Skate', 'Fortnite', 'Book', 'Sleep'] as const
-type Tab = typeof TABS[number]
+const TABS = [
+  { key: 'Workout',  label: 'Workout',  icon: '🏋️' },
+  { key: 'Skate',    label: 'Skate',    icon: '🛼' },
+  { key: 'Fortnite', label: 'Fortnite', icon: '🎮' },
+  { key: 'Book',     label: 'Book',     icon: '📚' },
+  { key: 'Sleep',    label: 'Sleep',    icon: '😴' },
+] as const
+
+type Tab = typeof TABS[number]['key']
 
 export function Log() {
   const [active, setActive] = useState<Tab>('Workout')
 
   return (
-    <>
+    <div className="min-h-screen pb-28">
       <TopBar title="Log Activity" />
-      <PageWrapper>
-        {/* Tab switcher */}
-        <div
-          className="flex overflow-x-auto gap-1 mb-6 pb-1"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActive(tab)}
-              className="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors"
-              style={
-                active === tab
-                  ? { background: '#F5A623', color: '#1A1A2E' }
-                  : { background: '#16213E', color: '#888888' }
-              }
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
 
-        {active === 'Workout' && <LogWorkoutForm />}
-        {active === 'Skate' && <LogSkateForm />}
+      {/* Sticky tab bar sits just below TopBar */}
+      <div
+        className="fixed left-0 right-0 z-30 flex px-3 py-2 gap-2"
+        style={{
+          top: 52,
+          background: 'var(--base-bg)',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActive(tab.key)}
+            className="flex flex-col items-center justify-center gap-1 py-2 rounded-xl font-semibold transition-colors flex-1"
+            style={
+              active === tab.key
+                ? { background: 'var(--accent)', color: 'var(--base-bg)' }
+                : { background: 'rgba(255,255,255,0.05)', color: '#888888' }
+            }
+          >
+            <span className="text-2xl">{tab.icon}</span>
+            <span className="text-xs">{tab.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Content scrolls below both bars — top padding accounts for TopBar + tab bar */}
+      <div className="px-4" style={{ paddingTop: 148 }}>
+        {active === 'Workout'  && <LogWorkoutForm />}
+        {active === 'Skate'    && <LogSkateForm />}
         {active === 'Fortnite' && <LogFortniteForm />}
-        {active === 'Book' && <LogBookForm />}
-        {active === 'Sleep' && <LogSleepForm />}
-      </PageWrapper>
-    </>
+        {active === 'Book'     && <LogBookForm />}
+        {active === 'Sleep'    && <LogSleepForm />}
+      </div>
+    </div>
   )
 }

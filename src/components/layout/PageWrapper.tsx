@@ -6,7 +6,10 @@ interface PageWrapperProps {
 
 export function PageWrapper({ children }: PageWrapperProps) {
   return (
-    <main className="pt-14 pb-20 px-4 min-h-screen" style={{ background: '#1A1A2E' }}>
+    <main
+      className="pb-24 px-4 min-h-screen fade-in"
+      style={{ paddingTop: 80 }}
+    >
       {children}
     </main>
   )

@@ -76,31 +76,39 @@ export function Home() {
       <TopBar />
       <PageWrapper>
         {/* Level hero */}
-        <div className="text-center py-6">
-          <h1 className="text-6xl font-bold" style={{ color: '#F5A623' }}>
+        <div className="text-center py-8 relative">
+          {/* Decorative orbs */}
+          <div className="orb-float absolute" style={{ width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(123,47,190,0.25) 0%, transparent 70%)', top: 0, left: '10%', filter: 'blur(8px)' }} />
+          <div className="orb-float absolute" style={{ width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle, rgba(26,188,156,0.2) 0%, transparent 70%)', top: 20, right: '10%', filter: 'blur(6px)', animationDelay: '2s' }} />
+
+          <h1 className="text-8xl font-bold xp-number glow-pulse" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
             {loading ? '—' : level}
           </h1>
-          <p className="text-sm font-medium mt-1" style={{ color: '#888' }}>
+          <p className="text-sm font-medium mt-1 uppercase tracking-widest" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>
             Level
           </p>
-          <p className="text-sm mt-1" style={{ color: '#CCCCCC' }}>
-            {totalXP.toLocaleString()} XP · {toNext.toLocaleString()} to next level
+          <p className="text-sm mt-2" style={{ color: '#CCCCCC' }}>
+            {totalXP.toLocaleString()} XP · <span style={{ color: 'var(--accent)' }}>{toNext.toLocaleString()}</span> to next level
           </p>
         </div>
 
         {/* XP bar */}
         <div className="mb-6">
-          <ProgressBar value={progress} />
+          <div className="flex justify-between text-xs mb-1" style={{ color: '#888' }}>
+            <span>Lvl {level}</span>
+            <span>Lvl {level + 1}</span>
+          </div>
+          <ProgressBar value={progress} height={18} />
         </div>
 
         {/* Stat grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-6 card-animate">
           <StatCard label="Bench PR" value={stats.benchPR ? stats.benchPR.toFixed(1) : '—'} unit="lbs" />
           <StatCard label="Squat PR" value={stats.squatPR ? stats.squatPR.toFixed(1) : '—'} unit="lbs" />
           <StatCard label="Deadlift PR" value={stats.deadliftPR ? stats.deadliftPR.toFixed(1) : '—'} unit="lbs" />
           <StatCard label="Total Miles" value={stats.totalMiles.toFixed(1)} unit="mi" />
           <StatCard label="Books 2026" value={stats.books2026} />
-          <StatCard label="Win Rate" value={`${stats.winRate}%`} />
+          <StatCard label="Fortnite Wins" value={stats.winCount} />
         </div>
 
         {/* Recent activity */}

@@ -10,8 +10,8 @@ export function Button({ children, variant = 'primary', fullWidth = false, class
   const base = `px-4 py-2 rounded-lg font-semibold transition-opacity disabled:opacity-50 ${fullWidth ? 'w-full' : ''}`
   const styles =
     variant === 'primary'
-      ? { background: '#F5A623', color: '#1A1A2E' }
-      : { background: 'transparent', color: '#F5A623', border: '1px solid #F5A623' }
+      ? { background: 'var(--accent)', color: 'var(--base-bg)' }
+      : { background: 'transparent', color: 'var(--accent)', border: '1px solid var(--accent)' }
 
   return (
     <button className={`${base} ${className}`} style={styles} {...props}>

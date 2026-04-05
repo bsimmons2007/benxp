@@ -39,7 +39,7 @@ export function BodyweightChart() {
           width={40}
         />
         <Tooltip
-          contentStyle={{ background: '#16213E', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
+          contentStyle={{ background: 'var(--bg-mid)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           labelFormatter={(label: any) => (typeof label === 'string' ? formatDate(label) : label)}
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,9 +48,9 @@ export function BodyweightChart() {
         <Line
           type="monotone"
           dataKey="weight_lbs"
-          stroke="#F5A623"
+          stroke="var(--accent)"
           strokeWidth={2}
-          dot={{ fill: '#F5A623', r: 4 }}
+          dot={{ fill: 'var(--accent)', r: 4 }}
         />
       </LineChart>
     </ResponsiveContainer>

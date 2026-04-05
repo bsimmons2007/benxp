@@ -65,7 +65,7 @@ function ToReadList() {
           <div className="flex gap-2">
             <Input label="Genre" type="text" className="flex-1" {...register('genre')} />
             <div className="flex flex-col gap-1 flex-1">
-              <label className="text-sm font-medium" style={{ color: '#888' }}>Priority</label>
+              <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Priority</label>
               <select
                 {...register('priority')}
                 className="px-3 py-2 rounded-lg text-white outline-none"
@@ -113,7 +113,7 @@ interface MoodForm {
 function SliderField({ label, name, register }: { label: string; name: string; register: ReturnType<typeof useForm<MoodForm>>['register'] }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium" style={{ color: '#888' }}>{label} (1-10)</label>
+      <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>{label} (1-10)</label>
       <input
         type="range"
         min="1"
@@ -166,7 +166,7 @@ function MoodSection() {
         <SliderField label="Stress" name="stress" register={register} />
         <Input label="Activities" type="text" placeholder="Gym, reading, skating..." {...register('activities')} />
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium" style={{ color: '#888' }}>Notes</label>
+          <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Notes</label>
           <textarea
             {...register('notes')}
             rows={3}

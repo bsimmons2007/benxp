@@ -48,7 +48,7 @@ export function LogFortniteForm() {
       <Input label="Date" type="date" {...register('date', { required: true })} />
 
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium" style={{ color: '#888888' }}>Mode</label>
+        <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Mode</label>
         <select
           {...register('mode')}
           className="px-3 py-2 rounded-lg text-white outline-none"
