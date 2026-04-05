@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 interface AuthForm {
@@ -11,6 +12,7 @@ export function Login() {
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [error, setError] = useState<string | null>(null)
   const { register, handleSubmit, formState: { isSubmitting } } = useForm<AuthForm>()
+  const navigate = useNavigate()
 
   const onSubmit = async (data: AuthForm) => {
     setError(null)
@@ -19,6 +21,7 @@ export function Login() {
         ? await supabase.auth.signInWithPassword({ email: data.email, password: data.password })
         : await supabase.auth.signUp({ email: data.email, password: data.password })
     if (error) setError(error.message)
+    else navigate('/')
   }
 
   return (
