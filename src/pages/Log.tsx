@@ -1,17 +1,11 @@
 import { useState } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { LogWorkoutForm } from '../components/forms/LogWorkoutForm'
-import { LogSkateForm } from '../components/forms/LogSkateForm'
 import { LogFortniteForm } from '../components/forms/LogFortniteForm'
-import { LogBookForm } from '../components/forms/LogBookForm'
-import { LogSleepForm } from '../components/forms/LogSleepForm'
 
 const TABS = [
   { key: 'Workout',  label: 'Workout',  icon: '🏋️' },
-  { key: 'Skate',    label: 'Skate',    icon: '🛼' },
   { key: 'Fortnite', label: 'Fortnite', icon: '🎮' },
-  { key: 'Book',     label: 'Book',     icon: '📚' },
-  { key: 'Sleep',    label: 'Sleep',    icon: '😴' },
 ] as const
 
 type Tab = typeof TABS[number]['key']
@@ -52,10 +46,7 @@ export function Log() {
       {/* Content scrolls below both bars — top padding accounts for TopBar + tab bar */}
       <div className="px-4" style={{ paddingTop: 148 }}>
         {active === 'Workout'  && <LogWorkoutForm />}
-        {active === 'Skate'    && <LogSkateForm />}
         {active === 'Fortnite' && <LogFortniteForm />}
-        {active === 'Book'     && <LogBookForm />}
-        {active === 'Sleep'    && <LogSleepForm />}
       </div>
     </div>
   )

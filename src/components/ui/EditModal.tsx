@@ -12,13 +12,13 @@ interface EditModalProps {
 export function EditModal({ title, onClose, onDelete, onSave, saving, children }: EditModalProps) {
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col justify-end"
-      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
-        className="rounded-t-2xl px-4 pt-4 pb-8 pop-in"
-        style={{ background: 'rgba(12,16,36,0.98)', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '85vh', overflowY: 'auto' }}
+        className="w-full rounded-2xl px-5 pt-5 pb-6 pop-in"
+        style={{ background: 'rgba(18,22,46,0.98)', border: '1px solid rgba(255,255,255,0.12)', maxHeight: '80vh', overflowY: 'auto', maxWidth: 480 }}
       >
         {/* Handle bar */}
         <div className="w-10 h-1 rounded-full mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.2)' }} />

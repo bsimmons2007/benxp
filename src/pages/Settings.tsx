@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
 import { useXP } from '../hooks/useXP'
@@ -60,7 +60,20 @@ export function Settings() {
   const navigate = useNavigate()
   const { totalXP, level } = useXP()
   const userName = useUserName()
+  const [editingName, setEditingName] = useState(false)
+  const [nameInput, setNameInput] = useState('')
+  const [nameSaving, setNameSaving] = useState(false)
+  const nameRef = useRef<HTMLInputElement>(null)
   const [activeTheme, setActiveTheme] = useState<Theme>(loadTheme)
+
+  async function saveName() {
+    if (!nameInput.trim()) return
+    setNameSaving(true)
+    await supabase.auth.updateUser({ data: { name: nameInput.trim() } })
+    setNameSaving(false)
+    setEditingName(false)
+    window.location.reload()
+  }
 
   async function logout() {
     await supabase.auth.signOut()
@@ -91,8 +104,30 @@ export function Settings() {
           >
             {userName ? userName[0].toUpperCase() : '?'}
           </div>
-          <div>
-            <p className="text-white font-bold text-lg" style={{ fontFamily: 'Cinzel, serif' }}>{userName || '—'}</p>
+          <div className="flex-1">
+            {editingName ? (
+              <div className="flex items-center gap-2">
+                <input
+                  ref={nameRef}
+                  autoFocus
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditingName(false) }}
+                  className="flex-1 px-3 py-1.5 rounded-lg text-white outline-none text-base"
+                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--accent)' }}
+                  placeholder="Your name"
+                />
+                <button onClick={saveName} disabled={nameSaving} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{ background: 'var(--accent)', color: 'var(--base-bg)' }}>
+                  {nameSaving ? '...' : 'Save'}
+                </button>
+                <button onClick={() => setEditingName(false)} className="px-2 py-1.5 rounded-lg text-xs" style={{ color: '#888', background: 'rgba(255,255,255,0.06)' }}>✕</button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <p className="text-white font-bold text-lg" style={{ fontFamily: 'Cinzel, serif' }}>{userName || '—'}</p>
+                <button onClick={() => { setNameInput(userName); setEditingName(true) }} className="text-xs px-2 py-0.5 rounded" style={{ color: '#888', background: 'rgba(255,255,255,0.06)' }}>✏️</button>
+              </div>
+            )}
             <p style={{ color: '#888', fontSize: 14 }}>Level {level} · {totalXP.toLocaleString()} XP</p>
           </div>
         </Card>
@@ -101,7 +136,7 @@ export function Settings() {
         <SectionHeader title="Color Scheme" />
         <Card>
           <p className="text-sm mb-4" style={{ color: '#888' }}>Pick a theme — changes apply instantly.</p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             {THEMES.map((t) => (
               <ThemeSwatch key={t.id} theme={t} active={activeTheme.id === t.id} onSelect={() => handleTheme(t)} />
             ))}
