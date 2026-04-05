@@ -20,7 +20,7 @@ export function Log() {
   const [active, setActive] = useState<Tab>('Workout')
 
   return (
-    <div className="min-h-screen pb-28">
+    <div className="min-h-screen" style={{ paddingBottom: 120 }}>
       <TopBar title="Log Activity" />
 
       {/* Sticky tab bar sits just below TopBar */}
