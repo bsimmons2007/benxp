@@ -9,14 +9,14 @@ interface StatCardProps {
 
 export function StatCard({ label, value, unit, highlight }: StatCardProps) {
   return (
-    <Card className={`card-animate ${highlight ? 'pr-badge' : ''}`}>
-      <p className="text-sm font-medium mb-1" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>
+    <Card className={`card-animate ${highlight ? 'pr-badge' : ''} !p-3`}>
+      <p className="font-medium mb-0.5 truncate" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif', fontSize: 11 }}>
         {label}
       </p>
-      <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>
+      <p className="text-lg font-bold leading-tight" style={{ color: 'var(--accent)' }}>
         {value}
         {unit && (
-          <span className="text-sm font-normal ml-1" style={{ color: '#888888' }}>
+          <span className="font-normal ml-0.5" style={{ color: '#888888', fontSize: 10 }}>
             {unit}
           </span>
         )}

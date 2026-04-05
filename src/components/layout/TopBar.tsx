@@ -1,12 +1,15 @@
 import { useNavigate } from 'react-router-dom'
+import { useUserName } from '../../hooks/useUserName'
 
 interface TopBarProps {
   title?: string
   hideSettings?: boolean
 }
 
-export function TopBar({ title = 'BenXP', hideSettings = false }: TopBarProps) {
+export function TopBar({ title, hideSettings = false }: TopBarProps) {
   const navigate = useNavigate()
+  const userName = useUserName()
+  const displayTitle = title ?? (userName ? `${userName}XP` : 'YouXP')
 
   return (
     <header
@@ -14,7 +17,7 @@ export function TopBar({ title = 'BenXP', hideSettings = false }: TopBarProps) {
       style={{ background: 'rgba(10,12,28,0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
     >
       <span className="text-2xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
-        {title}
+        {displayTitle}
       </span>
       {!hideSettings ? (
         <button

@@ -6,6 +6,7 @@ import { StatCard } from '../components/ui/StatCard'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { useXP } from '../hooks/useXP'
 import { useStats } from '../hooks/useStats'
+import { useUserName } from '../hooks/useUserName'
 import { supabase } from '../lib/supabase'
 import { formatDate } from '../lib/utils'
 import { xpForLevel } from '../lib/xp'
@@ -69,6 +70,7 @@ export function Home() {
   const { totalXP, level, progress, loading } = useXP()
   const { stats } = useStats()
   const activity = useRecentActivity()
+  const userName = useUserName()
   const toNext = xpForLevel(level + 1) - totalXP
 
   return (
@@ -85,7 +87,7 @@ export function Home() {
             {loading ? '—' : level}
           </h1>
           <p className="text-sm font-medium mt-1 uppercase tracking-widest" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>
-            Level
+            {userName ? `${userName}XP` : 'YouXP'} · Level
           </p>
           <p className="text-sm mt-2" style={{ color: '#CCCCCC' }}>
             {totalXP.toLocaleString()} XP · <span style={{ color: 'var(--accent)' }}>{toNext.toLocaleString()}</span> to next level
@@ -102,7 +104,7 @@ export function Home() {
         </div>
 
         {/* Stat grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6 card-animate">
+        <div className="grid grid-cols-3 gap-2 mb-6 card-animate">
           <StatCard label="Bench PR" value={stats.benchPR ? stats.benchPR.toFixed(1) : '—'} unit="lbs" />
           <StatCard label="Squat PR" value={stats.squatPR ? stats.squatPR.toFixed(1) : '—'} unit="lbs" />
           <StatCard label="Deadlift PR" value={stats.deadliftPR ? stats.deadliftPR.toFixed(1) : '—'} unit="lbs" />

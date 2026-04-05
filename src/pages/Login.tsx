@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 interface AuthForm {
+  name: string
   email: string
   password: string
 }
@@ -19,7 +20,7 @@ export function Login() {
     const { error } =
       mode === 'login'
         ? await supabase.auth.signInWithPassword({ email: data.email, password: data.password })
-        : await supabase.auth.signUp({ email: data.email, password: data.password })
+        : await supabase.auth.signUp({ email: data.email, password: data.password, options: { data: { name: data.name.trim() } } })
     if (error) setError(error.message)
     else navigate('/')
   }
@@ -40,7 +41,7 @@ export function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-6xl font-bold glow-pulse" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
-            BenXP
+            YouXP
           </h1>
           <p className="mt-2 text-sm uppercase tracking-widest" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>
             Your life. Gamified.
@@ -69,6 +70,20 @@ export function Login() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            {mode === 'signup' && (
+              <div className="flex flex-col gap-1">
+                <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Your Name</label>
+                <input
+                  type="text"
+                  placeholder="Ben"
+                  {...register('name', { required: mode === 'signup' })}
+                  className="px-4 py-3 rounded-xl text-white outline-none text-base"
+                  style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  onFocus={(e) => e.target.style.borderColor = 'var(--accent)'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+            )}
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Email</label>
               <input

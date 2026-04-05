@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
 import { useXP } from '../hooks/useXP'
+import { useUserName } from '../hooks/useUserName'
 import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
@@ -30,7 +31,7 @@ function ThemeSwatch({ theme, active, onSelect }: { theme: Theme; active: boolea
   return (
     <button
       onClick={onSelect}
-      className="flex flex-col items-center gap-2 p-3 rounded-xl transition-all"
+      className="flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all"
       style={{
         background: active ? `${theme.accent}22` : 'rgba(255,255,255,0.03)',
         border: active ? `2px solid ${theme.accent}` : '2px solid rgba(255,255,255,0.06)',
@@ -39,16 +40,16 @@ function ThemeSwatch({ theme, active, onSelect }: { theme: Theme; active: boolea
       }}
     >
       {/* Mini preview orbs */}
-      <div className="relative w-10 h-10 rounded-full overflow-hidden" style={{ background: theme.baseBg }}>
-        <div className="absolute" style={{ width: 24, height: 24, borderRadius: '50%', background: theme.orb1, top: -4, left: -4, filter: 'blur(4px)' }} />
-        <div className="absolute" style={{ width: 20, height: 20, borderRadius: '50%', background: theme.orb2, bottom: -4, right: -4, filter: 'blur(4px)' }} />
-        <div className="absolute inset-0 flex items-center justify-center text-base">{theme.emoji}</div>
+      <div className="relative w-8 h-8 rounded-full overflow-hidden" style={{ background: theme.baseBg }}>
+        <div className="absolute" style={{ width: 18, height: 18, borderRadius: '50%', background: theme.orb1, top: -2, left: -2, filter: 'blur(3px)' }} />
+        <div className="absolute" style={{ width: 16, height: 16, borderRadius: '50%', background: theme.orb2, bottom: -2, right: -2, filter: 'blur(3px)' }} />
+        <div className="absolute inset-0 flex items-center justify-center text-xs">{theme.emoji}</div>
       </div>
       <div
-        className="w-6 h-6 rounded-full"
-        style={{ background: theme.accent, boxShadow: `0 0 8px ${theme.accent}88` }}
+        className="w-4 h-4 rounded-full"
+        style={{ background: theme.accent, boxShadow: `0 0 6px ${theme.accent}88` }}
       />
-      <p className="text-xs font-semibold text-center leading-tight" style={{ color: active ? theme.accent : '#888', maxWidth: 64 }}>
+      <p className="text-xs font-semibold text-center leading-tight" style={{ color: active ? theme.accent : '#888', maxWidth: 64, fontSize: 10 }}>
         {theme.name}
       </p>
     </button>
@@ -58,6 +59,7 @@ function ThemeSwatch({ theme, active, onSelect }: { theme: Theme; active: boolea
 export function Settings() {
   const navigate = useNavigate()
   const { totalXP, level } = useXP()
+  const userName = useUserName()
   const [activeTheme, setActiveTheme] = useState<Theme>(loadTheme)
 
   async function logout() {
@@ -85,12 +87,12 @@ export function Settings() {
         <Card className="flex items-center gap-4 mb-2">
           <div
             className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0"
-            style={{ background: 'var(--accent)', color: '#1A1A2E', fontFamily: 'Cinzel, serif' }}
+            style={{ background: 'var(--accent)', color: 'var(--base-bg)', fontFamily: 'Cinzel, serif' }}
           >
-            B
+            {userName ? userName[0].toUpperCase() : '?'}
           </div>
           <div>
-            <p className="text-white font-bold text-lg" style={{ fontFamily: 'Cinzel, serif' }}>Ben</p>
+            <p className="text-white font-bold text-lg" style={{ fontFamily: 'Cinzel, serif' }}>{userName || '—'}</p>
             <p style={{ color: '#888', fontSize: 14 }}>Level {level} · {totalXP.toLocaleString()} XP</p>
           </div>
         </Card>
@@ -141,13 +143,9 @@ export function Settings() {
           <div className="flex items-center justify-between py-3 px-1" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
             <div className="flex items-center gap-3">
               <span className="text-xl">⚡</span>
-              <span className="text-white" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17 }}>BenXP</span>
+              <span className="text-white" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17 }}>YouXP</span>
             </div>
             <span style={{ color: '#888', fontSize: 14 }}>v1.0.0</span>
-          </div>
-          <div className="flex items-center gap-3 py-3 px-1">
-            <span className="text-xl">👤</span>
-            <span className="text-white" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17 }}>Built by Ben</span>
           </div>
         </Card>
 
