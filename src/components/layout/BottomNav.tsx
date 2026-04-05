@@ -5,6 +5,7 @@ const tabs = [
   { to: '/log',        label: 'Log',     icon: '➕' },
   { to: '/records',    label: 'Records', icon: '📊' },
   { to: '/books',      label: 'Books',   icon: '📚' },
+  { to: '/skate',      label: 'Skate',   icon: '🛼' },
   { to: '/sleep',      label: 'Sleep',   icon: '😴' },
   { to: '/challenges', label: 'Quests',  icon: '⚔️' },
 ]
@@ -26,8 +27,8 @@ export function BottomNav() {
             transform: isActive ? 'translateY(-2px)' : 'none',
           })}
         >
-          <span className="text-lg">{tab.icon}</span>
-          <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.02em' }}>{tab.label}</span>
+          <span style={{ fontSize: 18 }}>{tab.icon}</span>
+          <span style={{ fontSize: 8, fontWeight: 600, letterSpacing: '0.01em' }}>{tab.label}</span>
         </NavLink>
       ))}
     </nav>

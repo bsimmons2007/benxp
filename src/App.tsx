@@ -8,6 +8,7 @@ import { Records } from './pages/Records'
 import { Challenges } from './pages/Challenges'
 import { Books } from './pages/Books'
 import { Sleep } from './pages/Sleep'
+import { Skate } from './pages/Skate'
 import { More } from './pages/More'
 import { Settings } from './pages/Settings'
 import { Login } from './pages/Login'
@@ -41,6 +42,7 @@ function AppInner() {
         <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
         <Route path="/books" element={<ProtectedRoute><Books /></ProtectedRoute>} />
         <Route path="/sleep" element={<ProtectedRoute><Sleep /></ProtectedRoute>} />
+        <Route path="/skate" element={<ProtectedRoute><Skate /></ProtectedRoute>} />
         <Route path="/more" element={<ProtectedRoute><More /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       </Routes>
