@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { BottomNav } from './components/layout/BottomNav'
@@ -27,13 +27,12 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
-export default function App() {
-  useEffect(() => {
-    applyTheme(loadTheme())
-  }, [])
+function AppInner() {
+  const location = useLocation()
+  const showNav = location.pathname !== '/login'
 
   return (
-    <BrowserRouter>
+    <>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
@@ -45,7 +44,19 @@ export default function App() {
         <Route path="/more" element={<ProtectedRoute><More /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       </Routes>
-      <BottomNav />
+      {showNav && <BottomNav />}
+    </>
+  )
+}
+
+export default function App() {
+  useEffect(() => {
+    applyTheme(loadTheme())
+  }, [])
+
+  return (
+    <BrowserRouter>
+      <AppInner />
     </BrowserRouter>
   )
 }
