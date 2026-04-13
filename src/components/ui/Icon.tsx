@@ -346,6 +346,14 @@ export const MountainIcon: IconComponent = ({ size = 20, color = 'currentColor',
   </svg>
 )
 
+export const TerminalIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <rect x="2" y="3.5" width="16" height="13" rx="2" />
+    <path d="M6 9l3.5 3L6 15" />
+    <path d="M13 15h3" />
+  </svg>
+)
+
 // ── Map: section key → icon component ─────────────────────────
 
 const SECTION_ICON_MAP: Record<string, IconComponent> = {
