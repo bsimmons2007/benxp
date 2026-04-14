@@ -45,9 +45,23 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   const [toast, setToast] = useState<string | null>(null)
   const refreshXP       = useStore((s) => s.refreshXP)
   const refreshActivity = useStore((s) => s.refreshActivity)
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<SleepForm>({
+  const { register, handleSubmit, reset, watch, setValue, formState: { isSubmitting } } = useForm<SleepForm>({
     defaultValues: { date: today(), bedtime: '', hours_slept: '', wake_time: '' },
   })
+
+  // Auto-calculate hours slept whenever bedtime or wake_time changes
+  const watchedBedtime  = watch('bedtime')
+  const watchedWakeTime = watch('wake_time')
+  useEffect(() => {
+    if (watchedBedtime && watchedWakeTime) {
+      const [bh, bm] = watchedBedtime.split(':').map(Number)
+      const [wh, wm] = watchedWakeTime.split(':').map(Number)
+      let bedMins  = bh * 60 + bm
+      let wakeMins = wh * 60 + wm
+      if (wakeMins <= bedMins) wakeMins += 24 * 60   // crossed midnight
+      setValue('hours_slept', ((wakeMins - bedMins) / 60).toFixed(1))
+    }
+  }, [watchedBedtime, watchedWakeTime, setValue])
 
   const onSubmit = async (data: SleepForm) => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -83,10 +97,13 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <Input label="Date"        type="date"   {...register('date', { required: true })} />
-            <Input label="Bedtime"     type="time"   {...register('bedtime')} />
-            <Input label="Hours Slept" type="number" step="0.1" placeholder="7.5" {...register('hours_slept', { required: true })} />
-            <Input label="Wake Up"     type="time"   {...register('wake_time')} />
+            <Input label="Date"     type="date" {...register('date', { required: true })} />
+            <Input label="Bedtime"  type="time" {...register('bedtime')} />
+            <Input label="Wake Up"  type="time" {...register('wake_time')} />
+            <Input label="Hours Slept (auto-calculated)" type="number" step="0.1" placeholder="7.5"
+              {...register('hours_slept', { required: true })}
+              style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--accent)' }}
+            />
             <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Sleep'}</Button>
           </form>
         </div>

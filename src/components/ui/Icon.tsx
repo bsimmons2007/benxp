@@ -354,6 +354,16 @@ export const TerminalIcon: IconComponent = ({ size = 20, color = 'currentColor',
   </svg>
 )
 
+export const BasketballIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <circle cx="10" cy="10" r="8" />
+    <path d="M2 10h16" />
+    <path d="M10 2v16" />
+    <path d="M4.5 4.5c3 3 3 8.5 0 11" />
+    <path d="M15.5 4.5c-3 3-3 8.5 0 11" />
+  </svg>
+)
+
 // ── Map: section key → icon component ─────────────────────────
 
 const SECTION_ICON_MAP: Record<string, IconComponent> = {
@@ -366,6 +376,7 @@ const SECTION_ICON_MAP: Record<string, IconComponent> = {
   mood:       BrainIcon,
   cardio:     RunIcon,
   water:      DropletIcon,
+  basketball: BasketballIcon,
 }
 
 const ACTIVITY_ICON_MAP: Record<string, IconComponent> = {

@@ -27,6 +27,7 @@ import { PRFeed } from './pages/PRFeed'
 import { Strength } from './pages/Strength'
 import { Measurements } from './pages/Measurements'
 import { ResetPassword } from './pages/ResetPassword'
+import { Basketball } from './pages/Basketball'
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
 import { useAuth } from './hooks/useAuth'
@@ -75,6 +76,7 @@ function AppInner() {
         <Route path="/pr-feed"    element={<ProtectedRoute><PRFeed /></ProtectedRoute>} />
         <Route path="/strength"      element={<ProtectedRoute><Strength /></ProtectedRoute>} />
         <Route path="/measurements" element={<ProtectedRoute><Measurements /></ProtectedRoute>} />
+        <Route path="/basketball"   element={<ProtectedRoute><Basketball /></ProtectedRoute>} />
       </Routes>
       {showNav && <BottomNav />}
       {showNav && <SideNav />}

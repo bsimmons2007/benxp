@@ -64,6 +64,25 @@ export interface FortniteGame {
   rank_name: string | null
 }
 
+export interface BasketballSession {
+  id: string
+  created_at: string
+  date: string
+  fg_made: number
+  fg_attempted: number
+  three_made: number
+  three_attempted: number
+  ft_made: number
+  ft_attempted: number
+  points: number
+  assists: number
+  rebounds: number
+  steals: number
+  blocks: number
+  turnovers: number
+  notes: string | null
+}
+
 export interface Book {
   id: string
   created_at: string
