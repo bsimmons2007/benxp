@@ -47,10 +47,12 @@ interface BbForm {
 }
 
 function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
-  const [open, setOpen]   = useState(false)
-  const [toast, setToast] = useState<string | null>(null)
-  const refreshXP         = useStore(s => s.refreshXP)
-  const refreshActivity   = useStore(s => s.refreshActivity)
+  const [open,        setOpen]        = useState(false)
+  const [toast,       setToast]       = useState<string | null>(null)
+  const [showShooting, setShowShooting] = useState(true)
+  const [showBox,      setShowBox]      = useState(true)
+  const refreshXP       = useStore(s => s.refreshXP)
+  const refreshActivity = useStore(s => s.refreshActivity)
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<BbForm>({
     defaultValues: {
       date: today(), fg_made: '', fg_attempted: '', three_made: '', three_attempted: '',
@@ -64,28 +66,29 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: BbForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
+    if (!showShooting && !showBox) { setToast('Enable at least one section'); return }
     const pts = int(data.points)
     const { error } = await supabase.from('basketball_sessions').insert({
       user_id:         user.id,
       date:            data.date,
-      fg_made:         int(data.fg_made),
-      fg_attempted:    int(data.fg_attempted),
-      three_made:      int(data.three_made),
-      three_attempted: int(data.three_attempted),
-      ft_made:         int(data.ft_made),
-      ft_attempted:    int(data.ft_attempted),
-      points:          pts,
-      assists:         int(data.assists),
-      rebounds:        int(data.rebounds),
-      steals:          int(data.steals),
-      blocks:          int(data.blocks),
-      turnovers:       int(data.turnovers),
+      fg_made:         showShooting ? int(data.fg_made)        : 0,
+      fg_attempted:    showShooting ? int(data.fg_attempted)   : 0,
+      three_made:      showShooting ? int(data.three_made)     : 0,
+      three_attempted: showShooting ? int(data.three_attempted): 0,
+      ft_made:         showShooting ? int(data.ft_made)        : 0,
+      ft_attempted:    showShooting ? int(data.ft_attempted)   : 0,
+      points:          showBox ? pts                : 0,
+      assists:         showBox ? int(data.assists)  : 0,
+      rebounds:        showBox ? int(data.rebounds) : 0,
+      steals:          showBox ? int(data.steals)   : 0,
+      blocks:          showBox ? int(data.blocks)   : 0,
+      turnovers:       showBox ? int(data.turnovers): 0,
       notes:           data.notes || null,
     })
     if (error) { setToast('Error saving session'); return }
     const xp = XP_PER_SESSION + pts * XP_PER_POINT
     if (pts >= 20) playPR(); else playXPGain()
-    setToast(`+${xp} XP — ${pts} points logged!`)
+    setToast(`+${xp} XP — session logged!`)
     await refreshXP()
     refreshActivity()
     reset({ date: today(), fg_made: '', fg_attempted: '', three_made: '', three_attempted: '',
@@ -94,6 +97,15 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
     setOpen(false)
     onLogged()
   }
+
+  // toggle pill style
+  const pill = (active: boolean) => ({
+    padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: 'pointer',
+    border: '1px solid var(--accent)',
+    background: active ? 'var(--accent)' : 'transparent',
+    color: active ? '#1A1A2E' : 'var(--accent)',
+    transition: 'all 0.15s',
+  } as React.CSSProperties)
 
   return (
     <div className="mb-5">
@@ -111,28 +123,43 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
 
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+
+          {/* Section toggles */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            <button type="button" style={pill(showShooting)} onClick={() => setShowShooting(s => !s)}>🎯 Shooting</button>
+            <button type="button" style={pill(showBox)}      onClick={() => setShowBox(s => !s)}>📋 Box Score</button>
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: -8 }}>Shooting</p>
-            <div className="grid grid-cols-2 gap-3">
-              <Input label="FG Made"      type="number" placeholder="0" {...register('fg_made')} />
-              <Input label="FG Attempted" type="number" placeholder="0" {...register('fg_attempted')} />
-              <Input label="3PT Made"     type="number" placeholder="0" {...register('three_made')} />
-              <Input label="3PT Attempted" type="number" placeholder="0" {...register('three_attempted')} />
-              <Input label="FT Made"      type="number" placeholder="0" {...register('ft_made')} />
-              <Input label="FT Attempted" type="number" placeholder="0" {...register('ft_attempted')} />
-            </div>
+            {showShooting && (
+              <>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: -8 }}>Shooting</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Input label="FG Made"       type="number" placeholder="0" {...register('fg_made')} />
+                  <Input label="FG Attempted"  type="number" placeholder="0" {...register('fg_attempted')} />
+                  <Input label="3PT Made"      type="number" placeholder="0" {...register('three_made')} />
+                  <Input label="3PT Attempted" type="number" placeholder="0" {...register('three_attempted')} />
+                  <Input label="FT Made"       type="number" placeholder="0" {...register('ft_made')} />
+                  <Input label="FT Attempted"  type="number" placeholder="0" {...register('ft_attempted')} />
+                </div>
+              </>
+            )}
 
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: -8 }}>Box Score</p>
-            <div className="grid grid-cols-2 gap-3">
-              <Input label="Points"    type="number" placeholder="0" {...register('points', { required: true })} />
-              <Input label="Assists"   type="number" placeholder="0" {...register('assists')} />
-              <Input label="Rebounds"  type="number" placeholder="0" {...register('rebounds')} />
-              <Input label="Steals"    type="number" placeholder="0" {...register('steals')} />
-              <Input label="Blocks"    type="number" placeholder="0" {...register('blocks')} />
-              <Input label="Turnovers" type="number" placeholder="0" {...register('turnovers')} />
-            </div>
+            {showBox && (
+              <>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: -8 }}>Box Score</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Input label="Points"    type="number" placeholder="0" {...register('points')} />
+                  <Input label="Assists"   type="number" placeholder="0" {...register('assists')} />
+                  <Input label="Rebounds"  type="number" placeholder="0" {...register('rebounds')} />
+                  <Input label="Steals"    type="number" placeholder="0" {...register('steals')} />
+                  <Input label="Blocks"    type="number" placeholder="0" {...register('blocks')} />
+                  <Input label="Turnovers" type="number" placeholder="0" {...register('turnovers')} />
+                </div>
+              </>
+            )}
 
             <Input label="Notes (optional)" placeholder="e.g. pickup game at the rec" {...register('notes')} />
             <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Session'}</Button>
