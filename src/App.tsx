@@ -35,23 +35,7 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   const { session, loading, error } = useAuth()
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: 'var(--base-bg)' }}>
-        {/* Logo mark */}
-        <svg width="64" height="64" viewBox="0 0 100 100" className="glow-pulse">
-          <defs>
-            <filter id="ls-glow">
-              <feGaussianBlur stdDeviation="2.5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <rect width="100" height="100" rx="20" fill="rgba(255,255,255,0.04)"/>
-          <rect width="100" height="100" rx="20" fill="none" stroke="var(--accent)" strokeWidth="3" opacity="0.5" filter="url(#ls-glow)"/>
-          <path d="M60 12 L36 52 H53 L40 88 L64 48 H47 Z" fill="var(--accent)" filter="url(#ls-glow)"/>
-        </svg>
-        <p style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 22, fontWeight: 700, letterSpacing: '0.06em' }}>
-          YouXP
-        </p>
-      </div>
+      <div style={{ background: 'var(--base-bg)', minHeight: '100dvh' }} />
     )
   }
   if (error || !session) return <Navigate to="/login" replace />
