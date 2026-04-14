@@ -1,30 +1,60 @@
-@import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
 
 /* ── CSS Theme Variables ── */
 :root {
-  --accent:    #F5A623;
-  --accent-dim: rgba(245,166,35,0.2);
-  --orb1:      rgba(123,47,190,0.22);
-  --orb2:      rgba(26,188,156,0.16);
-  --orb3:      rgba(245,166,35,0.07);
-  --card-bg:   rgba(16,24,52,0.65);
-  --nav-bg:    rgba(8,10,24,0.9);
-  --base-bg:   #0d0d1a;
-  --bg-mid:    #12152b;
-  --bg-deep:   #0a1020;
+  /* Brand */
+  --accent:          #F5A623;
+  --accent-dim:      rgba(245,166,35,0.18);
+  --accent-subtle:   rgba(245,166,35,0.08);
+
+  /* Backgrounds */
+  --base-bg:         #0d0d1a;
+  --bg-mid:          #12152b;
+  --bg-deep:         #0a1020;
+  --card-bg:         rgba(16,24,52,0.6);
+  --nav-bg:          rgba(8,10,24,0.92);
+  --input-bg:        rgba(255,255,255,0.04);
+
+  /* Text scale */
+  --text-primary:    #e8e8e8;
+  --text-secondary:  #999;
+  --text-muted:      #5a5a6a;
+  --text-dim:        #3a3a4a;
+
+  /* Borders */
+  --border:          rgba(255,255,255,0.08);
+  --border-faint:    rgba(255,255,255,0.05);
+
+  /* Radius scale */
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  16px;
+  --r-xl:  20px;
+
+  /* Ambient orbs */
+  --orb1:  rgba(123,47,190,0.22);
+  --orb2:  rgba(26,188,156,0.16);
+  --orb3:  rgba(245,166,35,0.07);
+
+  /* Semantic status */
+  --green: #4ade80;
+  --red:   #f87171;
+  --error: #E94560;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body, #root {
   height: 100%;
-  color: #CCCCCC;
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background: var(--base-bg);
 }
+
 
 /* ── Layered background ── */
 body::before {
@@ -32,13 +62,14 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: 0;
+  /* Single gradient — no animation so it never creates a seam while scrolling */
   background:
-    radial-gradient(ellipse 80% 60% at 10%  0%,  var(--orb1) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 90% 100%, var(--orb2) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 80%  10%, var(--orb3) 0%, transparent 50%),
-    linear-gradient(160deg, var(--base-bg) 0%, var(--bg-mid) 50%, var(--bg-deep) 100%);
+    radial-gradient(ellipse 70% 55% at 15%  5%,   var(--orb1) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 45% at 88%  92%,  var(--orb2) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 75%  15%,  var(--orb3) 0%, transparent 55%),
+    var(--base-bg);
   pointer-events: none;
-  transition: background 0.6s ease;
+  transition: background 0.8s ease;
 }
 
 /* Subtle grid for depth */
@@ -48,12 +79,16 @@ body::after {
   inset: 0;
   z-index: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 48px 48px;
   pointer-events: none;
-  mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, black 30%, transparent 100%);
+  /* Fade grid out toward center and bottom — prevents harsh edge */
+  mask-image: radial-gradient(ellipse 120% 80% at 50% 0%, rgba(0,0,0,0.6) 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 120% 80% at 50% 0%, rgba(0,0,0,0.6) 0%, transparent 70%);
+  transition: opacity 0.6s ease;
 }
+
 
 #root { position: relative; z-index: 1; }
 
@@ -101,6 +136,32 @@ body::after {
   from { opacity: 0; transform: scale(0) rotate(-30deg); }
   to   { opacity: 1; transform: scale(1) rotate(0deg); }
 }
+@keyframes scanLine {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes numberPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+@keyframes accentFlash {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+@keyframes toastDrain {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spin { animation: spin 0.8s linear infinite; display: inline-block; }
 
 .fade-in        { animation: fadeInUp 0.35s ease both; }
 .card-animate   { animation: fadeInUp 0.4s ease both; }
@@ -113,24 +174,114 @@ body::after {
 
 .xp-number      { animation: countUp 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
 .glow-pulse     { animation: glowPulse 3s ease-in-out infinite; }
+
+@keyframes muscleGlowPulse {
+  0%, 100% { filter: drop-shadow(0 0 3px var(--muscle-glow, #fff)); }
+  50%       { filter: drop-shadow(0 0 10px var(--muscle-glow, #fff)) drop-shadow(0 0 18px var(--muscle-glow, #fff)); }
+}
+/* Ranked muscles breathe subtly */
+@keyframes muscleBreath {
+  0%, 100% { opacity: 0.88; }
+  50%       { opacity: 1; }
+}
+/* Gold+ muscles pulse with their glow color */
+@keyframes musclePulseHigh {
+  0%, 100% { filter: none; }
+  50%       { filter: drop-shadow(0 0 5px var(--muscle-glow, rgba(255,200,50,0.5))); }
+}
+/* Elite/Diamond/God — strong constant glow */
+@keyframes musclePulseTop {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--muscle-glow, rgba(255,100,200,0.6))); }
+  50%       { filter: drop-shadow(0 0 10px var(--muscle-glow, rgba(255,100,200,0.9))) drop-shadow(0 0 20px var(--muscle-glow, rgba(255,100,200,0.4))); }
+}
+.muscle-selected { animation: muscleGlowPulse 1.8s ease-in-out infinite; }
+.muscle-ranked   { animation: muscleBreath 3.5s ease-in-out infinite; }
+.muscle-high     { animation: musclePulseHigh 3s ease-in-out infinite; }
+.muscle-top      { animation: musclePulseTop 2.2s ease-in-out infinite; }
 .pr-badge       { animation: pulseAccent 2.5s ease-in-out infinite; }
 .orb-float      { animation: orb 6s ease-in-out infinite; }
 .border-glow    { animation: borderGlow 2s ease-in-out infinite; }
 .slide-in       { animation: slideIn 0.3s ease both; }
 .pop-in         { animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
 .star-fill      { animation: starFill 0.2s ease both; }
+.number-pop     { animation: numberPop 0.3s ease both; }
 
 .progress-bar-fill { animation: progressFill 1s cubic-bezier(0.22,1,0.36,1) both; }
 
 .shimmer {
-  background: linear-gradient(90deg, #16213E 25%, #1e2d4a 50%, #16213E 75%);
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, var(--accent-dim) 50%, rgba(255,255,255,0.03) 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.8s infinite;
 }
 
-/* Accent-colored text utility */
-.accent { color: var(--accent) !important; }
-.accent-bg { background: var(--accent) !important; }
+/* ── Card hover lift ── */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 24px var(--accent-dim);
+}
+
+/* ── Focus rings ── */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
+/* ── Button base interactions ── */
+button:not(:disabled):active { transform: scale(0.97); }
+
+/* ── Text utilities ── */
+.text-primary   { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted     { color: var(--text-muted); }
+
+/* ── Accent utilities ── */
+.accent        { color: var(--accent) !important; }
+.accent-bg     { background: var(--accent) !important; }
 .accent-border { border-color: var(--accent) !important; }
 
+/* ── Section label ── */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Nav active pill ── */
+.nav-active-dot {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  margin: 2px auto 0;
+}
+
+/* ── Scrollbar hide ── */
 ::-webkit-scrollbar { display: none; }
+
+/* ── Gradient text utility ── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), #fff 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glass card utility ── */
+.glass {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.light-theme .glass {
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+}

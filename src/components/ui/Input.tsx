@@ -4,35 +4,44 @@ import type { InputHTMLAttributes } from 'react'
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
+  hint?: string
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className = '', ...props }, ref) => {
+  ({ label, error, hint, className = '', id, ...props }, ref) => {
+    const inputId = id ?? label?.toLowerCase().replace(/\s+/g, '-')
+
     return (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         {label && (
-          <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>
+          <label
+            htmlFor={inputId}
+            className="section-label"
+          >
             {label}
           </label>
         )}
         <input
           ref={ref}
-          className={`px-3 py-3 rounded-lg text-white outline-none text-base ${className}`}
+          id={inputId}
+          className={`w-full px-3 py-2.5 rounded-xl text-sm font-medium outline-none transition-all ${className}`}
           style={{
-            background: '#0D1B2A',
-            border: '1px solid rgba(255,255,255,0.1)',
-          }}
-          onFocus={(e) => {
-            e.target.style.border = '1px solid var(--accent)'
-            props.onFocus?.(e)
-          }}
-          onBlur={(e) => {
-            e.target.style.border = '1px solid rgba(255,255,255,0.1)'
-            props.onBlur?.(e)
+            background: 'var(--input-bg)',
+            border: `1px solid ${error ? 'var(--error)' : 'var(--border)'}`,
+            color: 'var(--text-primary)',
           }}
           {...props}
         />
-        {error && <span className="text-xs" style={{ color: '#E94560' }}>{error}</span>}
+        {error && (
+          <span className="text-xs font-medium" style={{ color: 'var(--error)' }}>
+            {error}
+          </span>
+        )}
+        {hint && !error && (
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            {hint}
+          </span>
+        )}
       </div>
     )
   }

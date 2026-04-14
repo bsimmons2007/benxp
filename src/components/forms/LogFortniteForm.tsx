@@ -42,7 +42,7 @@ export function LogFortniteForm() {
     })
 
     const xp = data.win ? XP_RATES.fortnite_win : 0
-    setToast(data.win ? `+${xp} XP — Victory Royale! 🏆` : 'Game logged!')
+    setToast(data.win ? `+${xp} XP — Victory Royale!` : 'Game logged!')
     await refreshXP()
     reset({ date: today(), mode: 'Solos', season: '', placement: '', kills: '', accuracy: '', win: false })
   }

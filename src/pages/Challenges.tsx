@@ -1,123 +1,25 @@
 import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Badge } from '../components/ui/Badge'
 import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
+import { syncChallenges, getAutoProgress } from '../lib/challenges'
+import { loadHiddenSections, SECTION_DEFS } from '../lib/sections'
+import { playGoalComplete } from '../lib/sounds'
 import type { Challenge } from '../types'
-
-// ── Auto-tracking ──────────────────────────────────────────────
-
-function startOfWeek() {
-  const d = new Date()
-  d.setDate(d.getDate() - d.getDay())
-  return d.toISOString().split('T')[0]
-}
-function startOfMonth() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
-}
-function startOfYear() {
-  return `${new Date().getFullYear()}-01-01`
-}
-
-interface AutoProgress { current: number; target: number | null }
-
-async function getAutoProgress(name: string): Promise<AutoProgress | null> {
-  const sw = startOfWeek()
-  const sm = startOfMonth()
-  const sy = startOfYear()
-
-  // Weekly
-  if (name === 'Hit the gym 4x this week') {
-    const { data } = await supabase.from('lifting_log').select('date').gte('date', sw)
-    const days = new Set(data?.map((r: { date: string }) => r.date)).size
-    return { current: days, target: 4 }
-  }
-  if (name === 'Skate 3x this week') {
-    const { count } = await supabase.from('skate_sessions').select('id', { count: 'exact', head: true }).gte('date', sw)
-    return { current: count ?? 0, target: 3 }
-  }
-  if (name === 'Skate 20+ miles this week') {
-    const { data } = await supabase.from('skate_sessions').select('miles').gte('date', sw)
-    const total = data?.reduce((s: number, r: { miles: number }) => s + r.miles, 0) ?? 0
-    return { current: Math.round(total * 10) / 10, target: 20 }
-  }
-  if (name === 'Finish a book this week') {
-    const { count } = await supabase.from('books').select('id', { count: 'exact', head: true }).gte('date_finished', sw)
-    return { current: count ?? 0, target: 1 }
-  }
-
-  // Monthly
-  if (name === 'Hit the gym 12x this month') {
-    const { data } = await supabase.from('lifting_log').select('date').gte('date', sm)
-    const days = new Set(data?.map((r: { date: string }) => r.date)).size
-    return { current: days, target: 12 }
-  }
-  if (name === 'New PR in any lift') {
-    const { count } = await supabase.from('pr_history').select('id', { count: 'exact', head: true }).gte('date', sm)
-    return { current: count ?? 0, target: 1 }
-  }
-  if (name === 'Skate 50 miles this month') {
-    const { data } = await supabase.from('skate_sessions').select('miles').gte('date', sm)
-    const total = data?.reduce((s: number, r: { miles: number }) => s + r.miles, 0) ?? 0
-    return { current: Math.round(total * 10) / 10, target: 50 }
-  }
-  if (name === 'Finish 2 books this month') {
-    const { count } = await supabase.from('books').select('id', { count: 'exact', head: true }).gte('date_finished', sm)
-    return { current: count ?? 0, target: 2 }
-  }
-  if (name === 'Win a Fortnite game this month') {
-    const { count } = await supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('win', true).gte('date', sm)
-    return { current: count ?? 0, target: 1 }
-  }
-  if (name === 'Get a 10-kill game') {
-    const { data } = await supabase.from('fortnite_games').select('kills').gte('date', sm).order('kills', { ascending: false }).limit(1)
-    return { current: data?.[0]?.kills ?? 0, target: 10 }
-  }
-
-  // Boss
-  if (name === 'Bench 175 lbs (Est 1RM)') {
-    const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', 'Bench').order('est_1rm', { ascending: false }).limit(1)
-    return { current: data?.[0]?.est_1rm ?? 0, target: 175 }
-  }
-  if (name === 'Squat 200 lbs (Est 1RM)') {
-    const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', 'Squat').order('est_1rm', { ascending: false }).limit(1)
-    return { current: data?.[0]?.est_1rm ?? 0, target: 200 }
-  }
-  if (name === 'Deadlift 200 lbs (Est 1RM)') {
-    const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', 'Deadlift').order('est_1rm', { ascending: false }).limit(1)
-    return { current: data?.[0]?.est_1rm ?? 0, target: 200 }
-  }
-  if (name === 'Skate 100 total miles') {
-    const { data } = await supabase.from('skate_sessions').select('miles')
-    const total = data?.reduce((s: number, r: { miles: number }) => s + r.miles, 0) ?? 0
-    return { current: Math.round(total * 10) / 10, target: 100 }
-  }
-  if (name === 'Read 10 books in 2026') {
-    const { count } = await supabase.from('books').select('id', { count: 'exact', head: true }).gte('date_finished', sy)
-    return { current: count ?? 0, target: 10 }
-  }
-  if (name === 'Win 5 Fortnite games total') {
-    const { count } = await supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('win', true)
-    return { current: count ?? 0, target: 5 }
-  }
-  if (name === "Match all-time record (22 wins)") {
-    const { count } = await supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('win', true)
-    return { current: count ?? 0, target: 22 }
-  }
-
-  return null
-}
+import { CalendarIcon, SwordIcon } from '../components/ui/Icon'
 
 // ── Tier config ────────────────────────────────────────────────
 
-const TIERS = [
-  { key: 'Weekly',  label: 'Weekly',  icon: '📅', color: '#E94560', glow: 'rgba(233,69,96,0.3)' },
-  { key: 'Monthly', label: 'Monthly', icon: '🗓️', color: '#7B2FBE', glow: 'rgba(123,47,190,0.3)' },
-  { key: 'Boss',    label: 'Boss',    icon: '💀', color: '#F5A623', glow: 'rgba(245,166,35,0.3)' },
-] as const
 type TierKey = 'Weekly' | 'Monthly' | 'Boss'
+
+const TIERS: { key: TierKey; label: string; icon: ReactNode; color: string; glow: string }[] = [
+  { key: 'Weekly',  label: 'Weekly',  icon: <CalendarIcon size={20} color="currentColor" />, color: '#E94560', glow: 'rgba(233,69,96,0.3)' },
+  { key: 'Monthly', label: 'Monthly', icon: <CalendarIcon size={20} color="currentColor" />, color: '#7B2FBE', glow: 'rgba(123,47,190,0.3)' },
+  { key: 'Boss',    label: 'Boss',    icon: <SwordIcon    size={20} color="currentColor" />, color: 'var(--accent)', glow: 'rgba(245,166,35,0.3)' },
+]
 
 // ── Challenge card ─────────────────────────────────────────────
 
@@ -132,18 +34,18 @@ function ChallengeCard({
   tierColor: string
   tierGlow: string
 }) {
-  const [progress, setProgress] = useState<AutoProgress | null>(null)
+  const [progress, setProgress] = useState<{ current: number; target: number } | null>(null)
   const isBoss = challenge.tier === 'Boss'
   const isCompleted = challenge.status === 'completed'
+  const poolKey = challenge.notes ?? ''
+  const targetValue = parseFloat(challenge.target ?? '0')
 
   useEffect(() => {
-    getAutoProgress(challenge.challenge_name).then(setProgress)
-  }, [challenge.challenge_name])
+    if (!poolKey || !targetValue) return
+    getAutoProgress(supabase, poolKey, targetValue).then(setProgress)
+  }, [poolKey, targetValue])
 
-  const pct = progress && progress.target
-    ? Math.min((progress.current / progress.target) * 100, 100)
-    : null
-
+  const pct = progress ? Math.min((progress.current / progress.target) * 100, 100) : null
   const autoCompleted = pct !== null && pct >= 100
 
   return (
@@ -155,6 +57,7 @@ function ChallengeCard({
         border: `1px solid ${isCompleted || autoCompleted ? tierColor : 'rgba(255,255,255,0.08)'}`,
         boxShadow: isCompleted || autoCompleted ? `0 0 20px ${tierGlow}` : 'none',
         transition: 'all 0.3s ease',
+        opacity: isCompleted ? 0.55 : 1,
       }}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
@@ -180,7 +83,10 @@ function ChallengeCard({
 
         <div className="flex-shrink-0">
           {isCompleted || autoCompleted ? (
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg" style={{ background: tierColor }}>
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-lg"
+              style={{ background: '#4ade80', color: '#0a1a0a' }}
+            >
               ✓
             </div>
           ) : (
@@ -196,11 +102,11 @@ function ChallengeCard({
       </div>
 
       {/* Auto-tracked progress bar */}
-      {progress && progress.target && !isCompleted && (
+      {progress && !isCompleted && (
         <div>
           <div className="flex justify-between mb-1">
             <span className="text-xs" style={{ color: '#888' }}>Progress</span>
-            <span className="text-xs font-semibold" style={{ color: tierColor }}>
+            <span className="text-xs font-semibold" style={{ color: autoCompleted ? '#4ade80' : 'var(--accent)' }}>
               {progress.current} / {progress.target}
             </span>
           </div>
@@ -209,7 +115,9 @@ function ChallengeCard({
               className="h-full rounded-full progress-bar-fill"
               style={{
                 width: `${pct}%`,
-                background: `linear-gradient(90deg, ${tierColor}aa, ${tierColor})`,
+                background: autoCompleted
+                  ? 'linear-gradient(90deg, #4ade80aa, #4ade80)'
+                  : 'linear-gradient(90deg, var(--accent-dim, rgba(245,166,35,0.6)), var(--accent))',
                 transition: 'width 1s cubic-bezier(0.22,1,0.36,1)',
               }}
             />
@@ -225,24 +133,44 @@ function ChallengeCard({
 export function Challenges() {
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [activeTier, setActiveTier] = useState<TierKey>('Weekly')
+  const [syncing, setSyncing] = useState(true)
   const refreshXP = useStore((s) => s.refreshXP)
 
-  async function load() {
-    const { data } = await supabase.from('challenges').select('*')
+  async function syncAndLoad() {
+    setSyncing(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) await syncChallenges(supabase, user.id)
+    const { data } = await supabase.from('challenges')
+      .select('*')
+      .in('status', ['active', 'completed'])
+      .order('created_at', { ascending: false })
     setChallenges(data ?? [])
+    setSyncing(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { syncAndLoad() }, [])
 
   async function handleComplete(id: string) {
-    await supabase.from('challenges').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', id)
-    await load()
+    await supabase.from('challenges')
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
+      .eq('id', id)
+    playGoalComplete()
+    await syncAndLoad()
     await refreshXP()
   }
 
   const tier = TIERS.find((t) => t.key === activeTier)!
-  const visible = challenges.filter((c) => c.tier === activeTier)
-  const completedCount = visible.filter((c) => c.status === 'completed').length
+  const hiddenCategories = loadHiddenSections().flatMap(k => SECTION_DEFS[k].categories)
+  const active = challenges.filter((c) =>
+    c.tier === activeTier && c.status === 'active' &&
+    (!c.category || !hiddenCategories.includes(c.category))
+  )
+  const completed = challenges.filter((c) =>
+    c.tier === activeTier && c.status === 'completed' &&
+    (!c.category || !hiddenCategories.includes(c.category))
+  )
+  const visible = [...active, ...completed]
+  const completedCount = completed.length
 
   return (
     <>
@@ -253,8 +181,9 @@ export function Challenges() {
         <div className="flex gap-2 mb-5">
           {TIERS.map((t) => {
             const isActive = activeTier === t.key
-            const count = challenges.filter((c) => c.tier === t.key).length
-            const done = challenges.filter((c) => c.tier === t.key && c.status === 'completed').length
+            const tierChallenges = challenges.filter((c) => c.tier === t.key)
+            const count = tierChallenges.length
+            const done = tierChallenges.filter((c) => c.status === 'completed').length
             return (
               <button
                 key={t.key}
@@ -268,7 +197,7 @@ export function Challenges() {
                   transform: isActive ? 'translateY(-2px)' : 'none',
                 }}
               >
-                <span className="text-xl mb-1">{t.icon}</span>
+                <span style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>{t.icon}</span>
                 <span className="text-xs">{t.label}</span>
                 <span className="text-xs mt-0.5" style={{ opacity: 0.7 }}>{done}/{count}</span>
               </button>
@@ -289,7 +218,7 @@ export function Challenges() {
               {tier.icon} {tier.label} Challenges
             </p>
             <p className="text-xs mt-0.5" style={{ color: '#888' }}>
-              {completedCount} of {visible.length} completed
+              {syncing ? 'Syncing...' : `${active.length} active · ${completedCount} completed`}
             </p>
           </div>
           {/* Mini completion bar */}
@@ -310,8 +239,15 @@ export function Challenges() {
           </div>
         </div>
 
-        {/* Challenge cards */}
-        {visible.map((c) => (
+        {/* Loading state */}
+        {syncing && (
+          <div className="text-center py-8" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif', fontSize: 16 }}>
+            Loading challenges...
+          </div>
+        )}
+
+        {/* Active challenges first */}
+        {!syncing && active.map((c) => (
           <ChallengeCard
             key={c.id}
             challenge={c}
@@ -320,6 +256,31 @@ export function Challenges() {
             tierGlow={tier.glow}
           />
         ))}
+
+        {/* Completed challenges faded at bottom */}
+        {!syncing && completed.length > 0 && (
+          <>
+            <p className="text-xs font-semibold uppercase tracking-widest mt-4 mb-2" style={{ color: '#555' }}>
+              Completed
+            </p>
+            {completed.map((c) => (
+              <ChallengeCard
+                key={c.id}
+                challenge={c}
+                onComplete={() => {}}
+                tierColor={tier.color}
+                tierGlow={tier.glow}
+              />
+            ))}
+          </>
+        )}
+
+        {/* Empty state */}
+        {!syncing && active.length === 0 && completed.length === 0 && (
+          <div className="text-center py-12" style={{ color: '#555', fontFamily: 'Cormorant Garamond, serif', fontSize: 16 }}>
+            No {activeTier.toLowerCase()} challenges yet.
+          </div>
+        )}
 
       </PageWrapper>
     </>

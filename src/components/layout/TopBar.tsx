@@ -1,35 +1,114 @@
 import { useNavigate } from 'react-router-dom'
 import { useUserName } from '../../hooks/useUserName'
+import { useNavStore } from '../../store/useNavStore'
 
 interface TopBarProps {
-  title?: string
+  title?:        string
   hideSettings?: boolean
+  back?:         boolean   // show back arrow instead of hamburger
 }
 
-export function TopBar({ title, hideSettings = false }: TopBarProps) {
-  const navigate = useNavigate()
-  const userName = useUserName()
-  const displayTitle = title ?? (userName ? `${userName}XP` : 'YouXP')
+export function TopBar({ title, hideSettings = false, back = false }: TopBarProps) {
+  const navigate      = useNavigate()
+  const userName      = useUserName()
+  const toggleNav     = useNavStore(s => s.toggleNav)
+  const logoLabel     = title ?? (userName ? `${userName}XP` : 'YouXP')
+  const logoClickable = !title
+
+  function handleLeft() {
+    if (back) navigate(-1)
+    else toggleNav()
+  }
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 py-3 z-40"
-      style={{ background: 'rgba(10,12,28,0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+      className="fixed top-0 left-0 right-0 flex items-center justify-between z-40"
+      style={{
+        height:               '52px',
+        padding:              '0 12px',
+        background:           'rgba(10,12,28,0.92)',
+        backdropFilter:       'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom:         '1px solid var(--border-faint)',
+      }}
     >
-      <span className="text-2xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
-        {displayTitle}
-      </span>
+      {/* Left */}
+      <button
+        onClick={handleLeft}
+        aria-label={back ? 'Go back' : 'Open menu'}
+        className="flex items-center justify-center rounded-lg transition-colors"
+        style={{
+          width: 36, height: 36, flexShrink: 0,
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: 'var(--text-secondary)',
+        }}
+      >
+        {back ? (
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M11 4L6 9L11 14" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        ) : (
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+            <rect y="0"  width="18" height="2" rx="1" fill="currentColor" />
+            <rect y="6"  width="12" height="2" rx="1" fill="currentColor" />
+            <rect y="12" width="15" height="2" rx="1" fill="currentColor" />
+          </svg>
+        )}
+      </button>
+
+      {/* Center — absolutely positioned so it stays centered regardless of side buttons */}
+      <button
+        onClick={() => logoClickable && navigate('/monthly')}
+        style={{
+          background: 'none', border: 'none', padding: 0,
+          cursor: logoClickable ? 'pointer' : 'default',
+          position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+        }}
+      >
+        <span
+          style={{
+            color:         title ? 'var(--text-primary)' : 'var(--accent)',
+            fontFamily:    'Cinzel, serif',
+            fontSize:      title ? 14 : 18,
+            fontWeight:    700,
+            letterSpacing: title ? '0.08em' : '0.04em',
+            whiteSpace:    'nowrap',
+            transition:    'opacity 0.15s ease',
+          }}
+          onMouseEnter={e => { if (logoClickable) (e.target as HTMLElement).style.opacity = '0.7' }}
+          onMouseLeave={e => { if (logoClickable) (e.target as HTMLElement).style.opacity = '1' }}
+        >
+          {logoLabel}
+        </span>
+      </button>
+
+      {/* Right */}
       {!hideSettings ? (
         <button
           onClick={() => navigate('/settings')}
-          className="text-xl p-1"
-          style={{ color: '#888888' }}
           aria-label="Settings"
+          className="flex items-center justify-center rounded-lg transition-colors"
+          style={{
+            width: 36, height: 36, flexShrink: 0,
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--text-muted)',
+          }}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'var(--text-muted)')}
         >
-          ⚙️
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path
+              d="M9 11.5A2.5 2.5 0 1 0 9 6.5a2.5 2.5 0 0 0 0 5Z"
+              stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
+            />
+            <path
+              d="M14.7 7.3l-.6-1.4.9-1.7-1.2-1.2-1.7.9-1.4-.6L10 1.5H8l-.7 1.8-1.4.6-1.7-.9L3 4.2l.9 1.7-.6 1.4L1.5 8v2l1.8.7.6 1.4-.9 1.7 1.2 1.2 1.7-.9 1.4.6.7 1.8h2l.7-1.8 1.4-.6 1.7.9 1.2-1.2-.9-1.7.6-1.4 1.8-.7V8l-1.8-.7Z"
+              stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
+            />
+          </svg>
         </button>
       ) : (
-        <div style={{ width: 28 }} />
+        <div style={{ width: 36 }} />
       )}
     </header>
   )

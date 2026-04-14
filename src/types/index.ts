@@ -10,7 +10,34 @@ export interface LiftingLog {
   volume: number | null
   est_1rm: number | null
   is_pr: boolean
+  rpe: number | null
+  rest_secs: number | null
+  duration_secs: number | null
 }
+
+export interface Goal {
+  id: string
+  created_at: string
+  user_id: string
+  title: string
+  metric_key: string
+  target_value: number
+  target_unit: string
+  xp_reward: number
+  status: 'active' | 'completed'
+  completed_at: string | null
+}
+
+export interface CardioSession {
+  id: string
+  created_at: string
+  date: string
+  activity: 'run' | 'bike' | 'swim' | 'walk'
+  distance_miles: number
+  duration_mins: number | null
+  notes: string | null
+}
+
 
 export interface SkateSession {
   id: string
@@ -33,6 +60,8 @@ export interface FortniteGame {
   kills: number
   accuracy: number | null
   win: boolean
+  is_ranked: boolean
+  rank_name: string | null
 }
 
 export interface Book {
@@ -107,5 +136,5 @@ export interface MoodLog {
   notes: string | null
 }
 
-export type LiftType = 'Bench' | 'Squat' | 'Deadlift' | 'PullUps' | 'PushUps'
+export type LiftType = string   // open — any exercise from the exercises table or custom
 export type BookGenre = 'Fiction' | 'Fantasy' | 'Sci-Fi' | 'Non-Fiction' | 'Classic' | 'Other'

@@ -1,14 +1,16 @@
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { LogWorkoutForm } from '../components/forms/LogWorkoutForm'
 import { LogFortniteForm } from '../components/forms/LogFortniteForm'
+import { DumbbellIcon, GamepadIcon } from '../components/ui/Icon'
 
-const TABS = [
-  { key: 'Workout',  label: 'Workout',  icon: '🏋️' },
-  { key: 'Fortnite', label: 'Fortnite', icon: '🎮' },
-] as const
+type Tab = 'Workout' | 'Fortnite'
 
-type Tab = typeof TABS[number]['key']
+const TABS: { key: Tab; label: string; icon: ReactNode }[] = [
+  { key: 'Workout',  label: 'Workout',  icon: <DumbbellIcon size={24} color="currentColor" /> },
+  { key: 'Fortnite', label: 'Fortnite', icon: <GamepadIcon  size={24} color="currentColor" /> },
+]
 
 export function Log() {
   const [active, setActive] = useState<Tab>('Workout')
@@ -37,7 +39,7 @@ export function Log() {
                 : { background: 'rgba(255,255,255,0.05)', color: '#888888' }
             }
           >
-            <span className="text-2xl">{tab.icon}</span>
+            <span style={{ display: 'flex', alignItems: 'center' }}>{tab.icon}</span>
             <span className="text-xs">{tab.label}</span>
           </button>
         ))}

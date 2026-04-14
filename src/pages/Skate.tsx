@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
+import { EmptyState } from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import type { SkateSession } from '../types'
+import { ZapIcon, EditIcon, SkateIcon } from '../components/ui/Icon'
 
 // ── Log form ─────────────────────────────────────────────────
 
@@ -23,7 +25,8 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<SkateForm>({
     defaultValues: { date: today(), miles: '', duration: '', fastest_mile: '' },
   })
-  const refreshXP = useStore((s) => s.refreshXP)
+  const refreshXP       = useStore((s) => s.refreshXP)
+  const refreshActivity = useStore((s) => s.refreshActivity)
 
   const onSubmit = async (data: SkateForm) => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -37,8 +40,9 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
       fastest_mile: data.fastest_mile ? parseFloat(data.fastest_mile) : null,
     })
     const xp = Math.round(miles * XP_RATES.skate_per_mile)
-    setToast(`+${xp} XP — Session logged! 🛼`)
+    setToast(`+${xp} XP — Session logged!`)
     await refreshXP()
+    refreshActivity()
     reset({ date: today(), miles: '', duration: '', fastest_mile: '' })
     setOpen(false)
     onLogged()
@@ -181,19 +185,27 @@ export function Skate() {
               Avg {avgMiles.toFixed(1)} mi/session
             </p>
             <ResponsiveContainer width="100%" height={150}>
-              <LineChart data={milesTrend}>
-                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#888', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis domain={['auto', 'auto']} tick={{ fill: '#888', fontSize: 10 }} axisLine={false} tickLine={false} width={30} />
+              <AreaChart data={milesTrend} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
+                <defs>
+                  <linearGradient id="skate-miles-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="var(--accent)" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis domain={['auto', 'auto']} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
                 <Tooltip
-                  contentStyle={{ background: 'var(--bg-mid)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 12 }}
+                  contentStyle={{ background: 'rgba(10,10,22,0.97)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, color: '#fff', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   labelFormatter={(l: any) => typeof l === 'string' ? formatDate(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${Number(v).toFixed(2)} mi`, 'Miles']}
+                  cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
                 />
                 <ReferenceLine y={avgMiles} stroke="var(--accent)" strokeDasharray="4 2" strokeOpacity={0.4} />
-                <Line type="monotone" dataKey="miles" stroke="var(--accent)" strokeWidth={2} dot={{ fill: 'var(--accent)', r: 3 }} activeDot={{ r: 5 }} />
-              </LineChart>
+                <Area type="monotone" dataKey="miles" stroke="var(--accent)" strokeWidth={2.5} fill="url(#skate-miles-grad)" dot={{ fill: 'var(--accent)', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: 'var(--accent)', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+              </AreaChart>
             </ResponsiveContainer>
             <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>── avg</p>
           </div>
@@ -205,22 +217,38 @@ export function Skate() {
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Fastest Mile Trend</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>Lower is faster</p>
             <ResponsiveContainer width="100%" height={150}>
-              <LineChart data={fastestTrend}>
-                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#888', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis domain={['auto', 'auto']} tick={{ fill: '#888', fontSize: 10 }} axisLine={false} tickLine={false} width={35} />
+              <AreaChart data={fastestTrend} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
+                <defs>
+                  <linearGradient id="skate-speed-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#2ECC71" stopOpacity={0.28} />
+                    <stop offset="100%" stopColor="#2ECC71" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis domain={['auto', 'auto']} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={35} />
                 <Tooltip
-                  contentStyle={{ background: 'var(--bg-mid)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 12 }}
+                  contentStyle={{ background: 'rgba(10,10,22,0.97)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, color: '#fff', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   labelFormatter={(l: any) => typeof l === 'string' ? formatDate(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${Number(v).toFixed(2)} min/mi`, 'Fastest Mile']}
+                  cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
                 />
-                {fastestMile && <ReferenceLine y={fastestMile} stroke="#2ECC71" strokeDasharray="4 2" strokeOpacity={0.5} />}
-                <Line type="monotone" dataKey="fastest_mile" stroke="#2ECC71" strokeWidth={2} dot={{ fill: '#2ECC71', r: 3 }} activeDot={{ r: 5 }} />
-              </LineChart>
+                {fastestMile && <ReferenceLine y={fastestMile} stroke="#2ECC71" strokeDasharray="4 2" strokeOpacity={0.55} />}
+                <Area type="monotone" dataKey="fastest_mile" stroke="#2ECC71" strokeWidth={2.5} fill="url(#skate-speed-grad)" dot={{ fill: '#2ECC71', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#2ECC71', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+              </AreaChart>
             </ResponsiveContainer>
             {fastestMile && <p className="text-xs mt-1" style={{ color: '#2ECC71' }}>── PR {fastestMile.toFixed(2)} min/mi</p>}
           </div>
+        )}
+
+        {sessions.length === 0 && (
+          <EmptyState
+            icon={<SkateIcon size={64} color="var(--text-muted)" />}
+            title="No sessions yet"
+            sub="Log your first skate session to start tracking distance and pace trends."
+          />
         )}
 
         {/* Session history */}
@@ -232,7 +260,11 @@ export function Skate() {
                 <div>
                   <p className="text-white text-sm font-semibold">
                     {s.miles.toFixed(2)} mi
-                    {s.fastest_mile && <span className="ml-2 text-xs font-normal" style={{ color: '#2ECC71' }}>⚡ {s.fastest_mile.toFixed(2)} min/mi</span>}
+                    {s.fastest_mile && (
+                      <span className="ml-2 flex items-center gap-1 text-xs font-normal" style={{ color: '#2ECC71' }}>
+                        <ZapIcon size={11} color="#2ECC71" /> {s.fastest_mile.toFixed(2)} min/mi
+                      </span>
+                    )}
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: '#888' }}>
                     {formatDate(s.date)}{s.duration ? ` · ${s.duration}` : ''}
@@ -244,10 +276,9 @@ export function Skate() {
                   </span>
                   <button
                     onClick={() => setEditing(s)}
-                    className="text-xs px-1.5 py-0.5 rounded"
-                    style={{ color: '#888', background: 'rgba(255,255,255,0.06)' }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}
                   >
-                    ✏️
+                    <EditIcon size={13} color="var(--text-muted)" />
                   </button>
                 </div>
               </div>

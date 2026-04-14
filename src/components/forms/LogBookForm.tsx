@@ -56,7 +56,7 @@ export function LogBookForm() {
       rating: data.rating ? parseFloat(data.rating) : null,
     })
 
-    setToast(`+${XP_RATES.book_finished} XP — Book finished! 📚`)
+    setToast(`+${XP_RATES.book_finished} XP — Book finished!`)
     await refreshXP()
     reset({ date_finished: today(), title: '', author: '', genre: 'Fiction', customGenre: '', pages: '', rating: '' })
   }

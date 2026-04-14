@@ -1,14 +1,6 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { useStore } from '../store/useStore'
 
+/** Reads userName from the global store — no per-component getUser() calls. */
 export function useUserName(): string {
-  const [name, setName] = useState('')
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setName(user?.user_metadata?.name ?? '')
-    })
-  }, [])
-
-  return name
+  return useStore(s => s.userName)
 }
