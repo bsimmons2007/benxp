@@ -191,7 +191,6 @@ function GoalCard({ goal, current, onComplete, onDelete }: {
   onDelete: () => void
 }) {
   const [confirming, setConfirming] = useState(false)
-  const preset = presetFor(goal.metric_key)
   const pct = goal.metric_key === 'manual'
     ? (goal.status === 'completed' ? 100 : 0)
     : Math.min((current / goal.target_value) * 100, 100)

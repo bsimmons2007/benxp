@@ -118,7 +118,7 @@ export function Monthly() {
       if (booksRead.length > 0) highlights.push({ icon: <BookIcon size={18} color="var(--text-secondary)" />, label: 'Books Finished', value: String(booksRead.length) })
 
       // Top moments
-      const topMoments: { icon: string; text: string }[] = []
+      const topMoments: { icon: ReactNode; text: string }[] = []
       if (newPRs.length > 0) {
         const best = newPRs[0]
         topMoments.push({ icon: <TrophyIcon size={16} color="var(--accent)" />, text: `New ${best.lift} PR — ${best.est_1rm.toFixed(0)} lbs est. 1RM` })
