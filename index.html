@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#080810" />
+    <meta name="theme-color" content="#0d0d1a" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="Content-Security-Policy" content="
@@ -29,45 +29,78 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    <!-- Boot loader — inline styles allowed by CSP -->
+    <!-- Boot loader — inline styles, CSP allows unsafe-inline -->
     <style>
+      /* ── Loader shell ── */
       #lxp-loader {
         position: fixed; inset: 0; z-index: 9999;
-        background: #080810;
+        background: #0d0d1a;          /* matches --base-bg */
         display: flex; flex-direction: column;
-        align-items: center; justify-content: center; gap: 28px;
-        transition: transform 0.4s ease-in;
+        align-items: center; justify-content: center; gap: 32px;
+        transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
       }
       #lxp-loader.lxp-exit { transform: translateY(-100%); }
+
+      /* ── Ambient orbs (mirrors app body::before/after) ── */
+      #lxp-loader::before {
+        content: '';
+        position: absolute; inset: 0; pointer-events: none;
+        background:
+          radial-gradient(ellipse 60% 40% at 20% 30%, rgba(123,47,190,0.18) 0%, transparent 60%),
+          radial-gradient(ellipse 50% 35% at 80% 70%, rgba(26,188,156,0.12) 0%, transparent 60%),
+          radial-gradient(ellipse 40% 30% at 50% 50%, rgba(245,166,35,0.06) 0%, transparent 55%);
+      }
+
+      /* ── WordMark ── */
       #lxp-title {
-        display: flex;
-        font-family: 'Press Start 2P', monospace;
-        font-size: clamp(22px, 5vw, 50px);
-        color: #f5a623;
-        letter-spacing: 0.05em;
+        display: flex; align-items: baseline; gap: 0;
+        font-family: 'Cinzel', 'Georgia', serif;
+        font-size: clamp(36px, 8vw, 64px);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        position: relative; z-index: 1;
       }
-      #lxp-title span {
-        display: inline-block;
-        opacity: 0;
-        transform: translateY(-36px);
-        transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      #lxp-title .lxp-you {
+        color: #e8e8e8;
+        opacity: 0; transform: translateY(-24px);
+        transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
       }
-      #lxp-title span.lxp-v { opacity: 1; transform: translateY(0); }
+      #lxp-title .lxp-xp {
+        color: #F5A623;
+        text-shadow: 0 0 24px rgba(245,166,35,0.55), 0 0 60px rgba(245,166,35,0.2);
+        opacity: 0; transform: translateY(24px);
+        transition: opacity 0.3s ease 0.18s, transform 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.18s;
+      }
+      #lxp-title.lxp-v .lxp-you,
+      #lxp-title.lxp-v .lxp-xp { opacity: 1; transform: translateY(0); }
+
+      /* ── Progress bar ── */
+      #lxp-bar-wrap {
+        display: flex; flex-direction: column; align-items: center; gap: 10;
+        position: relative; z-index: 1;
+      }
       #lxp-bar-track {
-        width: min(300px, 80vw); height: 2px;
-        background: #1e1e38;
+        width: min(260px, 72vw); height: 2px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 999px; overflow: hidden;
       }
       #lxp-bar {
         height: 100%; width: 0%;
-        background: #f5a623;
-        box-shadow: 0 0 8px #f5a623;
+        background: #F5A623;
+        box-shadow: 0 0 10px rgba(245,166,35,0.7), 0 0 24px rgba(245,166,35,0.3);
+        border-radius: 999px;
         transition: width 1.8s cubic-bezier(0.4,0,0.2,1);
       }
+
+      /* ── Sub-label ── */
       #lxp-sub {
         font-family: 'DM Mono', 'Courier New', monospace;
-        font-size: 11px; color: #6b6b8a; letter-spacing: 0.15em;
+        font-size: 10px;
+        color: rgba(255,255,255,0.2);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
       }
-      .lxp-blink { animation: lxp-blink 0.8s step-end infinite; }
+      .lxp-blink { animation: lxp-blink 0.9s step-end infinite; }
       @keyframes lxp-blink { 50% { opacity: 0; } }
     </style>
   </head>
@@ -75,10 +108,12 @@
     <!-- Loader lives outside #root — React never touches it -->
     <div id="lxp-loader" aria-hidden="true">
       <div id="lxp-title">
-        <span>Y</span><span>o</span><span>u</span><span>X</span><span>P</span>
+        <span class="lxp-you">You</span><span class="lxp-xp">XP</span>
       </div>
-      <div id="lxp-bar-track"><div id="lxp-bar"></div></div>
-      <div id="lxp-sub">LOADING SYSTEM...<span class="lxp-blink">_</span></div>
+      <div id="lxp-bar-wrap">
+        <div id="lxp-bar-track"><div id="lxp-bar"></div></div>
+        <div id="lxp-sub">initializing...<span class="lxp-blink">_</span></div>
+      </div>
     </div>
 
     <div id="root"></div>
