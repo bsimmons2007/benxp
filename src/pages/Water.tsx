@@ -3,6 +3,7 @@ import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
+import { EditIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { today as appToday } from '../lib/utils'
 import { useStore } from '../store/useStore'
@@ -303,8 +304,17 @@ export function Water() {
                     <p style={{ color: '#555', fontSize: 11 }}>{formatTime(e.created_at)}</p>
                   </div>
                 </div>
-                <button onClick={() => { setEditEntry(e); setEditOz(String(e.oz)) }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#555', fontSize: 13, padding: 4 }}>✏️</button>
+                <button
+                  onClick={() => { setEditEntry(e); setEditOz(String(e.oz)) }}
+                  aria-label="Edit entry"
+                  style={{
+                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer',
+                  }}
+                >
+                  <EditIcon size={13} color="var(--text-muted)" />
+                </button>
               </div>
             ))}
           </div>

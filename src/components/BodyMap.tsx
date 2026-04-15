@@ -12,8 +12,8 @@ interface Props {
   onSelect: (key: string) => void
 }
 
-const EMPTY_COLOR  = '#0e0e22'
-const EMPTY_BORDER = '#1c1c35'
+const EMPTY_COLOR  = '#14143a'
+const EMPTY_BORDER = '#2a2a52'
 
 // ── Shared SVG defs ───────────────────────────────────────────────────────────
 
@@ -109,28 +109,35 @@ function MP({ muscleKey, points, scores, selected, hovered, onSelect, onHover }:
   )
 }
 
-// ── Rank dots — vertical, God → Bronze ───────────────────────────────────────
+// ── Rank legend — vertical, God → Bronze (major tiers only) ─────────────────
 
-function RankDots() {
-  const ranked = [...RANKS.filter(r => r.tier > 0)].reverse()
+const LEGEND_IDS = ['god', 'champion', 'elite', 'diamond3', 'platinum3', 'gold3', 'silver3', 'bronze3']
+
+function RankLegend() {
+  const legendRanks = RANKS.filter(r => LEGEND_IDS.includes(r.id)).reverse() // God first (RANKS is asc)
   return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center',
-      gap: 6, padding: '8px 10px',
-    }}>
-      {ranked.map(r => (
-        <div
-          key={r.id}
-          title={r.label}
-          style={{
-            width: 16, height: 16, borderRadius: '50%',
-            backgroundColor: r.color,
-            border: `2px solid ${r.border}`,
-            boxShadow: r.glow !== 'none' ? `0 0 7px ${r.glow}88` : 'none',
-            flexShrink: 0,
-          }}
-        />
-      ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '4px 10px' }}>
+      {legendRanks.map(r => {
+        // Strip roman numeral suffix for compact label
+        const shortLabel = r.label.replace(/ I{1,3}$/, '')
+        return (
+          <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{
+              width: 13, height: 13, borderRadius: '50%', flexShrink: 0,
+              backgroundColor: r.color,
+              border: `1.5px solid ${r.border}`,
+              boxShadow: r.glow !== 'none' ? `0 0 6px ${r.glow}88` : 'none',
+            }} />
+            <span style={{
+              fontSize: 9, fontWeight: 700, whiteSpace: 'nowrap',
+              color: r.glow !== 'none' ? r.glow : '#888',
+              fontFamily: 'Cinzel, serif', letterSpacing: '0.03em',
+            }}>
+              {shortLabel}
+            </span>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -140,7 +147,7 @@ function RankDots() {
 function MuscleLabel({ muscleKey, scores }: { muscleKey: string | null; scores: MuscleScoreResult[] }) {
   if (!muscleKey) {
     return (
-      <p style={{ textAlign: 'center', fontSize: 11, color: '#333', marginTop: 8, height: 30, lineHeight: '30px' }}>
+      <p style={{ textAlign: 'center', fontSize: 11, color: '#666', marginTop: 8, height: 30, lineHeight: '30px' }}>
         Tap a muscle to inspect
       </p>
     )
@@ -192,7 +199,7 @@ function FrontView({ scores, selected, hovered, onSelect, onHover }: SP) {
       scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={onHover} />
 
   return (
-    <svg viewBox="0 0 200 430" style={{ width: '100%', maxWidth: 260, display: 'block', userSelect: 'none' }}>
+    <svg viewBox="0 0 200 430" style={{ width: '100%', maxWidth: 300, display: 'block', userSelect: 'none' }}>
       {/* ── Body silhouette ── */}
       <polygon points="54,68 146,68 153,84 155,100 142,118 136,164 130,192 126,208 100,208 74,208 70,192 64,164 58,118 45,100 47,84"
         fill="url(#body-fill)" filter="url(#bodyEdge)" stroke="none" />
@@ -274,7 +281,7 @@ function BackView({ scores, selected, hovered, onSelect, onHover }: SP) {
       scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={onHover} />
 
   return (
-    <svg viewBox="0 0 200 430" style={{ width: '100%', maxWidth: 260, display: 'block', userSelect: 'none' }}>
+    <svg viewBox="0 0 200 430" style={{ width: '100%', maxWidth: 300, display: 'block', userSelect: 'none' }}>
       {/* ── Body silhouette ── */}
       <polygon points="54,68 146,68 154,84 156,102 144,120 136,166 128,198 126,212 100,212 74,212 72,198 64,166 56,120 44,102 46,84"
         fill="url(#body-fill)" filter="url(#bodyEdge)" stroke="none" />
@@ -366,7 +373,7 @@ export function BodyMap({ view, scores, selected, onSelect }: Props) {
           : <BackView  scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={handleHover} />
         }
         <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
-          <RankDots />
+          <RankLegend />
         </div>
       </div>
 
