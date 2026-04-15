@@ -17,6 +17,7 @@ import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import type { FortniteGame } from '../types'
 import { TrophyIcon, StarIcon, EditIcon } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Log panel ─────────────────────────────────────────────────────
 
@@ -235,6 +236,7 @@ function buildCumulativeWins(games: FortniteGame[]) {
 // ── Main page ─────────────────────────────────────────────────────
 
 export function Fortnite() {
+  usePageTitle('Fortnite')
   const [games, setGames] = useState<FortniteGame[]>([])
   const [editing, setEditing] = useState<FortniteGame | null>(null)
 
@@ -270,7 +272,7 @@ export function Fortnite() {
         <div className="grid grid-cols-3 gap-2 mb-5">
           {[
             { label: 'Wins',      value: wins },
-            { label: 'Best Game', value: bestKills ? `${bestKills}K` : '—' },
+            { label: 'Best Game', value: bestKills ? `${bestKills} kills` : '—' },
             { label: 'Avg Kills', value: games.length ? avgKills : '—' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>

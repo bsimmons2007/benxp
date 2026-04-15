@@ -8,6 +8,7 @@ import { XP_RATES } from '../lib/xp'
 import { useCountUp } from '../hooks/useCountUp'
 import { localDateStr } from '../lib/utils'
 import { DumbbellIcon, SkateIcon, GamepadIcon, MoonIcon, TrophyIcon, BookIcon, StarIcon } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
@@ -40,6 +41,7 @@ interface MonthlyData {
 }
 
 export function Monthly() {
+  usePageTitle('Monthly Reel')
   const now    = new Date()
   const [year,  setYear]  = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth())

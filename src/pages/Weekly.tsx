@@ -6,6 +6,7 @@ import { ProgressBar } from '../components/ui/ProgressBar'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { today as appToday, localDateStr } from '../lib/utils'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 function getMondayOfWeek(date: Date): string {
   const d = new Date(date)
@@ -44,6 +45,7 @@ interface WeeklyData {
 }
 
 export function Weekly() {
+  usePageTitle('Weekly Review')
   const [data, setData]         = useState<WeeklyData | null>(null)
   const [loading, setLoading]   = useState(true)
   const [weekOffset, setWeekOffset] = useState(0) // 0 = this week, -1 = last week

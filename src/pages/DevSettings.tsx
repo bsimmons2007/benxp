@@ -4,6 +4,7 @@ import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { XP_RATES, calculateLevel, xpForLevel } from '../lib/xp'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── PIN gate ──────────────────────────────────────────────────────────
 // PIN is read from env so it is never shipped in the JS bundle.
@@ -307,6 +308,7 @@ function XPEngine() {
 
 // ── Main page ─────────────────────────────────────────────────────────
 export function DevSettings() {
+  usePageTitle('Dev Tools')
   const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem(SESSION_KEY) === '1')
   const [activeTab, setActiveTab] = useState<'xp'>('xp')
 

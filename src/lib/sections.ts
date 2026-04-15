@@ -21,7 +21,8 @@ export const SECTION_DEFS: Record<SectionKey, SectionDef> = {
 }
 
 // Skate is a subsection of Cardio — removed from nav
-export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'books', 'cardio', 'basketball', 'sleep', 'fortnite', 'challenges', 'mood', 'water']
+// Fortnite + Basketball (Hoops) are "Hobby" tabs — shown in nav but hidden by default; enable in Settings
+export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'books', 'cardio', 'sleep', 'challenges', 'mood', 'water', 'basketball', 'fortnite']
 
 export function loadSectionOrder(): SectionKey[] {
   try {
@@ -45,7 +46,7 @@ export function loadHiddenSections(): SectionKey[] {
     const saved = JSON.parse(localStorage.getItem('benxp-hidden') ?? 'null') as SectionKey[]
     if (Array.isArray(saved)) return saved
   } catch { /* ignore */ }
-  return ['mood']
+  return ['mood', 'fortnite', 'basketball']
 }
 
 export function saveHiddenSections(hidden: SectionKey[]): void {

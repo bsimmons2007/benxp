@@ -11,6 +11,7 @@ import { useStore } from '../store/useStore'
 import { playGoalComplete } from '../lib/sounds'
 import type { Goal } from '../types'
 import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, TrophyIcon, TrashIcon } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Preset metric options ────────────────────────────────────
 const GOAL_PRESETS = [
@@ -270,6 +271,7 @@ function GoalCard({ goal, current, onComplete, onDelete }: {
 
 // ── Main page ────────────────────────────────────────────────
 export function Goals() {
+  usePageTitle('Goals')
   const [goals, setGoals] = useState<Goal[]>([])
   const [toast, setToast] = useState<string | null>(null)
   const vals = useMetricValues()
@@ -321,7 +323,44 @@ export function Goals() {
 
         {/* Active goals */}
         {active.length === 0 ? (
-          <p className="text-center py-8" style={{ color: '#555' }}>No active goals. Add one above.</p>
+          <div style={{ padding: '12px 0' }}>
+            <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet — try one of these:</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { emoji: '🏋️', label: 'Bench 225 lbs',      metric: 'bench_1rm',         target: 225 },
+                { emoji: '🛼', label: 'Skate 100 miles',     metric: 'total_skate_miles',  target: 100 },
+                { emoji: '🏃', label: 'Run 50 miles',        metric: 'total_cardio_miles', target: 50  },
+                { emoji: '📚', label: 'Read 5 books',        metric: 'books_read',         target: 5   },
+                { emoji: '😴', label: 'Sleep 7h avg',        metric: 'avg_sleep',          target: 7   },
+              ].map(t => (
+                <button
+                  key={t.metric}
+                  onClick={async () => {
+                    const { data: { user } } = await supabase.auth.getUser()
+                    if (!user) return
+                    await supabase.from('goals').insert({
+                      user_id: user.id, title: t.label,
+                      metric_key: t.metric, target_value: t.target, status: 'active',
+                    })
+                    load()
+                  }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '12px 14px', borderRadius: 12, textAlign: 'left',
+                    background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)',
+                    color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                    transition: 'all 0.15s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+                >
+                  <span style={{ fontSize: 20 }}>{t.emoji}</span>
+                  <span>{t.label}</span>
+                  <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-muted)' }}>+ Add</span>
+                </button>
+              ))}
+            </div>
+          </div>
         ) : (
           active.map(g => (
             <GoalCard

@@ -4,8 +4,10 @@
 import { useNavigate } from 'react-router-dom'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { StrengthTab } from '../components/StrengthTab'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 export function Strength() {
+  usePageTitle('Strength')
   const navigate = useNavigate()
   return (
     <>

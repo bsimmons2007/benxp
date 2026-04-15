@@ -15,6 +15,7 @@ import {
   SwordIcon, DumbbellIcon, SkateIcon, BookIcon, GamepadIcon, MoonIcon,
   BrainIcon, TargetIcon, CalendarIcon, ActivityIcon,
 } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 function badgeIconSm(badge: Badge, accentColor: string): ReactNode {
   const { id, category } = badge
@@ -203,6 +204,7 @@ function Card() {
 
 // ── Share page ────────────────────────────────────────────────
 export function ShareCard() {
+  usePageTitle('Share Card')
   const cardRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const [hint, setHint]     = useState(false)

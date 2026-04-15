@@ -21,6 +21,7 @@ import {
   TrendingIcon, GridIcon, HeartIcon,
 } from '../components/ui/Icon'
 import type { IconComponent } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 const CATEGORY_LABELS: Record<Badge['category'], string> = {
   general:    'General',
@@ -482,6 +483,7 @@ function useLifetimeStats() {
 }
 
 export function Profile() {
+  usePageTitle('Profile')
   const { totalXP, level, progress } = useXP()
   const { badges, earned, loading }  = useAchievements()
   const { skills, loading: skillsLoading } = useSkills()

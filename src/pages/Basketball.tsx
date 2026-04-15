@@ -17,6 +17,7 @@ import { playXPGain, playPR } from '../lib/sounds'
 import type { BasketballSession } from '../types'
 import { BasketballIcon, TrophyIcon, StarIcon, TrendingIcon, EditIcon } from '../components/ui/Icon'
 import { EditModal } from '../components/ui/EditModal'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── XP reward ────────────────────────────────────────────────────
 const XP_PER_SESSION = 25
@@ -295,22 +296,28 @@ function EditBbModal({ session, onClose, onSaved }: { session: BasketballSession
 
 // ── Main page ─────────────────────────────────────────────────────
 export function Basketball() {
+  usePageTitle('Basketball')
   const [sessions, setSessions] = useState<BasketballSession[]>([])
   const [loading,  setLoading]  = useState(true)
   const [editing,  setEditing]  = useState<BasketballSession | null>(null)
 
   const load = async () => {
     setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setLoading(false); return }
-    const { data } = await supabase
-      .from('basketball_sessions')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('date', { ascending: false })
-      .limit(100)
-    setSessions((data as BasketballSession[]) ?? [])
-    setLoading(false)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase
+        .from('basketball_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .limit(100)
+      setSessions((data as BasketballSession[]) ?? [])
+    } catch (e) {
+      console.error('Basketball load error:', e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [])

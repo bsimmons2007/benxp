@@ -11,6 +11,7 @@ import { RulerIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { today, formatDate } from '../lib/utils'
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Types ─────────────────────────────────────────────────────
 interface Measurement {
@@ -129,6 +130,7 @@ function SnapshotStat({
 
 // ── Main page ──────────────────────────────────────────────────
 export function Measurements() {
+  usePageTitle('Measurements')
   const [rows, setRows]         = useState<Measurement[]>([])
   const [loading, setLoading]   = useState(true)
   const [showForm, setShowForm] = useState(false)

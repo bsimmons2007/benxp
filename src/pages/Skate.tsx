@@ -14,6 +14,7 @@ import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import type { SkateSession } from '../types'
 import { ZapIcon, EditIcon, SkateIcon } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Log form ─────────────────────────────────────────────────
 
@@ -125,6 +126,7 @@ function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose:
 // ── Main page ─────────────────────────────────────────────────
 
 export function Skate() {
+  usePageTitle('Skate')
   const [sessions, setSessions] = useState<SkateSession[]>([])
   const [editing, setEditing] = useState<SkateSession | null>(null)
 

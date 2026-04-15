@@ -15,6 +15,7 @@ import { today, formatDate } from '../lib/utils'
 import { playXPGain, playPR } from '../lib/sounds'
 import type { SleepLog } from '../types'
 import { MoonIcon, CheckIcon, EditIcon } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const SLEEP_GOAL = 8        // hours/night target
@@ -526,6 +527,7 @@ const labelStyle = { color: '#aaa' }
 const itemStyle  = { color: '#fff' }
 
 export function Sleep() {
+  usePageTitle('Sleep')
   const [logs,    setLogs]    = useState<SleepLog[]>([])
   const [editing, setEditing] = useState<SleepLog | null>(null)
 

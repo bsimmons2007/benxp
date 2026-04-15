@@ -6,6 +6,7 @@ import { EditModal } from '../components/ui/EditModal'
 import { supabase } from '../lib/supabase'
 import { today as appToday } from '../lib/utils'
 import { useStore } from '../store/useStore'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 const GOAL_OZ    = 64   // daily goal in oz
 const QUICK_ADDS = [8, 12, 16, 20, 24] // oz presets
@@ -152,6 +153,7 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export function Water() {
+  usePageTitle('Water')
   const [entries,     setEntries]     = useState<WaterEntry[]>([])
   const [customOz,    setCustomOz]    = useState('')
   const [toast,       setToast]       = useState<string | null>(null)

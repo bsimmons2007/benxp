@@ -22,6 +22,7 @@ import {
 } from '../lib/sounds'
 import type { Theme } from '../lib/theme'
 import type { SectionKey } from '../lib/sections'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 const C = 'var(--text-muted)'
 const XP_BREAKDOWN: { label: string; icon: ReactNode; xp: string }[] = [
@@ -106,6 +107,7 @@ function ThemeSquare({ theme, active, onSelect }: { theme: Theme; active: boolea
 }
 
 export function Settings() {
+  usePageTitle('Settings')
   const navigate = useNavigate()
   const { totalXP, level } = useXP()
   const userName      = useUserName()

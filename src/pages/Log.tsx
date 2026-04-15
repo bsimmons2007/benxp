@@ -4,6 +4,7 @@ import { TopBar } from '../components/layout/TopBar'
 import { LogWorkoutForm } from '../components/forms/LogWorkoutForm'
 import { LogFortniteForm } from '../components/forms/LogFortniteForm'
 import { DumbbellIcon, GamepadIcon } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 type Tab = 'Workout' | 'Fortnite'
 
@@ -13,6 +14,7 @@ const TABS: { key: Tab; label: string; icon: ReactNode }[] = [
 ]
 
 export function Log() {
+  usePageTitle('Log')
   const [active, setActive] = useState<Tab>('Workout')
 
   return (

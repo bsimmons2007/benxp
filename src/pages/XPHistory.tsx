@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { useXP } from '../hooks/useXP'
 import { DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, GamepadIcon, MoonIcon, TargetIcon, ActivityIconComp } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 interface XPEvent {
   date: string
@@ -144,6 +145,7 @@ function formatDate(iso: string): string {
 }
 
 export function XPHistory() {
+  usePageTitle('XP History')
   const [events, setEvents] = useState<XPEvent[]>([])
   const [loading, setLoading] = useState(true)
   const { totalXP, loading: xpLoading } = useXP()

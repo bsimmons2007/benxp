@@ -7,6 +7,7 @@ import { TrophyIcon, SearchIcon, DumbbellIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { formatDate } from '../lib/utils'
 import type { PrHistory, LiftType } from '../types'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 const LIFT_ORDER: LiftType[] = ['Bench', 'Squat', 'Deadlift', 'PullUps', 'PushUps']
 
@@ -75,6 +76,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
 }
 
 export function PRFeed() {
+  usePageTitle('PR Feed')
   const navigate = useNavigate()
   const [prs, setPrs] = useState<PrHistory[]>([])
   const [loading, setLoading] = useState(true)

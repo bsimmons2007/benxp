@@ -13,6 +13,7 @@ import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain } from '../lib/sounds'
 import { ActivityIconComp, EditIcon, ZapIcon } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 const ACTIVITIES = [
   { key: 'run',   label: 'Run'   },
@@ -214,6 +215,7 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
 
 // ── Main page ─────────────────────────────────────────────────
 export function Cardio() {
+  usePageTitle('Cardio')
   const [sessions, setSessions] = useState<Session[]>([])
   const [filter, setFilter]     = useState<ActivityKey | 'all'>('all')
   const [editing, setEditing]   = useState<Session | null>(null)
@@ -315,7 +317,7 @@ export function Cardio() {
                 </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
                 <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
-                <YAxis domain={['auto', 'auto']} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
+                <YAxis domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.25)]} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
                 <Tooltip
                   contentStyle={{ background: 'rgba(10,10,22,0.97)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, color: '#fff', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any

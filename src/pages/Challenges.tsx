@@ -10,6 +10,7 @@ import { loadHiddenSections, SECTION_DEFS } from '../lib/sections'
 import { playGoalComplete } from '../lib/sounds'
 import type { Challenge } from '../types'
 import { CalendarIcon, SwordIcon } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Tier config ────────────────────────────────────────────────
 
@@ -131,6 +132,7 @@ function ChallengeCard({
 // ── Main page ──────────────────────────────────────────────────
 
 export function Challenges() {
+  usePageTitle('Quests')
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [activeTier, setActiveTier] = useState<TierKey>('Weekly')
   const [syncing, setSyncing] = useState(true)
@@ -138,14 +140,19 @@ export function Challenges() {
 
   async function syncAndLoad() {
     setSyncing(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) await syncChallenges(supabase, user.id)
-    const { data } = await supabase.from('challenges')
-      .select('*')
-      .in('status', ['active', 'completed'])
-      .order('created_at', { ascending: false })
-    setChallenges(data ?? [])
-    setSyncing(false)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) await syncChallenges(supabase, user.id)
+      const { data } = await supabase.from('challenges')
+        .select('*')
+        .in('status', ['active', 'completed'])
+        .order('created_at', { ascending: false })
+      setChallenges(data ?? [])
+    } catch (e) {
+      console.error('Challenges sync error:', e)
+    } finally {
+      setSyncing(false)
+    }
   }
 
   useEffect(() => { syncAndLoad() }, [])

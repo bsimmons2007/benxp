@@ -15,6 +15,7 @@ import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
 import type { MoodLog } from '../types'
 import { HeartIcon, ZapIcon, ActivityIcon, EditIcon } from '../components/ui/Icon'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { EditModal } from '../components/ui/EditModal'
 
 interface MoodForm {
@@ -41,6 +42,7 @@ function moodEmoji(v: number) {
 }
 
 export function Mood() {
+  usePageTitle('Mood')
   const { register, handleSubmit, watch, reset, formState: { isSubmitting } } = useForm<MoodForm>({
     defaultValues: { date: today(), mood: '7', energy: '7', stress: '5', activities: '', notes: '' },
   })

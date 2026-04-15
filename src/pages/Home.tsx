@@ -16,6 +16,7 @@ import { ArrowUpIcon, ArrowDownIcon, FlameIcon, ActivityIcon } from '../componen
 import { xpForLevel, getLevelTitle } from '../lib/xp'
 import { loadHiddenSections } from '../lib/sections'
 import { useStrengthSnapshot } from '../components/StrengthTab'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Types ────────────────────────────────────────────────────
 type TrendDir = 'up' | 'down' | 'flat'
@@ -161,6 +162,7 @@ function useTrends() {
 
 // ── Main page ────────────────────────────────────────────────
 export function Home() {
+  usePageTitle('Home')
   const { totalXP, level, progress, loading } = useXP()
   const { stats }    = useStats()
   const activity     = useStore(s => s.recentActivity)

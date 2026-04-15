@@ -14,6 +14,7 @@ import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playGoalComplete } from '../lib/sounds'
 import type { Book, ToRead } from '../types'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Types ────────────────────────────────────────────────────
 type SortKey = 'date_desc' | 'date_asc' | 'title_asc' | 'title_desc' | 'rating_desc' | 'rating_asc' | 'pages_desc' | 'pages_asc'
@@ -457,6 +458,7 @@ function ToReadSection() {
 
 // ── Main page ────────────────────────────────────────────────
 export function Books() {
+  usePageTitle('Books')
   const [allBooks, setAllBooks] = useState<Book[]>([])
   const [sort, setSort]           = useState<SortKey>('date_desc')
   const [filterGenre, setFilterGenre] = useState('All')

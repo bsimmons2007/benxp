@@ -17,6 +17,7 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { DumbbellIcon } from '../components/ui/Icon'
 import { useStore } from '../store/useStore'
 import type { LiftType, LiftingLog, PrHistory } from '../types'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Exercise library (loaded once from Supabase) ──────────────────────────────
 
@@ -389,15 +390,20 @@ function ExerciseRow({
 
         {/* RPE */}
         <div>
-          <label style={{ display: 'block', color: '#666', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>RPE</label>
+          <label style={{ display: 'block', color: '#666', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            RPE
+            <span title="Rate of Perceived Exertion — how hard the set felt on a scale of 1–10. 6 = easy, 8 = 2 reps left in tank, 10 = absolute max effort."
+              style={{ marginLeft: 5, cursor: 'help', color: '#555', fontSize: 11, fontStyle: 'normal' }}>ⓘ</span>
+          </label>
           <input
-            type="number" step="0.5" min="1" max="10" placeholder="8"
+            type="number" step="0.5" min="1" max="10" placeholder="8 (optional)"
             value={entry.rpe}
             onChange={e => onChange({ rpe: e.target.value })}
             style={FIELD_STYLE}
             onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
             onBlur={e  => (e.target.style.borderColor = 'rgba(255,255,255,0.10)')}
           />
+          <p style={{ fontSize: 9, color: '#444', marginTop: 3 }}>1–10 · How hard did that feel? (e.g. 8 = 2 reps left)</p>
         </div>
       </div>
     </div>
@@ -981,6 +987,7 @@ function EditIcon() {
 // ── Main page ─────────────────────────────────────────────────────
 
 export function Records() {
+  usePageTitle('Lifting')
   const [tab,             setTab]           = useState<'log' | 'strength'>('log')
   const [strengthLoaded,  setStrengthLoaded] = useState(false)
   const [prs,             setPrs]           = useState<Record<string, PrHistory>>({})
