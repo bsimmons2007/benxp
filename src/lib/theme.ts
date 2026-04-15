@@ -784,7 +784,7 @@ export function applyTheme(theme: Theme) {
 
 export function loadTheme(): Theme {
   const saved = localStorage.getItem('benxp-theme')
-  return THEMES.find((t) => t.id === saved) ?? THEMES[0]
+  return THEMES.find((t) => t.id === saved) ?? THEMES.find((t) => t.id === 'midnight') ?? THEMES[0]
 }
 
 // ── Time-of-day auto theme ─────────────────────────────────────
