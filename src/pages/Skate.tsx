@@ -180,7 +180,12 @@ export function Skate() {
         <LogSkatePanel onLogged={load} />
 
         {/* Miles trend */}
-        {milesTrend.length >= 2 && (
+        {milesTrend.length > 0 && milesTrend.length < 3 && (
+          <div style={{ textAlign: 'center', padding: '14px 0 8px', color: 'var(--text-muted)', fontSize: 12 }}>
+            📈 Log {3 - milesTrend.length} more session{3 - milesTrend.length > 1 ? 's' : ''} to unlock your trend chart
+          </div>
+        )}
+        {milesTrend.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Miles per Session</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>
@@ -214,7 +219,7 @@ export function Skate() {
         )}
 
         {/* Fastest mile trend */}
-        {fastestTrend.length >= 2 && (
+        {fastestTrend.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Fastest Mile Trend</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>Lower is faster</p>

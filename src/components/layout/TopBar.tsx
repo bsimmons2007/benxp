@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { useUserName } from '../../hooks/useUserName'
 import { useNavStore } from '../../store/useNavStore'
 
@@ -15,10 +16,23 @@ export function TopBar({ title, hideSettings = false, back = false }: TopBarProp
   const logoLabel     = title ?? (userName ? `${userName}XP` : 'YouXP')
   const logoClickable = !title
 
+  // Show a one-time hint pulse on the hamburger for new users
+  const [showHint, setShowHint] = useState(false)
+  useEffect(() => {
+    if (!back && !localStorage.getItem('benxp-nav-opened')) {
+      setShowHint(true)
+    }
+  }, [back])
+
   function handleLeft() {
     if (back) navigate(-1)
-    else toggleNav()
+    else {
+      toggleNav()
+      localStorage.setItem('benxp-nav-opened', '1')
+      setShowHint(false)
+    }
   }
+
 
   return (
     <header
@@ -33,6 +47,14 @@ export function TopBar({ title, hideSettings = false, back = false }: TopBarProp
       }}
     >
       {/* Left */}
+      <div style={{ position: 'relative', width: 36, height: 36, flexShrink: 0 }}>
+        {showHint && (
+          <span style={{
+            position: 'absolute', inset: -4, borderRadius: 12, pointerEvents: 'none',
+            border: '2px solid var(--accent)', opacity: 0.7,
+            animation: 'pulse-ring 1.5s ease-in-out infinite',
+          }} />
+        )}
       <button
         onClick={handleLeft}
         aria-label={back ? 'Go back' : 'Open menu'}
@@ -40,7 +62,8 @@ export function TopBar({ title, hideSettings = false, back = false }: TopBarProp
         style={{
           width: 36, height: 36, flexShrink: 0,
           background: 'none', border: 'none', cursor: 'pointer',
-          color: 'var(--text-secondary)',
+          color: showHint ? 'var(--accent)' : 'var(--text-secondary)',
+          position: 'relative',
         }}
       >
         {back ? (
@@ -55,6 +78,7 @@ export function TopBar({ title, hideSettings = false, back = false }: TopBarProp
           </svg>
         )}
       </button>
+      </div>
 
       {/* Center — absolutely positioned so it stays centered regardless of side buttons */}
       <button

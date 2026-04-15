@@ -286,7 +286,7 @@ export function Fortnite() {
         <LogFortnitePanel onLogged={load} />
 
         {/* Cumulative wins */}
-        {cumulativeWins.length >= 2 && (
+        {cumulativeWins.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Cumulative Wins</p>
             <ResponsiveContainer width="100%" height={160}>
@@ -308,7 +308,7 @@ export function Fortnite() {
         )}
 
         {/* Monthly wins bar */}
-        {monthlyWins.length >= 2 && (
+        {monthlyWins.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Monthly Wins</p>
             <ResponsiveContainer width="100%" height={130}>

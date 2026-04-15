@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
 import { Card } from '../components/ui/Card'
@@ -179,12 +180,12 @@ export function Home() {
   const animatedXP   = useCountUp(loading ? 0 : totalXP, 1200)
   const hidden       = loadHiddenSections()
 
-  const statCards: { label: string; value: string | number; unit?: string; trendKey?: string }[] = [
+  const statCards: { label: string; value: string | number; unit?: string; trendKey?: string; to?: string }[] = [
     ...(!hidden.includes('lifting') ? [
       { label: 'Bench PR',    value: stats.benchPR    ? stats.benchPR.toFixed(1)    : '—', unit: 'lbs', trendKey: 'bench'    },
       { label: 'Squat PR',    value: stats.squatPR    ? stats.squatPR.toFixed(1)    : '—', unit: 'lbs', trendKey: 'squat'    },
       { label: 'Deadlift PR', value: stats.deadliftPR ? stats.deadliftPR.toFixed(1) : '—', unit: 'lbs', trendKey: 'deadlift' },
-      { label: 'Strength SQ', value: strengthSQ !== null ? String(strengthSQ) : '—', unit: '/100' },
+      { label: 'Strength SQ', value: strengthSQ !== null ? String(strengthSQ) : '—', unit: '/100', to: '/strength' },
     ] : []),
     ...(!hidden.includes('skate')    ? [{ label: 'Total Miles', value: stats.totalMiles.toFixed(1), unit: 'mi', trendKey: 'miles' }] : []),
     ...(!hidden.includes('books')    ? [{ label: 'Books 2026',  value: stats.books2026, trendKey: 'books' }] : []),
@@ -273,15 +274,20 @@ export function Home() {
         {/* ── Stats grid ── */}
         {statCards.length > 0 && (
           <div className="grid grid-cols-3 gap-2 mb-5">
-            {statCards.map(c => (
-              <StatCard
-                key={c.label}
-                label={c.label}
-                value={c.value}
-                unit={c.unit}
-                trendDir={c.trendKey ? trends[c.trendKey] : undefined}
-              />
-            ))}
+            {statCards.map(c => {
+              const card = (
+                <StatCard
+                  key={c.label}
+                  label={c.label}
+                  value={c.value}
+                  unit={c.unit}
+                  trendDir={c.trendKey ? trends[c.trendKey] : undefined}
+                />
+              )
+              return c.to ? (
+                <Link key={c.label} to={c.to} style={{ textDecoration: 'none' }}>{card}</Link>
+              ) : card
+            })}
           </div>
         )}
 

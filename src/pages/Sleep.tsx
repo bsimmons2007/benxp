@@ -601,7 +601,12 @@ export function Sleep() {
         <LogSleepPanel onLogged={load} />
 
         {/* Hours slept trend */}
-        {sorted.length >= 2 && (
+        {sorted.length > 0 && sorted.length < 3 && (
+          <div style={{ textAlign: 'center', padding: '14px 0 8px', color: 'var(--text-muted)', fontSize: 12 }}>
+            📈 Log {3 - sorted.length} more night{3 - sorted.length > 1 ? 's' : ''} to unlock your trend chart
+          </div>
+        )}
+        {sorted.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Hours Slept</p>
             <ResponsiveContainer width="100%" height={160}>

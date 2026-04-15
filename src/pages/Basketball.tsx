@@ -490,7 +490,7 @@ export function Basketball() {
             )}
 
             {/* ── Trend charts ── */}
-            {chartSessions.length >= 2 && (
+            {chartSessions.length >= 3 && (
               <Card style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                   <TrendingIcon size={16} color="var(--text-secondary)" />
