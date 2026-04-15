@@ -14,7 +14,8 @@ import { playXPGain } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
 import type { MoodLog } from '../types'
-import { HeartIcon, ZapIcon, ActivityIcon } from '../components/ui/Icon'
+import { HeartIcon, ZapIcon, ActivityIcon, EditIcon } from '../components/ui/Icon'
+import { EditModal } from '../components/ui/EditModal'
 
 interface MoodForm {
   date: string
@@ -43,8 +44,11 @@ export function Mood() {
   const { register, handleSubmit, watch, reset, formState: { isSubmitting } } = useForm<MoodForm>({
     defaultValues: { date: today(), mood: '7', energy: '7', stress: '5', activities: '', notes: '' },
   })
-  const [recent, setRecent] = useState<MoodLog[]>([])
-  const [toast,  setToast]  = useState<string | null>(null)
+  const [recent,    setRecent]    = useState<MoodLog[]>([])
+  const [toast,     setToast]     = useState<string | null>(null)
+  const [editEntry, setEditEntry] = useState<MoodLog | null>(null)
+  const [editVals,  setEditVals]  = useState({ mood: '7', energy: '7', stress: '5', activities: '', notes: '' })
+  const [saving,    setSaving]    = useState(false)
   const refreshXP = useStore(s => s.refreshXP)
 
   const moodVal   = parseInt(watch('mood')   ?? '7')
@@ -56,6 +60,36 @@ export function Mood() {
   }
 
   useEffect(() => { loadRecent() }, [])
+
+  function openEdit(r: MoodLog) {
+    setEditVals({
+      mood: String(r.mood ?? 7), energy: String(r.energy ?? 7),
+      stress: String(r.stress ?? 5), activities: r.activities ?? '', notes: r.notes ?? '',
+    })
+    setEditEntry(r)
+  }
+
+  async function saveMoodEdit() {
+    if (!editEntry) return
+    setSaving(true)
+    await supabase.from('mood_log').update({
+      mood:       parseInt(editVals.mood),
+      energy:     parseInt(editVals.energy),
+      stress:     parseInt(editVals.stress),
+      activities: editVals.activities || null,
+      notes:      editVals.notes || null,
+    }).eq('id', editEntry.id)
+    setSaving(false)
+    setEditEntry(null)
+    loadRecent()
+  }
+
+  async function deleteMoodEntry() {
+    if (!editEntry) return
+    await supabase.from('mood_log').delete().eq('id', editEntry.id)
+    setEditEntry(null)
+    loadRecent()
+  }
 
   const onSubmit = async (data: MoodForm) => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -236,10 +270,13 @@ export function Mood() {
                 >
                   <div className="flex justify-between items-center">
                     <p style={{ fontSize: 12, color: '#666' }}>{formatDate(r.date)}</p>
-                    <div style={{ display: 'flex', gap: 10 }}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                       <span style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700 }}>{moodEmoji(r.mood ?? 5)} {r.mood}</span>
                       <span style={{ color: '#4ade80',       fontSize: 12 }}>E:{r.energy}</span>
                       <span style={{ color: '#f87171',       fontSize: 12 }}>S:{r.stress}</span>
+                      <button onClick={() => openEdit(r)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, opacity: 0.5 }}>
+                        <EditIcon size={12} color="var(--text-muted)" />
+                      </button>
                     </div>
                   </div>
                   {r.notes && (
@@ -253,6 +290,49 @@ export function Mood() {
 
         {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       </PageWrapper>
+
+      {editEntry && (
+        <EditModal
+          title={`Edit — ${formatDate(editEntry.date)}`}
+          onClose={() => setEditEntry(null)}
+          onDelete={deleteMoodEntry}
+          onSave={saveMoodEdit}
+          saving={saving}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {([
+              { label: 'Mood',   key: 'mood'   as const, color: 'var(--accent)' },
+              { label: 'Energy', key: 'energy' as const, color: '#4ade80' },
+              { label: 'Stress', key: 'stress' as const, color: '#f87171' },
+            ]).map(({ label, key, color }) => (
+              <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <label style={{ fontSize: 13, color: '#aaa' }}>{label}</label>
+                  <span style={{ fontSize: 14, fontWeight: 700, color }}>{editVals[key]}</span>
+                </div>
+                <input type="range" min="1" max="10" step="1"
+                  value={editVals[key]}
+                  onChange={e => setEditVals(v => ({ ...v, [key]: e.target.value }))}
+                  style={{ accentColor: color } as React.CSSProperties}
+                  className="w-full"
+                />
+              </div>
+            ))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={{ fontSize: 13, color: '#aaa' }}>Activities</label>
+              <input value={editVals.activities} onChange={e => setEditVals(v => ({ ...v, activities: e.target.value }))}
+                placeholder="Gym, reading…"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#fff', fontSize: 14, width: '100%' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={{ fontSize: 13, color: '#aaa' }}>Notes</label>
+              <textarea value={editVals.notes} onChange={e => setEditVals(v => ({ ...v, notes: e.target.value }))}
+                rows={3} placeholder="How was today?"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#fff', fontSize: 14, width: '100%', resize: 'none' }} />
+            </div>
+          </div>
+        </EditModal>
+      )}
     </>
   )
 }

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Toast } from '../components/ui/Toast'
+import { EditModal } from '../components/ui/EditModal'
 import { supabase } from '../lib/supabase'
 import { today as appToday } from '../lib/utils'
 import { useStore } from '../store/useStore'
@@ -156,6 +157,9 @@ export function Water() {
   const [toast,       setToast]       = useState<string | null>(null)
   const [userId,      setUserId]      = useState<string | null>(null)
   const [loading,     setLoading]     = useState(true)
+  const [editEntry,   setEditEntry]   = useState<WaterEntry | null>(null)
+  const [editOz,      setEditOz]      = useState('')
+  const [saving,      setSaving]      = useState(false)
   const refreshXP = useStore(s => s.refreshXP)
 
   const todayStr = appToday()
@@ -195,6 +199,15 @@ export function Water() {
 
   async function deleteEntry(id: string) {
     await supabase.from('water_log').delete().eq('id', id)
+    load()
+  }
+
+  async function saveEdit() {
+    if (!editEntry) return
+    setSaving(true)
+    await supabase.from('water_log').update({ oz: parseFloat(editOz) || editEntry.oz }).eq('id', editEntry.id)
+    setSaving(false)
+    setEditEntry(null)
     load()
   }
 
@@ -288,7 +301,8 @@ export function Water() {
                     <p style={{ color: '#555', fontSize: 11 }}>{formatTime(e.created_at)}</p>
                   </div>
                 </div>
-                <button onClick={() => deleteEntry(e.id)} style={{ color: '#333', fontSize: 16, padding: 4 }}>✕</button>
+                <button onClick={() => { setEditEntry(e); setEditOz(String(e.oz)) }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#555', fontSize: 13, padding: 4 }}>✏️</button>
               </div>
             ))}
           </div>
@@ -304,6 +318,23 @@ export function Water() {
 
       </PageWrapper>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {editEntry && (
+        <EditModal
+          title={`Edit — ${formatTime(editEntry.created_at)}`}
+          onClose={() => setEditEntry(null)}
+          onDelete={() => { deleteEntry(editEntry.id); setEditEntry(null) }}
+          onSave={saveEdit}
+          saving={saving}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <label style={{ fontSize: 12, color: '#888' }}>Amount (oz)</label>
+            <input
+              type="number" value={editOz} onChange={e => setEditOz(e.target.value)}
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 16, width: '100%' }}
+            />
+          </div>
+        </EditModal>
+      )}
     </>
   )
 }

@@ -15,7 +15,8 @@ import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import type { BasketballSession } from '../types'
-import { BasketballIcon, TrophyIcon, StarIcon, TrendingIcon } from '../components/ui/Icon'
+import { BasketballIcon, TrophyIcon, StarIcon, TrendingIcon, EditIcon } from '../components/ui/Icon'
+import { EditModal } from '../components/ui/EditModal'
 
 // ── XP reward ────────────────────────────────────────────────────
 const XP_PER_SESSION = 25
@@ -212,10 +213,91 @@ function TrendChart({ data, dataKey, label, color = 'var(--accent)' }: {
   )
 }
 
+// ── Edit modal ────────────────────────────────────────────────────
+function EditBbModal({ session, onClose, onSaved }: { session: BasketballSession; onClose: () => void; onSaved: () => void }) {
+  const [vals, setVals] = useState({
+    date: session.date,
+    fg_made: String(session.fg_made), fg_attempted: String(session.fg_attempted),
+    three_made: String(session.three_made), three_attempted: String(session.three_attempted),
+    ft_made: String(session.ft_made), ft_attempted: String(session.ft_attempted),
+    points: String(session.points), assists: String(session.assists),
+    rebounds: String(session.rebounds), steals: String(session.steals),
+    blocks: String(session.blocks), turnovers: String(session.turnovers),
+    notes: session.notes ?? '',
+  })
+  const [saving, setSaving] = useState(false)
+  const int = (v: string) => parseInt(v) || 0
+
+  async function save() {
+    setSaving(true)
+    await supabase.from('basketball_sessions').update({
+      date: vals.date,
+      fg_made: int(vals.fg_made), fg_attempted: int(vals.fg_attempted),
+      three_made: int(vals.three_made), three_attempted: int(vals.three_attempted),
+      ft_made: int(vals.ft_made), ft_attempted: int(vals.ft_attempted),
+      points: int(vals.points), assists: int(vals.assists),
+      rebounds: int(vals.rebounds), steals: int(vals.steals),
+      blocks: int(vals.blocks), turnovers: int(vals.turnovers),
+      notes: vals.notes || null,
+    }).eq('id', session.id)
+    setSaving(false)
+    onSaved()
+    onClose()
+  }
+
+  async function del() {
+    await supabase.from('basketball_sessions').delete().eq('id', session.id)
+    onSaved()
+    onClose()
+  }
+
+  const field = (label: string, key: keyof typeof vals) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <label style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</label>
+      <input
+        type="number" value={vals[key]}
+        onChange={e => setVals(v => ({ ...v, [key]: e.target.value }))}
+        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }}
+      />
+    </div>
+  )
+
+  return (
+    <EditModal title={`Edit — ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Date</label>
+          <input type="date" value={vals.date} onChange={e => setVals(v => ({ ...v, date: e.target.value }))}
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
+        </div>
+        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Shooting</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {field('FG Made', 'fg_made')}{field('FG Attempted', 'fg_attempted')}
+          {field('3PT Made', 'three_made')}{field('3PT Attempted', 'three_attempted')}
+          {field('FT Made', 'ft_made')}{field('FT Attempted', 'ft_attempted')}
+        </div>
+        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Box Score</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {field('Points', 'points')}{field('Assists', 'assists')}
+          {field('Rebounds', 'rebounds')}{field('Steals', 'steals')}
+          {field('Blocks', 'blocks')}{field('Turnovers', 'turnovers')}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Notes</label>
+          <input value={vals.notes} onChange={e => setVals(v => ({ ...v, notes: e.target.value }))}
+            placeholder="Optional notes…"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
+        </div>
+      </div>
+    </EditModal>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────
 export function Basketball() {
   const [sessions, setSessions] = useState<BasketballSession[]>([])
   const [loading,  setLoading]  = useState(true)
+  const [editing,  setEditing]  = useState<BasketballSession | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -444,7 +526,12 @@ export function Basketball() {
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                       <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{formatDate(s.date)}</span>
-                      <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--accent)' }}>{s.points} PTS</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--accent)' }}>{s.points} PTS</span>
+                        <button onClick={() => setEditing(s)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.5 }}>
+                          <EditIcon size={14} color="var(--text-muted)" />
+                        </button>
+                      </div>
                     </div>
                     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                       {[
@@ -470,6 +557,7 @@ export function Basketball() {
                 ))}
               </div>
             </Card>
+            {editing && <EditBbModal session={editing} onClose={() => setEditing(null)} onSaved={load} />}
           </>
         )}
       </PageWrapper>
