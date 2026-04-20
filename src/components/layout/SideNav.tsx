@@ -64,10 +64,13 @@ export function SideNav() {
     return () => document.removeEventListener('keydown', onKey)
   }, [closeNav])
 
+  // basketball + fortnite always live in the Hobbies section below — exclude from main tabs
+  const HOBBY_KEYS = new Set(['basketball', 'fortnite'])
+
   const mainTabs = [
     { to: '/', label: 'Home', iconKey: '__home' },
     ...order
-      .filter(key => !hidden.includes(key))
+      .filter(key => !hidden.includes(key) && !HOBBY_KEYS.has(key))
       .map(key => ({
         to:      SECTION_DEFS[key].path,
         label:   SECTION_DEFS[key].label,

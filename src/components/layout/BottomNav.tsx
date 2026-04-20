@@ -16,10 +16,13 @@ export function BottomNav() {
     return () => window.removeEventListener('sections-updated', onUpdate)
   }, [])
 
+  // basketball + fortnite live in the sidebar Hobbies section — never show in bottom tab bar
+  const HOBBY_KEYS = new Set(['basketball', 'fortnite'])
+
   const tabs = [
     { to: '/',     label: 'Home', iconKey: '__home' },
     ...order
-      .filter(key => !hidden.includes(key))
+      .filter(key => !hidden.includes(key) && !HOBBY_KEYS.has(key))
       .map(key => ({ to: SECTION_DEFS[key].path, label: SECTION_DEFS[key].label, iconKey: key })),
     { to: '/more', label: 'More', iconKey: '__more' },
   ]
