@@ -1028,6 +1028,7 @@ export function Records() {
   const [prs,             setPrs]           = useState<Record<string, PrHistory>>({})
   const [history,         setHistory]       = useState<LiftingLog[]>([])
   const [exercises,       setExercises]     = useState<ExerciseMeta[]>([])
+  const [muscleFilter,    setMuscleFilter]  = useState<string | null>(null)
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -1055,7 +1056,12 @@ export function Records() {
     if (t === 'strength' && !strengthLoaded) setStrengthLoaded(true)
   }
 
-  const loggedLifts = [...new Set(history.map(r => r.lift))]
+  const exerciseGroupMap = Object.fromEntries(exercises.map(e => [e.name, e.muscle_group]))
+  const allLoggedLifts = [...new Set(history.map(r => r.lift))]
+  const liftGroups = [...new Set(allLoggedLifts.map(l => exerciseGroupMap[l]).filter(Boolean))].sort()
+  const loggedLifts = muscleFilter
+    ? allLoggedLifts.filter(l => exerciseGroupMap[l] === muscleFilter)
+    : allLoggedLifts
 
   return (
     <>
@@ -1076,15 +1082,44 @@ export function Records() {
         <div style={{ display: tab === 'log' ? 'block' : 'none' }}>
           <LogWorkoutPanel onLogged={load} exercises={exercises} />
 
-          {loggedLifts.length > 0 && (
-            <p className="section-label mb-3">Your Lifts — tap to expand</p>
+          {allLoggedLifts.length > 0 && (
+            <>
+              <p className="section-label mb-2">Your Lifts — tap to expand</p>
+              {liftGroups.length > 1 && (
+                <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 8, marginBottom: 8, scrollbarWidth: 'none' }}>
+                  <button
+                    onClick={() => setMuscleFilter(null)}
+                    style={{
+                      flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                      background: muscleFilter === null ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                      color: muscleFilter === null ? 'var(--base-bg)' : 'var(--text-secondary)',
+                      border: `1px solid ${muscleFilter === null ? 'var(--accent)' : 'rgba(255,255,255,0.1)'}`,
+                      cursor: 'pointer', transition: 'all 0.12s ease',
+                    }}
+                  >All</button>
+                  {liftGroups.map(grp => (
+                    <button
+                      key={grp}
+                      onClick={() => setMuscleFilter(g => g === grp ? null : grp)}
+                      style={{
+                        flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                        background: muscleFilter === grp ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                        color: muscleFilter === grp ? 'var(--base-bg)' : 'var(--text-secondary)',
+                        border: `1px solid ${muscleFilter === grp ? 'var(--accent)' : 'rgba(255,255,255,0.1)'}`,
+                        cursor: 'pointer', transition: 'all 0.12s ease', whiteSpace: 'nowrap',
+                      }}
+                    >{MUSCLE_GROUP_ICONS[grp] ?? ''} {grp}</button>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           {loggedLifts.map(lift => (
             <LiftCard key={lift} lift={lift} pr={prs[lift]} history={history} onSaved={load} />
           ))}
 
-          {loggedLifts.length === 0 && (
+          {allLoggedLifts.length === 0 && (
             <EmptyState
               icon={<DumbbellIcon size={64} color="var(--text-muted)" />}
               title="No lifts logged yet"

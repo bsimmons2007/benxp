@@ -26,7 +26,7 @@ type FnRank = typeof FN_RANKS[number]
 
 interface FnForm {
   date: string
-  mode: 'Solos' | 'Duos' | 'Squads'
+  mode: 'Solos' | 'Duos' | 'Squads' | 'Blitz'
   season: string
   placement: string
   kills: string
@@ -96,7 +96,7 @@ function LogFortnitePanel({ onLogged }: { onLogged: () => void }) {
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Mode</label>
               <select {...register('mode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <option>Solos</option><option>Duos</option><option>Squads</option>
+                <option>Solos</option><option>Duos</option><option>Squads</option><option>Blitz</option>
               </select>
             </div>
             <Input label="Season" type="text" placeholder="Chapter 6 S2" {...register('season')} />
@@ -247,7 +247,8 @@ export function Fortnite() {
   useEffect(() => { load() }, [])
 
   const sorted = [...games].sort((a, b) => a.date.localeCompare(b.date))
-  const wins = games.filter(g => g.win).length
+  const wins = games.filter(g => g.win && g.mode !== 'Blitz').length
+  const blitzWins = games.filter(g => g.win && g.mode === 'Blitz').length
   const avgKills = games.length
     ? Math.round((games.reduce((s, g) => s + g.kills, 0) / games.length) * 10) / 10
     : 0
@@ -269,7 +270,7 @@ export function Fortnite() {
       <PageWrapper>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
+        <div className="grid grid-cols-3 gap-2 mb-3">
           {[
             { label: 'Wins',      value: wins },
             { label: 'Best Game', value: bestKills ? `${bestKills} kills` : '—' },
@@ -280,6 +281,14 @@ export function Fortnite() {
               <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
             </div>
           ))}
+        </div>
+        {/* Blitz row */}
+        <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)' }}>
+          <div className="flex items-center gap-2">
+            <span style={{ fontSize: 16 }}>⚡</span>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#a855f7', fontFamily: 'Cinzel, serif' }}>Blitz Wins</p>
+          </div>
+          <p style={{ fontSize: 22, fontWeight: 900, color: '#a855f7', fontFamily: 'Cinzel, serif' }}>{blitzWins}</p>
         </div>
 
         {/* Log button */}

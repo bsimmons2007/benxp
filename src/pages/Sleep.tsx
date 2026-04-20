@@ -114,6 +114,54 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
+// ── Nap log panel ─────────────────────────────────────────────────────────────
+
+function LogNapPanel({ onLogged }: { onLogged: () => void }) {
+  const [open,  setOpen]  = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
+  const [date,  setDate]  = useState(today())
+  const [hours, setHours] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!hours) return
+    setSaving(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setSaving(false); return }
+    await supabase.from('sleep_log').insert({
+      user_id: user.id, date, hours_slept: parseFloat(hours), is_nap: true,
+    })
+    setSaving(false)
+    setToast(`💤 Nap logged — ${hours}h`)
+    setOpen(false)
+    setHours('')
+    onLogged()
+  }
+
+  return (
+    <div className="mb-4">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all"
+        style={{ background: 'rgba(255,255,255,0.04)', color: '#888', border: '1px solid rgba(255,255,255,0.1)', fontSize: 14 }}
+      >
+        {open ? '✕ Cancel' : '💤 Log Nap'}
+      </button>
+      {open && (
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <form onSubmit={submit} className="flex flex-col gap-4">
+            <Input label="Date" type="date" value={date} onChange={e => setDate(e.target.value)} />
+            <Input label="Nap Length (hours)" type="number" step="0.25" placeholder="1.5" value={hours} onChange={e => setHours(e.target.value)} required />
+            <Button type="submit" fullWidth disabled={saving}>{saving ? 'Logging...' : 'Log Nap'}</Button>
+          </form>
+        </div>
+      )}
+      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+    </div>
+  )
+}
+
 // ── Edit modal ────────────────────────────────────────────────────────────────
 
 function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose: () => void; onSaved: () => void }) {
@@ -161,12 +209,16 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
 // ── Sleep debt card ───────────────────────────────────────────────────────────
 
 function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
-  if (logs.length < 3) return null
+  const nights = logs.filter(r => !r.is_nap)
+  if (nights.length < 3) return null
 
-  // Accumulate deficit over ALL logged nights (goal = 8h)
-  const withHours = logs.filter(r => r.hours_slept != null)
-  const totalDebt = withHours.reduce((sum, r) => sum + Math.max(0, SLEEP_GOAL - (r.hours_slept ?? 0)), 0)
-  const recentDebt = withHours.slice(0, 7).reduce((sum, r) => sum + Math.max(0, SLEEP_GOAL - (r.hours_slept ?? 0)), 0)
+  // Accumulate deficit over ALL logged nights (goal = 8h), naps reduce debt
+  const withHours = nights.filter(r => r.hours_slept != null)
+  const napTotal  = logs.filter(r => r.is_nap && r.hours_slept != null).reduce((s, r) => s + (r.hours_slept ?? 0), 0)
+  const rawDebt   = withHours.reduce((sum, r) => sum + Math.max(0, SLEEP_GOAL - (r.hours_slept ?? 0)), 0)
+  const totalDebt = Math.max(0, rawDebt - napTotal)
+  const recentNaps = logs.filter(r => r.is_nap && r.hours_slept != null).slice(0, 7).reduce((s, r) => s + (r.hours_slept ?? 0), 0)
+  const recentDebt = Math.max(0, withHours.slice(0, 7).reduce((sum, r) => sum + Math.max(0, SLEEP_GOAL - (r.hours_slept ?? 0)), 0) - recentNaps)
 
   if (totalDebt < 0.1) {
     return (
@@ -537,17 +589,18 @@ export function Sleep() {
   }
   useEffect(() => { load() }, [])
 
-  const sorted = [...logs].sort((a, b) => a.date.localeCompare(b.date))
+  const nightLogs = logs.filter(r => !r.is_nap)
+  const sorted = [...nightLogs].sort((a, b) => a.date.localeCompare(b.date))
 
-  // Stats
-  const withHours = logs.filter(r => r.hours_slept != null)
+  // Stats (nights only)
+  const withHours = nightLogs.filter(r => r.hours_slept != null)
   const avg  = withHours.length ? withHours.reduce((s, r) => s + (r.hours_slept ?? 0), 0) / withHours.length : 0
   const best = withHours.length ? Math.max(...withHours.map(r => r.hours_slept ?? 0)) : 0
 
   // Streak — fixed: use local date strings, handle today-not-logged case
   const streak = (() => {
-    if (!logs.length) return 0
-    const dateSet = new Set(logs.map(r => r.date))
+    if (!nightLogs.length) return 0
+    const dateSet = new Set(nightLogs.map(r => r.date))
     const todayStr = localDateStr(0)
     const yesterStr = localDateStr(1)
     // Start from today if logged, else yesterday
@@ -558,9 +611,9 @@ export function Sleep() {
     return s
   })()
 
-  // Day-of-week averages
+  // Day-of-week averages (nights only)
   const dayTotals: Record<number, { sum: number; count: number }> = {}
-  logs.forEach(r => {
+  nightLogs.forEach(r => {
     if (!r.hours_slept) return
     const day = new Date(r.date + 'T12:00:00').getDay()
     if (!dayTotals[day]) dayTotals[day] = { sum: 0, count: 0 }
@@ -595,10 +648,11 @@ export function Sleep() {
         <SleepDebtCard logs={logs} />
 
         {/* Wake time trainer */}
-        <WakeTimeTrainer logs={logs} />
+        <WakeTimeTrainer logs={nightLogs} />
 
-        {/* Log button */}
+        {/* Log buttons */}
         <LogSleepPanel onLogged={load} />
+        <LogNapPanel onLogged={load} />
 
         {/* Hours slept trend */}
         {sorted.length > 0 && sorted.length < 3 && (
@@ -642,7 +696,7 @@ export function Sleep() {
         )}
 
         {/* Day of week breakdown */}
-        {logs.length >= 3 && (
+        {nightLogs.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>By Day of Week</p>
             <ResponsiveContainer width="100%" height={120}>
@@ -667,19 +721,21 @@ export function Sleep() {
         {/* History */}
         <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>History</p>
         {logs.map(entry => {
-          const q        = sleepQuality(entry.hours_slept)
+          const isNap    = entry.is_nap
+          const q        = isNap ? { label: 'Nap', color: '#888' } : sleepQuality(entry.hours_slept)
           const dayLabel = DAYS[new Date(entry.date + 'T12:00:00').getDay()]
           return (
             <div
               key={entry.id}
               className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
-              style={{ background: 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}
+              style={{ background: isNap ? 'rgba(255,255,255,0.02)' : 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)', opacity: isNap ? 0.7 : 1 }}
             >
               <div className="flex items-center gap-3">
-                <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: q.color }} />
+                <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: isNap ? '#555' : q.color }} />
                 <div>
                   <p className="text-white font-semibold text-sm">
                     {formatDate(entry.date)} <span style={{ color: '#555', fontWeight: 400 }}>({dayLabel})</span>
+                    {entry.is_nap && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(255,255,255,0.06)', color: '#888', padding: '1px 6px', borderRadius: 4 }}>NAP</span>}
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: '#444' }}>
                     {entry.bedtime  && `Bed ${entry.bedtime} · `}
@@ -702,7 +758,7 @@ export function Sleep() {
             </div>
           )
         })}
-        {logs.length === 0 && (
+        {nightLogs.length === 0 && (
           <EmptyState icon={<MoonIcon size={64} color="var(--text-muted)" />} title="No sleep logged"
             sub="Start tracking your sleep to unlock trends, weekly averages, and quality scores." />
         )}

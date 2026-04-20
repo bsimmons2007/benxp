@@ -102,6 +102,7 @@ export interface SleepLog {
   hours_slept: number | null
   wake_time: string | null
   sleep_score: number | null
+  is_nap: boolean
 }
 
 export interface BodyweightLog {
