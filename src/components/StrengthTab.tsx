@@ -9,7 +9,7 @@ import { BodyMap } from './BodyMap'
 import { playRankUp } from '../lib/sounds'
 import {
   computeMuscleScores, computeStrengthQuotient, detectImbalances,
-  MUSCLES, RANKS,
+  MUSCLES, RANKS, IMBALANCE_PAIRS,
   type MuscleScoreResult, type LiftRow, type ExerciseDef, type ActivationRow, type RankMeta,
 } from '../lib/muscleScore'
 
@@ -383,6 +383,18 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
 
   const sq           = useMemo(() => computeStrengthQuotient(results), [results])
   const imbalances   = useMemo(() => detectImbalances(results), [results])
+  const lagKeys      = useMemo(() => {
+    const keys = new Set<string>()
+    imbalances.forEach(w => {
+      const pair = IMBALANCE_PAIRS.find(p => p.label === w.label)
+      if (pair) {
+        // whichever side has lower tier is the lagging one
+        if (w.aTier < w.bTier) keys.add(pair.a)
+        else keys.add(pair.b)
+      }
+    })
+    return keys
+  }, [imbalances])
   const selectedResult = selected ? results.find(r => r.muscleKey === selected) : null
 
   const GROUPS = ['chest', 'shoulders', 'arms', 'back', 'core', 'legs']
@@ -438,7 +450,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
               ))}
             </div>
 
-            <BodyMap view={view} scores={results} selected={selected} onSelect={handleSelect} />
+            <BodyMap view={view} scores={results} selected={selected} onSelect={handleSelect} imbalancedKeys={lagKeys.size > 0 ? lagKeys : undefined} />
 
             {selectedResult && (
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: 8 }}>

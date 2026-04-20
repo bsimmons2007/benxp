@@ -39,6 +39,7 @@ export function loadSectionOrder(): SectionKey[] {
 
 export function saveSectionOrder(order: SectionKey[]): void {
   localStorage.setItem('benxp-order', JSON.stringify(order))
+  window.dispatchEvent(new Event('sections-updated'))
 }
 
 export function loadHiddenSections(): SectionKey[] {
@@ -51,4 +52,5 @@ export function loadHiddenSections(): SectionKey[] {
 
 export function saveHiddenSections(hidden: SectionKey[]): void {
   localStorage.setItem('benxp-hidden', JSON.stringify(hidden))
+  window.dispatchEvent(new Event('sections-updated'))
 }

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { SECTION_DEFS, loadSectionOrder, loadHiddenSections } from '../../lib/sections'
 import { useStore } from '../../store/useStore'
@@ -39,9 +39,18 @@ const linkStyle = (isActive: boolean) => ({
 export function SideNav() {
   const navigate   = useNavigate()
   const location   = useLocation()
-  const order      = loadSectionOrder()
-  const hidden     = loadHiddenSections()
+  const [order,  setOrder]  = useState(() => loadSectionOrder())
+  const [hidden, setHidden] = useState(() => loadHiddenSections())
   const { level, progress, userName } = useStore()
+
+  useEffect(() => {
+    function onUpdate() {
+      setOrder(loadSectionOrder())
+      setHidden(loadHiddenSections())
+    }
+    window.addEventListener('sections-updated', onUpdate)
+    return () => window.removeEventListener('sections-updated', onUpdate)
+  }, [])
   const isOpen     = useNavStore(s => s.navOpen)
   const closeNav   = useNavStore(s => s.closeNav)
 
@@ -167,6 +176,25 @@ export function SideNav() {
               )}
             </NavLink>
           ))}
+
+          {/* Hobbies section — always visible, not affected by hidden list */}
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '8px 4px' }} />
+          <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-dim)', padding: '4px 12px 2px' }}>
+            Hobbies
+          </p>
+          {(['basketball', 'fortnite'] as const).map(key => {
+            const def = SECTION_DEFS[key]
+            return (
+              <NavLink key={key} to={def.path} style={({ isActive }) => linkStyle(isActive)}>
+                {({ isActive }) => (
+                  <>
+                    <SectionIcon sectionKey={key} size={16} color={isActive ? 'var(--accent)' : 'var(--text-secondary)'} />
+                    <span style={{ color: isActive ? 'var(--accent)' : 'var(--text-secondary)' }}>{def.label}</span>
+                  </>
+                )}
+              </NavLink>
+            )
+          })}
 
           {/* Separator */}
           <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '8px 4px' }} />

@@ -13,8 +13,8 @@ export function PageWrapper({ children, noPadding = false }: PageWrapperProps) {
     <main
       key={pathname}
       style={{
-        paddingTop:    60,
-        paddingBottom: 100,
+        paddingTop:    'calc(60px + env(safe-area-inset-top))',
+        paddingBottom: 'calc(100px + env(safe-area-inset-bottom))',
         paddingLeft:   noPadding ? 0 : 16,
         paddingRight:  noPadding ? 0 : 16,
         minHeight:     '100vh',

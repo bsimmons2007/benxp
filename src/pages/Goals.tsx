@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { ProgressBar } from '../components/ui/ProgressBar'
@@ -184,14 +185,27 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
   )
 }
 
+// Which metric keys link to which page
+const METRIC_LINK: Record<string, string> = {
+  squat_1rm:          '/lifting',
+  bench_1rm:          '/lifting',
+  deadlift_1rm:       '/lifting',
+  total_skate_miles:  '/skate',
+  total_cardio_miles: '/cardio',
+  books_read:         '/books',
+  fn_wins:            '/fortnite',
+}
+
 // ── Goal card ────────────────────────────────────────────────
-function GoalCard({ goal, current, onComplete, onDelete }: {
+function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
   goal: Goal
   current: number
   onComplete: () => void
   onDelete: () => void
+  onNavigate: (path: string) => void
 }) {
   const [confirming, setConfirming] = useState(false)
+  const linkedPage = METRIC_LINK[goal.metric_key]
   const pct = goal.metric_key === 'manual'
     ? (goal.status === 'completed' ? 100 : 0)
     : Math.min((current / goal.target_value) * 100, 100)

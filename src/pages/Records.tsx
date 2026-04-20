@@ -421,6 +421,13 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
   const [milestone,  setMilestone]  = useState<import('../lib/xp').StrengthMilestone | null>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
+  const [lastWorkout, setLastWorkout] = useState<Omit<SessionEntry, 'uid'>[] | null>(null)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('benxp-last-workout')
+      if (saved) setLastWorkout(JSON.parse(saved))
+    } catch { /* ignore */ }
+  }, [])
 
   function addEntry() { setEntries(e => [...e, newEntry()]) }
   function removeEntry(uid: string) { setEntries(e => e.filter(x => x.uid !== uid)) }
@@ -511,6 +518,13 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
     if (lastMilestone) setMilestone(lastMilestone)
     await refreshXP()
     refreshActivity()
+    // Save session template for "Repeat Last Workout"
+    const template = valid.map(e => ({
+      liftName: e.liftName, isBodyweight: e.isBodyweight, isTimed: e.isTimed,
+      weight: e.weight, sets: e.sets, reps: e.reps, duration: e.duration, rpe: e.rpe, bodyweight: e.bodyweight,
+    }))
+    localStorage.setItem('benxp-last-workout', JSON.stringify(template))
+
     setEntries([newEntry()])
     setDate(today())
     setOpen(false)
@@ -520,20 +534,41 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
 
   return (
     <div className="mb-5">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-center gap-2 rounded-xl font-semibold transition-all"
-        style={{
-          height: 44,
-          background: open ? 'rgba(255,255,255,0.04)' : 'var(--accent)',
-          color: open ? 'var(--text-secondary)' : '#1A1A2E',
-          border: open ? '1px solid var(--border)' : 'none',
-          fontSize: 14, letterSpacing: '0.01em',
-          boxShadow: open ? 'none' : '0 4px 16px var(--accent-dim)',
-        }}
-      >
-        {open ? '✕ Cancel' : '+ Log Workout'}
-      </button>
+      <div style={{ display: 'flex', gap: 8, marginBottom: lastWorkout ? 8 : 0 }}>
+        <button
+          onClick={() => setOpen(o => !o)}
+          className="flex items-center justify-center gap-2 rounded-xl font-semibold transition-all"
+          style={{
+            flex: 1, height: 44,
+            background: open ? 'rgba(255,255,255,0.04)' : 'var(--accent)',
+            color: open ? 'var(--text-secondary)' : '#1A1A2E',
+            border: open ? '1px solid var(--border)' : 'none',
+            fontSize: 14, letterSpacing: '0.01em',
+            boxShadow: open ? 'none' : '0 4px 16px var(--accent-dim)',
+          }}
+        >
+          {open ? '✕ Cancel' : '+ Log Workout'}
+        </button>
+        {!open && lastWorkout && (
+          <button
+            onClick={() => {
+              setEntries(lastWorkout.map(e => ({ ...e, uid: Math.random().toString(36).slice(2) })))
+              setOpen(true)
+            }}
+            title="Repeat your last logged workout"
+            style={{
+              height: 44, padding: '0 14px', borderRadius: 12, flexShrink: 0,
+              background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)',
+              color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+              display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
+          >
+            ↺ Repeat
+          </button>
+        )}
+      </div>
 
       {open && (
         <form onSubmit={handleSubmit}>

@@ -3,7 +3,6 @@ import { PageWrapper } from '../components/layout/PageWrapper'
 import {
   PersonIcon, TargetIcon, RulerIcon, CalendarIcon, GridIcon,
   TrophyIcon, ShareIcon, TrendingIcon, ChevronRightIcon, TerminalIcon,
-  BasketballIcon, GamepadIcon,
 } from '../components/ui/Icon'
 import type { CSSProperties } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -11,8 +10,6 @@ import { usePageTitle } from '../hooks/usePageTitle'
 type IconFn = (props: { size?: number; color?: string; style?: CSSProperties }) => React.ReactElement
 
 const NAV_LINKS: { to: string; Icon: IconFn; label: string; sub: string }[] = [
-  { to: '/basketball',   Icon: BasketballIcon, label: 'Hoops',            sub: 'Stats, shooting & streaks'    },
-  { to: '/fortnite',     Icon: GamepadIcon,    label: 'Fortnite',         sub: 'Wins, kills & ranked tracker' },
   { to: '/profile',      Icon: PersonIcon,   label: 'Profile',            sub: 'Badges, skills & identity'    },
   { to: '/goals',        Icon: TargetIcon,   label: 'Goals',              sub: 'Set targets, earn XP'         },
   { to: '/measurements', Icon: RulerIcon,    label: 'Measurements',       sub: 'Body composition over time'   },

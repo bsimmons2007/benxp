@@ -38,8 +38,10 @@ export function TopBar({ title, hideSettings = false, back = false }: TopBarProp
     <header
       className="fixed top-0 left-0 right-0 flex items-center justify-between z-40"
       style={{
-        height:               '52px',
-        padding:              '0 12px',
+        height:               'calc(52px + env(safe-area-inset-top))',
+        paddingTop:           'env(safe-area-inset-top)',
+        paddingLeft:          '12px',
+        paddingRight:         '12px',
         background:           'rgba(10,12,28,0.92)',
         backdropFilter:       'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',

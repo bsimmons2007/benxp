@@ -1,10 +1,20 @@
+import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { SECTION_DEFS, loadSectionOrder, loadHiddenSections } from '../../lib/sections'
 import { SectionIcon, HomeIcon, DotsIcon } from '../ui/Icon'
 
 export function BottomNav() {
-  const order  = loadSectionOrder()
-  const hidden = loadHiddenSections()
+  const [order,  setOrder]  = useState(() => loadSectionOrder())
+  const [hidden, setHidden] = useState(() => loadHiddenSections())
+
+  useEffect(() => {
+    function onUpdate() {
+      setOrder(loadSectionOrder())
+      setHidden(loadHiddenSections())
+    }
+    window.addEventListener('sections-updated', onUpdate)
+    return () => window.removeEventListener('sections-updated', onUpdate)
+  }, [])
 
   const tabs = [
     { to: '/',     label: 'Home', iconKey: '__home' },
@@ -16,13 +26,15 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 flex justify-around items-center py-1 z-40 md:hidden"
+      className="fixed bottom-0 left-0 right-0 flex justify-around items-start z-40 md:hidden"
       style={{
         background:           'var(--nav-bg)',
         backdropFilter:       'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderTop:            '1px solid var(--border-faint)',
-        height:               56,
+        height:               'calc(56px + env(safe-area-inset-bottom))',
+        paddingTop:           8,
+        paddingBottom:        'env(safe-area-inset-bottom)',
       }}
     >
       {tabs.map((tab) => (

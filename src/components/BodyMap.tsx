@@ -6,10 +6,11 @@ import type { MuscleScoreResult } from '../lib/muscleScore'
 import { RANKS, MUSCLES } from '../lib/muscleScore'
 
 interface Props {
-  view:     'front' | 'back'
-  scores:   MuscleScoreResult[]
-  selected: string | null
-  onSelect: (key: string) => void
+  view:           'front' | 'back'
+  scores:         MuscleScoreResult[]
+  selected:       string | null
+  onSelect:       (key: string) => void
+  imbalancedKeys?: Set<string>
 }
 
 const EMPTY_COLOR  = '#14143a'
@@ -52,32 +53,37 @@ function SvgDefs() {
 // ── Muscle polygon ────────────────────────────────────────────────────────────
 
 interface PolyProps {
-  muscleKey: string
-  points:    string
-  scores:    MuscleScoreResult[]
-  selected:  string | null
-  hovered:   string | null
-  onSelect:  (key: string) => void
-  onHover:   (key: string | null) => void
+  muscleKey:       string
+  points:          string
+  scores:          MuscleScoreResult[]
+  selected:        string | null
+  hovered:         string | null
+  onSelect:        (key: string) => void
+  onHover:         (key: string | null) => void
+  imbalancedKeys?: Set<string>
 }
 
-function MP({ muscleKey, points, scores, selected, hovered, onSelect, onHover }: PolyProps) {
-  const result     = scores.find(r => r.muscleKey === muscleKey)
-  const rank       = result?.rank
-  const tier       = rank?.tier ?? 0
-  const isSelected = selected === muscleKey
-  const isHovered  = hovered  === muscleKey
-  const glow       = rank?.glow ?? 'none'
+function MP({ muscleKey, points, scores, selected, hovered, onSelect, onHover, imbalancedKeys }: PolyProps) {
+  const result       = scores.find(r => r.muscleKey === muscleKey)
+  const rank         = result?.rank
+  const tier         = rank?.tier ?? 0
+  const isSelected   = selected === muscleKey
+  const isHovered    = hovered  === muscleKey
+  const isImbalanced = imbalancedKeys?.has(muscleKey) ?? false
+  const glow         = rank?.glow ?? 'none'
 
   const fill   = tier > 0 ? `url(#grad-${rank!.id})` : EMPTY_COLOR
   const stroke = isSelected
     ? (glow !== 'none' ? glow : 'var(--accent)')
-    : isHovered
-      ? (glow !== 'none' ? `${glow}cc` : 'rgba(255,255,255,0.4)')
-      : (rank?.border ?? EMPTY_BORDER)
+    : isImbalanced
+      ? '#e07830'
+      : isHovered
+        ? (glow !== 'none' ? `${glow}cc` : 'rgba(255,255,255,0.4)')
+        : (rank?.border ?? EMPTY_BORDER)
 
   const filter = (isHovered && tier > 0) || tier >= 16
     ? 'url(#muscleGlowStrong)'
+    : isImbalanced ? 'url(#muscleGlow)'
     : tier >= 10 ? 'url(#muscleGlow)'
     : 'none'
 
@@ -91,7 +97,7 @@ function MP({ muscleKey, points, scores, selected, hovered, onSelect, onHover }:
       points={points}
       fill={fill}
       stroke={stroke}
-      strokeWidth={isSelected ? 2.6 : isHovered ? 1.8 : tier > 0 ? 1.0 : 0.5}
+      strokeWidth={isSelected ? 2.6 : isImbalanced ? 2.0 : isHovered ? 1.8 : tier > 0 ? 1.0 : 0.5}
       filter={filter}
       style={{
         cursor: 'pointer',
@@ -178,11 +184,12 @@ function MuscleLabel({ muscleKey, scores }: { muscleKey: string | null; scores: 
 }
 
 type SP = {
-  scores:   MuscleScoreResult[]
-  selected: string | null
-  hovered:  string | null
-  onSelect: (k: string) => void
-  onHover:  (k: string | null) => void
+  scores:          MuscleScoreResult[]
+  selected:        string | null
+  hovered:         string | null
+  onSelect:        (k: string) => void
+  onHover:         (k: string | null) => void
+  imbalancedKeys?: Set<string>
 }
 
 // ── FRONT VIEW ───────────────────────────────────────────────────────────────
@@ -193,10 +200,10 @@ type SP = {
 //   Abs y=134–182     | Hip y=206        | Knee y=322
 //   Calf y=328–388
 
-function FrontView({ scores, selected, hovered, onSelect, onHover }: SP) {
+function FrontView({ scores, selected, hovered, onSelect, onHover, imbalancedKeys }: SP) {
   const p = (key: string, pts: string, side?: string) =>
     <MP key={`${key}-${side ?? 'c'}`} muscleKey={key} points={pts}
-      scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={onHover} />
+      scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={onHover} imbalancedKeys={imbalancedKeys} />
 
   return (
     <svg viewBox="0 0 200 430" style={{ width: '100%', maxWidth: 300, display: 'block', userSelect: 'none' }}>
@@ -275,10 +282,10 @@ function FrontView({ scores, selected, hovered, onSelect, onHover }: SP) {
 // ── BACK VIEW ────────────────────────────────────────────────────────────────
 // All muscle regions share exact boundary lines.
 
-function BackView({ scores, selected, hovered, onSelect, onHover }: SP) {
+function BackView({ scores, selected, hovered, onSelect, onHover, imbalancedKeys }: SP) {
   const p = (key: string, pts: string, side?: string) =>
     <MP key={`${key}-${side ?? 'c'}`} muscleKey={key} points={pts}
-      scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={onHover} />
+      scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={onHover} imbalancedKeys={imbalancedKeys} />
 
   return (
     <svg viewBox="0 0 200 430" style={{ width: '100%', maxWidth: 300, display: 'block', userSelect: 'none' }}>
@@ -356,7 +363,7 @@ function BackView({ scores, selected, hovered, onSelect, onHover }: SP) {
 
 // ── Main export ───────────────────────────────────────────────────────────────
 
-export function BodyMap({ view, scores, selected, onSelect }: Props) {
+export function BodyMap({ view, scores, selected, onSelect, imbalancedKeys }: Props) {
   const [hovered, setHovered] = useState<string | null>(null)
   const handleHover = useCallback((key: string | null) => setHovered(key), [])
 
@@ -366,11 +373,11 @@ export function BodyMap({ view, scores, selected, onSelect }: Props) {
         <SvgDefs />
       </svg>
 
-      {/* Body centered, rank dots on right via absolute positioning */}
+      {/* Body centered, rank legend on right via absolute positioning */}
       <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
         {view === 'front'
-          ? <FrontView scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={handleHover} />
-          : <BackView  scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={handleHover} />
+          ? <FrontView scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={handleHover} imbalancedKeys={imbalancedKeys} />
+          : <BackView  scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={handleHover} imbalancedKeys={imbalancedKeys} />
         }
         <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
           <RankLegend />
