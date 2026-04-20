@@ -83,17 +83,20 @@ export function Hobbies() {
   usePageTitle('Hobbies')
   const [bbSessions, setBbSessions] = useState<number | null>(null)
   const [fnWins,     setFnWins]     = useState<number | null>(null)
+  const [pbWins,     setPbWins]     = useState<number | null>(null)
 
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const [bb, fn] = await Promise.all([
+      const [bb, fn, pb] = await Promise.all([
         supabase.from('basketball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
+        supabase.from('pickleball_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
       ])
       setBbSessions(bb.count ?? 0)
       setFnWins(fn.count ?? 0)
+      setPbWins(pb.count ?? 0)
     }
     load()
   }, [])
@@ -122,6 +125,16 @@ export function Hobbies() {
             accentColor="#a855f7"
             statLabel="wins"
             statValue={fnWins ?? '—'}
+          />
+
+          <HobbyCard
+            emoji="🏓"
+            label="Pickleball"
+            sub="Wins, scores & win rate"
+            path="/pickleball"
+            accentColor="#22c55e"
+            statLabel="wins"
+            statValue={pbWins ?? '—'}
           />
 
         </div>
