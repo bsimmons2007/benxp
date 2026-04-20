@@ -267,7 +267,7 @@ export function Challenges() {
         {/* Completed challenges faded at bottom */}
         {!syncing && completed.length > 0 && (
           <>
-            <p className="text-xs font-semibold uppercase tracking-widest mt-4 mb-2" style={{ color: '#777' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest mt-4 mb-2" style={{ color: '#555' }}>
               Completed
             </p>
             {completed.map((c) => (
@@ -284,7 +284,7 @@ export function Challenges() {
 
         {/* Empty state */}
         {!syncing && active.length === 0 && completed.length === 0 && (
-          <div className="text-center py-12" style={{ color: '#777', fontFamily: 'Cormorant Garamond, serif', fontSize: 16 }}>
+          <div className="text-center py-12" style={{ color: '#555', fontFamily: 'Cormorant Garamond, serif', fontSize: 16 }}>
             No {activeTier.toLowerCase()} challenges yet.
           </div>
         )}

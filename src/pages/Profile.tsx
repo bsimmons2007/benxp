@@ -355,13 +355,13 @@ function ActivityHeatmap() {
           {year} Activity
         </p>
         {loaded && (
-          <p style={{ color: '#777', fontSize: 11 }}>
+          <p style={{ color: '#555', fontSize: 11 }}>
             {Object.keys(counts).length} active days
           </p>
         )}
       </div>
       {!loaded ? (
-        <p style={{ color: '#777', fontSize: 12 }}>Loading…</p>
+        <p style={{ color: '#555', fontSize: 12 }}>Loading…</p>
       ) : (
         <div style={{ overflowX: 'auto', paddingBottom: 4 }}>
           <div style={{ display: 'block', width: 'fit-content', margin: '0 auto' }}>
@@ -371,7 +371,7 @@ function ActivityHeatmap() {
                 const mc = monthCols.find(m => m.col === wi)
                 return (
                   <div key={wi} style={{ width: CELL + GAP, flexShrink: 0, position: 'relative' }}>
-                    {mc && <span style={{ fontSize: 8, color: '#666', userSelect: 'none', position: 'absolute', whiteSpace: 'nowrap' }}>{mc.label}</span>}
+                    {mc && <span style={{ fontSize: 8, color: '#444', userSelect: 'none', position: 'absolute', whiteSpace: 'nowrap' }}>{mc.label}</span>}
                   </div>
                 )
               })}
@@ -404,11 +404,11 @@ function ActivityHeatmap() {
       )}
       {/* Legend */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, justifyContent: 'flex-end' }}>
-        <span style={{ fontSize: 9, color: '#777' }}>Less</span>
+        <span style={{ fontSize: 9, color: '#555' }}>Less</span>
         {['rgba(255,255,255,0.07)','rgba(245,166,35,0.30)','rgba(245,166,35,0.55)','rgba(245,166,35,0.75)','rgba(245,166,35,0.95)'].map((bg, i) => (
           <div key={i} style={{ width: CELL, height: CELL, borderRadius: 2, background: bg }} />
         ))}
-        <span style={{ fontSize: 9, color: '#777' }}>More</span>
+        <span style={{ fontSize: 9, color: '#555' }}>More</span>
       </div>
     </Card>
   )
@@ -538,7 +538,7 @@ export function Profile() {
             {title}
           </p>
           {stats.memberSince && (
-            <p className="text-xs mt-1" style={{ color: '#777' }}>Member since {stats.memberSince}</p>
+            <p className="text-xs mt-1" style={{ color: '#555' }}>Member since {stats.memberSince}</p>
           )}
 
           {/* Level + XP bar */}
@@ -560,7 +560,7 @@ export function Profile() {
             <div className="flex items-center justify-between mb-2">
               <div>
                 <p className="text-xs uppercase tracking-widest" style={{ color: '#888' }}>Consistency Score</p>
-                <p className="text-xs mt-0.5" style={{ color: '#777' }}>{activeDays} active days in the last 30</p>
+                <p className="text-xs mt-0.5" style={{ color: '#555' }}>{activeDays} active days in the last 30</p>
               </div>
               <span style={{
                 fontSize: 32, fontWeight: 900,
@@ -610,9 +610,9 @@ export function Profile() {
 
         {/* Skill Mastery */}
         <div className="mb-2">
-          <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: '#666' }}>Skill Mastery</p>
+          <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: '#444' }}>Skill Mastery</p>
           {skillsLoading ? (
-            <p style={{ color: '#666', fontSize: 13 }}>Loading skills…</p>
+            <p style={{ color: '#444', fontSize: 13 }}>Loading skills…</p>
           ) : (
             <div className="flex flex-col gap-2">
               {skills.map(s => <SkillCard key={s.key} skill={s} />)}
@@ -622,7 +622,7 @@ export function Profile() {
 
         {/* Badges by category */}
         {loading ? (
-          <p style={{ color: '#666', textAlign: 'center', paddingTop: 20 }}>Loading badges…</p>
+          <p style={{ color: '#444', textAlign: 'center', paddingTop: 20 }}>Loading badges…</p>
         ) : (
           byCategory.map(({ cat, label, items, earnedCount }) => (
             <Card key={cat} className="mb-3">

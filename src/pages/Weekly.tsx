@@ -170,7 +170,7 @@ export function Weekly() {
         </div>
 
         {loading ? (
-          <p style={{ color: '#666', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
+          <p style={{ color: '#444', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
         ) : !data ? null : (
           <>
             {/* XP Earned hero */}
@@ -180,7 +180,7 @@ export function Weekly() {
                 +{data.xpEarned.toLocaleString()}
               </p>
               {data.xpEarned === 0 && (
-                <p className="text-xs mt-2" style={{ color: '#777' }}>No activity logged this week yet.</p>
+                <p className="text-xs mt-2" style={{ color: '#555' }}>No activity logged this week yet.</p>
               )}
             </Card>
 
@@ -325,7 +325,7 @@ export function Weekly() {
                     ].map(s => (
                       <div key={s.label} style={{ textAlign: 'center' }}>
                         <p style={{ color: 'var(--accent)', fontSize: 14, fontWeight: 700 }}>{s.val}</p>
-                        <p style={{ color: '#666', fontSize: 10 }}>{s.label}</p>
+                        <p style={{ color: '#444', fontSize: 10 }}>{s.label}</p>
                       </div>
                     ))}
                   </div>
@@ -336,7 +336,7 @@ export function Weekly() {
             {/* Empty state */}
             {data.xpEarned === 0 && (
               <Card>
-                <p className="text-center text-sm" style={{ color: '#666', padding: '8px 0' }}>
+                <p className="text-center text-sm" style={{ color: '#444', padding: '8px 0' }}>
                   No activity this week yet — get after it.
                 </p>
               </Card>

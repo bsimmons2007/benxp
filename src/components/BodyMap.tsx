@@ -153,7 +153,7 @@ function RankLegend() {
 function MuscleLabel({ muscleKey, scores }: { muscleKey: string | null; scores: MuscleScoreResult[] }) {
   if (!muscleKey) {
     return (
-      <p style={{ textAlign: 'center', fontSize: 11, color: '#666', marginTop: 8, height: 30, lineHeight: '30px' }}>
+      <p style={{ textAlign: 'center', fontSize: 11, color: '#444', marginTop: 8, height: 30, lineHeight: '30px' }}>
         Tap a muscle to inspect
       </p>
     )
@@ -172,12 +172,12 @@ function MuscleLabel({ muscleKey, scores }: { muscleKey: string | null; scores: 
       boxShadow: tier > 0 && glow !== 'none' ? `0 0 12px ${glow}33` : 'none',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 10, color: '#777', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{muscle?.group}</span>
+        <span style={{ fontSize: 10, color: '#555', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{muscle?.group}</span>
         <span style={{ fontSize: 13, fontWeight: 700, color: '#e0e0f0' }}>{muscle?.name ?? muscleKey}</span>
       </div>
       {tier > 0 && result
         ? <span style={{ fontSize: 11, color: glow !== 'none' ? glow : '#aaa', fontFamily: 'Cinzel, serif', fontWeight: 700 }}>{result.rank.icon} {result.rank.label}</span>
-        : <span style={{ fontSize: 10, color: '#666' }}>Unranked</span>
+        : <span style={{ fontSize: 10, color: '#444' }}>Unranked</span>
       }
     </div>
   )

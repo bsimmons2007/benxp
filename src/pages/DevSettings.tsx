@@ -38,7 +38,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center" style={{ minHeight: '60vh', gap: 32 }}>
       <div>
-        <p className="text-xs uppercase tracking-widest text-center mb-1" style={{ color: '#777' }}>Developer Access</p>
+        <p className="text-xs uppercase tracking-widest text-center mb-1" style={{ color: '#555' }}>Developer Access</p>
         <p className="text-xl font-bold text-center" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Enter PIN</p>
       </div>
 
@@ -198,7 +198,7 @@ function XPEngine() {
     fetchXPEntries().then(d => { setData(d); setLoading(false) })
   }, [])
 
-  if (loading) return <p style={{ color: '#666', textAlign: 'center', padding: 40 }}>Loading XP engine…</p>
+  if (loading) return <p style={{ color: '#444', textAlign: 'center', padding: 40 }}>Loading XP engine…</p>
   if (!data) return null
 
   const byCategory = CATEGORY_ORDER.map(cat => ({
@@ -253,7 +253,7 @@ function XPEngine() {
         <div className="flex flex-col gap-1.5" style={{ fontFamily: 'monospace', fontSize: 11 }}>
           {Object.entries(XP_RATES).map(([k, v]) => (
             <div key={k} className="flex justify-between">
-              <span style={{ color: '#666' }}>{k.replace(/_/g, ' ')}</span>
+              <span style={{ color: '#444' }}>{k.replace(/_/g, ' ')}</span>
               <span style={{ color: 'var(--accent)' }}>{v === 0 ? 'variable' : `${v} XP`}</span>
             </div>
           ))}
@@ -294,7 +294,7 @@ function XPEngine() {
                 </span>
               </div>
               {expanded === `${i}` && e.detail && (
-                <p style={{ color: '#777', fontSize: 10, marginTop: 4, marginLeft: 22, fontFamily: 'monospace' }}>
+                <p style={{ color: '#555', fontSize: 10, marginTop: 4, marginLeft: 22, fontFamily: 'monospace' }}>
                   {e.detail} · {e.category}
                 </p>
               )}
@@ -328,7 +328,7 @@ export function DevSettings() {
               </div>
               <button
                 onClick={() => { sessionStorage.removeItem(SESSION_KEY); setUnlocked(false) }}
-                style={{ color: '#777', fontSize: 11, background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}
+                style={{ color: '#555', fontSize: 11, background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}
               >
                 Lock
               </button>

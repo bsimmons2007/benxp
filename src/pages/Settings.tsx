@@ -238,7 +238,7 @@ export function Settings() {
 
   // Reusable chevron
   function Chevron({ open }: { open: boolean }) {
-    return <span style={{ color: '#777', fontSize: 12, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', display: 'block', flexShrink: 0 }}>▾</span>
+    return <span style={{ color: '#555', fontSize: 12, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', display: 'block', flexShrink: 0 }}>▾</span>
   }
 
   // Reusable toggle pill
@@ -312,7 +312,7 @@ export function Settings() {
               <p className="mt-0.5" style={{ color: 'var(--accent)', fontSize: 13, fontFamily: 'Cinzel, serif' }}>
                 Level {displayLevel}
               </p>
-              <p style={{ color: '#666', fontSize: 12 }}>{totalXP.toLocaleString()} XP total</p>
+              <p style={{ color: '#444', fontSize: 12 }}>{totalXP.toLocaleString()} XP total</p>
             </div>
           </div>
         </Card>
@@ -332,7 +332,7 @@ export function Settings() {
               </div>
               <div className="text-left">
                 <p className="font-semibold text-sm text-white">{activeTheme.name}</p>
-                <p style={{ color: '#666', fontSize: 11 }}>Color theme</p>
+                <p style={{ color: '#444', fontSize: 11 }}>Color theme</p>
               </div>
             </div>
             <Chevron open={themeOpen} />
@@ -358,7 +358,7 @@ export function Settings() {
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><TrophyIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
                 <p className="font-semibold text-sm text-white">Level Display</p>
-                <p style={{ color: '#666', fontSize: 11 }}>{levelStyle === 'roman' ? `Roman — ${toRoman(level)}` : `Numeric — ${level}`}</p>
+                <p style={{ color: '#444', fontSize: 11 }}>{levelStyle === 'roman' ? `Roman — ${toRoman(level)}` : `Numeric — ${level}`}</p>
               </div>
             </div>
             <Chevron open={levelOpen} />
@@ -392,7 +392,7 @@ export function Settings() {
               <span style={{ fontSize: 20, width: 28, textAlign: 'center' }}>🕐</span>
               <div>
                 <p className="font-semibold text-sm text-white">Time of Day Theme</p>
-                <p style={{ color: '#666', fontSize: 11 }}>
+                <p style={{ color: '#444', fontSize: 11 }}>
                   {timeTheme ? 'Auto-switches: Dawn · Day · Dusk · Night' : 'Auto-switches with the clock'}
                 </p>
               </div>
@@ -417,7 +417,7 @@ export function Settings() {
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><DumbbellIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
                 <p className="font-semibold text-sm text-white">Dashboard Sections</p>
-                <p style={{ color: '#666', fontSize: 11 }}>
+                <p style={{ color: '#444', fontSize: 11 }}>
                   {hiddenSections.length === 0 ? 'All visible' : `${hiddenSections.length} hidden`} · {sectionOrder.length} sections
                 </p>
               </div>
@@ -447,7 +447,7 @@ export function Settings() {
                   )
                 })}
               </div>
-              <button onClick={resetSections} className="w-full py-2 rounded-lg text-xs" style={{ color: '#666', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <button onClick={resetSections} className="w-full py-2 rounded-lg text-xs" style={{ color: '#444', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 Reset to default order
               </button>
             </div>
@@ -463,7 +463,7 @@ export function Settings() {
               </span>
               <div className="text-left">
                 <p className="font-semibold text-sm text-white">Sound</p>
-                <p style={{ color: '#666', fontSize: 11 }}>
+                <p style={{ color: '#444', fontSize: 11 }}>
                   {[sfx && 'SFX', ambient && `Ambient · ${AMBIENT_SCENES.find(s => s.id === activeScene)?.name ?? ''}`].filter(Boolean).join(' · ') || 'All off'}
                 </p>
               </div>
@@ -482,7 +482,7 @@ export function Settings() {
                     <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{row.icon}</span>
                     <div>
                       <p className="text-white text-sm font-medium">{row.label}</p>
-                      <p style={{ color: '#777', fontSize: 11 }}>{row.sub}</p>
+                      <p style={{ color: '#555', fontSize: 11 }}>{row.sub}</p>
                     </div>
                   </div>
                   <Toggle value={row.value} onToggle={row.toggle} />
@@ -500,12 +500,12 @@ export function Settings() {
                     style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer' }}
                   />
                 </div>
-                <span style={{ color: '#666', fontSize: 11, minWidth: 28, textAlign: 'right' }}>{Math.round(volume * 100)}%</span>
+                <span style={{ color: '#444', fontSize: 11, minWidth: 28, textAlign: 'right' }}>{Math.round(volume * 100)}%</span>
               </div>
 
               {/* Scene picker */}
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
-                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#666' }}>Atmosphere</p>
+                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#444' }}>Atmosphere</p>
                 <div className="flex flex-col gap-1.5">
                   {AMBIENT_SCENES.map(scene => {
                     const isActive = activeScene === scene.id
@@ -522,7 +522,7 @@ export function Settings() {
                         <span style={{ fontSize: 18, flexShrink: 0 }}>{scene.emoji}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-white">{scene.name}</p>
-                          <p className="text-xs truncate" style={{ color: '#666' }}>{scene.description}</p>
+                          <p className="text-xs truncate" style={{ color: '#444' }}>{scene.description}</p>
                         </div>
                         {isActive && <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)', boxShadow: '0 0 6px var(--accent)', flexShrink: 0, animation: ambient ? 'glowPulse 2s ease-in-out infinite' : 'none' }} />}
                       </button>
@@ -541,7 +541,7 @@ export function Settings() {
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><ActivityIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
                 <p className="font-semibold text-sm text-white">XP Rates</p>
-                <p style={{ color: '#666', fontSize: 11 }}>How XP is earned per activity</p>
+                <p style={{ color: '#444', fontSize: 11 }}>How XP is earned per activity</p>
               </div>
             </div>
             <Chevron open={xpOpen} />
@@ -568,7 +568,7 @@ export function Settings() {
               <span style={{ fontSize: 20, width: 28, textAlign: 'center' }}>🗄️</span>
               <div className="text-left">
                 <p className="font-semibold text-sm text-white">Data & Account</p>
-                <p style={{ color: '#666', fontSize: 11 }}>Export, delete · BenXP v1.0.0</p>
+                <p style={{ color: '#444', fontSize: 11 }}>Export, delete · BenXP v1.0.0</p>
               </div>
             </div>
             <Chevron open={dataOpen} />
@@ -584,7 +584,7 @@ export function Settings() {
                   <span style={{ width: 28, textAlign: 'center' }}>📤</span>
                   <span className="text-white text-sm">{exporting ? 'Exporting...' : 'Export data as CSV'}</span>
                 </div>
-                <span style={{ color: '#777' }}>›</span>
+                <span style={{ color: '#555' }}>›</span>
               </div>
 
               {deleteStep === 'idle' ? (
@@ -597,7 +597,7 @@ export function Settings() {
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><TrashIcon size={16} color="#E94560" /></span>
                     <span style={{ color: '#E94560', fontSize: 14 }}>Delete account &amp; all data</span>
                   </div>
-                  <span style={{ color: '#777' }}>›</span>
+                  <span style={{ color: '#555' }}>›</span>
                 </div>
               ) : (
                 <div className="py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>

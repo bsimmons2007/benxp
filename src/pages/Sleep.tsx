@@ -218,8 +218,8 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
           textAlign: 'center', flexShrink: 0,
         }}>
           <p style={{ color: '#fff', fontWeight: 700, fontSize: 18, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{recoveryNights}</p>
-          <p style={{ color: '#666', fontSize: 10 }}>nights @ 9h</p>
-          <p style={{ color: '#666', fontSize: 10 }}>to recover</p>
+          <p style={{ color: '#444', fontSize: 10 }}>nights @ 9h</p>
+          <p style={{ color: '#444', fontSize: 10 }}>to recover</p>
         </div>
       </div>
     </div>
@@ -336,7 +336,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
       {/* Header */}
       <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <p className="font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 15 }}>⏰ Wake Time Trainer</p>
-        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#777', cursor: 'pointer', fontSize: 18 }}>✕</button>
+        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18 }}>✕</button>
       </div>
 
       <div className="p-4 flex flex-col gap-4">
@@ -344,12 +344,12 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
         {/* Current vs target */}
         <div className="flex items-center gap-3">
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <p style={{ color: '#666', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+            <p style={{ color: '#444', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
               {avgWakeMins !== null ? `Current avg (${wakeTimeLogs.length} nights)` : 'Current (estimated)'}
             </p>
             <p style={{ color: '#ccc', fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif' }}>{fmtTime(currentWakeMins)}</p>
           </div>
-          <div style={{ color: '#777', fontSize: 22, fontWeight: 300 }}>→</div>
+          <div style={{ color: '#555', fontSize: 22, fontWeight: 300 }}>→</div>
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.3)' }}>
             <p style={{ color: 'var(--accent)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Goal</p>
             <p style={{ color: 'var(--accent)', fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif' }}>{fmtTime(targetWakeMins)}</p>
@@ -413,7 +413,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               ].map(s => (
                 <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
                   <p style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{s.value}</p>
-                  <p style={{ color: '#777', fontSize: 9, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
+                  <p style={{ color: '#555', fontSize: 9, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
                 </div>
               ))}
             </div>
@@ -448,7 +448,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
             {/* Day-by-day schedule */}
             <div>
-              <p style={{ color: '#777', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Full Schedule</p>
+              <p style={{ color: '#555', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Full Schedule</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 280, overflowY: 'auto' }}>
                 {schedule.map((s, i) => {
                   const isToday    = s.date === todayStr
@@ -679,9 +679,9 @@ export function Sleep() {
                 <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: q.color }} />
                 <div>
                   <p className="text-white font-semibold text-sm">
-                    {formatDate(entry.date)} <span style={{ color: '#777', fontWeight: 400 }}>({dayLabel})</span>
+                    {formatDate(entry.date)} <span style={{ color: '#555', fontWeight: 400 }}>({dayLabel})</span>
                   </p>
-                  <p className="text-xs mt-0.5" style={{ color: '#666' }}>
+                  <p className="text-xs mt-0.5" style={{ color: '#444' }}>
                     {entry.bedtime  && `Bed ${entry.bedtime} · `}
                     {entry.wake_time && `Up ${entry.wake_time}`}
                   </p>

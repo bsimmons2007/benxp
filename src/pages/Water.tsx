@@ -138,9 +138,9 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
       <div style={{ textAlign: 'center' }}>
         <p style={{ fontSize: 28, fontWeight: 900, color: fill >= 1 ? glowColor : '#fff', fontFamily: 'Cinzel, serif', lineHeight: 1,
           textShadow: fill >= 1 ? `0 0 20px ${glowColor}` : 'none', transition: 'all 0.4s ease' }}>
-          {ozDrunk.toFixed(0)}<span style={{ fontSize: 14, fontWeight: 400, color: '#666' }}>oz</span>
+          {ozDrunk.toFixed(0)}<span style={{ fontSize: 14, fontWeight: 400, color: '#444' }}>oz</span>
         </p>
-        <p style={{ fontSize: 12, color: '#777', marginTop: 2 }}>of {goal}oz goal</p>
+        <p style={{ fontSize: 12, color: '#555', marginTop: 2 }}>of {goal}oz goal</p>
         {fill >= 1 && (
           <p className="pop-in" style={{ fontSize: 12, color: glowColor, fontWeight: 700, marginTop: 4 }}>
             🎉 Goal reached!
@@ -301,7 +301,7 @@ export function Water() {
                   <span style={{ fontSize: 18 }}>💧</span>
                   <div>
                     <p className="font-bold" style={{ color: '#29b6f6', fontSize: 15 }}>{Number(e.oz).toFixed(0)}oz</p>
-                    <p style={{ color: '#777', fontSize: 11 }}>{formatTime(e.created_at)}</p>
+                    <p style={{ color: '#555', fontSize: 11 }}>{formatTime(e.created_at)}</p>
                   </div>
                 </div>
                 <button
@@ -321,10 +321,10 @@ export function Water() {
         )}
 
         {entries.length === 0 && !loading && (
-          <div style={{ textAlign: 'center', padding: '32px 0', color: '#666' }}>
+          <div style={{ textAlign: 'center', padding: '32px 0', color: '#444' }}>
             <p style={{ fontSize: 36, marginBottom: 8 }}>💧</p>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#666' }}>No water logged yet today</p>
-            <p style={{ fontSize: 12, color: '#666', marginTop: 4 }}>Tap a quick add button to get started</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#444' }}>No water logged yet today</p>
+            <p style={{ fontSize: 12, color: '#444', marginTop: 4 }}>Tap a quick add button to get started</p>
           </div>
         )}
 

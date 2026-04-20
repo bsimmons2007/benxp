@@ -108,7 +108,7 @@ export function BodyweightChart() {
               )}
             </div>
           ) : (
-            <span style={{ color: '#777', fontSize: 12 }}>No goal set</span>
+            <span style={{ color: '#555', fontSize: 12 }}>No goal set</span>
           )}
         </div>
         <button

@@ -42,7 +42,7 @@ function RankProgressBar({ result }: { result: MuscleScoreResult }) {
   return (
     <div style={{ marginTop: 6 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-        <span style={{ fontSize: 10, color: '#666' }}>Progress to next rank</span>
+        <span style={{ fontSize: 10, color: '#444' }}>Progress to next rank</span>
         <span style={{ fontSize: 10, color: glow, fontWeight: 700 }}>{pct}%</span>
       </div>
       <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
@@ -86,7 +86,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
         <span style={{ fontSize: 28, fontWeight: 900, color: glow, fontFamily: 'Cinzel, serif' }}>
           {result.score.toFixed(3)}
         </span>
-        <span style={{ fontSize: 12, color: '#777' }}>strength score</span>
+        <span style={{ fontSize: 12, color: '#555' }}>strength score</span>
         {result.isStale && (
           <span style={{ fontSize: 10, color: '#e07830', background: 'rgba(224,120,48,0.12)', border: '1px solid rgba(224,120,48,0.3)', padding: '2px 6px', borderRadius: 4 }}>
             ⚠ stale
@@ -103,7 +103,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
 
       {nextRank && result.rank.tier > 0 && (
         <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <span style={{ fontSize: 11, color: '#777' }}>
+          <span style={{ fontSize: 11, color: '#555' }}>
             Need{' '}
             <span style={{ color: nextRank.glow !== 'none' ? nextRank.glow : '#aaa', fontWeight: 700 }}>
               +{(nextRank.minScore - result.score).toFixed(3)}
@@ -118,7 +118,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
 
       {result.contributions.length > 0 && (
         <div style={{ marginTop: 12 }}>
-          <p style={{ fontSize: 11, color: '#777', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+          <p style={{ fontSize: 11, color: '#555', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
             Contributing exercises
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -151,7 +151,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
       )}
 
       {result.rank.tier === 0 && (
-        <p style={{ fontSize: 13, color: '#777', textAlign: 'center', marginTop: 12 }}>
+        <p style={{ fontSize: 13, color: '#555', textAlign: 'center', marginTop: 12 }}>
           No exercise data yet.<br />
           <span style={{ color: '#888' }}>Log a lift that targets {muscle?.name ?? 'this muscle'}.</span>
         </p>
@@ -171,7 +171,7 @@ function GroupRow({ group, results, selected, onSelect }: {
   const groupMuscles = MUSCLES.filter(m => m.group === group)
   return (
     <div style={{ marginBottom: 2 }}>
-      <p style={{ fontSize: 10, color: '#777', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4, fontFamily: 'Cormorant Garamond, serif' }}>
+      <p style={{ fontSize: 10, color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4, fontFamily: 'Cormorant Garamond, serif' }}>
         {group}
       </p>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -256,7 +256,7 @@ function StrengthOrb({ sq }: { sq: number }) {
         </span>
         <span style={{ fontSize: 9, color: `${glow}aa`, letterSpacing: '0.14em' }}>SQ</span>
       </div>
-      <p style={{ fontSize: 11, color: '#666', textAlign: 'center' }}>Strength Quotient</p>
+      <p style={{ fontSize: 11, color: '#444', textAlign: 'center' }}>Strength Quotient</p>
       <RankBadge rank={rank} size="sm" />
     </div>
   )
@@ -279,7 +279,7 @@ function RankDropdown() {
         }}
       >
         <span>Rank Tiers</span>
-        <span style={{ fontSize: 10, color: '#777' }}>▾ tap to expand</span>
+        <span style={{ fontSize: 10, color: '#555' }}>▾ tap to expand</span>
       </summary>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 3, paddingTop: 10 }}>
         {ranked.map(rank => {
@@ -409,7 +409,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
   if (!triggerLoad && !loaded) {
     return (
       <div style={{ padding: '40px 0', textAlign: 'center' }}>
-        <p style={{ color: '#666', fontSize: 13 }}>Loading strength data…</p>
+        <p style={{ color: '#444', fontSize: 13 }}>Loading strength data…</p>
       </div>
     )
   }
@@ -417,7 +417,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }}>
-        <p style={{ color: '#666', fontFamily: 'Cinzel, serif', fontSize: 13 }}>Computing strength scores…</p>
+        <p style={{ color: '#444', fontFamily: 'Cinzel, serif', fontSize: 13 }}>Computing strength scores…</p>
       </div>
     )
   }
@@ -458,7 +458,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
               </div>
             )}
             {!selected && (
-              <p style={{ textAlign: 'center', fontSize: 12, color: '#666', marginTop: 8 }}>
+              <p style={{ textAlign: 'center', fontSize: 12, color: '#444', marginTop: 8 }}>
                 Tap a muscle to see its rank &amp; contributors
               </p>
             )}
@@ -470,7 +470,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
           {/* Strength Quotient */}
           <Card style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 12 }}>
             <StrengthOrb sq={sq} />
-            <p style={{ fontSize: 12, color: '#777', textAlign: 'center', marginTop: 4 }}>
+            <p style={{ fontSize: 12, color: '#555', textAlign: 'center', marginTop: 4 }}>
               Based on {liftLog.length} logged sets across{' '}
               {new Set(liftLog.map(r => r.lift)).size} exercises
             </p>

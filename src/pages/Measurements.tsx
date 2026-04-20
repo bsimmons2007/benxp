@@ -115,9 +115,9 @@ function SnapshotStat({
   const delta = prev != null ? latest - prev : null
   return (
     <div className="flex flex-col">
-      <p style={{ color: '#666', fontSize: 10, marginBottom: 2 }}>{label}</p>
+      <p style={{ color: '#444', fontSize: 10, marginBottom: 2 }}>{label}</p>
       <p className="font-bold" style={{ color: 'var(--accent)', fontSize: 16 }}>
-        {latest.toFixed(1)}<span style={{ color: '#666', fontSize: 10, marginLeft: 2 }}>{unit}</span>
+        {latest.toFixed(1)}<span style={{ color: '#444', fontSize: 10, marginLeft: 2 }}>{unit}</span>
       </p>
       {delta != null && (
         <p style={{ fontSize: 10, color: delta < 0 ? '#4ade80' : delta > 0 ? '#f87171' : '#888', marginTop: 1 }}>
@@ -211,16 +211,16 @@ export function Measurements() {
         {showForm && (
           <Card className="mb-4 pop-in">
             <form onSubmit={handleSubmit(onSubmit)}>
-              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#666' }}>New Entry</p>
+              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#444' }}>New Entry</p>
               <Input type="date" {...register('date')} className="mb-4" style={{ width: '100%' }} />
 
               {FIELD_GROUPS.map(group => (
                 <div key={group.label} className="mb-4">
-                  <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#777' }}>{group.label}</p>
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#555' }}>{group.label}</p>
                   <div className="grid grid-cols-2 gap-2">
                     {group.fields.map(f => (
                       <div key={f.key}>
-                        <p style={{ color: '#888', fontSize: 11, marginBottom: 3 }}>{f.label} <span style={{ color: '#777' }}>({f.unit})</span></p>
+                        <p style={{ color: '#888', fontSize: 11, marginBottom: 3 }}>{f.label} <span style={{ color: '#555' }}>({f.unit})</span></p>
                         <Input
                           type="number"
                           step="0.1"
@@ -257,7 +257,7 @@ export function Measurements() {
           <>
             {/* Latest snapshot */}
             <Card className="mb-3">
-              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#666' }}>Latest · {formatDate(latest.date)}</p>
+              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#444' }}>Latest · {formatDate(latest.date)}</p>
               <div className="grid grid-cols-3 gap-3 mb-4">
                 {[
                   { key: 'weight_lbs'  as const, label: 'Weight',   unit: 'lbs' },
@@ -299,7 +299,7 @@ export function Measurements() {
             </Card>
 
             {/* History */}
-            <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#777' }}>History</p>
+            <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#555' }}>History</p>
             <div className="flex flex-col gap-2">
               {rows.map((row, i) => (
                 <Card key={row.id} className="card-animate">
@@ -321,13 +321,13 @@ export function Measurements() {
                       .filter(f => row[f.key] != null)
                       .map(f => (
                         <span key={f.key} style={{ color: '#888', fontSize: 12 }}>
-                          <span style={{ color: '#666' }}>{f.label} </span>
+                          <span style={{ color: '#444' }}>{f.label} </span>
                           <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{(row[f.key] as number).toFixed(1)}</span>
-                          <span style={{ color: '#777', fontSize: 10 }}>{f.unit}</span>
+                          <span style={{ color: '#555', fontSize: 10 }}>{f.unit}</span>
                         </span>
                       ))}
                   </div>
-                  {row.notes && <p className="mt-1.5 text-xs italic" style={{ color: '#777' }}>{row.notes}</p>}
+                  {row.notes && <p className="mt-1.5 text-xs italic" style={{ color: '#555' }}>{row.notes}</p>}
                 </Card>
               ))}
             </div>

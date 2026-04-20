@@ -277,7 +277,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
             <button
               onClick={() => setConfirming(true)}
               className="px-3 py-1.5 rounded-lg flex items-center justify-center"
-              style={{ background: 'rgba(255,255,255,0.04)', color: '#666', border: '1px solid rgba(255,255,255,0.06)' }}
+              style={{ background: 'rgba(255,255,255,0.04)', color: '#444', border: '1px solid rgba(255,255,255,0.06)' }}
             >
               <TrashIcon size={14} color="#666" />
             </button>
@@ -349,7 +349,7 @@ export function Goals() {
         {/* Active goals */}
         {active.length === 0 ? (
           <div style={{ padding: '12px 0' }}>
-            <p style={{ color: '#777', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet — try one of these:</p>
+            <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet — try one of these:</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { emoji: '🏋️', label: 'Bench 225 lbs',      metric: 'bench_1rm',         target: 225 },
@@ -402,7 +402,7 @@ export function Goals() {
         {/* Completed goals */}
         {completed.length > 0 && (
           <>
-            <p className="text-xs uppercase tracking-widest mt-4 mb-3 font-semibold" style={{ color: '#777' }}>Completed</p>
+            <p className="text-xs uppercase tracking-widest mt-4 mb-3 font-semibold" style={{ color: '#555' }}>Completed</p>
             {completed.map(g => (
               <div
                 key={g.id}
@@ -414,7 +414,7 @@ export function Goals() {
                   <div>
                     <p className="text-sm text-white">{g.title}</p>
                     {g.completed_at && (
-                      <p className="text-xs" style={{ color: '#777' }}>
+                      <p className="text-xs" style={{ color: '#555' }}>
                         {new Date(g.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </p>
                     )}

@@ -106,7 +106,7 @@ export function Login() {
           >
             YouXP
           </h1>
-          <p style={{ color: '#777', fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'Cormorant Garamond, serif' }}>
+          <p style={{ color: '#555', fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'Cormorant Garamond, serif' }}>
             Your life. Gamified.
           </p>
         </div>
@@ -120,7 +120,7 @@ export function Login() {
             {FEATURES.map(f => (
               <div key={f.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ display: 'flex', alignItems: 'center' }}>{f.icon}</span>
-                <span style={{ color: '#666', fontSize: 13 }}>{f.label}</span>
+                <span style={{ color: '#444', fontSize: 13 }}>{f.label}</span>
               </div>
             ))}
           </div>
@@ -131,7 +131,7 @@ export function Login() {
             background: 'rgba(255,255,255,0.025)',
             border: '1px solid rgba(255,255,255,0.05)',
           }}>
-            <p style={{ color: '#666', fontSize: 13, fontStyle: 'italic', lineHeight: 1.7, margin: 0 }}>
+            <p style={{ color: '#444', fontSize: 13, fontStyle: 'italic', lineHeight: 1.7, margin: 0 }}>
               "Every rep. Every mile. Every page.{' '}
               <span style={{ color: 'var(--accent)', fontWeight: 600, fontStyle: 'normal' }}>All XP.</span>"
             </p>
@@ -150,7 +150,7 @@ export function Login() {
           </div>
           <div>
             <p style={{ color: '#888', fontSize: 13, fontWeight: 600, margin: 0 }}>Start at Level 1 · Newcomer</p>
-            <p style={{ color: '#666', fontSize: 12, margin: '3px 0 0' }}>Earn XP with every single activity you log</p>
+            <p style={{ color: '#444', fontSize: 12, margin: '3px 0 0' }}>Earn XP with every single activity you log</p>
           </div>
         </div>
       </div>
@@ -171,7 +171,7 @@ export function Login() {
             <h1 className="glow-pulse" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 44, fontWeight: 900 }}>
               YouXP
             </h1>
-            <p style={{ color: '#666', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 6, fontFamily: 'Cormorant Garamond, serif' }}>
+            <p style={{ color: '#444', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 6, fontFamily: 'Cormorant Garamond, serif' }}>
               Your life. Gamified.
             </p>
           </div>
@@ -193,7 +193,7 @@ export function Login() {
               <h2 style={{ color: '#e0e0e0', fontFamily: 'Cinzel, serif', fontSize: 19, fontWeight: 700, margin: '0 0 5px' }}>
                 {mode === 'login' ? 'Welcome back' : 'Create your account'}
               </h2>
-              <p style={{ color: '#777', fontSize: 13, margin: 0 }}>
+              <p style={{ color: '#555', fontSize: 13, margin: 0 }}>
                 {mode === 'login'
                   ? 'Sign in to continue your grind'
                   : 'Start earning XP for everything you do'}
@@ -250,7 +250,7 @@ export function Login() {
                         setError(null)
                         alert('Check your email for a reset link!')
                       }}
-                      style={{ background: 'none', border: 'none', color: '#777', fontSize: 11, cursor: 'pointer', padding: 0, transition: 'color 0.15s' }}
+                      style={{ background: 'none', border: 'none', color: '#555', fontSize: 11, cursor: 'pointer', padding: 0, transition: 'color 0.15s' }}
                       onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
                       onMouseLeave={e => (e.currentTarget.style.color = '#555')}
                     >
@@ -325,7 +325,7 @@ export function Login() {
             </form>
 
             {/* Mode switch */}
-            <p style={{ textAlign: 'center', marginTop: 22, color: '#777', fontSize: 13 }}>
+            <p style={{ textAlign: 'center', marginTop: 22, color: '#555', fontSize: 13 }}>
               {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
               <button
                 type="button"
@@ -353,7 +353,7 @@ export function Login() {
 function FieldLabel({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
     <label style={{
-      display: 'block', color: '#777', fontSize: 11,
+      display: 'block', color: '#555', fontSize: 11,
       fontWeight: 700, letterSpacing: '0.08em',
       textTransform: 'uppercase', marginBottom: 6,
       ...style,

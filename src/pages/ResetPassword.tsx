@@ -77,12 +77,12 @@ export function ResetPassword() {
         <h2 style={{ color: '#e0e0e0', fontFamily: 'Cinzel, serif', fontSize: 19, fontWeight: 700, marginBottom: 6 }}>
           Set New Password
         </h2>
-        <p style={{ color: '#777', fontSize: 13, marginBottom: 24 }}>
+        <p style={{ color: '#555', fontSize: 13, marginBottom: 24 }}>
           Choose a strong password for your account.
         </p>
 
         {!ready && (
-          <p style={{ color: '#777', fontSize: 13, textAlign: 'center' }}>
+          <p style={{ color: '#555', fontSize: 13, textAlign: 'center' }}>
             Verifying reset link…
           </p>
         )}
@@ -91,7 +91,7 @@ export function ResetPassword() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* New password */}
             <div>
-              <label style={{ display: 'block', color: '#777', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+              <label style={{ display: 'block', color: '#555', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
                 New Password
               </label>
               <div style={{ position: 'relative' }}>
@@ -121,7 +121,7 @@ export function ResetPassword() {
 
             {/* Confirm password */}
             <div>
-              <label style={{ display: 'block', color: '#777', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+              <label style={{ display: 'block', color: '#555', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
                 Confirm Password
               </label>
               <input
@@ -172,7 +172,7 @@ export function ResetPassword() {
             <p style={{ color: '#4caf50', fontWeight: 700, fontSize: 15, fontFamily: 'Cinzel, serif' }}>
               Password updated!
             </p>
-            <p style={{ color: '#777', fontSize: 13, marginTop: 6 }}>
+            <p style={{ color: '#555', fontSize: 13, marginTop: 6 }}>
               Redirecting you home…
             </p>
           </div>

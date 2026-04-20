@@ -19,9 +19,9 @@
 
   /* Text scale */
   --text-primary:    #e8e8e8;
-  --text-secondary:  #b0b0b8;
-  --text-muted:      #808090;
-  --text-dim:        #606070;
+  --text-secondary:  #999;
+  --text-muted:      #5a5a6a;
+  --text-dim:        #3a3a4a;
 
   /* Borders */
   --border:          rgba(255,255,255,0.08);

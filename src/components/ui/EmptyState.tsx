@@ -22,14 +22,14 @@ export function EmptyState({ icon, title, sub, action }: EmptyStateProps) {
 
       <p
         className="font-bold mb-2"
-        style={{ color: '#777', fontFamily: 'Cinzel, serif', fontSize: 15, letterSpacing: '0.04em' }}
+        style={{ color: '#555', fontFamily: 'Cinzel, serif', fontSize: 15, letterSpacing: '0.04em' }}
       >
         {title}
       </p>
 
       <p
         className="text-sm"
-        style={{ color: '#666', maxWidth: 230, lineHeight: 1.6 }}
+        style={{ color: '#444', maxWidth: 230, lineHeight: 1.6 }}
       >
         {sub}
       </p>

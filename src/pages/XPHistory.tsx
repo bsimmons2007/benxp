@@ -185,13 +185,13 @@ export function XPHistory() {
           }}
         >
           <div>
-            <p className="text-xs uppercase tracking-widest" style={{ color: '#666', fontFamily: 'Cormorant Garamond, serif' }}>All-time XP</p>
+            <p className="text-xs uppercase tracking-widest" style={{ color: '#444', fontFamily: 'Cormorant Garamond, serif' }}>All-time XP</p>
             <p className="font-bold text-2xl" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
               {xpLoading ? '—' : totalXP.toLocaleString()}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs uppercase tracking-widest" style={{ color: '#666', fontFamily: 'Cormorant Garamond, serif' }}>Events</p>
+            <p className="text-xs uppercase tracking-widest" style={{ color: '#444', fontFamily: 'Cormorant Garamond, serif' }}>Events</p>
             <p className="font-bold text-2xl" style={{ color: '#ccc', fontFamily: 'Cinzel, serif' }}>
               {loading ? '—' : events.length}
             </p>
@@ -200,7 +200,7 @@ export function XPHistory() {
 
         {/* Event list */}
         {loading ? (
-          <p style={{ color: '#777', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
+          <p style={{ color: '#555', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
         ) : (
           <div className="flex flex-col gap-1">
             {grouped.map(group => (
@@ -208,7 +208,7 @@ export function XPHistory() {
                 {/* Date separator */}
                 <p
                   className="text-xs uppercase tracking-widest px-1 pt-3 pb-1"
-                  style={{ color: '#777', fontFamily: 'Cormorant Garamond, serif' }}
+                  style={{ color: '#555', fontFamily: 'Cormorant Garamond, serif' }}
                 >
                   {formatDate(group.date)}
                 </p>

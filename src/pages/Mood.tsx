@@ -151,7 +151,7 @@ export function Mood() {
                 <p style={{ color: s.color, fontSize: 24, fontWeight: 900, lineHeight: 1, fontFamily: 'Cinzel, serif' }}>
                   {s.value}
                 </p>
-                <p style={{ color: '#777', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <p style={{ color: '#555', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   {s.label}
                 </p>
               </div>
@@ -271,7 +271,7 @@ export function Mood() {
                   }}
                 >
                   <div className="flex justify-between items-center">
-                    <p style={{ fontSize: 12, color: '#666' }}>{formatDate(r.date)}</p>
+                    <p style={{ fontSize: 12, color: '#444' }}>{formatDate(r.date)}</p>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                       <span style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700 }}>{moodEmoji(r.mood ?? 5)} {r.mood}</span>
                       <span style={{ color: '#4ade80',       fontSize: 12 }}>E:{r.energy}</span>
@@ -282,7 +282,7 @@ export function Mood() {
                     </div>
                   </div>
                   {r.notes && (
-                    <p style={{ fontSize: 11, color: '#777', marginTop: 4, fontStyle: 'italic' }}>"{r.notes}"</p>
+                    <p style={{ fontSize: 11, color: '#555', marginTop: 4, fontStyle: 'italic' }}>"{r.notes}"</p>
                   )}
                 </div>
               ))}

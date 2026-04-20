@@ -164,7 +164,7 @@ function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () =
             {book.author && <p className="text-sm mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{book.author}</p>}
             <div className="flex items-center gap-2 mt-2">
               <GenreChip genre={book.genre} />
-              {book.pages && <span style={{ color: '#666', fontSize: 11 }}>{book.pages} pp</span>}
+              {book.pages && <span style={{ color: '#444', fontSize: 11 }}>{book.pages} pp</span>}
             </div>
           </div>
           <div className="flex flex-col gap-2 flex-shrink-0">
@@ -224,7 +224,7 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
           </div>
           <div className="flex flex-col items-end gap-1 flex-shrink-0">
             {book.date_finished && <p className="text-xs" style={{ color: '#888' }}>{formatDate(book.date_finished)}</p>}
-            {book.pages && <p className="text-xs" style={{ color: '#666' }}>{book.pages} pp</p>}
+            {book.pages && <p className="text-xs" style={{ color: '#444' }}>{book.pages} pp</p>}
             <button onClick={e => { e.stopPropagation(); setEditing(true) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer', marginTop: 4 }}>
               <EditIcon size={13} color="var(--text-muted)" />
             </button>
@@ -241,7 +241,7 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
                 { label: 'Finished', value: book.date_finished ? formatDate(book.date_finished) : '—' },
               ].map(item => (
                 <div key={item.label}>
-                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#666', fontFamily: 'Cormorant Garamond, serif' }}>{item.label}</p>
+                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#444', fontFamily: 'Cormorant Garamond, serif' }}>{item.label}</p>
                   <p className="text-white">{item.value}</p>
                 </div>
               ))}
@@ -446,7 +446,7 @@ function ToReadSection() {
               {b.priority && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: PRIORITY_COLORS[b.priority], color: '#fff' }}>{b.priority}</span>
               )}
-              <button onClick={() => remove(b.id)} style={{ color: '#666', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <button onClick={() => remove(b.id)} style={{ color: '#444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
           </div>
         ))}
@@ -541,7 +541,7 @@ export function Books() {
         {/* Genre filter */}
         {finished.length > 0 && (
           <>
-            <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: '#666' }}>
+            <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: '#444' }}>
               Finished ({finished.length})
             </p>
             <div className="flex gap-2 overflow-x-auto pb-1 mb-3" style={{ scrollbarWidth: 'none' }}>

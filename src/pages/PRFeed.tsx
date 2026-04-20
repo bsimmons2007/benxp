@@ -138,7 +138,7 @@ export function PRFeed() {
 
         {/* PR count */}
         {!loading && (
-          <p className="text-xs mb-3" style={{ color: '#777' }}>
+          <p className="text-xs mb-3" style={{ color: '#555' }}>
             {filtered.length} PR{filtered.length !== 1 ? 's' : ''} total
           </p>
         )}
@@ -184,11 +184,11 @@ export function PRFeed() {
                         </span>
                       )}
                     </div>
-                    <span style={{ color: '#777', fontSize: 11 }}>{formatDate(pr.date)}</span>
+                    <span style={{ color: '#555', fontSize: 11 }}>{formatDate(pr.date)}</span>
                   </div>
                   <span className="font-bold text-lg" style={{ color: 'var(--accent)' }}>
                     {pr.est_1rm.toFixed(0)}
-                    <span style={{ color: '#666', fontSize: 11, fontWeight: 400, marginLeft: 3 }}>lbs</span>
+                    <span style={{ color: '#444', fontSize: 11, fontWeight: 400, marginLeft: 3 }}>lbs</span>
                   </span>
                 </div>
               )
