@@ -1056,9 +1056,9 @@ export function Records() {
     if (t === 'strength' && !strengthLoaded) setStrengthLoaded(true)
   }
 
-  const exerciseGroupMap = Object.fromEntries(exercises.map(e => [e.name, e.muscle_group]))
+  const exerciseGroupMap: Record<string, string> = Object.fromEntries(exercises.map(e => [e.name, e.muscle_group] as [string, string]))
   const allLoggedLifts = [...new Set(history.map(r => r.lift))]
-  const liftGroups = [...new Set(allLoggedLifts.map(l => exerciseGroupMap[l]).filter(Boolean))].sort()
+  const liftGroups = [...new Set(allLoggedLifts.map(l => exerciseGroupMap[l]).filter((g): g is string => Boolean(g)))].sort()
   const loggedLifts = muscleFilter
     ? allLoggedLifts.filter(l => exerciseGroupMap[l] === muscleFilter)
     : allLoggedLifts
