@@ -238,7 +238,7 @@ export function Settings() {
 
   // Reusable chevron
   function Chevron({ open }: { open: boolean }) {
-    return <span style={{ color: '#555', fontSize: 12, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', display: 'block', flexShrink: 0 }}>▾</span>
+    return <span style={{ color: '#777', fontSize: 12, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', display: 'block', flexShrink: 0 }}>▾</span>
   }
 
   // Reusable toggle pill
@@ -482,7 +482,7 @@ export function Settings() {
                     <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{row.icon}</span>
                     <div>
                       <p className="text-white text-sm font-medium">{row.label}</p>
-                      <p style={{ color: '#555', fontSize: 11 }}>{row.sub}</p>
+                      <p style={{ color: '#777', fontSize: 11 }}>{row.sub}</p>
                     </div>
                   </div>
                   <Toggle value={row.value} onToggle={row.toggle} />
@@ -505,7 +505,7 @@ export function Settings() {
 
               {/* Scene picker */}
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
-                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#444' }}>Atmosphere</p>
+                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#666' }}>Atmosphere</p>
                 <div className="flex flex-col gap-1.5">
                   {AMBIENT_SCENES.map(scene => {
                     const isActive = activeScene === scene.id
@@ -522,7 +522,7 @@ export function Settings() {
                         <span style={{ fontSize: 18, flexShrink: 0 }}>{scene.emoji}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-white">{scene.name}</p>
-                          <p className="text-xs truncate" style={{ color: '#444' }}>{scene.description}</p>
+                          <p className="text-xs truncate" style={{ color: '#666' }}>{scene.description}</p>
                         </div>
                         {isActive && <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)', boxShadow: '0 0 6px var(--accent)', flexShrink: 0, animation: ambient ? 'glowPulse 2s ease-in-out infinite' : 'none' }} />}
                       </button>
@@ -584,7 +584,7 @@ export function Settings() {
                   <span style={{ width: 28, textAlign: 'center' }}>📤</span>
                   <span className="text-white text-sm">{exporting ? 'Exporting...' : 'Export data as CSV'}</span>
                 </div>
-                <span style={{ color: '#555' }}>›</span>
+                <span style={{ color: '#777' }}>›</span>
               </div>
 
               {deleteStep === 'idle' ? (
@@ -597,7 +597,7 @@ export function Settings() {
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><TrashIcon size={16} color="#E94560" /></span>
                     <span style={{ color: '#E94560', fontSize: 14 }}>Delete account &amp; all data</span>
                   </div>
-                  <span style={{ color: '#555' }}>›</span>
+                  <span style={{ color: '#777' }}>›</span>
                 </div>
               ) : (
                 <div className="py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>

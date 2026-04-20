@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { BottomNav } from './components/layout/BottomNav'
 import { SideNav } from './components/layout/SideNav'
@@ -43,13 +43,101 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+// N = new workout log  |  G = goals  |  H = home  |  ? = show help
+
+const SHORTCUTS: { key: string; path: string; label: string }[] = [
+  { key: 'n', path: '/lifting',  label: 'N — New Workout'  },
+  { key: 'g', path: '/goals',    label: 'G — Goals'        },
+  { key: 'h', path: '/',         label: 'H — Home'         },
+]
+
+function useKeyboardShortcuts() {
+  const navigate = useNavigate()
+  const [helpVisible, setHelpVisible] = useState(false)
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      // Ignore when typing in inputs
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement).isContentEditable) return
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+
+      if (e.key === '?') { setHelpVisible(h => !h); return }
+      if (e.key === 'Escape') { setHelpVisible(false); return }
+
+      const sc = SHORTCUTS.find(s => s.key === e.key.toLowerCase())
+      if (sc) { navigate(sc.path); setHelpVisible(false) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [navigate])
+
+  return { helpVisible, setHelpVisible }
+}
+
+function ShortcutHelp({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="pop-in"
+        style={{
+          background: 'rgba(12,16,36,0.98)', border: '1px solid rgba(255,255,255,0.12)',
+          borderRadius: 16, padding: '20px 24px', minWidth: 220,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
+        }}
+      >
+        <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12, fontFamily: 'Cinzel, serif' }}>
+          Keyboard Shortcuts
+        </p>
+        {SHORTCUTS.map(s => (
+          <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <kbd style={{
+              display: 'inline-block', width: 24, height: 24, lineHeight: '24px', textAlign: 'center',
+              borderRadius: 5, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+              color: 'var(--accent)', fontSize: 12, fontWeight: 700, fontFamily: 'monospace', flexShrink: 0,
+            }}>
+              {s.key.toUpperCase()}
+            </kbd>
+            <span style={{ fontSize: 13, color: '#ccc' }}>{s.label.split(' — ')[1]}</span>
+          </div>
+        ))}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0' }}>
+          <kbd style={{
+            display: 'inline-block', width: 24, height: 24, lineHeight: '24px', textAlign: 'center',
+            borderRadius: 5, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+            color: '#888', fontSize: 11, fontWeight: 700, fontFamily: 'monospace', flexShrink: 0,
+          }}>?</kbd>
+          <span style={{ fontSize: 13, color: '#888' }}>Toggle this help</span>
+        </div>
+        <button
+          onClick={onClose}
+          style={{ marginTop: 14, width: '100%', padding: '8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#888', cursor: 'pointer', fontSize: 12 }}
+        >
+          Close (Esc)
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function AppInner() {
   const location = useLocation()
   const showNav = location.pathname !== '/login' && location.pathname !== '/reset-password'
+  const { helpVisible, setHelpVisible } = useKeyboardShortcuts()
 
   return (
     <>
       <LevelUpOverlay />
+      {helpVisible && <ShortcutHelp onClose={() => setHelpVisible(false)} />}
       <Routes>
         <Route path="/login"         element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />

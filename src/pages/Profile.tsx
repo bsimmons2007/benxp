@@ -355,13 +355,13 @@ function ActivityHeatmap() {
           {year} Activity
         </p>
         {loaded && (
-          <p style={{ color: '#555', fontSize: 11 }}>
+          <p style={{ color: '#777', fontSize: 11 }}>
             {Object.keys(counts).length} active days
           </p>
         )}
       </div>
       {!loaded ? (
-        <p style={{ color: '#555', fontSize: 12 }}>Loading…</p>
+        <p style={{ color: '#777', fontSize: 12 }}>Loading…</p>
       ) : (
         <div style={{ overflowX: 'auto', paddingBottom: 4 }}>
           <div style={{ display: 'block', width: 'fit-content', margin: '0 auto' }}>
@@ -404,11 +404,11 @@ function ActivityHeatmap() {
       )}
       {/* Legend */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, justifyContent: 'flex-end' }}>
-        <span style={{ fontSize: 9, color: '#555' }}>Less</span>
+        <span style={{ fontSize: 9, color: '#777' }}>Less</span>
         {['rgba(255,255,255,0.07)','rgba(245,166,35,0.30)','rgba(245,166,35,0.55)','rgba(245,166,35,0.75)','rgba(245,166,35,0.95)'].map((bg, i) => (
           <div key={i} style={{ width: CELL, height: CELL, borderRadius: 2, background: bg }} />
         ))}
-        <span style={{ fontSize: 9, color: '#555' }}>More</span>
+        <span style={{ fontSize: 9, color: '#777' }}>More</span>
       </div>
     </Card>
   )
@@ -538,7 +538,7 @@ export function Profile() {
             {title}
           </p>
           {stats.memberSince && (
-            <p className="text-xs mt-1" style={{ color: '#555' }}>Member since {stats.memberSince}</p>
+            <p className="text-xs mt-1" style={{ color: '#777' }}>Member since {stats.memberSince}</p>
           )}
 
           {/* Level + XP bar */}
@@ -560,7 +560,7 @@ export function Profile() {
             <div className="flex items-center justify-between mb-2">
               <div>
                 <p className="text-xs uppercase tracking-widest" style={{ color: '#888' }}>Consistency Score</p>
-                <p className="text-xs mt-0.5" style={{ color: '#555' }}>{activeDays} active days in the last 30</p>
+                <p className="text-xs mt-0.5" style={{ color: '#777' }}>{activeDays} active days in the last 30</p>
               </div>
               <span style={{
                 fontSize: 32, fontWeight: 900,

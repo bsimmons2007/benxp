@@ -377,7 +377,7 @@ export function Cardio() {
             })}
           </div>
         ) : (
-          <p className="text-center py-8" style={{ color: '#555' }}>
+          <p className="text-center py-8" style={{ color: '#777' }}>
             {sessions.length === 0 ? 'No sessions yet.' : 'No sessions for this activity.'}
           </p>
         )}

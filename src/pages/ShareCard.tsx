@@ -195,8 +195,8 @@ function Card() {
 
       {/* Footer */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <p style={{ color: '#444', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>youxp.app</p>
-        <p style={{ color: '#444', fontSize: 9, margin: 0 }}>{new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
+        <p style={{ color: '#666', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>youxp.app</p>
+        <p style={{ color: '#666', fontSize: 9, margin: 0 }}>{new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
       </div>
     </div>
   )
@@ -244,7 +244,7 @@ export function ShareCard() {
     <>
       <TopBar title="Share" />
       <PageWrapper>
-        <p className="text-xs uppercase tracking-widest text-center mb-6" style={{ color: '#555' }}>
+        <p className="text-xs uppercase tracking-widest text-center mb-6" style={{ color: '#777' }}>
           Your Progress Card
         </p>
 

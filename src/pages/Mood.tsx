@@ -151,7 +151,7 @@ export function Mood() {
                 <p style={{ color: s.color, fontSize: 24, fontWeight: 900, lineHeight: 1, fontFamily: 'Cinzel, serif' }}>
                   {s.value}
                 </p>
-                <p style={{ color: '#555', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <p style={{ color: '#777', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   {s.label}
                 </p>
               </div>
@@ -282,7 +282,7 @@ export function Mood() {
                     </div>
                   </div>
                   {r.notes && (
-                    <p style={{ fontSize: 11, color: '#555', marginTop: 4, fontStyle: 'italic' }}>"{r.notes}"</p>
+                    <p style={{ fontSize: 11, color: '#777', marginTop: 4, fontStyle: 'italic' }}>"{r.notes}"</p>
                   )}
                 </div>
               ))}

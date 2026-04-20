@@ -216,11 +216,11 @@ export function Measurements() {
 
               {FIELD_GROUPS.map(group => (
                 <div key={group.label} className="mb-4">
-                  <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#555' }}>{group.label}</p>
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#777' }}>{group.label}</p>
                   <div className="grid grid-cols-2 gap-2">
                     {group.fields.map(f => (
                       <div key={f.key}>
-                        <p style={{ color: '#888', fontSize: 11, marginBottom: 3 }}>{f.label} <span style={{ color: '#555' }}>({f.unit})</span></p>
+                        <p style={{ color: '#888', fontSize: 11, marginBottom: 3 }}>{f.label} <span style={{ color: '#777' }}>({f.unit})</span></p>
                         <Input
                           type="number"
                           step="0.1"
@@ -299,7 +299,7 @@ export function Measurements() {
             </Card>
 
             {/* History */}
-            <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#555' }}>History</p>
+            <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#777' }}>History</p>
             <div className="flex flex-col gap-2">
               {rows.map((row, i) => (
                 <Card key={row.id} className="card-animate">
@@ -323,11 +323,11 @@ export function Measurements() {
                         <span key={f.key} style={{ color: '#888', fontSize: 12 }}>
                           <span style={{ color: '#666' }}>{f.label} </span>
                           <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{(row[f.key] as number).toFixed(1)}</span>
-                          <span style={{ color: '#555', fontSize: 10 }}>{f.unit}</span>
+                          <span style={{ color: '#777', fontSize: 10 }}>{f.unit}</span>
                         </span>
                       ))}
                   </div>
-                  {row.notes && <p className="mt-1.5 text-xs italic" style={{ color: '#555' }}>{row.notes}</p>}
+                  {row.notes && <p className="mt-1.5 text-xs italic" style={{ color: '#777' }}>{row.notes}</p>}
                 </Card>
               ))}
             </div>

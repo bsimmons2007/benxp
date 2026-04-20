@@ -180,7 +180,7 @@ export function Weekly() {
                 +{data.xpEarned.toLocaleString()}
               </p>
               {data.xpEarned === 0 && (
-                <p className="text-xs mt-2" style={{ color: '#555' }}>No activity logged this week yet.</p>
+                <p className="text-xs mt-2" style={{ color: '#777' }}>No activity logged this week yet.</p>
               )}
             </Card>
 

@@ -446,7 +446,7 @@ function ToReadSection() {
               {b.priority && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: PRIORITY_COLORS[b.priority], color: '#fff' }}>{b.priority}</span>
               )}
-              <button onClick={() => remove(b.id)} style={{ color: '#444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <button onClick={() => remove(b.id)} style={{ color: '#666', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
           </div>
         ))}

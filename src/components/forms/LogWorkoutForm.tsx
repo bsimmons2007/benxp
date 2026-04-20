@@ -180,7 +180,7 @@ export function LogWorkoutForm() {
           }}
         />
         {!bwLoggedToday && (
-          <p style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
+          <p style={{ fontSize: 10, color: '#777', marginTop: 2 }}>
             Only asked once per day — updates your weight graph
           </p>
         )}

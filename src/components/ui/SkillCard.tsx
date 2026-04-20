@@ -36,15 +36,15 @@ export function SkillCard({ skill }: SkillCardProps) {
           <p className="font-bold text-2xl" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', lineHeight: 1 }}>
             {skill.level}
           </p>
-          <p style={{ color: '#555', fontSize: 9 }}>LEVEL</p>
+          <p style={{ color: '#777', fontSize: 9 }}>LEVEL</p>
         </div>
       </div>
 
       <ProgressBar value={skill.progress} height={6} glow />
 
       <div className="flex justify-between mt-1.5">
-        <p style={{ color: '#555', fontSize: 10 }}>{skill.xp.toLocaleString()} XP</p>
-        <p style={{ color: '#555', fontSize: 10 }}>{skill.nextXP.toLocaleString()} to next</p>
+        <p style={{ color: '#777', fontSize: 10 }}>{skill.xp.toLocaleString()} XP</p>
+        <p style={{ color: '#777', fontSize: 10 }}>{skill.nextXP.toLocaleString()} to next</p>
       </div>
     </div>
   )

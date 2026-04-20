@@ -29,7 +29,7 @@ export function EmptyState({ icon, title, sub, action }: EmptyStateProps) {
 
       <p
         className="text-sm"
-        style={{ color: '#444', maxWidth: 230, lineHeight: 1.6 }}
+        style={{ color: '#666', maxWidth: 230, lineHeight: 1.6 }}
       >
         {sub}
       </p>
