@@ -279,6 +279,19 @@ button:not(:disabled):active { transform: scale(0.97); }
   background-clip: text;
 }
 
+/* ── Desktop sidebar layout ── */
+@media (min-width: 768px) {
+  .sidebar-drawer {
+    transform: translateX(0) !important;
+  }
+  .page-main {
+    padding-left: calc(240px + 28px) !important;
+    padding-right: 28px !important;
+    padding-bottom: 48px !important;
+    max-width: 100%;
+  }
+}
+
 /* ── Glass card utility ── */
 .glass {
   background: var(--card-bg);

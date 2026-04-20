@@ -12,12 +12,13 @@ export function PageWrapper({ children, noPadding = false }: PageWrapperProps) {
   return (
     <main
       key={pathname}
+      className="page-main"
       style={{
-        paddingTop:    'calc(60px + env(safe-area-inset-top))',
-        paddingBottom: 'calc(100px + env(safe-area-inset-bottom))',
-        paddingLeft:   noPadding ? 0 : 16,
-        paddingRight:  noPadding ? 0 : 16,
-        minHeight:     '100vh',
+        paddingTop:    'calc(72px + env(safe-area-inset-top))',
+        paddingBottom: 'calc(110px + env(safe-area-inset-bottom))',
+        paddingLeft:   noPadding ? 0 : 20,
+        paddingRight:  noPadding ? 0 : 20,
+        minHeight:     '100dvh',
         animation:     'pageEnter 0.24s cubic-bezier(0.22,1,0.36,1) both',
       }}
     >

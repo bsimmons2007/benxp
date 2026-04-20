@@ -77,9 +77,10 @@ export function SideNav() {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop — mobile only */}
       <div
         onClick={closeNav}
+        className="md:hidden"
         style={{
           position:      'fixed',
           inset:         0,
@@ -93,8 +94,9 @@ export function SideNav() {
         }}
       />
 
-      {/* Drawer */}
+      {/* Drawer — always visible on desktop, slide-in on mobile */}
       <aside
+        className="sidebar-drawer"
         style={{
           position:             'fixed',
           top:                  0,
