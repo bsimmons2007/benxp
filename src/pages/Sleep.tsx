@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
@@ -123,7 +123,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
   const [hours, setHours] = useState('')
   const [saving, setSaving] = useState(false)
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault()
     if (!hours) return
     setSaving(true)
