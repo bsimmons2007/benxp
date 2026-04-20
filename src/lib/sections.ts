@@ -1,4 +1,4 @@
-export type SectionKey = 'lifting' | 'books' | 'skate' | 'sleep' | 'fortnite' | 'challenges' | 'mood' | 'cardio' | 'water' | 'basketball'
+export type SectionKey = 'lifting' | 'books' | 'skate' | 'sleep' | 'fortnite' | 'challenges' | 'mood' | 'cardio' | 'water' | 'basketball' | 'hobbies'
 
 export interface SectionDef {
   label: string
@@ -17,19 +17,21 @@ export const SECTION_DEFS: Record<SectionKey, SectionDef> = {
   mood:       { label: 'Mood',     icon: '🧠', path: '/mood',       categories: ['Mood'] },
   cardio:     { label: 'Cardio',   icon: '🏃', path: '/cardio',     categories: ['Cardio'] },
   water:      { label: 'Water',    icon: '💧', path: '/water',      categories: ['Health'] },
-  basketball: { label: 'Hoops',   icon: '🏀', path: '/basketball', categories: ['Basketball'] },
+  basketball: { label: 'Hoops',    icon: '🏀', path: '/basketball', categories: ['Basketball'] },
+  hobbies:    { label: 'Hobbies',  icon: '🎯', path: '/hobbies',    categories: ['Basketball', 'Gaming'] },
 }
 
 // Skate is a subsection of Cardio — removed from nav
-// Fortnite + Basketball (Hoops) are "Hobby" tabs — shown in nav but hidden by default; enable in Settings
-export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'books', 'cardio', 'sleep', 'challenges', 'mood', 'water', 'basketball', 'fortnite']
+// Basketball + Fortnite live under /hobbies — excluded from standalone nav
+export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'books', 'cardio', 'sleep', 'challenges', 'mood', 'water', 'hobbies']
 
 export function loadSectionOrder(): SectionKey[] {
   try {
     const saved = JSON.parse(localStorage.getItem('benxp-order') ?? 'null') as SectionKey[]
     if (Array.isArray(saved)) {
-      // Drop skate + energy (merged/removed), keep valid keys, append any new ones
-      const validSaved = saved.filter((k): k is SectionKey => k in SECTION_DEFS && (k as string) !== 'skate' && (k as string) !== 'energy' && (k as string) !== 'strength')
+      // Drop removed/merged keys; basketball + fortnite are now inside /hobbies
+      const dropped = new Set(['skate', 'energy', 'strength', 'basketball', 'fortnite'])
+      const validSaved = saved.filter((k): k is SectionKey => k in SECTION_DEFS && !dropped.has(k as string))
       const missing = DEFAULT_ORDER.filter(k => !validSaved.includes(k))
       return [...validSaved, ...missing]
     }
@@ -47,7 +49,7 @@ export function loadHiddenSections(): SectionKey[] {
     const saved = JSON.parse(localStorage.getItem('benxp-hidden') ?? 'null') as SectionKey[]
     if (Array.isArray(saved)) return saved
   } catch { /* ignore */ }
-  return ['mood', 'fortnite', 'basketball']
+  return ['mood']
 }
 
 export function saveHiddenSections(hidden: SectionKey[]): void {

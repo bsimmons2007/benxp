@@ -364,6 +364,16 @@ export const BasketballIcon: IconComponent = ({ size = 20, color = 'currentColor
   </svg>
 )
 
+export const HobbiesIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <circle cx="10" cy="10" r="3" />
+    <path d="M6.5 3.5 10 7l3.5-3.5" strokeLinecap="round" />
+    <path d="M16.5 6.5 13 10l3.5 3.5" strokeLinecap="round" />
+    <path d="M13.5 16.5 10 13l-3.5 3.5" strokeLinecap="round" />
+    <path d="M3.5 13.5 7 10 3.5 6.5" strokeLinecap="round" />
+  </svg>
+)
+
 // ── Map: section key → icon component ─────────────────────────
 
 const SECTION_ICON_MAP: Record<string, IconComponent> = {
@@ -377,6 +387,7 @@ const SECTION_ICON_MAP: Record<string, IconComponent> = {
   cardio:     RunIcon,
   water:      DropletIcon,
   basketball: BasketballIcon,
+  hobbies:    HobbiesIcon,
 }
 
 const ACTIVITY_ICON_MAP: Record<string, IconComponent> = {

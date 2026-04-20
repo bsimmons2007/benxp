@@ -28,6 +28,7 @@ import { Strength } from './pages/Strength'
 import { Measurements } from './pages/Measurements'
 import { ResetPassword } from './pages/ResetPassword'
 import { Basketball } from './pages/Basketball'
+import { Hobbies } from './pages/Hobbies'
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
 import { useAuth } from './hooks/useAuth'
@@ -165,6 +166,7 @@ function AppInner() {
         <Route path="/strength"      element={<ProtectedRoute><Strength /></ProtectedRoute>} />
         <Route path="/measurements" element={<ProtectedRoute><Measurements /></ProtectedRoute>} />
         <Route path="/basketball"   element={<ProtectedRoute><Basketball /></ProtectedRoute>} />
+        <Route path="/hobbies"      element={<ProtectedRoute><Hobbies /></ProtectedRoute>} />
       </Routes>
       {showNav && <BottomNav />}
       {showNav && <SideNav />}

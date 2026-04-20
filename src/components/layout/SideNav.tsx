@@ -64,13 +64,10 @@ export function SideNav() {
     return () => document.removeEventListener('keydown', onKey)
   }, [closeNav])
 
-  // basketball + fortnite always live in the Hobbies section below — exclude from main tabs
-  const HOBBY_KEYS = new Set(['basketball', 'fortnite'])
-
   const mainTabs = [
     { to: '/', label: 'Home', iconKey: '__home' },
     ...order
-      .filter(key => !hidden.includes(key) && !HOBBY_KEYS.has(key))
+      .filter(key => !hidden.includes(key))
       .map(key => ({
         to:      SECTION_DEFS[key].path,
         label:   SECTION_DEFS[key].label,
@@ -179,25 +176,6 @@ export function SideNav() {
               )}
             </NavLink>
           ))}
-
-          {/* Hobbies section — always visible, not affected by hidden list */}
-          <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '8px 4px' }} />
-          <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-dim)', padding: '4px 12px 2px' }}>
-            Hobbies
-          </p>
-          {(['basketball', 'fortnite'] as const).map(key => {
-            const def = SECTION_DEFS[key]
-            return (
-              <NavLink key={key} to={def.path} style={({ isActive }) => linkStyle(isActive)}>
-                {({ isActive }) => (
-                  <>
-                    <SectionIcon sectionKey={key} size={16} color={isActive ? 'var(--accent)' : 'var(--text-secondary)'} />
-                    <span style={{ color: isActive ? 'var(--accent)' : 'var(--text-secondary)' }}>{def.label}</span>
-                  </>
-                )}
-              </NavLink>
-            )
-          })}
 
           {/* Separator */}
           <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '8px 4px' }} />
