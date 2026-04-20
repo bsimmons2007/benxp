@@ -138,7 +138,6 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
 
   const tooltipPos = computeTooltipPos(highlightRect, step.tooltipPosition, tooltipHeight)
   const vw = typeof window !== 'undefined' ? window.innerWidth : 390
-  const vh = typeof window !== 'undefined' ? window.innerHeight : 844
 
   return (
     <div
