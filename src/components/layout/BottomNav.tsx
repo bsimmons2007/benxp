@@ -26,6 +26,7 @@ export function BottomNav() {
 
   return (
     <nav
+      data-tutorial="bottom-nav"
       className="fixed bottom-0 left-0 right-0 flex justify-around items-start z-40 md:hidden"
       style={{
         background:           'var(--nav-bg)',

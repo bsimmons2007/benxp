@@ -84,6 +84,7 @@ export function TopBar({ title, hideSettings = false, back = false }: TopBarProp
 
       {/* Center — absolutely positioned so it stays centered regardless of side buttons */}
       <button
+        data-tutorial="topbar-logo"
         onClick={() => logoClickable && navigate('/monthly')}
         style={{
           background: 'none', border: 'none', padding: 0,
@@ -111,6 +112,7 @@ export function TopBar({ title, hideSettings = false, back = false }: TopBarProp
       {/* Right */}
       {!hideSettings ? (
         <button
+          data-tutorial="settings-btn"
           onClick={() => navigate('/settings')}
           aria-label="Settings"
           className="flex items-center justify-center rounded-lg transition-colors"

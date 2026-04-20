@@ -23,6 +23,7 @@ import {
 import type { Theme } from '../lib/theme'
 import type { SectionKey } from '../lib/sections'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { resetTutorial } from '../lib/tutorial'
 
 const C = 'var(--text-muted)'
 const XP_BREAKDOWN: { label: string; icon: ReactNode; xp: string }[] = [
@@ -316,6 +317,34 @@ export function Settings() {
             </div>
           </div>
         </Card>
+
+        {/* ── Restart Tutorial ─────────────────────────────────────── */}
+        <button
+          onClick={() => {
+            resetTutorial()
+            window.dispatchEvent(new Event('tutorial-reset'))
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            width: '100%',
+            padding: '12px 16px',
+            marginBottom: 8,
+            borderRadius: 12,
+            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'rgba(255,255,255,0.03)',
+            color: 'var(--accent)',
+            cursor: 'pointer',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 13,
+            fontWeight: 600,
+            textAlign: 'left',
+          }}
+        >
+          <span style={{ fontSize: 16 }}>🎮</span>
+          Restart App Tutorial
+        </button>
 
         {/* ── Appearance card ───────────────────────────────────────── */}
         <Card className="mb-2">

@@ -31,7 +31,9 @@ import { Basketball } from './pages/Basketball'
 import { Hobbies } from './pages/Hobbies'
 import { Pickleball } from './pages/Pickleball'
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
+import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
+import { isTutorialDone } from './lib/tutorial'
 import { useAuth } from './hooks/useAuth'
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -135,10 +137,27 @@ function AppInner() {
   const location = useLocation()
   const showNav = location.pathname !== '/login' && location.pathname !== '/reset-password'
   const { helpVisible, setHelpVisible } = useKeyboardShortcuts()
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/reset-password'
+
+  const [showTutorial, setShowTutorial] = useState(() => !isAuthRoute && !isTutorialDone())
+
+  useEffect(() => {
+    if (isAuthRoute) return
+    if (!isTutorialDone()) setShowTutorial(true)
+
+    function onReset() {
+      setShowTutorial(true)
+    }
+    window.addEventListener('tutorial-reset', onReset)
+    return () => window.removeEventListener('tutorial-reset', onReset)
+  }, [isAuthRoute])
 
   return (
     <>
       <LevelUpOverlay />
+      {showTutorial && !isAuthRoute && (
+        <TutorialOverlay onDone={() => setShowTutorial(false)} />
+      )}
       {helpVisible && <ShortcutHelp onClose={() => setHelpVisible(false)} />}
       <Routes>
         <Route path="/login"         element={<Login />} />
