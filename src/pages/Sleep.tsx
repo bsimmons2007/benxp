@@ -212,13 +212,19 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   const nights = logs.filter(r => !r.is_nap)
   if (nights.length < 3) return null
 
-  // Accumulate deficit over ALL logged nights (goal = 8h), naps reduce debt
+  // Total debt = sum of nightly deficits minus all nap hours (naps pay back debt)
   const withHours = nights.filter(r => r.hours_slept != null)
-  const napTotal  = logs.filter(r => r.is_nap && r.hours_slept != null).reduce((s, r) => s + (r.hours_slept ?? 0), 0)
+  const allNaps   = logs.filter(r => r.is_nap && r.hours_slept != null)
+  const napTotal  = allNaps.reduce((s, r) => s + (r.hours_slept ?? 0), 0)
   const rawDebt   = withHours.reduce((sum, r) => sum + Math.max(0, SLEEP_GOAL - (r.hours_slept ?? 0)), 0)
   const totalDebt = Math.max(0, rawDebt - napTotal)
-  const recentNaps = logs.filter(r => r.is_nap && r.hours_slept != null).slice(0, 7).reduce((s, r) => s + (r.hours_slept ?? 0), 0)
-  const recentDebt = Math.max(0, withHours.slice(0, 7).reduce((sum, r) => sum + Math.max(0, SLEEP_GOAL - (r.hours_slept ?? 0)), 0) - recentNaps)
+
+  // Recent 7 nights — use actual dates so naps align to same window
+  const recent7Nights = withHours.slice(0, 7)
+  const cutoffDate    = recent7Nights.length ? recent7Nights[recent7Nights.length - 1].date : ''
+  const recentNapHrs  = allNaps.filter(r => r.date >= cutoffDate).reduce((s, r) => s + (r.hours_slept ?? 0), 0)
+  const recentRaw     = recent7Nights.reduce((sum, r) => sum + Math.max(0, SLEEP_GOAL - (r.hours_slept ?? 0)), 0)
+  const recentDebt    = Math.max(0, recentRaw - recentNapHrs)
 
   if (totalDebt < 0.1) {
     return (
