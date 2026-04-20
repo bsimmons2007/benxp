@@ -14,14 +14,13 @@ import { supabase } from '../lib/supabase'
 import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
+import { XP_RATES } from '../lib/xp'
 import type { BasketballSession } from '../types'
 import { BasketballIcon, TrophyIcon, StarIcon, TrendingIcon, EditIcon } from '../components/ui/Icon'
 import { EditModal } from '../components/ui/EditModal'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── XP reward ────────────────────────────────────────────────────
-const XP_PER_SESSION = 25
-const XP_PER_POINT   = 1
 
 // ── Helpers ───────────────────────────────────────────────────────
 function pct(made: number, attempted: number) {
@@ -88,7 +87,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
       notes:           data.notes || null,
     })
     if (error) { setToast('Error saving session'); return }
-    const xp = XP_PER_SESSION + pts * XP_PER_POINT
+    const xp = XP_RATES.basketball_session + pts * XP_RATES.basketball_per_point
     if (pts >= 20) playPR(); else playXPGain()
     setToast(`+${xp} XP — session logged!`)
     await refreshXP()

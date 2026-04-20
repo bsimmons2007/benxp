@@ -35,20 +35,24 @@ export function getLevelTitle(level: number): string {
 }
 
 export const XP_RATES = {
-  per_set:              15,   // was 10 — each set requires real physical effort
-  workout_day:          60,   // was 50 — consistency bonus
-  new_pr:              200,   // was 150 — PRs are rare, meaningful milestones
-  book_finished:       250,   // was 150 — finishing a book = hours of dedication
-  skate_per_mile:       12,   // was 10 — slight bump for outdoor effort
-  fortnite_win:        100,   // was 150 — wins happen frequently; less than PRs/books
-  fortnite_kill:         3,   // NEW — kills now contribute to global XP
-  sleep_log:            20,   // was 15 — consistency tracking matters
-  sleep_quality_bonus:  35,   // was 25 — reward disciplined sleep more
+  per_set:              15,   // each set requires real physical effort
+  workout_day:          60,   // consistency bonus
+  new_pr:              200,   // PRs are rare, meaningful milestones
+  book_finished:       250,   // finishing a book = hours of dedication
+  skate_per_mile:       12,   // outdoor effort
+  fortnite_win:        100,   // wins happen frequently
+  fortnite_kill:         3,   // kills contribute to global XP
+  sleep_log:            20,   // consistency tracking matters
+  sleep_quality_bonus:  35,   // reward disciplined sleep
   challenge:             0,   // fallback — each challenge carries its own xp_reward
-  cardio_per_mile:      12,   // was 8 — matched to skate; running is comparable effort
-  mood_log:             15,   // was 10 — daily mental health tracking is valuable
-  measurement_log:      25,   // was 20 — body tracking deserves more
-  water_goal_reached:   50,   // unchanged — daily 64oz goal hit
+  cardio_per_mile:      12,   // matched to skate
+  mood_log:             15,   // daily mental health tracking
+  measurement_log:      25,   // body tracking
+  water_goal_reached:   50,   // daily 64oz goal hit
+  basketball_session:   25,   // per hoops session
+  basketball_per_point:  1,   // each point scored
+  pickleball_game:      15,   // per pickleball game logged
+  pickleball_win:       20,   // win bonus
 }
 
 export function calculateLevel(totalXP: number): number {
@@ -80,19 +84,21 @@ export interface AppStats {
  * Previously these were two separate fetch calls (7 + 4 queries) with 4 overlapping tables.
  */
 export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ totalXP: number; stats: AppStats }> {
-  const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog] = await Promise.all([
+  const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball] = await Promise.all([
     supabase.from('lifting_log').select('date'),
     supabase.from('skate_sessions').select('miles'),
     supabase.from('pr_history').select('lift, est_1rm'),
     supabase.from('books').select('date_finished').not('date_finished', 'is', null),
     supabase.from('fortnite_games').select('win, kills'),
     supabase.from('challenges').select('xp_reward').eq('status', 'completed'),
-    supabase.from('sleep_log').select('hours_slept'),
+    supabase.from('sleep_log').select('hours_slept').eq('is_nap', false),  // exclude naps
     supabase.from('cardio_sessions').select('distance_miles'),
     supabase.from('goals').select('xp_reward').eq('status', 'completed'),
     supabase.from('mood_log').select('id'),
     supabase.from('body_measurements').select('id'),
     supabase.from('water_log').select('date, oz'),
+    supabase.from('basketball_sessions').select('points'),
+    supabase.from('pickleball_games').select('win'),
   ])
 
   // ── XP ──────────────────────────────────────────────────────
@@ -127,7 +133,17 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     }
     return Object.values(byDate).filter(oz => oz >= 64).length * XP_RATES.water_goal_reached
   })()
-  const totalXP = Math.round(setXP + dayXP + prXP + bookXP + skateXP + fnXP + challengeXP + sleepXP + cardioXP + goalXP + moodXP + measurementXP + waterGoalXP)
+  const basketballXP  = (basketball.data ?? []).reduce(
+    (s: number, r: { points: number }) =>
+      s + XP_RATES.basketball_session + ((r.points ?? 0) * XP_RATES.basketball_per_point),
+    0
+  )
+  const pickleballXP  = (pickleball.data ?? []).reduce(
+    (s: number, r: { win: boolean }) =>
+      s + XP_RATES.pickleball_game + (r.win ? XP_RATES.pickleball_win : 0),
+    0
+  )
+  const totalXP = Math.round(setXP + dayXP + prXP + bookXP + skateXP + fnXP + challengeXP + sleepXP + cardioXP + goalXP + moodXP + measurementXP + waterGoalXP + basketballXP + pickleballXP)
 
   // ── Stats ────────────────────────────────────────────────────
   const prMap: Record<string, number> = {}

@@ -12,11 +12,10 @@ import { supabase } from '../lib/supabase'
 import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
+import { XP_RATES } from '../lib/xp'
 import { EditIcon, TrophyIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-const XP_PER_GAME = 15
-const XP_WIN_BONUS = 20
 
 const ACCENT = '#22c55e'
 
@@ -66,7 +65,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
       opponent:  data.opponent  || null,
       notes:     data.notes     || null,
     })
-    const xp = XP_PER_GAME + (isWin ? XP_WIN_BONUS : 0)
+    const xp = XP_RATES.pickleball_game + (isWin ? XP_RATES.pickleball_win : 0)
     if (isWin) { playPR(); setToast(`+${xp} XP — Dink master!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP()
