@@ -11,7 +11,7 @@ import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
 import { playGoalComplete } from '../lib/sounds'
 import type { Goal } from '../types'
-import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, TrophyIcon, TrashIcon } from '../components/ui/Icon'
+import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, TrophyIcon, TrashIcon, MoonIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Preset metric options ────────────────────────────────────
@@ -23,6 +23,7 @@ const GOAL_PRESETS = [
   { key: 'total_cardio_miles', label: 'Cardio Miles',    unit: 'miles', defaultTarget: 50  },
   { key: 'books_read',         label: 'Books Read',      unit: 'books', defaultTarget: 20  },
   { key: 'fn_wins',            label: 'Fortnite Wins',   unit: 'wins',  defaultTarget: 10  },
+  { key: 'avg_sleep',          label: 'Avg Sleep',       unit: 'hrs',   defaultTarget: 7   },
   { key: 'manual',             label: 'Custom Goal',     unit: '',      defaultTarget: 1   },
 ] as const
 
@@ -38,6 +39,7 @@ function GoalIcon({ metricKey, size = 18, color = 'var(--text-muted)' }: { metri
   if (metricKey === 'total_cardio_miles') return <RunIcon size={size} color={color} />
   if (metricKey === 'books_read') return <BookIcon size={size} color={color} />
   if (metricKey === 'fn_wins') return <GamepadIcon size={size} color={color} />
+  if (metricKey === 'avg_sleep') return <MoonIcon size={size} color={color} />
   return <TargetIcon size={size} color={color} />
 }
 
@@ -50,6 +52,7 @@ interface MetricValues {
   total_cardio_miles: number
   books_read:         number
   fn_wins:            number
+  avg_sleep:          number
 }
 
 function useMetricValues() {
@@ -57,18 +60,28 @@ function useMetricValues() {
 
   useEffect(() => {
     async function load() {
-      const [prs, skate, cardio, books, wins] = await Promise.all([
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+      const cutoff = thirtyDaysAgo.toISOString().split('T')[0]
+
+      const [prs, skate, cardio, books, wins, sleep] = await Promise.all([
         supabase.from('pr_history').select('lift, est_1rm'),
         supabase.from('skate_sessions').select('miles'),
         supabase.from('cardio_sessions').select('distance_miles'),
         supabase.from('books').select('id').not('date_finished', 'is', null),
         supabase.from('fortnite_games').select('id').eq('win', true),
+        supabase.from('sleep_log').select('hours_slept').eq('is_nap', false).gte('date', cutoff),
       ])
 
       const bestPR = (lift: string) =>
         (prs.data ?? [])
           .filter((r: { lift: string; est_1rm: number }) => r.lift === lift)
           .reduce((m: number, r: { lift: string; est_1rm: number }) => Math.max(m, r.est_1rm), 0)
+
+      const sleepRows = sleep.data ?? []
+      const avgSleep  = sleepRows.length
+        ? sleepRows.reduce((s: number, r: { hours_slept: number }) => s + (r.hours_slept ?? 0), 0) / sleepRows.length
+        : 0
 
       setVals({
         squat_1rm:          bestPR('Squat'),
@@ -78,6 +91,7 @@ function useMetricValues() {
         total_cardio_miles: (cardio.data ?? []).reduce((s: number, r: { distance_miles: number }) => s + r.distance_miles, 0),
         books_read:         books.data?.length ?? 0,
         fn_wins:            wins.data?.length ?? 0,
+        avg_sleep:          Math.round(avgSleep * 10) / 10,
       })
     }
     load()
@@ -352,11 +366,11 @@ export function Goals() {
             <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet — try one of these:</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { emoji: 'lift', label: 'Bench 225 lbs',      metric: 'bench_1rm',         target: 225 },
-                { emoji: 'skate', label: 'Skate 100 miles',     metric: 'total_skate_miles',  target: 100 },
-                { emoji: 'run', label: 'Run 50 miles',        metric: 'total_cardio_miles', target: 50  },
-                { emoji: 'books', label: 'Read 5 books',        metric: 'books_read',         target: 5   },
-                { emoji: 'sleep', label: 'Sleep 7h avg',        metric: 'avg_sleep',          target: 7   },
+                { label: 'Bench 225 lbs',  metric: 'bench_1rm',         target: 225 },
+                { label: 'Skate 100 miles', metric: 'total_skate_miles', target: 100 },
+                { label: 'Run 50 miles',   metric: 'total_cardio_miles', target: 50  },
+                { label: 'Read 5 books',   metric: 'books_read',         target: 5   },
+                { label: 'Sleep 7h avg',   metric: 'avg_sleep',          target: 7   },
               ].map(t => (
                 <button
                   key={t.metric}
@@ -379,7 +393,7 @@ export function Goals() {
                   onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
                   onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
                 >
-                  
+                  <GoalIcon metricKey={t.metric} size={16} color="var(--accent)" />
                   <span>{t.label}</span>
                   <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-muted)' }}>+ Add</span>
                 </button>

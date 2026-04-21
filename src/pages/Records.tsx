@@ -14,7 +14,7 @@ import { formatDate, today } from '../lib/utils'
 import { checkForPR, getMilestoneHit, LIFT_MILESTONES, XP_RATES } from '../lib/xp'
 import { MilestoneOverlay } from '../components/ui/MilestoneOverlay'
 import { EmptyState } from '../components/ui/EmptyState'
-import { DumbbellIcon } from '../components/ui/Icon'
+import { DumbbellIcon, RunIcon, ActivityIcon, ZapIcon, GridIcon } from '../components/ui/Icon'
 import { useStore } from '../store/useStore'
 import type { LiftType, LiftingLog, PrHistory } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -28,30 +28,20 @@ interface ExerciseMeta {
   type:      string
 }
 
-// Emoji per muscle group shown in the picker filter chips
-const MUSCLE_GROUP_ICONS: Record<string, string> = {
-  'Chest':           '',
-  'Back':            '',
-  'Shoulders':       '',
-  'Biceps':          '',
-  'Triceps':         '',
-  'Legs':            '',
-  'Glutes':          '',
-  'Core':            '',
-  'Cardio':          '',
-  'Full Body':       '',
-  'Arms':            '',
-  'Hamstrings':      '',
-  'Quads':           '',
-  'Calves':          '',
-  'Forearms':        '',
-  'Traps':           '',
-  'Lats':            '',
-  'Upper Back':      '',
-  'Lower Back':      '',
-  'Hip Flexors':     '',
-  'Abs':             '',
-  'Obliques':        '',
+// SVG icon per muscle group shown in the picker filter chips
+const PUSH_MUSCLES  = new Set(['Chest', 'Shoulders', 'Triceps', 'Arms', 'Biceps', 'Forearms'])
+const LEG_MUSCLES   = new Set(['Legs', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Hip Flexors'])
+const CORE_MUSCLES  = new Set(['Core', 'Abs', 'Obliques'])
+const BACK_MUSCLES  = new Set(['Back', 'Lats', 'Upper Back', 'Lower Back', 'Traps'])
+
+function MuscleGroupIcon({ group, size = 11, color = 'currentColor' }: { group: string; size?: number; color?: string }) {
+  if (PUSH_MUSCLES.has(group))  return <DumbbellIcon size={size} color={color} />
+  if (LEG_MUSCLES.has(group))   return <RunIcon      size={size} color={color} />
+  if (CORE_MUSCLES.has(group))  return <ZapIcon      size={size} color={color} />
+  if (BACK_MUSCLES.has(group))  return <ActivityIcon size={size} color={color} />
+  if (group === 'Cardio')       return <RunIcon      size={size} color={color} />
+  if (group === 'Full Body')    return <GridIcon     size={size} color={color} />
+  return <DumbbellIcon size={size} color={color} />
 }
 
 function liftIcon(_name?: string, _group?: string) {
@@ -143,7 +133,7 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
                     fontWeight: activeGrp === g ? 700 : 400,
                   }}
                 >
-                  {MUSCLE_GROUP_ICONS[g] ?? ''} {g}
+                  <MuscleGroupIcon group={g} color={activeGrp === g ? 'var(--base-bg)' : '#888'} /> {g}
                 </button>
               ))}
             </div>
@@ -1109,7 +1099,7 @@ export function Records() {
                         border: `1px solid ${muscleFilter === grp ? 'var(--accent)' : 'rgba(255,255,255,0.1)'}`,
                         cursor: 'pointer', transition: 'all 0.12s ease', whiteSpace: 'nowrap',
                       }}
-                    >{MUSCLE_GROUP_ICONS[grp] ?? ''} {grp}</button>
+                    ><MuscleGroupIcon group={grp} color={muscleFilter === grp ? 'var(--base-bg)' : 'var(--text-secondary)'} /> {grp}</button>
                   ))}
                 </div>
               )}

@@ -13,7 +13,7 @@ import { useStreak } from '../hooks/useStreak'
 import { useStore } from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import { formatDate, toRoman, localDateStr } from '../lib/utils'
-import { ArrowUpIcon, ArrowDownIcon, FlameIcon, ActivityIcon } from '../components/ui/Icon'
+import { ArrowUpIcon, ArrowDownIcon, FlameIcon, ActivityIcon, BadgeIcon, ActivityIconComp } from '../components/ui/Icon'
 import { xpForLevel, getLevelTitle } from '../lib/xp'
 import { loadHiddenSections } from '../lib/sections'
 import { useStrengthSnapshot } from '../components/StrengthTab'
@@ -188,7 +188,7 @@ export function Home() {
       { label: 'Strength SQ', value: strengthSQ !== null ? String(strengthSQ) : '—', unit: '/100', to: '/strength' },
     ] : []),
     ...(!hidden.includes('skate')    ? [{ label: 'Total Miles', value: stats.totalMiles.toFixed(1), unit: 'mi', trendKey: 'miles' }] : []),
-    ...(!hidden.includes('books')    ? [{ label: 'Books 2026',  value: stats.books2026, trendKey: 'books' }] : []),
+    ...(!hidden.includes('books')    ? [{ label: `Books ${new Date().getFullYear()}`,  value: stats.books2026, trendKey: 'books' }] : []),
     ...(!hidden.includes('fortnite') ? [{ label: 'FN Wins',     value: stats.winCount,  trendKey: 'wins'  }] : []),
   ]
 
@@ -261,10 +261,10 @@ export function Home() {
                     background: 'rgba(255,255,255,0.05)',
                     border: '1px solid var(--border)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 20, cursor: 'default',
+                    cursor: 'default',
                   }}
                 >
-                  {b.icon}
+                  <BadgeIcon icon={b.icon} size={18} color="var(--accent)" />
                 </div>
               ))}
             </div>
@@ -301,7 +301,7 @@ export function Home() {
               {activity.map((a, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <span style={{ fontSize: 17, lineHeight: 1 }}>{a.icon}</span>
+                    <ActivityIconComp activityKey={a.icon} size={17} color="var(--text-muted)" />
                     <span style={{ fontSize: 13, color: 'var(--text-primary)' }}>{a.label}</span>
                   </div>
                   <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{formatDate(a.date)}</span>

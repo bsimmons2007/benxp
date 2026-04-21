@@ -346,6 +346,14 @@ export const MountainIcon: IconComponent = ({ size = 20, color = 'currentColor',
   </svg>
 )
 
+export const SnowflakeIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <path d="M10 2v16M2 10h16" />
+    <path d="M4.93 4.93l10.14 10.14M15.07 4.93L4.93 15.07" />
+    <path d="M7 7l-2-2M13 7l2-2M7 13l-2 2M13 13l2 2" />
+  </svg>
+)
+
 export const TerminalIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
   <svg {...base(size, color, style, className)}>
     <rect x="2" y="3.5" width="16" height="13" rx="2" />
@@ -391,11 +399,15 @@ const SECTION_ICON_MAP: Record<string, IconComponent> = {
 }
 
 const ACTIVITY_ICON_MAP: Record<string, IconComponent> = {
-  run:   RunIcon,
-  bike:  BikeIcon,
-  swim:  SwimIcon,
-  walk:  WalkIcon,
-  skate: SkateIcon,
+  run:      RunIcon,
+  bike:     BikeIcon,
+  swim:     SwimIcon,
+  walk:     WalkIcon,
+  skate:    SkateIcon,
+  lift:     DumbbellIcon,
+  book:     BookIcon,
+  game:     GamepadIcon,
+  fortnite: GamepadIcon,
 }
 
 export function SectionIcon({ sectionKey, size = 20, color = 'currentColor', style }: {
@@ -411,5 +423,58 @@ export function ActivityIconComp({ activityKey, size = 20, color = 'currentColor
 }) {
   const Comp = ACTIVITY_ICON_MAP[activityKey]
   if (!Comp) return <RunIcon size={size} color={color} style={style} />
+  return <Comp size={size} color={color} style={style} />
+}
+
+// ── Badge icon map ─────────────────────────────────────────────
+
+const BADGE_ICON_MAP: Record<string, IconComponent> = {
+  Star:    StarIcon,
+  Fire:    FlameIcon,
+  Rocket:  RocketIcon,
+  Gem:     DiamondIcon,
+  Crown:   CrownIcon,
+  Zap:     ZapIcon,
+  Up:      ArrowUpIcon,
+  Target:  TargetIcon,
+  Shield:  ShieldIcon,
+  Trophy:  TrophyIcon,
+  Done:    CheckIcon,
+  Sword:   SwordIcon,
+  Strong:  DumbbellIcon,
+  Chart:   ActivityIcon,
+  Cal:     CalendarIcon,
+  Skate:   SkateIcon,
+  Read:    BookIcon,
+  Books:   BookIcon,
+  Brain:   BrainIcon,
+  Game:    GamepadIcon,
+  Moon:    MoonIcon,
+  Mtn:     MountainIcon,
+  Files:   GridIcon,
+}
+
+export function BadgeIcon({ icon, size = 18, color = 'currentColor', style }: {
+  icon: string; size?: number; color?: string; style?: CSSProperties
+}) {
+  const Comp = BADGE_ICON_MAP[icon] ?? StarIcon
+  return <Comp size={size} color={color} style={style} />
+}
+
+// ── Ambient scene icon ─────────────────────────────────────────
+
+const AMBIENT_ICON_MAP: Record<string, IconComponent> = {
+  cosmic: RocketIcon,
+  forest: MountainIcon,
+  ocean:  DropletIcon,
+  ember:  FlameIcon,
+  arctic: SnowflakeIcon,
+  lofi:   BookIcon,
+}
+
+export function AmbientSceneIcon({ id, size = 14, color = 'currentColor', style }: {
+  id: string; size?: number; color?: string; style?: CSSProperties
+}) {
+  const Comp = AMBIENT_ICON_MAP[id] ?? ActivityIcon
   return <Comp size={size} color={color} style={style} />
 }

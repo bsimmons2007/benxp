@@ -1,4 +1,5 @@
 import { ProgressBar } from './ProgressBar'
+import { SectionIcon } from './Icon'
 import { SKILL_DEFS } from '../../lib/skills'
 import type { SkillState } from '../../lib/skills'
 
@@ -24,7 +25,7 @@ export function SkillCard({ skill }: SkillCardProps) {
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span style={{ fontSize: 22 }}>{def.icon}</span>
+          <SectionIcon sectionKey={def.icon} size={22} color="var(--accent)" />
           <div>
             <p className="font-bold text-white text-sm" style={{ fontFamily: 'Cinzel, serif' }}>{def.label}</p>
             <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>

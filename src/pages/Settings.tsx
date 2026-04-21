@@ -8,7 +8,7 @@ import { useStore } from '../store/useStore'
 import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme, timeThemeEnabled, setTimeThemeEnabled, applyTimeOrSavedTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
-import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon } from '../components/ui/Icon'
+import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon } from '../components/ui/Icon'
 import { toRoman } from '../lib/utils'
 import {
   SECTION_DEFS, DEFAULT_ORDER,
@@ -546,7 +546,9 @@ export function Settings() {
                           border: isActive ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.05)',
                         }}
                       >
-                        <span style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700, flexShrink: 0, minWidth: 36, textAlign: 'center' }}>{scene.emoji}</span>
+                        <span style={{ flexShrink: 0, minWidth: 36, display: 'flex', justifyContent: 'center' }}>
+                          <AmbientSceneIcon id={scene.id} size={16} color="var(--accent)" />
+                        </span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-white">{scene.name}</p>
                           <p className="text-xs truncate" style={{ color: '#444' }}>{scene.description}</p>

@@ -33,7 +33,7 @@ const TT_STYLE = {
   borderRadius: 8, color: '#fff', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
 
-function moodEmoji(v: number) {
+function moodLabel(v: number) {
   if (v >= 9) return 'Excellent'
   if (v >= 7) return 'Good'
   if (v >= 5) return 'Okay'
@@ -106,7 +106,7 @@ export function Mood() {
       notes: data.notes || null,
     })
     playXPGain()
-    setToast(`+${XP_RATES.mood_log} XP · Check-in logged ${moodEmoji(parseInt(data.mood))}`)
+    setToast(`+${XP_RATES.mood_log} XP · Check-in logged ${moodLabel(parseInt(data.mood))}`)
     refreshXP()
     reset({ date: today(), mood: '7', energy: '7', stress: '5', activities: '', notes: '' })
     loadRecent()
@@ -206,7 +206,7 @@ export function Mood() {
         {/* Log form */}
         <Card className="mb-5">
           <p style={{ fontSize: 14, fontWeight: 700, color: '#ccc', fontFamily: 'Cinzel, serif', marginBottom: 16 }}>
-            {moodEmoji(moodVal)} Daily Check-in
+            {moodLabel(moodVal)} Daily Check-in
           </p>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
@@ -273,7 +273,7 @@ export function Mood() {
                   <div className="flex justify-between items-center">
                     <p style={{ fontSize: 12, color: '#444' }}>{formatDate(r.date)}</p>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                      <span style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700 }}>{moodEmoji(r.mood ?? 5)} {r.mood}</span>
+                      <span style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700 }}>{moodLabel(r.mood ?? 5)} {r.mood}</span>
                       <span style={{ color: '#4ade80',       fontSize: 12 }}>E:{r.energy}</span>
                       <span style={{ color: '#f87171',       fontSize: 12 }}>S:{r.stress}</span>
                       <button onClick={() => openEdit(r)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, opacity: 0.5 }}>
