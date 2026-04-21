@@ -189,19 +189,9 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
   return (
     <EditModal title={`Edit — ${formatDate(entry.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
-        {[
-          { label: 'Bedtime',     type: 'time',   val: bedtime,  set: setBedtime  },
-          { label: 'Hours Slept', type: 'number', val: hours,    set: setHours    },
-          { label: 'Wake Time',   type: 'time',   val: wakeTime, set: setWakeTime },
-        ].map(({ label, type, val, set }) => (
-          <div key={label} className="flex flex-col gap-1">
-            <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>{label}</label>
-            <input type={type} step={type === 'number' ? 0.1 : undefined} value={val}
-              onChange={e => set(e.target.value)}
-              className="px-3 py-3 rounded-lg text-white outline-none text-base"
-              style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
-          </div>
-        ))}
+        <Input label="Bedtime"     type="time"   value={bedtime}  onChange={e => setBedtime(e.target.value)} />
+        <Input label="Hours Slept" type="number" step={0.1} value={hours}    onChange={e => setHours(e.target.value)} />
+        <Input label="Wake Time"   type="time"   value={wakeTime} onChange={e => setWakeTime(e.target.value)} />
       </div>
     </EditModal>
   )
@@ -646,7 +636,7 @@ export function Sleep() {
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
               <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{s.value}</p>
-              <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
+              <p className="section-label mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -757,7 +747,7 @@ export function Sleep() {
                 </div>
                 <button
                   onClick={() => setEditing(entry)}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}
                 >
                   <EditIcon size={13} color="var(--text-muted)" />
                 </button>

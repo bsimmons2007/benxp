@@ -104,19 +104,10 @@ function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose:
   return (
     <EditModal title={`Skate — ${formatDate(row.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Miles</label>
-          <input type="number" step="0.01" value={miles} onChange={(e) => setMiles(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
-        </div>
+        <Input label="Miles" type="number" step="0.01" value={miles} onChange={e => setMiles(e.target.value)} />
         <div className="flex gap-3">
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Duration</label>
-            <input type="text" value={duration} onChange={(e) => setDuration(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
-          </div>
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Fastest Mile</label>
-            <input type="number" step="0.01" value={fastest} onChange={(e) => setFastest(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
-          </div>
+          <div className="flex-1"><Input label="Duration" type="text" value={duration} onChange={e => setDuration(e.target.value)} /></div>
+          <div className="flex-1"><Input label="Fastest Mile" type="number" step="0.01" value={fastest} onChange={e => setFastest(e.target.value)} /></div>
         </div>
       </div>
     </EditModal>
@@ -167,7 +158,7 @@ export function Skate() {
             { label: 'Fastest Mile', value: fastestMile ? fastestMile.toFixed(2) : '—', unit: fastestMile ? 'min' : '' },
           ].map((s) => (
             <div key={s.label} className="rounded-xl p-3" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p style={{ color: '#888', fontSize: 11, fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
+              <p className="section-label">{s.label}</p>
               <p className="text-lg font-bold" style={{ color: 'var(--accent)' }}>
                 {s.value}
                 {s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: '#888' }}>{s.unit}</span>}

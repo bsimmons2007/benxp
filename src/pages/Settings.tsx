@@ -438,7 +438,7 @@ export function Settings() {
                       style={{ background: isHidden ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.05)', opacity: isHidden ? 0.5 : 1 }}
                     >
                       <SectionIcon sectionKey={key} size={18} color="var(--text-secondary)" />
-                      <span className="flex-1 font-medium" style={{ color: isHidden ? '#555' : '#CCC', fontFamily: 'Cormorant Garamond, serif', fontSize: 15 }}>{def.label}</span>
+                      <span className="flex-1 font-medium text-sm" style={{ color: isHidden ? '#555' : '#CCC' }}>{def.label}</span>
                       <button onClick={() => moveSection(key, -1)} disabled={idx === 0} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === 0 ? '#333' : '#777', background: 'rgba(255,255,255,0.06)' }}>↑</button>
                       <button onClick={() => moveSection(key, 1)} disabled={idx === sectionOrder.length - 1} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === sectionOrder.length - 1 ? '#333' : '#777', background: 'rgba(255,255,255,0.06)' }}>↓</button>
                       <button onClick={() => toggleHidden(key)} className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: isHidden ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)' }}>
@@ -553,7 +553,7 @@ export function Settings() {
                 <div key={r.label} className="flex items-center justify-between py-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                   <div className="flex items-center gap-2">
                     <span>{r.icon}</span>
-                    <span style={{ color: '#BBBBBB', fontFamily: 'Cormorant Garamond, serif', fontSize: 15 }}>{r.label}</span>
+                    <span className="text-sm" style={{ color: '#BBBBBB' }}>{r.label}</span>
                   </div>
                   <span className="font-bold" style={{ color: 'var(--accent)', fontSize: 13 }}>{r.xp}</span>
                 </div>
@@ -569,7 +569,7 @@ export function Settings() {
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><DotsIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
                 <p className="font-semibold text-sm text-white">Data & Account</p>
-                <p style={{ color: '#444', fontSize: 11 }}>Export, delete · BenXP v1.0.0</p>
+                <p style={{ color: '#444', fontSize: 11 }}>Export, delete · YouXP</p>
               </div>
             </div>
             <Chevron open={dataOpen} />

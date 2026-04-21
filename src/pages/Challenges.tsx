@@ -73,7 +73,7 @@ function ChallengeCard({
             {challenge.category && <Badge label={challenge.category} />}
           </div>
           {challenge.target && (
-            <p className="text-xs mb-2" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif', fontSize: 13 }}>
+            <p className="text-xs mb-2" style={{ color: '#888', fontSize: 13 }}>
               Target: {challenge.target}
             </p>
           )}
@@ -248,7 +248,7 @@ export function Challenges() {
 
         {/* Loading state */}
         {syncing && (
-          <div className="text-center py-8" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif', fontSize: 16 }}>
+          <div className="text-center py-8" style={{ color: '#888', fontSize: 14 }}>
             Loading challenges...
           </div>
         )}
@@ -267,9 +267,7 @@ export function Challenges() {
         {/* Completed challenges faded at bottom */}
         {!syncing && completed.length > 0 && (
           <>
-            <p className="text-xs font-semibold uppercase tracking-widest mt-4 mb-2" style={{ color: '#555' }}>
-              Completed
-            </p>
+            <p className="section-label mt-4 mb-2">Completed</p>
             {completed.map((c) => (
               <ChallengeCard
                 key={c.id}
@@ -284,7 +282,7 @@ export function Challenges() {
 
         {/* Empty state */}
         {!syncing && active.length === 0 && completed.length === 0 && (
-          <div className="text-center py-12" style={{ color: '#555', fontFamily: 'Cormorant Garamond, serif', fontSize: 16 }}>
+          <div className="text-center py-12" style={{ color: '#555', fontSize: 14 }}>
             No {activeTier.toLowerCase()} challenges yet.
           </div>
         )}

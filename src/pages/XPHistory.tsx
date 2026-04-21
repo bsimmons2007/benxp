@@ -185,13 +185,13 @@ export function XPHistory() {
           }}
         >
           <div>
-            <p className="text-xs uppercase tracking-widest" style={{ color: '#444', fontFamily: 'Cormorant Garamond, serif' }}>All-time XP</p>
+            <p className="section-label">All-time XP</p>
             <p className="font-bold text-2xl" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
               {xpLoading ? '—' : totalXP.toLocaleString()}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs uppercase tracking-widest" style={{ color: '#444', fontFamily: 'Cormorant Garamond, serif' }}>Events</p>
+            <p className="section-label">Events</p>
             <p className="font-bold text-2xl" style={{ color: '#ccc', fontFamily: 'Cinzel, serif' }}>
               {loading ? '—' : events.length}
             </p>
@@ -206,10 +206,7 @@ export function XPHistory() {
             {grouped.map(group => (
               <div key={group.date}>
                 {/* Date separator */}
-                <p
-                  className="text-xs uppercase tracking-widest px-1 pt-3 pb-1"
-                  style={{ color: '#555', fontFamily: 'Cormorant Garamond, serif' }}
-                >
+                <p className="section-label px-1 pt-3 pb-1">
                   {formatDate(group.date)}
                 </p>
 

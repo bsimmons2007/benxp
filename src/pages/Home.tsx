@@ -169,7 +169,7 @@ export function Home() {
   const activity     = useStore(s => s.recentActivity)
   const trends       = useTrends()
   const userName     = useUserName()
-  const { earned }   = useAchievements()
+  const { earned, loading: badgesLoading } = useAchievements()
   const streak       = useStreak()
   const toNext       = xpForLevel(level + 1) - totalXP
   const levelStyle   = (localStorage.getItem('benxp-level-style') as 'number' | 'roman') ?? 'number'
@@ -242,8 +242,9 @@ export function Home() {
         />
 
         {/* ── Badges ── */}
+        <div className="mb-5" style={{ minHeight: badgesLoading ? 68 : undefined }}>
         {recentBadges.length > 0 && (
-          <div className="mb-5">
+          <div>
             <div className="flex items-center justify-between mb-2">
               <p className="section-label">Badges</p>
               <a href="/profile" style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 600 }}>
@@ -257,7 +258,7 @@ export function Home() {
                   title={`${b.name}: ${b.description}`}
                   className="pop-in"
                   style={{
-                    width: 40, height: 40, borderRadius: 10,
+                    width: 44, height: 44, borderRadius: 10,
                     background: 'rgba(255,255,255,0.05)',
                     border: '1px solid var(--border)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -270,6 +271,7 @@ export function Home() {
             </div>
           </div>
         )}
+        </div>
 
         {/* ── Stats grid ── */}
         {statCards.length > 0 && (
@@ -295,7 +297,10 @@ export function Home() {
         <Card>
           <p className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Recent Activity</p>
           {activity.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No activity yet — start logging!</p>
+            <div className="flex flex-col items-center py-6 gap-2">
+              <ActivityIconComp activityKey="lift" size={32} color="var(--text-dim)" />
+              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No activity yet — start logging!</p>
+            </div>
           ) : (
             <div className="flex flex-col gap-2.5">
               {activity.map((a, i) => (

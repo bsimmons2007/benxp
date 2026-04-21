@@ -211,12 +211,12 @@ export function Measurements() {
         {showForm && (
           <Card className="mb-4 pop-in">
             <form onSubmit={handleSubmit(onSubmit)}>
-              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#444' }}>New Entry</p>
+              <p className="section-label mb-3">New Entry</p>
               <Input type="date" {...register('date')} className="mb-4" style={{ width: '100%' }} />
 
               {FIELD_GROUPS.map(group => (
                 <div key={group.label} className="mb-4">
-                  <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#555' }}>{group.label}</p>
+                  <p className="section-label mb-2">{group.label}</p>
                   <div className="grid grid-cols-2 gap-2">
                     {group.fields.map(f => (
                       <div key={f.key}>
@@ -257,7 +257,7 @@ export function Measurements() {
           <>
             {/* Latest snapshot */}
             <Card className="mb-3">
-              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#444' }}>Latest · {formatDate(latest.date)}</p>
+              <p className="section-label mb-3">Latest · {formatDate(latest.date)}</p>
               <div className="grid grid-cols-3 gap-3 mb-4">
                 {[
                   { key: 'weight_lbs'  as const, label: 'Weight',   unit: 'lbs' },
@@ -299,7 +299,7 @@ export function Measurements() {
             </Card>
 
             {/* History */}
-            <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#555' }}>History</p>
+            <p className="section-label mb-2">History</p>
             <div className="flex flex-col gap-2">
               {rows.map((row, i) => (
                 <Card key={row.id} className="card-animate">
