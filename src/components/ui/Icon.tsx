@@ -248,6 +248,18 @@ export const ZapIcon: IconComponent = ({ size = 16, color = 'currentColor', styl
   </svg>
 )
 
+export const BookmarkIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <path d="M5 2h10a1 1 0 0 1 1 1v15l-6-4-6 4V3a1 1 0 0 1 1-1Z" />
+  </svg>
+)
+
+export const BellIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <path d="M10 2a6 6 0 0 0-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 0 0-6-6ZM8 18a2 2 0 0 0 4 0" />
+  </svg>
+)
+
 export const StarIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
   <svg {...base(size, color, style, className)}>
     <path d="M10 2l2.4 5 5.6.8-4 3.9.9 5.3L10 14.4l-4.9 2.6.9-5.3L2 8.8l5.6-.8L10 2Z" />
@@ -359,6 +371,23 @@ export const TerminalIcon: IconComponent = ({ size = 20, color = 'currentColor',
     <rect x="2" y="3.5" width="16" height="13" rx="2" />
     <path d="M6 9l3.5 3L6 15" />
     <path d="M13 15h3" />
+  </svg>
+)
+
+export const GolfIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <path d="M6 18V4" />
+    <path d="M6 4l8 3-8 3" />
+    <circle cx="14" cy="17" r="2" fill="none" />
+    <path d="M6 17h6" />
+  </svg>
+)
+
+export const DiscIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <ellipse cx="10" cy="11" rx="8" ry="3.5" />
+    <path d="M2 11c0-2.5 3.6-5 8-5s8 2.5 8 5" />
+    <path d="M5.5 11.5q4.5-2 9 0" />
   </svg>
 )
 

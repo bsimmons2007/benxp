@@ -158,3 +158,41 @@ export interface MoodLog {
 
 export type LiftType = string   // open — any exercise from the exercises table or custom
 export type BookGenre = 'Fiction' | 'Fantasy' | 'Sci-Fi' | 'Non-Fiction' | 'Classic' | 'Other'
+
+export interface GolfRound {
+  id: string
+  created_at: string
+  date: string
+  course: string
+  holes: number
+  score: number
+  par: number
+  putts: number | null
+  fairways_hit: number | null
+  fairways_possible: number | null
+  gir: number | null
+  notes: string | null
+}
+
+export interface DiscGolfRound {
+  id: string
+  created_at: string
+  date: string
+  course: string
+  holes: number
+  score: number
+  par: number
+  notes: string | null
+}
+
+export interface HikingSession {
+  id: string
+  created_at: string
+  date: string
+  trail: string
+  distance_miles: number
+  elevation_gain_ft: number | null
+  duration_mins: number | null
+  difficulty: string | null
+  notes: string | null
+}

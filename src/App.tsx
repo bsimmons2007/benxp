@@ -32,6 +32,9 @@ import { Hobbies } from './pages/Hobbies'
 import { Pickleball } from './pages/Pickleball'
 import { Terms } from './pages/Terms'
 import { Privacy } from './pages/Privacy'
+import { Golf } from './pages/Golf'
+import { DiscGolf } from './pages/DiscGolf'
+import { Hiking } from './pages/Hiking'
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
@@ -194,6 +197,9 @@ function AppInner() {
         <Route path="/pickleball"   element={<ProtectedRoute><Pickleball /></ProtectedRoute>} />
         <Route path="/terms"        element={<Terms />} />
         <Route path="/privacy"      element={<Privacy />} />
+        <Route path="/golf"         element={<ProtectedRoute><Golf /></ProtectedRoute>} />
+        <Route path="/disc-golf"    element={<ProtectedRoute><DiscGolf /></ProtectedRoute>} />
+        <Route path="/hiking"       element={<ProtectedRoute><Hiking /></ProtectedRoute>} />
       </Routes>
       {showNav && <BottomNav />}
       {showNav && <SideNav />}
