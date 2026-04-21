@@ -374,6 +374,22 @@ export const TerminalIcon: IconComponent = ({ size = 20, color = 'currentColor',
   </svg>
 )
 
+export const TableTennisIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <circle cx="14" cy="6" r="3" />
+    <path d="M11.5 8.5 4 16a2 2 0 0 0 0 2.8 2 2 0 0 0 2.8 0l7.5-7.5" />
+    <path d="M9 11l2 2" />
+  </svg>
+)
+
+export const ChessIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <path d="M7 4h6M10 4v3M8 7h4" />
+    <path d="M7 7c0 3 1 4 3 5s3 2 3 5H7c0-3 1-4 3-5s3-2 3-5" />
+    <path d="M6 17h8M5 19h10" />
+  </svg>
+)
+
 export const GolfIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
   <svg {...base(size, color, style, className)}>
     <path d="M6 18V4" />

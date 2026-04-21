@@ -196,3 +196,28 @@ export interface HikingSession {
   difficulty: string | null
   notes: string | null
 }
+
+export interface TableTennisGame {
+  id: string
+  created_at: string
+  date: string
+  win: boolean
+  my_score: number | null
+  opp_score: number | null
+  game_type: string
+  opponent: string | null
+  notes: string | null
+}
+
+export interface ChessGame {
+  id: string
+  created_at: string
+  date: string
+  result: 'win' | 'loss' | 'draw'
+  rating_after: number | null
+  time_control: string
+  color: string | null
+  opponent: string | null
+  opening: string | null
+  notes: string | null
+}

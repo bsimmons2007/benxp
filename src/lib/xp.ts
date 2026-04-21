@@ -59,6 +59,11 @@ export const XP_RATES = {
   disc_golf_under_par:  15,   // bonus per stroke under par
   hiking_per_mile:      20,   // per mile hiked
   hiking_per_500ft:     15,   // per 500 ft elevation gain
+  table_tennis_game:    10,   // per game logged
+  table_tennis_win:     15,   // win bonus
+  chess_game:           15,   // per game logged
+  chess_win:            25,   // win bonus
+  chess_draw:            8,   // draw bonus
 }
 
 export function calculateLevel(totalXP: number): number {
@@ -90,7 +95,7 @@ export interface AppStats {
  * Previously these were two separate fetch calls (7 + 4 queries) with 4 overlapping tables.
  */
 export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ totalXP: number; stats: AppStats }> {
-  const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball, golf, discGolf, hiking] = await Promise.all([
+  const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess] = await Promise.all([
     supabase.from('lifting_log').select('date'),
     supabase.from('skate_sessions').select('miles'),
     supabase.from('pr_history').select('lift, est_1rm'),
@@ -108,6 +113,8 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     supabase.from('golf_rounds').select('score, par'),
     supabase.from('disc_golf_rounds').select('score, par'),
     supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft'),
+    supabase.from('table_tennis_games').select('win'),
+    supabase.from('chess_games').select('result'),
   ])
 
   // ── XP ──────────────────────────────────────────────────────
@@ -173,7 +180,17 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
       return s + milesXP + elevXP
     }, 0
   )
-  const totalXP = Math.round(setXP + dayXP + prXP + bookXP + skateXP + fnXP + challengeXP + sleepXP + cardioXP + goalXP + moodXP + measurementXP + waterGoalXP + basketballXP + pickleballXP + golfXP + discGolfXP + hikingXP)
+  const tableTennisXP = (tableTennis.data ?? []).reduce(
+    (s: number, r: { win: boolean }) =>
+      s + XP_RATES.table_tennis_game + (r.win ? XP_RATES.table_tennis_win : 0), 0
+  )
+  const chessXP = (chess.data ?? []).reduce(
+    (s: number, r: { result: string }) =>
+      s + XP_RATES.chess_game
+        + (r.result === 'win'  ? XP_RATES.chess_win  : 0)
+        + (r.result === 'draw' ? XP_RATES.chess_draw : 0), 0
+  )
+  const totalXP = Math.round(setXP + dayXP + prXP + bookXP + skateXP + fnXP + challengeXP + sleepXP + cardioXP + goalXP + moodXP + measurementXP + waterGoalXP + basketballXP + pickleballXP + golfXP + discGolfXP + hikingXP + tableTennisXP + chessXP)
 
   // ── Stats ────────────────────────────────────────────────────
   const prMap: Record<string, number> = {}
