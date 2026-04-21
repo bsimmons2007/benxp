@@ -318,34 +318,6 @@ export function Settings() {
           </div>
         </Card>
 
-        {/* ── Restart Tutorial ─────────────────────────────────────── */}
-        <button
-          onClick={() => {
-            resetTutorial()
-            window.dispatchEvent(new Event('tutorial-reset'))
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            width: '100%',
-            padding: '12px 16px',
-            marginBottom: 8,
-            borderRadius: 12,
-            border: '1px solid rgba(255,255,255,0.08)',
-            background: 'rgba(255,255,255,0.03)',
-            color: 'var(--accent)',
-            cursor: 'pointer',
-            fontFamily: 'Inter, sans-serif',
-            fontSize: 13,
-            fontWeight: 600,
-            textAlign: 'left',
-          }}
-        >
-          <GamepadIcon size={16} color="var(--accent)" />
-          Restart App Tutorial
-        </button>
-
         {/* ── Appearance card ───────────────────────────────────────── */}
         <Card className="mb-2">
 
@@ -612,6 +584,18 @@ export function Settings() {
                 <div className="flex items-center gap-3">
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><ShareIcon size={16} color="#888" /></span>
                   <span className="text-white text-sm">{exporting ? 'Exporting...' : 'Export data as CSV'}</span>
+                </div>
+                <span style={{ color: '#555' }}>›</span>
+              </div>
+
+              <div
+                className="flex items-center justify-between py-2.5 cursor-pointer"
+                style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+                onClick={() => { resetTutorial(); window.dispatchEvent(new Event('tutorial-reset')) }}
+              >
+                <div className="flex items-center gap-3">
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><GamepadIcon size={16} color="#888" /></span>
+                  <span className="text-white text-sm">Restart app tutorial</span>
                 </div>
                 <span style={{ color: '#555' }}>›</span>
               </div>

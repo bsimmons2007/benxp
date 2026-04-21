@@ -30,12 +30,71 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'pages_asc',   label: 'Fewest pages' },
 ]
 
-const BASE_GENRES = ['Fiction', 'Fantasy', 'Sci-Fi', 'Non-Fiction', 'Classic', 'Horror', 'Mystery', 'Thriller', 'Biography', 'Other']
+const BASE_GENRES = [
+  // ── Literature & Fiction ───────────────────────────────
+  'Fiction', 'Literary Fiction', 'Historical Fiction', 'Short Stories', 'Classic',
+  'Mythology', 'Fables',
+  // ── Speculative ───────────────────────────────────────
+  'Fantasy', 'Epic Fantasy', 'Urban Fantasy', 'Dark Fantasy',
+  'Sci-Fi', 'Hard Sci-Fi', 'Space Opera', 'Cyberpunk', 'Dystopian',
+  'Alternate History', 'Steampunk', 'Solarpunk',
+  // ── Horror & Supernatural ─────────────────────────────
+  'Horror', 'Gothic', 'Paranormal', 'Occult',
+  // ── Mystery & Crime ───────────────────────────────────
+  'Mystery', 'Cozy Mystery', 'Crime', 'Noir', 'Thriller',
+  'Psychological Thriller', 'Legal Thriller', 'Spy Thriller', 'Suspense',
+  // ── Action & Adventure ────────────────────────────────
+  'Adventure', 'Action', 'Western', 'Military Fiction',
+  // ── Romance ───────────────────────────────────────────
+  'Romance', 'Dark Romance', 'Paranormal Romance',
+  // ── Non-Fiction ───────────────────────────────────────
+  'Non-Fiction', 'Biography', 'Autobiography', 'Memoir',
+  'History', 'True Crime', 'Journalism',
+  'Philosophy', 'Psychology', 'Sociology', 'Anthropology',
+  'Science', 'Physics', 'Biology', 'Math',
+  'Technology', 'AI & Machine Learning', 'Cybersecurity',
+  'Business', 'Economics', 'Investing', 'Entrepreneurship',
+  'Self-Help', 'Productivity', 'Health & Fitness', 'Nutrition',
+  'Spirituality', 'Religion', 'Politics', 'Law',
+  'Travel', 'Nature', 'Sports', 'Art',
+  // ── Young Adult & Other ───────────────────────────────
+  'Young Adult', 'Middle Grade', 'Graphic Novel', 'Comics', 'Manga',
+  'Poetry', 'Plays', 'Essays',
+  'Other',
+]
 
 const GENRE_COLORS: Record<string, string> = {
-  Fantasy: '#7B2FBE', 'Sci-Fi': '#0F3460', Fiction: '#1ABC9C',
-  'Non-Fiction': '#E67E22', Classic: '#8B6914', Horror: '#E94560',
-  Mystery: '#2C3E50', Thriller: '#C0392B', Biography: '#27AE60',
+  // Fiction
+  'Fiction': '#1ABC9C', 'Literary Fiction': '#16A085', 'Historical Fiction': '#8B6914',
+  'Short Stories': '#27AE60', 'Classic': '#6B5B2E', 'Mythology': '#8E44AD', 'Fables': '#9B59B6',
+  // Speculative
+  'Fantasy': '#7B2FBE', 'Epic Fantasy': '#6C3483', 'Urban Fantasy': '#8E44AD', 'Dark Fantasy': '#4A235A',
+  'Sci-Fi': '#0F3460', 'Hard Sci-Fi': '#1A5276', 'Space Opera': '#154360', 'Cyberpunk': '#1F618D',
+  'Dystopian': '#2C3E50', 'Alternate History': '#2E4057', 'Steampunk': '#7D6608', 'Solarpunk': '#1E8449',
+  // Horror
+  'Horror': '#E94560', 'Gothic': '#922B21', 'Paranormal': '#C0392B', 'Occult': '#922B21',
+  // Mystery & Crime
+  'Mystery': '#2C3E50', 'Cozy Mystery': '#5D6D7E', 'Crime': '#283747', 'Noir': '#1C2833',
+  'Thriller': '#C0392B', 'Psychological Thriller': '#A93226', 'Legal Thriller': '#922B21',
+  'Spy Thriller': '#7B241C', 'Suspense': '#B03A2E',
+  // Action
+  'Adventure': '#D4AC0D', 'Action': '#D68910', 'Western': '#A04000', 'Military Fiction': '#4D5656',
+  // Romance
+  'Romance': '#E91E8C', 'Dark Romance': '#9B1B6E', 'Paranormal Romance': '#C2185B',
+  // Non-Fiction
+  'Non-Fiction': '#E67E22', 'Biography': '#27AE60', 'Autobiography': '#1E8449',
+  'Memoir': '#239B56', 'History': '#CA6F1E', 'True Crime': '#D35400', 'Journalism': '#E59866',
+  'Philosophy': '#7D6608', 'Psychology': '#117A65', 'Sociology': '#0E6655', 'Anthropology': '#0B5345',
+  'Science': '#1A5276', 'Physics': '#154360', 'Biology': '#145A32', 'Math': '#0D47A1',
+  'Technology': '#1565C0', 'AI & Machine Learning': '#1976D2', 'Cybersecurity': '#0277BD',
+  'Business': '#B9770E', 'Economics': '#9A7D0A', 'Investing': '#7D6608', 'Entrepreneurship': '#F39C12',
+  'Self-Help': '#E67E22', 'Productivity': '#D68910', 'Health & Fitness': '#27AE60', 'Nutrition': '#2ECC71',
+  'Spirituality': '#7D3C98', 'Religion': '#6C3483', 'Politics': '#839192', 'Law': '#5D6D7E',
+  'Travel': '#148F77', 'Nature': '#1E8449', 'Sports': '#E74C3C', 'Art': '#8E44AD',
+  // YA & Other
+  'Young Adult': '#3498DB', 'Middle Grade': '#5DADE2', 'Graphic Novel': '#F39C12',
+  'Comics': '#E67E22', 'Manga': '#EC407A', 'Poetry': '#AB47BC', 'Plays': '#7E57C2',
+  'Essays': '#5C6BC0', 'Other': '#555',
 }
 
 // ── Star rating ──────────────────────────────────────────────

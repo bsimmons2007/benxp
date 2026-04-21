@@ -54,7 +54,7 @@ export interface FortniteGame {
   id: string
   created_at: string
   date: string
-  mode: 'Solos' | 'Duos' | 'Squads' | 'Blitz' | null
+  mode: 'Solos' | 'Duos' | 'Trios' | 'Squads' | 'Blitz' | 'Blitz Solos' | 'Blitz Duos' | 'Blitz Squads' | null
   season: string | null
   placement: number | null
   kills: number
