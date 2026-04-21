@@ -221,3 +221,47 @@ export interface ChessGame {
   opening: string | null
   notes: string | null
 }
+
+export interface VolleyballSession {
+  id: string
+  created_at: string
+  date: string
+  format: 'Indoor' | 'Sand'
+  win: boolean
+  sets_won: number | null
+  sets_lost: number | null
+  aces: number | null
+  kills: number | null
+  blocks: number | null
+  digs: number | null
+  assists: number | null
+  my_score: number | null
+  opp_score: number | null
+  partner: string | null
+  opponent: string | null
+  notes: string | null
+}
+
+export interface SpikeballGame {
+  id: string
+  created_at: string
+  date: string
+  win: boolean
+  my_score: number | null
+  opp_score: number | null
+  partner: string | null
+  opponents: string | null
+  notes: string | null
+}
+
+export interface PoolGame {
+  id: string
+  created_at: string
+  date: string
+  win: boolean
+  game_type: string
+  opponent: string | null
+  run_count: number | null
+  break_and_run: boolean
+  notes: string | null
+}

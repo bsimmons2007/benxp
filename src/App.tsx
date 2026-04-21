@@ -37,6 +37,9 @@ import { DiscGolf } from './pages/DiscGolf'
 import { Hiking } from './pages/Hiking'
 import { TableTennis } from './pages/TableTennis'
 import { Chess } from './pages/Chess'
+import { Volleyball } from './pages/Volleyball'
+import { Spikeball } from './pages/Spikeball'
+import { Pool } from './pages/Pool'
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
@@ -204,6 +207,9 @@ function AppInner() {
         <Route path="/hiking"       element={<ProtectedRoute><Hiking /></ProtectedRoute>} />
         <Route path="/table-tennis" element={<ProtectedRoute><TableTennis /></ProtectedRoute>} />
         <Route path="/chess"        element={<ProtectedRoute><Chess /></ProtectedRoute>} />
+        <Route path="/volleyball"   element={<ProtectedRoute><Volleyball /></ProtectedRoute>} />
+        <Route path="/spikeball"    element={<ProtectedRoute><Spikeball /></ProtectedRoute>} />
+        <Route path="/pool"         element={<ProtectedRoute><Pool /></ProtectedRoute>} />
       </Routes>
       {showNav && <BottomNav />}
       {showNav && <SideNav />}

@@ -64,6 +64,13 @@ export const XP_RATES = {
   chess_game:           15,   // per game logged
   chess_win:            25,   // win bonus
   chess_draw:            8,   // draw bonus
+  volleyball_game:      15,   // per session logged
+  volleyball_win:       20,   // win bonus
+  spikeball_game:       15,   // per game logged
+  spikeball_win:        20,   // win bonus
+  pool_game:            10,   // per game logged
+  pool_win:             15,   // win bonus
+  pool_break_and_run:   25,   // bonus for break and run
 }
 
 export function calculateLevel(totalXP: number): number {
@@ -95,7 +102,7 @@ export interface AppStats {
  * Previously these were two separate fetch calls (7 + 4 queries) with 4 overlapping tables.
  */
 export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ totalXP: number; stats: AppStats }> {
-  const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess] = await Promise.all([
+  const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess, volleyball, spikeball, pool] = await Promise.all([
     supabase.from('lifting_log').select('date'),
     supabase.from('skate_sessions').select('miles'),
     supabase.from('pr_history').select('lift, est_1rm'),
@@ -115,6 +122,9 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft'),
     supabase.from('table_tennis_games').select('win'),
     supabase.from('chess_games').select('result'),
+    supabase.from('volleyball_sessions').select('win'),
+    supabase.from('spikeball_games').select('win'),
+    supabase.from('pool_games').select('win, break_and_run'),
   ])
 
   // ── XP ──────────────────────────────────────────────────────
@@ -190,7 +200,21 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
         + (r.result === 'win'  ? XP_RATES.chess_win  : 0)
         + (r.result === 'draw' ? XP_RATES.chess_draw : 0), 0
   )
-  const totalXP = Math.round(setXP + dayXP + prXP + bookXP + skateXP + fnXP + challengeXP + sleepXP + cardioXP + goalXP + moodXP + measurementXP + waterGoalXP + basketballXP + pickleballXP + golfXP + discGolfXP + hikingXP + tableTennisXP + chessXP)
+  const volleyballXP = (volleyball.data ?? []).reduce(
+    (s: number, r: { win: boolean }) =>
+      s + XP_RATES.volleyball_game + (r.win ? XP_RATES.volleyball_win : 0), 0
+  )
+  const spikeballXP = (spikeball.data ?? []).reduce(
+    (s: number, r: { win: boolean }) =>
+      s + XP_RATES.spikeball_game + (r.win ? XP_RATES.spikeball_win : 0), 0
+  )
+  const poolXP = (pool.data ?? []).reduce(
+    (s: number, r: { win: boolean; break_and_run: boolean }) =>
+      s + XP_RATES.pool_game
+        + (r.win ? XP_RATES.pool_win : 0)
+        + (r.break_and_run ? XP_RATES.pool_break_and_run : 0), 0
+  )
+  const totalXP = Math.round(setXP + dayXP + prXP + bookXP + skateXP + fnXP + challengeXP + sleepXP + cardioXP + goalXP + moodXP + measurementXP + waterGoalXP + basketballXP + pickleballXP + golfXP + discGolfXP + hikingXP + tableTennisXP + chessXP + volleyballXP + spikeballXP + poolXP)
 
   // ── Stats ────────────────────────────────────────────────────
   const prMap: Record<string, number> = {}

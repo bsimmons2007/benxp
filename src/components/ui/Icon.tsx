@@ -374,6 +374,31 @@ export const TerminalIcon: IconComponent = ({ size = 20, color = 'currentColor',
   </svg>
 )
 
+export const VolleyballIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <circle cx="10" cy="10" r="8" />
+    <path d="M2.5 7.5c2.5 1 4.5 4.5 7.5 4.5" />
+    <path d="M10 12c3 0 5.5-3 7.5-4.5" />
+    <path d="M6 17.5c1-3 1-6 4-7.5" />
+  </svg>
+)
+
+export const SpikeballIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <ellipse cx="10" cy="14" rx="7.5" ry="2.5" />
+    <circle cx="10" cy="6.5" r="3.5" />
+    <path d="M6.5 11.5 8.5 9M13.5 11.5 11.5 9" />
+  </svg>
+)
+
+export const PoolIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
+  <svg {...base(size, color, style, className)}>
+    <circle cx="7.5" cy="13" r="3.5" />
+    <circle cx="7.5" cy="13" r="1.2" />
+    <path d="M11 9.5 18.5 2.5" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+)
+
 export const TableTennisIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
   <svg {...base(size, color, style, className)}>
     <circle cx="14" cy="6" r="3" />

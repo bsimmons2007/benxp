@@ -4,7 +4,7 @@ import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { supabase } from '../lib/supabase'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { BasketballIcon, GamepadIcon, TargetIcon, GolfIcon, DiscIcon, MountainIcon, TableTennisIcon, ChessIcon } from '../components/ui/Icon'
+import { BasketballIcon, GamepadIcon, TargetIcon, GolfIcon, DiscIcon, MountainIcon, TableTennisIcon, ChessIcon, VolleyballIcon, SpikeballIcon, PoolIcon } from '../components/ui/Icon'
 
 // ── Hobby card ────────────────────────────────────────────────────────────────
 
@@ -89,12 +89,15 @@ export function Hobbies() {
   const [hikeMiles,    setHikeMiles]    = useState<number | null>(null)
   const [ttWins,       setTtWins]       = useState<number | null>(null)
   const [chessGames,   setChessGames]   = useState<number | null>(null)
+  const [vbWins,       setVbWins]       = useState<number | null>(null)
+  const [sbWins,       setSbWins]       = useState<number | null>(null)
+  const [poolWins,     setPoolWins]     = useState<number | null>(null)
 
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const [bb, fn, pb, golf, dg, hike, tt, chess] = await Promise.all([
+      const [bb, fn, pb, golf, dg, hike, tt, chess, vb, sb, pool] = await Promise.all([
         supabase.from('basketball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
         supabase.from('pickleball_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
@@ -103,6 +106,9 @@ export function Hobbies() {
         supabase.from('hiking_sessions').select('distance_miles').eq('user_id', user.id),
         supabase.from('table_tennis_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
         supabase.from('chess_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('volleyball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
+        supabase.from('spikeball_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
+        supabase.from('pool_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
       ])
       setBbSessions(bb.count ?? 0)
       setFnWins(fn.count ?? 0)
@@ -113,6 +119,9 @@ export function Hobbies() {
       setHikeMiles(Math.round(miles * 10) / 10)
       setTtWins(tt.count ?? 0)
       setChessGames(chess.count ?? 0)
+      setVbWins(vb.count ?? 0)
+      setSbWins(sb.count ?? 0)
+      setPoolWins(pool.count ?? 0)
     }
     load()
   }, [])
@@ -171,6 +180,36 @@ export function Hobbies() {
             accentColor="#a78bfa"
             statLabel="games"
             statValue={chessGames ?? '—'}
+          />
+
+          <HobbyCard
+            icon={<VolleyballIcon size={28} color="#f472b6" />}
+            label="Volleyball"
+            sub="Indoor & sand — wins, sets & stats"
+            path="/volleyball"
+            accentColor="#f472b6"
+            statLabel="wins"
+            statValue={vbWins ?? '—'}
+          />
+
+          <HobbyCard
+            icon={<SpikeballIcon size={28} color="#fb923c" />}
+            label="Spikeball"
+            sub="Wins, scores & partner tracking"
+            path="/spikeball"
+            accentColor="#fb923c"
+            statLabel="wins"
+            statValue={sbWins ?? '—'}
+          />
+
+          <HobbyCard
+            icon={<PoolIcon size={28} color="#c084fc" />}
+            label="Pool"
+            sub="8-Ball, 9-Ball, break & runs"
+            path="/pool"
+            accentColor="#c084fc"
+            statLabel="wins"
+            statValue={poolWins ?? '—'}
           />
 
           <HobbyCard
