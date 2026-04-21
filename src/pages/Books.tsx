@@ -159,18 +159,34 @@ function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: ()
 }
 
 // ── Edit book modal ──────────────────────────────────────────
+const inputCls = "px-3 py-3 rounded-lg text-white outline-none text-base w-full"
+const inputStyle = { background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }
+const labelStyle = { color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return <label className="text-base font-medium" style={labelStyle}>{children}</label>
+}
+
 function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => void; onSaved: () => void }) {
-  const [rating, setRating] = useState(String(book.rating ?? ''))
-  const [pages,  setPages]  = useState(String(book.pages ?? ''))
-  const [date,   setDate]   = useState(book.date_finished ?? '')
-  const [saving, setSaving] = useState(false)
+  const [title,    setTitle]    = useState(book.title)
+  const [author,   setAuthor]   = useState(book.author ?? '')
+  const [genre,    setGenre]    = useState(book.genre ?? 'Fiction')
+  const [pages,    setPages]    = useState(String(book.pages  ?? ''))
+  const [rating,   setRating]   = useState(String(book.rating ?? ''))
+  const [date,     setDate]     = useState(book.date_finished ?? '')
+  const [finished, setFinished] = useState(!!book.date_finished)
+  const [saving,   setSaving]   = useState(false)
 
   async function save() {
+    if (!title.trim()) return
     setSaving(true)
     await supabase.from('books').update({
-      rating: rating ? parseFloat(rating) : null,
-      pages:  pages  ? parseInt(pages)    : null,
-      date_finished: date || null,
+      title:         title.trim(),
+      author:        author.trim() || null,
+      genre:         genre || null,
+      pages:         pages  ? parseInt(pages)    : null,
+      rating:        rating ? parseFloat(rating) : null,
+      date_finished: finished && date ? date : null,
     }).eq('id', book.id)
     setSaving(false); onSaved(); onClose()
   }
@@ -181,22 +197,71 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
   }
 
   return (
-    <EditModal title={book.title} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title="Edit Book" onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
+
+        {/* Title */}
         <div className="flex flex-col gap-1">
-          <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Date Finished</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
+          <FieldLabel>Title</FieldLabel>
+          <input value={title} onChange={e => setTitle(e.target.value)} className={inputCls} style={inputStyle} placeholder="Book title" />
         </div>
-        <div className="flex gap-3">
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Rating (1–5)</label>
-            <input type="number" step="0.1" min="1" max="5" value={rating} onChange={e => setRating(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
-          </div>
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Pages</label>
-            <input type="number" value={pages} onChange={e => setPages(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
-          </div>
+
+        {/* Author */}
+        <div className="flex flex-col gap-1">
+          <FieldLabel>Author</FieldLabel>
+          <input value={author} onChange={e => setAuthor(e.target.value)} className={inputCls} style={inputStyle} placeholder="Author name" />
         </div>
+
+        {/* Genre */}
+        <div className="flex flex-col gap-1">
+          <FieldLabel>Genre</FieldLabel>
+          <select value={genre} onChange={e => setGenre(e.target.value)} className={inputCls} style={inputStyle}>
+            {BASE_GENRES.map(g => <option key={g} value={g}>{g}</option>)}
+          </select>
+        </div>
+
+        {/* Pages */}
+        <div className="flex flex-col gap-1">
+          <FieldLabel>Pages</FieldLabel>
+          <input type="number" value={pages} onChange={e => setPages(e.target.value)} className={inputCls} style={inputStyle} placeholder="350" />
+        </div>
+
+        {/* Status toggle */}
+        <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+          {[
+            { val: false, label: 'Currently Reading' },
+            { val: true,  label: 'Finished' },
+          ].map(({ val, label }) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => setFinished(val)}
+              style={{
+                flex: 1, padding: '10px 0', fontSize: 13, fontWeight: 600,
+                background: finished === val ? 'var(--accent)' : 'transparent',
+                color: finished === val ? 'var(--base-bg)' : '#888',
+                border: 'none', cursor: 'pointer', transition: 'all 0.15s',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Date finished + Rating (only when finished) */}
+        {finished && (
+          <>
+            <div className="flex flex-col gap-1">
+              <FieldLabel>Date Finished</FieldLabel>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} className={inputCls} style={inputStyle} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <FieldLabel>Rating (1–5, optional)</FieldLabel>
+              <input type="number" step="0.1" min="1" max="5" value={rating} onChange={e => setRating(e.target.value)} className={inputCls} style={inputStyle} placeholder="4.5" />
+            </div>
+          </>
+        )}
+
       </div>
     </EditModal>
   )
