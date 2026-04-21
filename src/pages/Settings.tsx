@@ -8,7 +8,8 @@ import { useStore } from '../store/useStore'
 import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme, timeThemeEnabled, setTimeThemeEnabled, applyTimeOrSavedTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
-import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon } from '../components/ui/Icon'
+import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon } from '../components/ui/Icon'
+import { getNotifPrefs, saveNotifPrefs, requestPermission, permissionGranted, notificationsSupported } from '../lib/notifications'
 import { toRoman } from '../lib/utils'
 import {
   SECTION_DEFS, DEFAULT_ORDER,
@@ -145,6 +146,10 @@ export function Settings() {
   const [deleteStep, setDeleteStep] = useState<'idle' | 'confirm'>('idle')
   const [deleting, setDeleting] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [notifOpen, setNotifOpen]       = useState(false)
+  const [notifEnabled, setNotifEnabled] = useState(() => getNotifPrefs().enabled)
+  const [notifTime, setNotifTime]       = useState(() => getNotifPrefs().time)
+  const [notifPerm, setNotifPerm]       = useState(() => permissionGranted())
 
   async function saveName() {
     if (!nameInput.trim()) return
@@ -534,6 +539,101 @@ export function Settings() {
             </div>
           )}
         </Card>
+
+        {/* ── Notifications card ───────────────────────────────────── */}
+        {notificationsSupported() && (
+          <Card className="mb-2">
+            <button onClick={() => setNotifOpen(o => !o)} className="w-full flex items-center justify-between py-2">
+              <div className="flex items-center gap-3">
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><BellIcon size={18} color="var(--text-secondary)" /></span>
+                <div className="text-left">
+                  <p className="font-semibold text-sm text-white">Reminders</p>
+                  <p style={{ color: '#444', fontSize: 11 }}>
+                    {notifEnabled && notifPerm
+                      ? `Daily reminder at ${notifTime}`
+                      : notifEnabled && !notifPerm
+                      ? 'Permission needed — tap to fix'
+                      : 'Off'}
+                  </p>
+                </div>
+              </div>
+              <Chevron open={notifOpen} />
+            </button>
+
+            {notifOpen && (
+              <div className="pb-1 pop-in">
+                {/* Enable toggle */}
+                <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div className="flex items-center gap-3">
+                    <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BellIcon size={16} color="var(--accent)" /></span>
+                    <div>
+                      <p className="text-white text-sm font-medium">Daily log reminder</p>
+                      <p style={{ color: '#555', fontSize: 11 }}>Reminds you when you open the app near your chosen time</p>
+                    </div>
+                  </div>
+                  <Toggle
+                    value={notifEnabled}
+                    onToggle={async () => {
+                      if (!notifEnabled) {
+                        const perm = await requestPermission()
+                        const granted = perm === 'granted'
+                        setNotifPerm(granted)
+                        if (!granted) {
+                          // Show friendly message but still save intent
+                          setNotifEnabled(true)
+                          saveNotifPrefs({ enabled: true, time: notifTime })
+                          return
+                        }
+                      }
+                      const next = !notifEnabled
+                      setNotifEnabled(next)
+                      saveNotifPrefs({ enabled: next, time: notifTime })
+                    }}
+                  />
+                </div>
+
+                {/* Permission warning */}
+                {notifEnabled && !notifPerm && (
+                  <div className="pop-in" style={{
+                    margin: '0 0 8px', padding: '10px 12px', borderRadius: 10,
+                    background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)',
+                  }}>
+                    <p style={{ color: 'var(--accent)', fontSize: 12, lineHeight: 1.5 }}>
+                      Notification permission was denied. To enable reminders, allow notifications for this site in your browser settings, then toggle back on.
+                    </p>
+                  </div>
+                )}
+
+                {/* Time picker */}
+                {notifEnabled && (
+                  <div className="flex items-center justify-between py-2.5 pop-in" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="flex items-center gap-3">
+                      <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CalendarIcon size={16} color="#888" /></span>
+                      <div>
+                        <p className="text-white text-sm font-medium">Reminder time</p>
+                        <p style={{ color: '#555', fontSize: 11 }}>Open the app within 5 min to trigger it</p>
+                      </div>
+                    </div>
+                    <input
+                      type="time"
+                      value={notifTime}
+                      onChange={e => {
+                        setNotifTime(e.target.value)
+                        saveNotifPrefs({ enabled: notifEnabled, time: e.target.value })
+                      }}
+                      style={{
+                        padding: '6px 10px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                        background: 'var(--input-bg)', border: '1px solid var(--border)',
+                        color: 'var(--text-primary)', outline: 'none', flexShrink: 0,
+                        colorScheme: 'dark',
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </Card>
+        )}
 
         {/* ── XP Rates card ─────────────────────────────────────────── */}
         <Card className="mb-2">

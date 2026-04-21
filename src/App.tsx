@@ -36,6 +36,7 @@ import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
 import { isTutorialDone } from './lib/tutorial'
+import { checkDailyReminder } from './lib/notifications'
 import { useAuth } from './hooks/useAuth'
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -146,6 +147,7 @@ function AppInner() {
   useEffect(() => {
     if (isAuthRoute) return
     if (!isTutorialDone()) setShowTutorial(true)
+    checkDailyReminder()
 
     function onReset() {
       setShowTutorial(true)

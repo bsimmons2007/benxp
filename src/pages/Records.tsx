@@ -14,7 +14,7 @@ import { formatDate, today } from '../lib/utils'
 import { checkForPR, getMilestoneHit, LIFT_MILESTONES, XP_RATES } from '../lib/xp'
 import { MilestoneOverlay } from '../components/ui/MilestoneOverlay'
 import { EmptyState } from '../components/ui/EmptyState'
-import { DumbbellIcon, RunIcon, ActivityIcon, ZapIcon, GridIcon } from '../components/ui/Icon'
+import { DumbbellIcon, RunIcon, ActivityIcon, ZapIcon, GridIcon, BookmarkIcon } from '../components/ui/Icon'
 import { useStore } from '../store/useStore'
 import type { LiftType, LiftingLog, PrHistory } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -195,6 +195,30 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
     </div>
   )
 }
+
+// ── Workout Templates ─────────────────────────────────────────────
+
+interface WorkoutTemplate {
+  id:         string
+  name:       string
+  exercises:  Omit<SessionEntry, 'uid'>[]
+  createdAt:  string
+}
+
+const TMPL_KEY = 'benxp-workout-templates'
+
+function getTemplates(): WorkoutTemplate[] {
+  try { return JSON.parse(localStorage.getItem(TMPL_KEY) ?? '[]') } catch { return [] }
+}
+function saveTemplates(ts: WorkoutTemplate[]) {
+  localStorage.setItem(TMPL_KEY, JSON.stringify(ts))
+}
+function addTemplate(name: string, exercises: Omit<SessionEntry, 'uid'>[]): WorkoutTemplate {
+  const t: WorkoutTemplate = { id: Math.random().toString(36).slice(2), name, exercises, createdAt: new Date().toISOString() }
+  saveTemplates([t, ...getTemplates()])
+  return t
+}
+function deleteTemplate(id: string) { saveTemplates(getTemplates().filter(t => t.id !== id)) }
 
 // ── Session logging ───────────────────────────────────────────────
 
@@ -412,11 +436,17 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
   const [lastWorkout, setLastWorkout] = useState<Omit<SessionEntry, 'uid'>[] | null>(null)
+  const [templates,    setTemplates]   = useState<WorkoutTemplate[]>([])
+  const [tmplOpen,     setTmplOpen]    = useState(false)
+  const [savingTmpl,   setSavingTmpl]  = useState(false)
+  const [tmplName,     setTmplName]    = useState('')
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem('benxp-last-workout')
       if (saved) setLastWorkout(JSON.parse(saved))
     } catch { /* ignore */ }
+    setTemplates(getTemplates())
   }, [])
 
   function addEntry() { setEntries(e => [...e, newEntry()]) }
@@ -524,10 +554,10 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
 
   return (
     <div className="mb-5">
-      <div style={{ display: 'flex', gap: 8, marginBottom: lastWorkout ? 8 : 0 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: (lastWorkout || templates.length > 0) && !open ? 8 : 0 }}>
         <button
           data-tutorial="log-workout-btn"
-          onClick={() => setOpen(o => !o)}
+          onClick={() => { setOpen(o => !o); setTmplOpen(false) }}
           className="flex items-center justify-center gap-2 rounded-xl font-semibold transition-all"
           style={{
             flex: 1, height: 44,
@@ -545,6 +575,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
             onClick={() => {
               setEntries(lastWorkout.map(e => ({ ...e, uid: Math.random().toString(36).slice(2) })))
               setOpen(true)
+              setTmplOpen(false)
             }}
             title="Repeat your last logged workout"
             style={{
@@ -559,7 +590,73 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
             ↺ Repeat
           </button>
         )}
+        {!open && templates.length > 0 && (
+          <button
+            onClick={() => setTmplOpen(o => !o)}
+            title="Load a saved workout template"
+            style={{
+              height: 44, padding: '0 14px', borderRadius: 12, flexShrink: 0,
+              background: tmplOpen ? 'rgba(245,166,35,0.12)' : 'rgba(255,255,255,0.05)',
+              border: tmplOpen ? '1px solid rgba(245,166,35,0.4)' : '1px solid var(--border)',
+              color: tmplOpen ? 'var(--accent)' : 'var(--text-secondary)',
+              cursor: 'pointer', fontSize: 13, fontWeight: 600,
+              display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s',
+            }}
+          >
+            <BookmarkIcon size={14} color={tmplOpen ? 'var(--accent)' : 'var(--text-secondary)'} />
+            Templates
+          </button>
+        )}
       </div>
+
+      {/* Templates panel */}
+      {tmplOpen && !open && (
+        <div className="pop-in" style={{
+          marginBottom: 12, borderRadius: 14,
+          background: 'rgba(12,16,36,0.95)', border: '1px solid rgba(245,166,35,0.2)',
+          backdropFilter: 'blur(12px)', overflow: 'hidden',
+        }}>
+          <p className="section-label" style={{ padding: '12px 14px 8px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            Saved Templates
+          </p>
+          {templates.map(t => (
+            <div key={t.id} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.04)',
+            }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.2 }}>{t.name}</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {t.exercises.length} exercise{t.exercises.length !== 1 ? 's' : ''} · {t.exercises.map(e => e.liftName).filter(Boolean).slice(0, 3).join(', ')}{t.exercises.length > 3 ? '…' : ''}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setEntries(t.exercises.map(e => ({ ...e, uid: Math.random().toString(36).slice(2) })))
+                  setOpen(true)
+                  setTmplOpen(false)
+                }}
+                style={{
+                  padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, flexShrink: 0,
+                  background: 'var(--accent)', color: '#1A1A2E', border: 'none', cursor: 'pointer',
+                }}
+              >
+                Load
+              </button>
+              <button
+                onClick={() => { deleteTemplate(t.id); setTemplates(getTemplates()) }}
+                style={{
+                  width: 28, height: 28, borderRadius: 7, flexShrink: 0,
+                  background: 'rgba(233,69,96,0.08)', border: '1px solid rgba(233,69,96,0.2)',
+                  color: '#E94560', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {open && (
         <form onSubmit={handleSubmit}>
@@ -604,6 +701,70 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
             >
               + Add Another Exercise
             </button>
+
+            {/* Save as Template */}
+            {!savingTmpl ? (
+              <button
+                type="button"
+                onClick={() => { setSavingTmpl(true); setTmplName('') }}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                  width: '100%', marginTop: 8, padding: '6px', borderRadius: 8,
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: '#555', fontSize: 12, transition: 'color 0.15s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#555')}
+              >
+                <BookmarkIcon size={12} /> Save as Template
+              </button>
+            ) : (
+              <div className="pop-in" style={{ display: 'flex', gap: 6, marginTop: 10, alignItems: 'center' }}>
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Template name (e.g. Push Day)…"
+                  value={tmplName}
+                  onChange={e => setTmplName(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && tmplName.trim()) {
+                      addTemplate(tmplName.trim(), entries.filter(en => en.liftName).map(en => ({ liftName: en.liftName, isBodyweight: en.isBodyweight, isTimed: en.isTimed, weight: en.weight, sets: en.sets, reps: en.reps, duration: en.duration, rpe: en.rpe, bodyweight: en.bodyweight })))
+                      setTemplates(getTemplates()); setSavingTmpl(false); setTmplName('')
+                    }
+                    if (e.key === 'Escape') { setSavingTmpl(false); setTmplName('') }
+                  }}
+                  style={{
+                    flex: 1, padding: '8px 12px', borderRadius: 8,
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    color: 'var(--text-primary)', fontSize: 13, outline: 'none',
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={!tmplName.trim()}
+                  onClick={() => {
+                    addTemplate(tmplName.trim(), entries.filter(en => en.liftName).map(en => ({ liftName: en.liftName, isBodyweight: en.isBodyweight, isTimed: en.isTimed, weight: en.weight, sets: en.sets, reps: en.reps, duration: en.duration, rpe: en.rpe, bodyweight: en.bodyweight })))
+                    setTemplates(getTemplates()); setSavingTmpl(false); setTmplName('')
+                  }}
+                  style={{
+                    padding: '8px 14px', borderRadius: 8, flexShrink: 0,
+                    background: tmplName.trim() ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                    color: tmplName.trim() ? '#1A1A2E' : '#555', border: 'none',
+                    fontSize: 12, fontWeight: 700, cursor: tmplName.trim() ? 'pointer' : 'not-allowed',
+                  }}
+                >Save</button>
+                <button
+                  type="button"
+                  onClick={() => { setSavingTmpl(false); setTmplName('') }}
+                  style={{
+                    width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                    background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
+                    color: '#555', cursor: 'pointer', fontSize: 13,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >✕</button>
+              </div>
+            )}
 
             {/* Submit */}
             <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
