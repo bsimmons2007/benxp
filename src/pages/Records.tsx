@@ -536,6 +536,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
     <div className="mb-5">
       <div style={{ display: 'flex', gap: 8, marginBottom: lastWorkout ? 8 : 0 }}>
         <button
+          data-tutorial="log-workout-btn"
           onClick={() => setOpen(o => !o)}
           className="flex items-center justify-center gap-2 rounded-xl font-semibold transition-all"
           style={{

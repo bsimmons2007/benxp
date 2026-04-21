@@ -89,6 +89,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   return (
     <div className="mb-5">
       <button
+        data-tutorial="log-sleep-btn"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'rgba(255,255,255,0.05)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
