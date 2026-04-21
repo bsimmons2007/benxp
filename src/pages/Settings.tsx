@@ -8,7 +8,7 @@ import { useStore } from '../store/useStore'
 import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme, timeThemeEnabled, setTimeThemeEnabled, applyTimeOrSavedTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
-import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon } from '../components/ui/Icon'
+import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon } from '../components/ui/Icon'
 import { toRoman } from '../lib/utils'
 import {
   SECTION_DEFS, DEFAULT_ORDER,
@@ -626,6 +626,27 @@ export function Settings() {
             </div>
           )}
         </Card>
+
+        {/* ── Legal ─────────────────────────────────────────────────── */}
+        <div className="flex justify-center gap-6 mt-4 mb-2">
+          <button
+            onClick={() => navigate('/terms')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              color: 'var(--text-muted)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}
+          >
+            <ShieldIcon size={13} color="var(--text-muted)" />
+            Terms of Service
+          </button>
+          <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>·</span>
+          <button
+            onClick={() => navigate('/privacy')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              color: 'var(--text-muted)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}
+          >
+            <ShieldIcon size={13} color="var(--text-muted)" />
+            Privacy Policy
+          </button>
+        </div>
 
         {/* ── Sign out ──────────────────────────────────────────────── */}
         <button onClick={logout} className="w-full py-3.5 rounded-xl font-semibold mt-2" style={{ background: 'rgba(233,69,96,0.12)', color: '#E94560', border: '1px solid rgba(233,69,96,0.25)', fontFamily: 'Cinzel, serif' }}>

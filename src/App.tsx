@@ -30,6 +30,8 @@ import { ResetPassword } from './pages/ResetPassword'
 import { Basketball } from './pages/Basketball'
 import { Hobbies } from './pages/Hobbies'
 import { Pickleball } from './pages/Pickleball'
+import { Terms } from './pages/Terms'
+import { Privacy } from './pages/Privacy'
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
@@ -188,6 +190,8 @@ function AppInner() {
         <Route path="/basketball"   element={<ProtectedRoute><Basketball /></ProtectedRoute>} />
         <Route path="/hobbies"      element={<ProtectedRoute><Hobbies /></ProtectedRoute>} />
         <Route path="/pickleball"   element={<ProtectedRoute><Pickleball /></ProtectedRoute>} />
+        <Route path="/terms"        element={<Terms />} />
+        <Route path="/privacy"      element={<Privacy />} />
       </Routes>
       {showNav && <BottomNav />}
       {showNav && <SideNav />}

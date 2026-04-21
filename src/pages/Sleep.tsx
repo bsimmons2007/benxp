@@ -15,7 +15,6 @@ import { today, formatDate } from '../lib/utils'
 import { playXPGain, playPR } from '../lib/sounds'
 import type { SleepLog } from '../types'
 import { MoonIcon, CheckIcon, EditIcon } from '../components/ui/Icon'
-import { AdBanner } from '../components/ui/AdBanner'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -661,8 +660,6 @@ export function Sleep() {
         {/* Log buttons */}
         <LogSleepPanel onLogged={load} />
         <LogNapPanel onLogged={load} />
-
-        <AdBanner slot="sleep" />
 
         {/* Hours slept trend */}
         {sorted.length > 0 && sorted.length < 3 && (

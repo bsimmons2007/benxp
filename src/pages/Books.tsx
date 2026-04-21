@@ -15,7 +15,6 @@ import { useStore } from '../store/useStore'
 import { playGoalComplete } from '../lib/sounds'
 import type { Book, ToRead } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { AdBanner } from '../components/ui/AdBanner'
 
 // ── Types ────────────────────────────────────────────────────
 type SortKey = 'date_desc' | 'date_asc' | 'title_asc' | 'title_desc' | 'rating_desc' | 'rating_asc' | 'pages_desc' | 'pages_asc'
@@ -693,8 +692,6 @@ export function Books() {
 
         {/* Add book */}
         <LogBookPanel onLogged={load} />
-
-        <AdBanner slot="books" />
 
         {/* Currently reading */}
         {reading.length > 0 && (
