@@ -14,6 +14,7 @@ import { useStore } from '../store/useStore'
 import { playXPGain } from '../lib/sounds'
 import { ActivityIconComp, EditIcon, ZapIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { AdBanner } from '../components/ui/AdBanner'
 
 const ACTIVITIES = [
   { key: 'run',   label: 'Run'   },
@@ -283,6 +284,8 @@ export function Cardio() {
         </div>
 
         <LogCardioPanel onLogged={load} />
+
+        <AdBanner slot="cardio" />
 
         {/* Activity filter tabs */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-1">

@@ -18,6 +18,7 @@ import { DumbbellIcon, RunIcon, ActivityIcon, ZapIcon, GridIcon } from '../compo
 import { useStore } from '../store/useStore'
 import type { LiftType, LiftingLog, PrHistory } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { AdBanner } from '../components/ui/AdBanner'
 
 // ── Exercise library (loaded once from Supabase) ──────────────────────────────
 
@@ -1072,6 +1073,8 @@ export function Records() {
         {/* ── Log tab ── */}
         <div style={{ display: tab === 'log' ? 'block' : 'none' }}>
           <LogWorkoutPanel onLogged={load} exercises={exercises} />
+
+          <AdBanner slot="records" />
 
           {allLoggedLifts.length > 0 && (
             <>
