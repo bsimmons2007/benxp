@@ -119,12 +119,12 @@ export interface AmbientScene {
 }
 
 export const AMBIENT_SCENES: AmbientScene[] = [
-  { id: 'cosmic',  name: 'Cosmic Void',   emoji: '🌌', description: 'Deep space resonance & stellar drift' },
-  { id: 'forest',  name: 'Dark Forest',   emoji: '🌲', description: 'Jungle insects, wind & rustling leaves' },
-  { id: 'ocean',   name: 'Deep Ocean',    emoji: '🌊', description: 'Rolling waves, tide & oceanic depth' },
-  { id: 'ember',   name: 'Ember & Fire',  emoji: '🔥', description: 'Crackling fire, warm analog saturation' },
-  { id: 'arctic',  name: 'Arctic Wind',   emoji: '❄️', description: 'Howling blizzard & frozen resonance' },
-  { id: 'lofi',    name: 'Lo-fi Study',   emoji: '📻', description: 'Vinyl crackle, soft rain & warm chords' },
+  { id: 'cosmic',  name: 'Cosmic Void',   emoji: 'Cosmic', description: 'Deep space resonance & stellar drift' },
+  { id: 'forest',  name: 'Dark Forest',   emoji: 'Forest', description: 'Jungle insects, wind & rustling leaves' },
+  { id: 'ocean',   name: 'Deep Ocean',    emoji: 'Ocean',  description: 'Rolling waves, tide & oceanic depth' },
+  { id: 'ember',   name: 'Ember & Fire',  emoji: 'Fire',   description: 'Crackling fire, warm analog saturation' },
+  { id: 'arctic',  name: 'Arctic Wind',   emoji: 'Ice',    description: 'Howling blizzard & frozen resonance' },
+  { id: 'lofi',    name: 'Lo-fi Study',   emoji: 'Lo-fi',  description: 'Vinyl crackle, soft rain & warm chords' },
 ]
 
 // Maps visual theme IDs → ambient scene ID

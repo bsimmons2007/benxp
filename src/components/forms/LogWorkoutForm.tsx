@@ -105,7 +105,7 @@ export function LogWorkoutForm() {
     }
 
     const xpEarned = sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0)
-    setToast(`+${xpEarned} XP${isPR ? ' — New PR! 🎉' : ''}`)
+    setToast(`+${xpEarned} XP${isPR ? ' — New PR!' : ''}`)
     await refreshXP()
 
     // Keep bodyweight pre-filled across entries (only ask once)

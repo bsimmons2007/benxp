@@ -1,5 +1,5 @@
 // Standalone /strength route — thin wrapper around StrengthTab.
-// The main entry point is now the 💪 Strength Map tab inside /lifting.
+// The main entry point is now the Strength Map tab inside /lifting.
 
 import { useNavigate } from 'react-router-dom'
 import { PageWrapper } from '../components/layout/PageWrapper'

@@ -25,16 +25,16 @@ async function fetchActivity(): Promise<ActivityEntry[]> {
 
   const entries: ActivityEntry[] = [
     ...(lifting.data ?? []).map((r: { date: string; lift: string; weight: number; reps: number }) => ({
-      type: 'lift', label: `${r.lift} ${r.weight ? `${r.weight}lbs` : ''} ×${r.reps}`, date: r.date, icon: '🏋️',
+      type: 'lift', label: `${r.lift} ${r.weight ? `${r.weight}lbs` : ''} ×${r.reps}`, date: r.date, icon: 'lift',
     })),
     ...(skate.data ?? []).map((r: { date: string; miles: number }) => ({
-      type: 'skate', label: `${r.miles} miles`, date: r.date, icon: '🛼',
+      type: 'skate', label: `${r.miles} miles`, date: r.date, icon: 'skate',
     })),
     ...(books.data ?? []).map((r: { date_finished: string; title: string }) => ({
-      type: 'book', label: r.title, date: r.date_finished, icon: '📚',
+      type: 'book', label: r.title, date: r.date_finished, icon: 'book',
     })),
     ...(games.data ?? []).map((r: { date: string; kills: number; win: boolean }) => ({
-      type: 'fortnite', label: `${r.kills} kills${r.win ? ' — WIN' : ''}`, date: r.date, icon: '🎮',
+      type: 'fortnite', label: `${r.kills} kills${r.win ? ' — WIN' : ''}`, date: r.date, icon: 'game',
     })),
   ]
   entries.sort((a, b) => b.date.localeCompare(a.date))

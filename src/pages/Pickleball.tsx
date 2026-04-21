@@ -274,7 +274,7 @@ export function Pickleball() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 16,
               }}>
-                {game.win ? '🏆' : '🎾'}
+                {game.win ? <TrophyIcon size={16} color='#22c55e' /> : <span style={{ color: '#555', fontSize: 14 }}>○</span>}
               </div>
               <div>
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>
@@ -309,7 +309,7 @@ export function Pickleball() {
 
         {games.length === 0 && (
           <EmptyState
-            icon={<span style={{ fontSize: 64 }}>🏓</span>}
+            icon={<TrophyIcon size={48} color="var(--text-muted)" />}
             title="No games logged yet"
             sub="Log your first pickleball game to start tracking wins and streaks."
           />

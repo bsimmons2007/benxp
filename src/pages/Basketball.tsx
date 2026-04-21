@@ -127,8 +127,8 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
 
           {/* Section toggles */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-            <button type="button" style={pill(showShooting)} onClick={() => setShowShooting(s => !s)}>🎯 Shooting</button>
-            <button type="button" style={pill(showBox)}      onClick={() => setShowBox(s => !s)}>📋 Box Score</button>
+            <button type="button" style={pill(showShooting)} onClick={() => setShowShooting(s => !s)}>Shooting</button>
+            <button type="button" style={pill(showBox)}      onClick={() => setShowBox(s => !s)}>Box Score</button>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">

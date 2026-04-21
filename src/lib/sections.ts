@@ -8,17 +8,17 @@ export interface SectionDef {
 }
 
 export const SECTION_DEFS: Record<SectionKey, SectionDef> = {
-  lifting:    { label: 'Lifting',  icon: '🏋️', path: '/lifting',    categories: ['Workout', 'Lifting'] },
-  books:      { label: 'Books',    icon: '📚', path: '/books',      categories: ['Reading'] },
-  skate:      { label: 'Skate',    icon: '🛼', path: '/skate',      categories: ['Skate'] },
-  sleep:      { label: 'Sleep',    icon: '😴', path: '/sleep',      categories: ['Sleep'] },
-  fortnite:   { label: 'Fortnite', icon: '🎮', path: '/fortnite',   categories: ['Gaming'] },
-  challenges: { label: 'Quests',   icon: '⚔️', path: '/challenges', categories: [] },
-  mood:       { label: 'Mood',     icon: '🧠', path: '/mood',       categories: ['Mood'] },
-  cardio:     { label: 'Cardio',   icon: '🏃', path: '/cardio',     categories: ['Cardio'] },
-  water:      { label: 'Water',    icon: '💧', path: '/water',      categories: ['Health'] },
-  basketball: { label: 'Hoops',    icon: '🏀', path: '/basketball', categories: ['Basketball'] },
-  hobbies:    { label: 'Hobbies',  icon: '🎯', path: '/hobbies',    categories: ['Basketball', 'Gaming'] },
+  lifting:    { label: 'Lifting',  icon: 'lifting',    path: '/lifting',    categories: ['Workout', 'Lifting'] },
+  books:      { label: 'Books',    icon: 'books',      path: '/books',      categories: ['Reading'] },
+  skate:      { label: 'Skate',    icon: 'skate',      path: '/skate',      categories: ['Skate'] },
+  sleep:      { label: 'Sleep',    icon: 'sleep',      path: '/sleep',      categories: ['Sleep'] },
+  fortnite:   { label: 'Fortnite', icon: 'fortnite',   path: '/fortnite',   categories: ['Gaming'] },
+  challenges: { label: 'Quests',   icon: 'challenges', path: '/challenges', categories: [] },
+  mood:       { label: 'Mood',     icon: 'mood',       path: '/mood',       categories: ['Mood'] },
+  cardio:     { label: 'Cardio',   icon: 'cardio',     path: '/cardio',     categories: ['Cardio'] },
+  water:      { label: 'Water',    icon: 'water',      path: '/water',      categories: ['Health'] },
+  basketball: { label: 'Hoops',    icon: 'basketball', path: '/basketball', categories: ['Basketball'] },
+  hobbies:    { label: 'Hobbies',  icon: 'hobbies',    path: '/hobbies',    categories: ['Basketball', 'Gaming'] },
 }
 
 // Skate is a subsection of Cardio — removed from nav

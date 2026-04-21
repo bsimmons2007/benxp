@@ -306,7 +306,7 @@ export function Cardio() {
         {/* Distance trend */}
         {chartData.length > 0 && chartData.length < 3 && (
           <div style={{ textAlign: 'center', padding: '14px 0 8px', color: 'var(--text-muted)', fontSize: 12 }}>
-            📈 Log {3 - chartData.length} more session{3 - chartData.length > 1 ? 's' : ''} to unlock your trend chart
+            Log {3 - chartData.length} more session{3 - chartData.length > 1 ? 's' : ''} to unlock your trend chart
           </div>
         )}
         {chartData.length >= 3 && (

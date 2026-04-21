@@ -14,7 +14,7 @@ export function Toast({ message, onDone, onUndo, duration }: ToastProps) {
   const timerRef      = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    if (message.includes('PR') || message.includes('🎉')) playPR()
+    if (message.includes('PR')) playPR()
     else if (message.includes('XP')) playXPGain()
 
     timerRef.current = setTimeout(() => {

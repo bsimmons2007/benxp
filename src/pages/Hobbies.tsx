@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { supabase } from '../lib/supabase'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { BasketballIcon, GamepadIcon, TargetIcon } from '../components/ui/Icon'
 
 // ── Hobby card ────────────────────────────────────────────────────────────────
 
 interface HobbyCardProps {
-  emoji:       string
+  icon:        ReactNode
   label:       string
   sub:         string
   path:        string
@@ -17,7 +18,7 @@ interface HobbyCardProps {
   accentColor: string
 }
 
-function HobbyCard({ emoji, label, sub, path, statLabel, statValue, accentColor }: HobbyCardProps) {
+function HobbyCard({ icon, label, sub, path, statLabel, statValue, accentColor }: HobbyCardProps) {
   const navigate = useNavigate()
   return (
     <button
@@ -46,9 +47,8 @@ function HobbyCard({ emoji, label, sub, path, statLabel, statValue, accentColor 
         background: `${accentColor}15`,
         border: `1.5px solid ${accentColor}40`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 26,
       }}>
-        {emoji}
+        {icon}
       </div>
 
       {/* Text */}
@@ -108,7 +108,7 @@ export function Hobbies() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
           <HobbyCard
-            emoji="🏀"
+            icon={<BasketballIcon size={28} color="#f97316" />}
             label="Hoops"
             sub="Shot charts, box scores & streaks"
             path="/basketball"
@@ -118,7 +118,7 @@ export function Hobbies() {
           />
 
           <HobbyCard
-            emoji="🎮"
+            icon={<GamepadIcon size={28} color="#a855f7" />}
             label="Fortnite"
             sub="Wins, kill streaks & placement"
             path="/fortnite"
@@ -128,7 +128,7 @@ export function Hobbies() {
           />
 
           <HobbyCard
-            emoji="🏓"
+            icon={<TargetIcon size={28} color="#22c55e" />}
             label="Pickleball"
             sub="Wins, scores & win rate"
             path="/pickleball"

@@ -34,11 +34,11 @@ const TT_STYLE = {
 }
 
 function moodEmoji(v: number) {
-  if (v >= 9) return '🤩'
-  if (v >= 7) return '😊'
-  if (v >= 5) return '😐'
-  if (v >= 3) return '😔'
-  return '😞'
+  if (v >= 9) return 'Excellent'
+  if (v >= 7) return 'Good'
+  if (v >= 5) return 'Okay'
+  if (v >= 3) return 'Low'
+  return 'Rough'
 }
 
 export function Mood() {

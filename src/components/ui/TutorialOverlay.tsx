@@ -202,7 +202,7 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
             onClick={() => isLast ? finish() : goTo(stepIndex + 1)}
             style={{ flex: 2, padding: '9px 0', borderRadius: 10, border: 'none', background: 'var(--accent)', color: '#0d0d1a', fontSize: 13, cursor: 'pointer', fontWeight: 700 }}
           >
-            {isLast ? "Let's Go! 🚀" : 'Next →'}
+            {isLast ? "Let's Go!" : 'Next →'}
           </button>
         </div>
       </div>

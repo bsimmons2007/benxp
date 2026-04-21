@@ -128,7 +128,7 @@ async function fetchXPEntries(): Promise<{ entries: XPEntry[]; total: number }> 
   const liftRows = lifting.data ?? []
   liftRows.forEach((r: { date: string; lift: string; sets: number; reps: number; weight: number | null }) => {
     entries.push({
-      category: 'Lifting', icon: '🏋️',
+      category: 'Lifting', icon: 'lift',
       label: `${r.lift} — ${r.sets}×${r.reps}${r.weight ? ` @ ${r.weight}lbs` : ''}`,
       xp: XP_RATES.per_set,
       detail: r.date,
@@ -138,28 +138,28 @@ async function fetchXPEntries(): Promise<{ entries: XPEntry[]; total: number }> 
   // Workout day bonuses
   const uniqueDays = [...new Set(liftRows.map((r: { date: string }) => r.date))]
   uniqueDays.forEach(date => {
-    entries.push({ category: 'Lifting', icon: '📅', label: `Workout day bonus`, xp: XP_RATES.workout_day, detail: date })
+    entries.push({ category: 'Lifting', icon: 'cal', label: `Workout day bonus`, xp: XP_RATES.workout_day, detail: date })
   })
 
   // PRs
   ;(prs.data ?? []).forEach((r: { date: string; lift: string; est_1rm: number }) => {
-    entries.push({ category: 'Lifting', icon: '🏆', label: `PR — ${r.lift} ${r.est_1rm.toFixed(0)} lbs`, xp: XP_RATES.new_pr, detail: r.date })
+    entries.push({ category: 'Lifting', icon: 'trophy', label: `PR — ${r.lift} ${r.est_1rm.toFixed(0)} lbs`, xp: XP_RATES.new_pr, detail: r.date })
   })
 
   // Skate
   ;(skate.data ?? []).forEach((r: { date: string; miles: number }) => {
     const xp = Math.round(r.miles * XP_RATES.skate_per_mile)
-    entries.push({ category: 'Skate', icon: '🛼', label: `${r.miles} miles`, xp, detail: r.date })
+    entries.push({ category: 'Skate', icon: 'skate', label: `${r.miles} miles`, xp, detail: r.date })
   })
 
   // Books
   ;(books.data ?? []).forEach((r: { date_finished: string; title: string }) => {
-    entries.push({ category: 'Books', icon: '📚', label: r.title, xp: XP_RATES.book_finished, detail: r.date_finished })
+    entries.push({ category: 'Books', icon: 'books', label: r.title, xp: XP_RATES.book_finished, detail: r.date_finished })
   })
 
   // Fortnite wins
   ;(games.data ?? []).forEach((r: { date: string; kills: number }) => {
-    entries.push({ category: 'Fortnite', icon: '🎮', label: `Win — ${r.kills} kills`, xp: XP_RATES.fortnite_win, detail: r.date })
+    entries.push({ category: 'Fortnite', icon: 'game', label: `Win — ${r.kills} kills`, xp: XP_RATES.fortnite_win, detail: r.date })
   })
 
   // Sleep
@@ -167,7 +167,7 @@ async function fetchXPEntries(): Promise<{ entries: XPEntry[]; total: number }> 
     const bonus = (r.hours_slept ?? 0) >= 7 ? XP_RATES.sleep_quality_bonus : 0
     const xp = XP_RATES.sleep_log + bonus
     entries.push({
-      category: 'Sleep', icon: '😴',
+      category: 'Sleep', icon: 'sleep',
       label: `${r.hours_slept ?? '?'}h sleep${bonus > 0 ? ' (+quality bonus)' : ''}`,
       xp, detail: r.date,
     })
@@ -175,7 +175,7 @@ async function fetchXPEntries(): Promise<{ entries: XPEntry[]; total: number }> 
 
   // Challenges
   ;(challenges.data ?? []).forEach((r: { notes: string; xp_reward: number }) => {
-    entries.push({ category: 'Challenges', icon: '⚔️', label: r.notes ?? 'Challenge', xp: r.xp_reward })
+    entries.push({ category: 'Challenges', icon: 'sword', label: r.notes ?? 'Challenge', xp: r.xp_reward })
   })
 
   const total = entries.reduce((s, e) => s + e.xp, 0)
@@ -336,7 +336,7 @@ export function DevSettings() {
 
             {/* Tab bar */}
             <div className="flex gap-2 mb-5">
-              {[{ id: 'xp', label: '⚡ XP Engine' }].map(t => (
+              {[{ id: 'xp', label: 'XP Engine' }].map(t => (
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id as 'xp')}

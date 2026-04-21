@@ -3,7 +3,7 @@ import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
-import { EditIcon } from '../components/ui/Icon'
+import { EditIcon, DropletIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { today as appToday } from '../lib/utils'
 import { useStore } from '../store/useStore'
@@ -143,7 +143,7 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
         <p style={{ fontSize: 12, color: '#555', marginTop: 2 }}>of {goal}oz goal</p>
         {fill >= 1 && (
           <p className="pop-in" style={{ fontSize: 12, color: glowColor, fontWeight: 700, marginTop: 4 }}>
-            🎉 Goal reached!
+            Goal reached!
           </p>
         )}
       </div>
@@ -192,10 +192,10 @@ export function Water() {
     const newTotal = totalOz + oz
     const goalJustMet = !wasGoalMet && newTotal >= GOAL_OZ
     if (goalJustMet) {
-      setToast(`💧 Daily goal reached! +50 XP`)
+      setToast('Daily goal reached! +50 XP')
       await refreshXP()
     } else {
-      setToast(`+${oz}oz logged 💧`)
+      setToast(`+${oz}oz logged`)
     }
     load()
   }
@@ -298,7 +298,7 @@ export function Water() {
               <div key={e.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2"
                 style={{ background: 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="flex items-center gap-3">
-                  <span style={{ fontSize: 18 }}>💧</span>
+                  <DropletIcon size={18} color="#29b6f6" />
                   <div>
                     <p className="font-bold" style={{ color: '#29b6f6', fontSize: 15 }}>{Number(e.oz).toFixed(0)}oz</p>
                     <p style={{ color: '#555', fontSize: 11 }}>{formatTime(e.created_at)}</p>
@@ -322,7 +322,7 @@ export function Water() {
 
         {entries.length === 0 && !loading && (
           <div style={{ textAlign: 'center', padding: '32px 0', color: '#444' }}>
-            <p style={{ fontSize: 36, marginBottom: 8 }}>💧</p>
+            <DropletIcon size={36} color="var(--text-muted)" />
             <p style={{ fontSize: 14, fontWeight: 700, color: '#444' }}>No water logged yet today</p>
             <p style={{ fontSize: 12, color: '#444', marginTop: 4 }}>Tap a quick add button to get started</p>
           </div>

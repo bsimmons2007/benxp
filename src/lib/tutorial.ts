@@ -24,7 +24,7 @@ export interface TutorialStep {
 export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id:    'welcome',
-    title: 'Welcome to BenXP 🎮',
+    title: 'Welcome to BenXP',
     body:  'Your personal life tracker. Log workouts, sleep, games, books & more — everything earns XP and levels you up.',
     tooltipPosition: 'center',
     navigateTo: '/',
@@ -47,7 +47,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id:         'lifting',
-    title:      '🏋️ Lifting',
+    title:      'Lifting',
     body:       'Log every set you do — weight, reps, and exercise. Hit a new max and you earn a PR + bonus XP. Your strength is tracked on the body map.',
     target:     '[data-tutorial="log-workout-btn"]',
     tooltipPosition: 'below',
@@ -55,7 +55,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id:         'cardio',
-    title:      '🏃 Cardio',
+    title:      'Cardio',
     body:       'Log runs, bikes, swims — any distance activity. You earn XP per mile. Consistency builds your streak.',
     target:     '[data-tutorial="log-cardio-btn"]',
     tooltipPosition: 'below',
@@ -63,7 +63,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id:         'sleep',
-    title:      '🌙 Sleep',
+    title:      'Sleep',
     body:       'Log your bedtime and wake time. The app tracks sleep debt, quality scores, and your streak. Good sleep = bonus XP.',
     target:     '[data-tutorial="log-sleep-btn"]',
     tooltipPosition: 'below',
@@ -86,7 +86,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id:    'done',
-    title: "You're All Set! 🏆",
+    title: "You're All Set!",
     body:  'Start logging to build streaks, earn XP, and climb the level chart. The more consistent you are, the faster you grow.',
     tooltipPosition: 'center',
     navigateTo: '/',

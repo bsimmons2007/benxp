@@ -352,11 +352,11 @@ export function Goals() {
             <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet — try one of these:</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { emoji: '🏋️', label: 'Bench 225 lbs',      metric: 'bench_1rm',         target: 225 },
-                { emoji: '🛼', label: 'Skate 100 miles',     metric: 'total_skate_miles',  target: 100 },
-                { emoji: '🏃', label: 'Run 50 miles',        metric: 'total_cardio_miles', target: 50  },
-                { emoji: '📚', label: 'Read 5 books',        metric: 'books_read',         target: 5   },
-                { emoji: '😴', label: 'Sleep 7h avg',        metric: 'avg_sleep',          target: 7   },
+                { emoji: 'lift', label: 'Bench 225 lbs',      metric: 'bench_1rm',         target: 225 },
+                { emoji: 'skate', label: 'Skate 100 miles',     metric: 'total_skate_miles',  target: 100 },
+                { emoji: 'run', label: 'Run 50 miles',        metric: 'total_cardio_miles', target: 50  },
+                { emoji: 'books', label: 'Read 5 books',        metric: 'books_read',         target: 5   },
+                { emoji: 'sleep', label: 'Sleep 7h avg',        metric: 'avg_sleep',          target: 7   },
               ].map(t => (
                 <button
                   key={t.metric}
@@ -379,7 +379,7 @@ export function Goals() {
                   onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
                   onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
                 >
-                  <span style={{ fontSize: 20 }}>{t.emoji}</span>
+                  
                   <span>{t.label}</span>
                   <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-muted)' }}>+ Add</span>
                 </button>

@@ -134,7 +134,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
       user_id: user.id, date, hours_slept: parseFloat(hours), is_nap: true,
     })
     setSaving(false)
-    setToast(`💤 Nap logged — ${hours}h`)
+    setToast(`Nap logged — ${hours}h`)
     setOpen(false)
     setHours('')
     onLogged()
@@ -147,7 +147,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all"
         style={{ background: 'rgba(255,255,255,0.04)', color: '#888', border: '1px solid rgba(255,255,255,0.1)', fontSize: 14 }}
       >
-        {open ? '✕ Cancel' : '💤 Log Nap'}
+        {open ? '✕ Cancel' : 'Log Nap'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -377,7 +377,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-bold text-sm" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>⏰ Wake Time Trainer</p>
+            <p className="font-bold text-sm" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Wake Time Trainer</p>
             <p style={{ color: '#888', fontSize: 11, marginTop: 2 }}>
               {avgWakeMins !== null
                 ? `Avg wake: ${fmtTime(avgWakeMins)} · Set a goal wake time`
@@ -394,7 +394,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
     <div className="rounded-xl mb-4 pop-in" style={{ background: 'rgba(10,12,28,0.95)', border: '1px solid rgba(245,166,35,0.25)' }}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <p className="font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 15 }}>⏰ Wake Time Trainer</p>
+        <p className="font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 15 }}>Wake Time Trainer</p>
         <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18 }}>✕</button>
       </div>
 
@@ -457,7 +457,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
         {deltaMinutes <= 0 && (
           <div className="rounded-lg p-3 flex items-center gap-2" style={{ background: 'rgba(46,204,113,0.08)', border: '1px solid rgba(46,204,113,0.2)' }}>
             <CheckIcon size={16} color="#2ECC71" />
-            <p style={{ color: '#2ECC71', fontSize: 13, fontWeight: 600 }}>You're already at or ahead of your goal! 🎉</p>
+            <p style={{ color: '#2ECC71', fontSize: 13, fontWeight: 600 }}>You're already at or ahead of your goal!</p>
           </div>
         )}
 
@@ -530,7 +530,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                       {/* Day number */}
                       <div style={{ width: 28, textAlign: 'center', flexShrink: 0 }}>
                         {isGoalDay
-                          ? <span style={{ fontSize: 16 }}>🏁</span>
+                          ? <CheckIcon size={14} color="#2ECC71" />
                           : onTrack === true
                             ? <CheckIcon size={14} color="#2ECC71" />
                             : <span style={{ color: isToday ? 'var(--accent)' : '#444', fontSize: 11, fontWeight: 700 }}>D{i + 1}</span>
@@ -664,7 +664,7 @@ export function Sleep() {
         {/* Hours slept trend */}
         {sorted.length > 0 && sorted.length < 3 && (
           <div style={{ textAlign: 'center', padding: '14px 0 8px', color: 'var(--text-muted)', fontSize: 12 }}>
-            📈 Log {3 - sorted.length} more night{3 - sorted.length > 1 ? 's' : ''} to unlock your trend chart
+            Log {3 - sorted.length} more night{3 - sorted.length > 1 ? 's' : ''} to unlock your trend chart
           </div>
         )}
         {sorted.length >= 3 && (

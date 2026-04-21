@@ -20,7 +20,7 @@ export const THEMES: Theme[] = [
   {
     id: 'crimson',
     name: 'Crimson',
-    emoji: '🔴',
+    emoji: 'Red',
     accent: '#E94560',
     accentDim: 'rgba(233,69,96,0.2)',
     orb1: 'rgba(233,69,96,0.24)',
@@ -35,7 +35,7 @@ export const THEMES: Theme[] = [
   {
     id: 'wine',
     name: 'Wine',
-    emoji: '🍷',
+    emoji: 'Wine',
     accent: '#C44569',
     accentDim: 'rgba(196,69,105,0.2)',
     orb1: 'rgba(196,69,105,0.22)',
@@ -50,7 +50,7 @@ export const THEMES: Theme[] = [
   {
     id: 'rose',
     name: 'Rose',
-    emoji: '🌹',
+    emoji: 'Rose',
     accent: '#FB7185',
     accentDim: 'rgba(251,113,133,0.2)',
     orb1: 'rgba(251,113,133,0.2)',
@@ -65,7 +65,7 @@ export const THEMES: Theme[] = [
   {
     id: 'sakura',
     name: 'Sakura',
-    emoji: '🌸',
+    emoji: 'Sakura',
     accent: '#FF6B9D',
     accentDim: 'rgba(255,107,157,0.2)',
     orb1: 'rgba(255,107,157,0.22)',
@@ -80,7 +80,7 @@ export const THEMES: Theme[] = [
   {
     id: 'neon',
     name: 'Neon Pink',
-    emoji: '💜',
+    emoji: 'Purple',
     accent: '#F472B6',
     accentDim: 'rgba(244,114,182,0.2)',
     orb1: 'rgba(244,114,182,0.2)',
@@ -97,7 +97,7 @@ export const THEMES: Theme[] = [
   {
     id: 'ember',
     name: 'Ember',
-    emoji: '🔥',
+    emoji: 'Fire',
     accent: '#FF6B35',
     accentDim: 'rgba(255,107,53,0.2)',
     orb1: 'rgba(255,107,53,0.22)',
@@ -112,7 +112,7 @@ export const THEMES: Theme[] = [
   {
     id: 'rust',
     name: 'Rust',
-    emoji: '🦀',
+    emoji: 'Rust',
     accent: '#E07B54',
     accentDim: 'rgba(224,123,84,0.2)',
     orb1: 'rgba(224,123,84,0.2)',
@@ -127,7 +127,7 @@ export const THEMES: Theme[] = [
   {
     id: 'copper',
     name: 'Copper',
-    emoji: '🟤',
+    emoji: 'Brown',
     accent: '#E8956D',
     accentDim: 'rgba(232,149,109,0.2)',
     orb1: 'rgba(232,149,109,0.18)',
@@ -142,7 +142,7 @@ export const THEMES: Theme[] = [
   {
     id: 'dusk',
     name: 'Dusk',
-    emoji: '🌅',
+    emoji: 'Dusk',
     accent: '#F0A500',
     accentDim: 'rgba(240,165,0,0.2)',
     orb1: 'rgba(240,100,60,0.2)',
@@ -157,7 +157,7 @@ export const THEMES: Theme[] = [
   {
     id: 'gold',
     name: 'Gold Rush',
-    emoji: '⚡',
+    emoji: 'Zap',
     accent: '#F5A623',
     accentDim: 'rgba(245,166,35,0.22)',
     orb1: 'rgba(123,47,190,0.25)',
@@ -172,7 +172,7 @@ export const THEMES: Theme[] = [
   {
     id: 'amber',
     name: 'Amber',
-    emoji: '🟡',
+    emoji: 'Yellow',
     accent: '#FBBF24',
     accentDim: 'rgba(251,191,36,0.2)',
     orb1: 'rgba(251,191,36,0.18)',
@@ -189,7 +189,7 @@ export const THEMES: Theme[] = [
   {
     id: 'walnut',
     name: 'Walnut',
-    emoji: '🌰',
+    emoji: 'Nut',
     accent: '#D4956A',
     accentDim: 'rgba(212,149,106,0.2)',
     orb1: 'rgba(212,149,106,0.16)',
@@ -204,7 +204,7 @@ export const THEMES: Theme[] = [
   {
     id: 'mocha',
     name: 'Mocha',
-    emoji: '☕',
+    emoji: 'Coffee',
     accent: '#C4956A',
     accentDim: 'rgba(196,149,106,0.2)',
     orb1: 'rgba(196,149,106,0.18)',
@@ -221,7 +221,7 @@ export const THEMES: Theme[] = [
   {
     id: 'matrix',
     name: 'Matrix',
-    emoji: '💻',
+    emoji: 'Code',
     accent: '#00FF41',
     accentDim: 'rgba(0,255,65,0.2)',
     orb1: 'rgba(0,255,65,0.14)',
@@ -236,7 +236,7 @@ export const THEMES: Theme[] = [
   {
     id: 'forest',
     name: 'Dark Forest',
-    emoji: '🌲',
+    emoji: 'Tree',
     accent: '#2ECC71',
     accentDim: 'rgba(46,204,113,0.2)',
     orb1: 'rgba(39,174,96,0.22)',
@@ -251,7 +251,7 @@ export const THEMES: Theme[] = [
   {
     id: 'jade',
     name: 'Jade',
-    emoji: '🟢',
+    emoji: 'Green',
     accent: '#34D399',
     accentDim: 'rgba(52,211,153,0.2)',
     orb1: 'rgba(52,211,153,0.18)',
@@ -266,7 +266,7 @@ export const THEMES: Theme[] = [
   {
     id: 'sage',
     name: 'Sage',
-    emoji: '🌿',
+    emoji: 'Sage',
     accent: '#86EFAC',
     accentDim: 'rgba(134,239,172,0.2)',
     orb1: 'rgba(134,239,172,0.15)',
@@ -281,7 +281,7 @@ export const THEMES: Theme[] = [
   {
     id: 'teal',
     name: 'Teal',
-    emoji: '🩵',
+    emoji: 'Teal',
     accent: '#2DD4BF',
     accentDim: 'rgba(45,212,191,0.2)',
     orb1: 'rgba(45,212,191,0.18)',
@@ -298,7 +298,7 @@ export const THEMES: Theme[] = [
   {
     id: 'cyber',
     name: 'Neon Cyber',
-    emoji: '🔵',
+    emoji: 'Blue',
     accent: '#00EEFF',
     accentDim: 'rgba(0,238,255,0.2)',
     orb1: 'rgba(255,0,120,0.2)',
@@ -313,7 +313,7 @@ export const THEMES: Theme[] = [
   {
     id: 'arctic',
     name: 'Arctic',
-    emoji: '❄️',
+    emoji: 'Ice',
     accent: '#67E8F9',
     accentDim: 'rgba(103,232,249,0.2)',
     orb1: 'rgba(103,232,249,0.16)',
@@ -328,7 +328,7 @@ export const THEMES: Theme[] = [
   {
     id: 'ice',
     name: 'Arctic Ice',
-    emoji: '🧊',
+    emoji: 'Frost',
     accent: '#7FDBFF',
     accentDim: 'rgba(127,219,255,0.2)',
     orb1: 'rgba(127,219,255,0.18)',
@@ -343,7 +343,7 @@ export const THEMES: Theme[] = [
   {
     id: 'cobalt',
     name: 'Cobalt',
-    emoji: '💙',
+    emoji: 'Cobalt',
     accent: '#2D9BF0',
     accentDim: 'rgba(45,155,240,0.2)',
     orb1: 'rgba(45,155,240,0.2)',
@@ -358,7 +358,7 @@ export const THEMES: Theme[] = [
   {
     id: 'ocean',
     name: 'Deep Ocean',
-    emoji: '🌊',
+    emoji: 'Ocean',
     accent: '#3498DB',
     accentDim: 'rgba(52,152,219,0.2)',
     orb1: 'rgba(52,152,219,0.22)',
@@ -373,7 +373,7 @@ export const THEMES: Theme[] = [
   {
     id: 'midnight',
     name: 'Midnight',
-    emoji: '🌑',
+    emoji: 'Night',
     accent: '#4B9FFF',
     accentDim: 'rgba(75,159,255,0.2)',
     orb1: 'rgba(75,159,255,0.16)',
@@ -388,7 +388,7 @@ export const THEMES: Theme[] = [
   {
     id: 'navy',
     name: 'Navy',
-    emoji: '🌐',
+    emoji: 'Globe',
     accent: '#5B8DEF',
     accentDim: 'rgba(91,141,239,0.2)',
     orb1: 'rgba(91,141,239,0.18)',
@@ -403,7 +403,7 @@ export const THEMES: Theme[] = [
   {
     id: 'storm',
     name: 'Storm',
-    emoji: '⛈️',
+    emoji: 'Storm',
     accent: '#60A5FA',
     accentDim: 'rgba(96,165,250,0.2)',
     orb1: 'rgba(96,165,250,0.15)',
@@ -418,7 +418,7 @@ export const THEMES: Theme[] = [
   {
     id: 'void',
     name: 'Void',
-    emoji: '🕳️',
+    emoji: 'Void',
     accent: '#7DD3FC',
     accentDim: 'rgba(125,211,252,0.2)',
     orb1: 'rgba(125,211,252,0.1)',
@@ -435,7 +435,7 @@ export const THEMES: Theme[] = [
   {
     id: 'indigo',
     name: 'Indigo',
-    emoji: '🔷',
+    emoji: 'Indigo',
     accent: '#818CF8',
     accentDim: 'rgba(129,140,248,0.2)',
     orb1: 'rgba(129,140,248,0.2)',
@@ -450,7 +450,7 @@ export const THEMES: Theme[] = [
   {
     id: 'slate',
     name: 'Slate',
-    emoji: '🪨',
+    emoji: 'Rock',
     accent: '#7C83FD',
     accentDim: 'rgba(124,131,253,0.2)',
     orb1: 'rgba(124,131,253,0.18)',
@@ -465,7 +465,7 @@ export const THEMES: Theme[] = [
   {
     id: 'galaxy',
     name: 'Galaxy',
-    emoji: '🌌',
+    emoji: 'Galaxy',
     accent: '#A855F7',
     accentDim: 'rgba(168,85,247,0.2)',
     orb1: 'rgba(168,85,247,0.26)',
@@ -480,7 +480,7 @@ export const THEMES: Theme[] = [
   {
     id: 'grape',
     name: 'Grape',
-    emoji: '🍇',
+    emoji: 'Grape',
     accent: '#B066FF',
     accentDim: 'rgba(176,102,255,0.2)',
     orb1: 'rgba(176,102,255,0.2)',
@@ -495,7 +495,7 @@ export const THEMES: Theme[] = [
   {
     id: 'plum',
     name: 'Plum',
-    emoji: '🫐',
+    emoji: 'Plum',
     accent: '#C084FC',
     accentDim: 'rgba(192,132,252,0.2)',
     orb1: 'rgba(192,132,252,0.2)',
@@ -512,7 +512,7 @@ export const THEMES: Theme[] = [
   {
     id: 'sunrise',
     name: 'Sunrise',
-    emoji: '🌄',
+    emoji: 'Dawn',
     accent: '#FF8C69',
     accentDim: 'rgba(255,140,105,0.22)',
     orb1: 'rgba(255,140,105,0.26)',
@@ -527,7 +527,7 @@ export const THEMES: Theme[] = [
   {
     id: 'hellfire',
     name: 'Hellfire',
-    emoji: '🔴',
+    emoji: 'Red',
     accent: '#FF3D00',
     accentDim: 'rgba(255,61,0,0.22)',
     orb1: 'rgba(255,61,0,0.28)',
@@ -542,7 +542,7 @@ export const THEMES: Theme[] = [
   {
     id: 'cherry',
     name: 'Cherry',
-    emoji: '🍒',
+    emoji: 'Cherry',
     accent: '#DC143C',
     accentDim: 'rgba(220,20,60,0.22)',
     orb1: 'rgba(220,20,60,0.24)',
@@ -557,7 +557,7 @@ export const THEMES: Theme[] = [
   {
     id: 'lemon',
     name: 'Lemon',
-    emoji: '🍋',
+    emoji: 'Lemon',
     accent: '#FFE03A',
     accentDim: 'rgba(255,224,58,0.2)',
     orb1: 'rgba(255,224,58,0.18)',
@@ -572,7 +572,7 @@ export const THEMES: Theme[] = [
   {
     id: 'lime',
     name: 'Lime',
-    emoji: '💚',
+    emoji: 'Lime',
     accent: '#B2FF59',
     accentDim: 'rgba(178,255,89,0.2)',
     orb1: 'rgba(178,255,89,0.16)',
@@ -587,7 +587,7 @@ export const THEMES: Theme[] = [
   {
     id: 'toxic',
     name: 'Toxic',
-    emoji: '☢️',
+    emoji: 'Toxic',
     accent: '#ADFF2F',
     accentDim: 'rgba(173,255,47,0.2)',
     orb1: 'rgba(173,255,47,0.18)',
@@ -602,7 +602,7 @@ export const THEMES: Theme[] = [
   {
     id: 'aurora',
     name: 'Aurora',
-    emoji: '🌌',
+    emoji: 'Galaxy',
     accent: '#64FFDA',
     accentDim: 'rgba(100,255,218,0.2)',
     orb1: 'rgba(100,255,218,0.20)',
@@ -617,7 +617,7 @@ export const THEMES: Theme[] = [
   {
     id: 'sky',
     name: 'Sky',
-    emoji: '🌤️',
+    emoji: 'Sky',
     accent: '#38BDF8',
     accentDim: 'rgba(56,189,248,0.2)',
     orb1: 'rgba(56,189,248,0.22)',
@@ -632,7 +632,7 @@ export const THEMES: Theme[] = [
   {
     id: 'lavender',
     name: 'Lavender',
-    emoji: '💜',
+    emoji: 'Purple',
     accent: '#C4B5FD',
     accentDim: 'rgba(196,181,253,0.2)',
     orb1: 'rgba(196,181,253,0.18)',
@@ -647,7 +647,7 @@ export const THEMES: Theme[] = [
   {
     id: 'blush',
     name: 'Blush',
-    emoji: '🌸',
+    emoji: 'Sakura',
     accent: '#FFB7C5',
     accentDim: 'rgba(255,183,197,0.2)',
     orb1: 'rgba(255,183,197,0.18)',
@@ -662,7 +662,7 @@ export const THEMES: Theme[] = [
   {
     id: 'bronze',
     name: 'Bronze',
-    emoji: '🥉',
+    emoji: 'Bronze',
     accent: '#CD7F32',
     accentDim: 'rgba(205,127,50,0.22)',
     orb1: 'rgba(205,127,50,0.22)',
@@ -677,7 +677,7 @@ export const THEMES: Theme[] = [
   {
     id: 'sand',
     name: 'Sand',
-    emoji: '🏜️',
+    emoji: 'Sand',
     accent: '#D4A574',
     accentDim: 'rgba(212,165,116,0.2)',
     orb1: 'rgba(212,165,116,0.16)',
@@ -692,7 +692,7 @@ export const THEMES: Theme[] = [
   {
     id: 'pine',
     name: 'Pine',
-    emoji: '🌲',
+    emoji: 'Tree',
     accent: '#4CAF72',
     accentDim: 'rgba(76,175,114,0.2)',
     orb1: 'rgba(76,175,114,0.18)',
@@ -707,7 +707,7 @@ export const THEMES: Theme[] = [
   {
     id: 'mercury',
     name: 'Mercury',
-    emoji: '🪨',
+    emoji: 'Rock',
     accent: '#E2E8F0',
     accentDim: 'rgba(226,232,240,0.16)',
     orb1: 'rgba(226,232,240,0.10)',
@@ -724,7 +724,7 @@ export const THEMES: Theme[] = [
   {
     id: 'steel',
     name: 'Steel',
-    emoji: '⚙️',
+    emoji: 'Gear',
     accent: '#94A3B8',
     accentDim: 'rgba(148,163,184,0.2)',
     orb1: 'rgba(148,163,184,0.14)',
@@ -739,7 +739,7 @@ export const THEMES: Theme[] = [
   {
     id: 'ash',
     name: 'Ash',
-    emoji: '🌫️',
+    emoji: 'Ash',
     accent: '#A0AEC0',
     accentDim: 'rgba(160,174,192,0.2)',
     orb1: 'rgba(160,174,192,0.12)',
@@ -754,7 +754,7 @@ export const THEMES: Theme[] = [
   {
     id: 'carbon',
     name: 'Carbon',
-    emoji: '🖤',
+    emoji: 'Carbon',
     accent: '#CBD5E0',
     accentDim: 'rgba(203,213,224,0.15)',
     orb1: 'rgba(203,213,224,0.08)',

@@ -10,12 +10,12 @@ export interface SkillDef {
 }
 
 export const SKILL_DEFS: Record<SkillKey, SkillDef> = {
-  lifting:  { key: 'lifting',  label: 'Lifting',  icon: '🏋️', description: 'Consistency and strength in the gym' },
-  skating:  { key: 'skating',  label: 'Skating',  icon: '🛼', description: 'Total miles and sessions on wheels' },
-  reading:  { key: 'reading',  label: 'Reading',  icon: '📚', description: 'Books consumed and knowledge gained' },
-  fortnite: { key: 'fortnite', label: 'Fortnite', icon: '🎮', description: 'Victory Royales and eliminations' },
-  sleep:    { key: 'sleep',    label: 'Sleep',    icon: '😴', description: 'Consistency and quality of rest' },
-  cardio:   { key: 'cardio',   label: 'Cardio',   icon: '🏃', description: 'Miles of running, cycling, and swimming' },
+  lifting:  { key: 'lifting',  label: 'Lifting',  icon: 'lifting',  description: 'Consistency and strength in the gym' },
+  skating:  { key: 'skating',  label: 'Skating',  icon: 'skate',    description: 'Total miles and sessions on wheels' },
+  reading:  { key: 'reading',  label: 'Reading',  icon: 'books',    description: 'Books consumed and knowledge gained' },
+  fortnite: { key: 'fortnite', label: 'Fortnite', icon: 'fortnite', description: 'Victory Royales and eliminations' },
+  sleep:    { key: 'sleep',    label: 'Sleep',    icon: 'sleep',    description: 'Consistency and quality of rest' },
+  cardio:   { key: 'cardio',   label: 'Cardio',   icon: 'cardio',   description: 'Miles of running, cycling, and swimming' },
 }
 
 // Skill titles — tiered progression from Beginner to Godlike

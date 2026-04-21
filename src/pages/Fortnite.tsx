@@ -16,7 +16,7 @@ import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import type { FortniteGame } from '../types'
-import { TrophyIcon, StarIcon, EditIcon } from '../components/ui/Icon'
+import { TrophyIcon, StarIcon, EditIcon, ZapIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Log panel ─────────────────────────────────────────────────────
@@ -285,7 +285,7 @@ export function Fortnite() {
         {/* Blitz row */}
         <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)' }}>
           <div className="flex items-center gap-2">
-            <span style={{ fontSize: 16 }}>⚡</span>
+            <ZapIcon size={16} color="#a855f7" />
             <p style={{ fontSize: 13, fontWeight: 700, color: '#a855f7', fontFamily: 'Cinzel, serif' }}>Blitz Wins</p>
           </div>
           <p style={{ fontSize: 22, fontWeight: 900, color: '#a855f7', fontFamily: 'Cinzel, serif' }}>{blitzWins}</p>

@@ -8,7 +8,7 @@ import { useStore } from '../store/useStore'
 import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme, timeThemeEnabled, setTimeThemeEnabled, applyTimeOrSavedTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
-import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon } from '../components/ui/Icon'
+import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon } from '../components/ui/Icon'
 import { toRoman } from '../lib/utils'
 import {
   SECTION_DEFS, DEFAULT_ORDER,
@@ -283,7 +283,7 @@ export function Settings() {
                   </div>
                 )}
               </button>
-              <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center pointer-events-none" style={{ background: 'var(--accent)', color: 'var(--base-bg)', fontSize: 10 }}>📷</div>
+              <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center pointer-events-none" style={{ background: 'var(--accent)', color: 'var(--base-bg)', fontSize: 10 }}>+</div>
               <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
             </div>
 
@@ -342,7 +342,7 @@ export function Settings() {
             textAlign: 'left',
           }}
         >
-          <span style={{ fontSize: 16 }}>🎮</span>
+          <GamepadIcon size={16} color="var(--accent)" />
           Restart App Tutorial
         </button>
 
@@ -418,7 +418,7 @@ export function Settings() {
           {/* Time of day auto-theme row */}
           <div className="flex items-center justify-between py-2">
             <div className="flex items-center gap-3">
-              <span style={{ fontSize: 20, width: 28, textAlign: 'center' }}>🕐</span>
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><CalendarIcon size={18} color="var(--text-secondary)" /></span>
               <div>
                 <p className="font-semibold text-sm text-white">Time of Day Theme</p>
                 <p style={{ color: '#444', fontSize: 11 }}>
@@ -465,12 +465,12 @@ export function Settings() {
                       className="flex items-center gap-3 py-2 px-3 rounded-xl"
                       style={{ background: isHidden ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.05)', opacity: isHidden ? 0.5 : 1 }}
                     >
-                      <span className="text-base">{def.icon}</span>
+                      <SectionIcon sectionKey={key} size={18} color="var(--text-secondary)" />
                       <span className="flex-1 font-medium" style={{ color: isHidden ? '#555' : '#CCC', fontFamily: 'Cormorant Garamond, serif', fontSize: 15 }}>{def.label}</span>
                       <button onClick={() => moveSection(key, -1)} disabled={idx === 0} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === 0 ? '#333' : '#777', background: 'rgba(255,255,255,0.06)' }}>↑</button>
                       <button onClick={() => moveSection(key, 1)} disabled={idx === sectionOrder.length - 1} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === sectionOrder.length - 1 ? '#333' : '#777', background: 'rgba(255,255,255,0.06)' }}>↓</button>
                       <button onClick={() => toggleHidden(key)} className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: isHidden ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)' }}>
-                        {isHidden ? '🙈' : '👁️'}
+                        {isHidden ? 'Hide' : 'Show'}
                       </button>
                     </div>
                   )
@@ -487,9 +487,7 @@ export function Settings() {
         <Card className="mb-2">
           <button onClick={() => setSoundOpen(o => !o)} className="w-full flex items-center justify-between py-2">
             <div className="flex items-center gap-3">
-              <span style={{ fontSize: 20, width: 28, textAlign: 'center' }}>
-                {sfx || ambient ? (volume < 0.15 ? '🔇' : '🔊') : '🔇'}
-              </span>
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><ActivityIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
                 <p className="font-semibold text-sm text-white">Sound</p>
                 <p style={{ color: '#444', fontSize: 11 }}>
@@ -520,7 +518,7 @@ export function Settings() {
 
               {/* Volume */}
               <div className="flex items-center gap-3 py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                <span style={{ width: 28, textAlign: 'center' }}>{volume < 0.15 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}</span>
+                <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ActivityIcon size={16} color="#555" /></span>
                 <div className="flex-1">
                   <p className="text-white text-sm font-medium mb-1">Volume</p>
                   <input
@@ -548,7 +546,7 @@ export function Settings() {
                           border: isActive ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.05)',
                         }}
                       >
-                        <span style={{ fontSize: 18, flexShrink: 0 }}>{scene.emoji}</span>
+                        <span style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700, flexShrink: 0, minWidth: 36, textAlign: 'center' }}>{scene.emoji}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-white">{scene.name}</p>
                           <p className="text-xs truncate" style={{ color: '#444' }}>{scene.description}</p>
@@ -594,7 +592,7 @@ export function Settings() {
         <Card className="mb-2">
           <button onClick={() => setDataOpen(o => !o)} className="w-full flex items-center justify-between py-2">
             <div className="flex items-center gap-3">
-              <span style={{ fontSize: 20, width: 28, textAlign: 'center' }}>🗄️</span>
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><DotsIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
                 <p className="font-semibold text-sm text-white">Data & Account</p>
                 <p style={{ color: '#444', fontSize: 11 }}>Export, delete · BenXP v1.0.0</p>
@@ -610,7 +608,7 @@ export function Settings() {
                 onClick={!exporting ? handleExportCSV : undefined}
               >
                 <div className="flex items-center gap-3">
-                  <span style={{ width: 28, textAlign: 'center' }}>📤</span>
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><ShareIcon size={16} color="#888" /></span>
                   <span className="text-white text-sm">{exporting ? 'Exporting...' : 'Export data as CSV'}</span>
                 </div>
                 <span style={{ color: '#555' }}>›</span>

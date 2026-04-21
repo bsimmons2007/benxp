@@ -280,7 +280,7 @@ export function Login() {
                       transition: 'color 0.15s ease',
                     }}
                   >
-                    {showPass ? '👁' : '🙈'}
+                    {showPass ? 'Hide' : 'Show'}
                   </button>
                 </div>
               </div>

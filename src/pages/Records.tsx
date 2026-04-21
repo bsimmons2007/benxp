@@ -30,28 +30,28 @@ interface ExerciseMeta {
 
 // Emoji per muscle group shown in the picker filter chips
 const MUSCLE_GROUP_ICONS: Record<string, string> = {
-  'Chest':           '🫁',
-  'Back':            '🔙',
-  'Shoulders':       '🦴',
-  'Biceps':          '💪',
-  'Triceps':         '💪',
-  'Legs':            '🦵',
-  'Glutes':          '🍑',
-  'Core':            '⚡',
-  'Cardio':          '🏃',
-  'Full Body':       '🏋️',
-  'Arms':            '💪',
-  'Hamstrings':      '🦵',
-  'Quads':           '🦵',
-  'Calves':          '🦵',
-  'Forearms':        '💪',
-  'Traps':           '🦴',
-  'Lats':            '🔙',
-  'Upper Back':      '🔙',
-  'Lower Back':      '🔙',
-  'Hip Flexors':     '🦵',
-  'Abs':             '⚡',
-  'Obliques':        '⚡',
+  'Chest':           '',
+  'Back':            '',
+  'Shoulders':       '',
+  'Biceps':          '',
+  'Triceps':         '',
+  'Legs':            '',
+  'Glutes':          '',
+  'Core':            '',
+  'Cardio':          '',
+  'Full Body':       '',
+  'Arms':            '',
+  'Hamstrings':      '',
+  'Quads':           '',
+  'Calves':          '',
+  'Forearms':        '',
+  'Traps':           '',
+  'Lats':            '',
+  'Upper Back':      '',
+  'Lower Back':      '',
+  'Hip Flexors':     '',
+  'Abs':             '',
+  'Obliques':        '',
 }
 
 function liftIcon(_name?: string, _group?: string) {
@@ -295,7 +295,7 @@ function ExerciseRow({
               cursor: 'pointer', letterSpacing: '0.06em',
             }}
           >
-            ⏱ {isTimed ? 'TIMED' : 'REPS'}
+            {isTimed ? 'TIMED' : 'REPS'}
           </button>
           {canRemove && (
             <button
@@ -513,7 +513,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       totalXP += sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0)
     }
 
-    const prMsg = prCount > 0 ? ` — ${prCount} PR${prCount > 1 ? 's' : ''}! 🎉` : ''
+    const prMsg = prCount > 0 ? ` — ${prCount} PR${prCount > 1 ? 's' : ''}!` : ''
     setToast(`+${totalXP} XP · ${valid.length} exercise${valid.length > 1 ? 's' : ''} logged${prMsg}`)
     if (lastMilestone) setMilestone(lastMilestone)
     await refreshXP()

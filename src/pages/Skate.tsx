@@ -182,7 +182,7 @@ export function Skate() {
         {/* Miles trend */}
         {milesTrend.length > 0 && milesTrend.length < 3 && (
           <div style={{ textAlign: 'center', padding: '14px 0 8px', color: 'var(--text-muted)', fontSize: 12 }}>
-            📈 Log {3 - milesTrend.length} more session{3 - milesTrend.length > 1 ? 's' : ''} to unlock your trend chart
+            Log {3 - milesTrend.length} more session{3 - milesTrend.length > 1 ? 's' : ''} to unlock your trend chart
           </div>
         )}
         {milesTrend.length >= 3 && (

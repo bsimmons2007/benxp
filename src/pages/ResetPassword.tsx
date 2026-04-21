@@ -114,7 +114,7 @@ export function ResetPassword() {
                     color: showPass ? 'var(--accent)' : '#555', fontSize: 15, padding: 3,
                   }}
                 >
-                  {showPass ? '👁' : '🙈'}
+                  {showPass ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
