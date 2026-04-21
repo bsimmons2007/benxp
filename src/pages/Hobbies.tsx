@@ -133,13 +133,13 @@ export function Hobbies() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
           <HobbyCard
-            icon={<GolfIcon size={28} color="#34d399" />}
-            label="Golf"
-            sub="Score vs par, putts & round history"
-            path="/golf"
-            accentColor="#34d399"
-            statLabel="rounds"
-            statValue={golfRounds ?? '—'}
+            icon={<ChessIcon size={28} color="#a78bfa" />}
+            label="Chess"
+            sub="ELO rating trend, W/D/L record"
+            path="/chess"
+            accentColor="#a78bfa"
+            statLabel="games"
+            statValue={chessGames ?? '—'}
           />
 
           <HobbyCard
@@ -153,6 +153,26 @@ export function Hobbies() {
           />
 
           <HobbyCard
+            icon={<GamepadIcon size={28} color="#a855f7" />}
+            label="Fortnite"
+            sub="Wins, kill streaks & placement"
+            path="/fortnite"
+            accentColor="#a855f7"
+            statLabel="wins"
+            statValue={fnWins ?? '—'}
+          />
+
+          <HobbyCard
+            icon={<GolfIcon size={28} color="#34d399" />}
+            label="Golf"
+            sub="Score vs par, putts & round history"
+            path="/golf"
+            accentColor="#34d399"
+            statLabel="rounds"
+            statValue={golfRounds ?? '—'}
+          />
+
+          <HobbyCard
             icon={<MountainIcon size={28} color="#84cc16" />}
             label="Hiking"
             sub="Trails, miles & elevation gain"
@@ -160,56 +180,6 @@ export function Hobbies() {
             accentColor="#84cc16"
             statLabel="miles"
             statValue={hikeMiles ?? '—'}
-          />
-
-          <HobbyCard
-            icon={<TableTennisIcon size={28} color="#38bdf8" />}
-            label="Table Tennis"
-            sub="Games, win rate & streak"
-            path="/table-tennis"
-            accentColor="#38bdf8"
-            statLabel="wins"
-            statValue={ttWins ?? '—'}
-          />
-
-          <HobbyCard
-            icon={<ChessIcon size={28} color="#a78bfa" />}
-            label="Chess"
-            sub="ELO rating trend, W/D/L record"
-            path="/chess"
-            accentColor="#a78bfa"
-            statLabel="games"
-            statValue={chessGames ?? '—'}
-          />
-
-          <HobbyCard
-            icon={<VolleyballIcon size={28} color="#f472b6" />}
-            label="Volleyball"
-            sub="Indoor & sand — wins, sets & stats"
-            path="/volleyball"
-            accentColor="#f472b6"
-            statLabel="wins"
-            statValue={vbWins ?? '—'}
-          />
-
-          <HobbyCard
-            icon={<SpikeballIcon size={28} color="#fb923c" />}
-            label="Spikeball"
-            sub="Wins, scores & partner tracking"
-            path="/spikeball"
-            accentColor="#fb923c"
-            statLabel="wins"
-            statValue={sbWins ?? '—'}
-          />
-
-          <HobbyCard
-            icon={<PoolIcon size={28} color="#c084fc" />}
-            label="Pool"
-            sub="8-Ball, 9-Ball, break & runs"
-            path="/pool"
-            accentColor="#c084fc"
-            statLabel="wins"
-            statValue={poolWins ?? '—'}
           />
 
           <HobbyCard
@@ -223,16 +193,6 @@ export function Hobbies() {
           />
 
           <HobbyCard
-            icon={<GamepadIcon size={28} color="#a855f7" />}
-            label="Fortnite"
-            sub="Wins, kill streaks & placement"
-            path="/fortnite"
-            accentColor="#a855f7"
-            statLabel="wins"
-            statValue={fnWins ?? '—'}
-          />
-
-          <HobbyCard
             icon={<TargetIcon size={28} color="#22c55e" />}
             label="Pickleball"
             sub="Wins, scores & win rate"
@@ -240,6 +200,46 @@ export function Hobbies() {
             accentColor="#22c55e"
             statLabel="wins"
             statValue={pbWins ?? '—'}
+          />
+
+          <HobbyCard
+            icon={<PoolIcon size={28} color="#c084fc" />}
+            label="Pool"
+            sub="8-Ball, 9-Ball, break & runs"
+            path="/pool"
+            accentColor="#c084fc"
+            statLabel="wins"
+            statValue={poolWins ?? '—'}
+          />
+
+          <HobbyCard
+            icon={<SpikeballIcon size={28} color="#fb923c" />}
+            label="Spikeball"
+            sub="Wins, scores & partner tracking"
+            path="/spikeball"
+            accentColor="#fb923c"
+            statLabel="wins"
+            statValue={sbWins ?? '—'}
+          />
+
+          <HobbyCard
+            icon={<TableTennisIcon size={28} color="#38bdf8" />}
+            label="Table Tennis"
+            sub="Games, win rate & streak"
+            path="/table-tennis"
+            accentColor="#38bdf8"
+            statLabel="wins"
+            statValue={ttWins ?? '—'}
+          />
+
+          <HobbyCard
+            icon={<VolleyballIcon size={28} color="#f472b6" />}
+            label="Volleyball"
+            sub="Indoor & sand — wins, sets & stats"
+            path="/volleyball"
+            accentColor="#f472b6"
+            statLabel="wins"
+            statValue={vbWins ?? '—'}
           />
 
         </div>
