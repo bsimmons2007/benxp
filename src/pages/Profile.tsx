@@ -19,21 +19,38 @@ import {
   BrainIcon, TargetIcon, CalendarIcon, ActivityIcon,
   CrownIcon, ShieldIcon, DiamondIcon, RocketIcon, MountainIcon,
   TrendingIcon, GridIcon, HeartIcon,
+  BasketballIcon, GolfIcon, DiscIcon, TableTennisIcon, ChessIcon,
+  VolleyballIcon, SpikeballIcon, PoolIcon,
 } from '../components/ui/Icon'
 import type { IconComponent } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const CATEGORY_LABELS: Record<Badge['category'], string> = {
-  general:    'General',
-  lifting:    'Lifting',
-  skate:      'Skating',
-  books:      'Books',
-  fortnite:   'Fortnite',
-  sleep:      'Sleep',
-  challenges: 'Challenges',
+  general:      'General',
+  lifting:      'Lifting',
+  skate:        'Skating',
+  books:        'Books',
+  fortnite:     'Fortnite',
+  sleep:        'Sleep',
+  challenges:   'Challenges',
+  basketball:   'Hoops',
+  pickleball:   'Pickleball',
+  golf:         'Golf',
+  disc_golf:    'Disc Golf',
+  hiking:       'Hiking',
+  table_tennis: 'Table Tennis',
+  chess:        'Chess',
+  pool:         'Pool',
+  volleyball:   'Volleyball',
+  spikeball:    'Spikeball',
+  cardio:       'Cardio',
 }
 
-const CATEGORY_ORDER: Badge['category'][] = ['general', 'lifting', 'skate', 'books', 'fortnite', 'sleep', 'challenges']
+const CATEGORY_ORDER: Badge['category'][] = [
+  'general', 'lifting', 'skate', 'cardio', 'books', 'sleep', 'challenges',
+  'fortnite', 'basketball', 'pickleball', 'golf', 'disc_golf', 'hiking',
+  'table_tennis', 'chess', 'pool', 'volleyball', 'spikeball',
+]
 
 // Unique icon per badge — every badge gets its own identity
 const BADGE_ICON: Record<string, IconComponent> = {
@@ -190,16 +207,93 @@ const BADGE_ICON: Record<string, IconComponent> = {
   sleep_perfect_20:    DiamondIcon,
   sleep_400h:          HeartIcon,
   sleep_1000h:         CrownIcon,
+  // ── Basketball ──────────────────────────────────────────
+  bb_first:            BasketballIcon,
+  bb_10_sessions:      BasketballIcon,
+  bb_century:          TrophyIcon,
+  bb_buckets:          FlameIcon,
+  bb_sharp:            TargetIcon,
+  // ── Pickleball ──────────────────────────────────────────
+  pb_first_win:        TargetIcon,
+  pb_10_wins:          TargetIcon,
+  pb_25_wins:          TrophyIcon,
+  pb_50_wins:          CrownIcon,
+  // ── Golf ────────────────────────────────────────────────
+  golf_first:          GolfIcon,
+  golf_18_holes:       GolfIcon,
+  golf_10_rounds:      TrophyIcon,
+  golf_under_par:      TargetIcon,
+  golf_eagle_round:    CrownIcon,
+  // ── Disc Golf ───────────────────────────────────────────
+  dg_first:            DiscIcon,
+  dg_10_rounds:        TrophyIcon,
+  dg_under_par:        TargetIcon,
+  dg_birdie_machine:   CrownIcon,
+  // ── Hiking ──────────────────────────────────────────────
+  hike_first:          MountainIcon,
+  hike_10mi:           MountainIcon,
+  hike_50mi:           TrophyIcon,
+  hike_100mi:          CrownIcon,
+  hike_summit:         RocketIcon,
+  hike_vert_mile:      DiamondIcon,
+  hike_expert:         ShieldIcon,
+  // ── Table Tennis ────────────────────────────────────────
+  tt_first_win:        TableTennisIcon,
+  tt_10_wins:          TrophyIcon,
+  tt_25_wins:          TrophyIcon,
+  tt_50_wins:          CrownIcon,
+  tt_shut_out:         DiamondIcon,
+  // ── Chess ───────────────────────────────────────────────
+  chess_first:         ChessIcon,
+  chess_first_win:     TrophyIcon,
+  chess_10_wins:       TrophyIcon,
+  chess_draw_5:        ShieldIcon,
+  chess_openings:      BrainIcon,
+  chess_1500:          DiamondIcon,
+  chess_1800:          CrownIcon,
+  // ── Pool ────────────────────────────────────────────────
+  pool_first_win:      PoolIcon,
+  pool_first_bar:      TrophyIcon,
+  pool_10_wins:        TrophyIcon,
+  pool_25_wins:        ShieldIcon,
+  pool_bar_10:         CrownIcon,
+  // ── Volleyball ──────────────────────────────────────────
+  vb_first_win:        VolleyballIcon,
+  vb_10_wins:          TrophyIcon,
+  vb_25_wins:          TrophyIcon,
+  vb_beach_bum:        StarIcon,
+  vb_net_master:       CrownIcon,
+  // ── Spikeball ───────────────────────────────────────────
+  sb_first_win:        SpikeballIcon,
+  sb_10_wins:          TrophyIcon,
+  sb_25_wins:          CrownIcon,
+  // ── Cardio ──────────────────────────────────────────────
+  cardio_first:        ActivityIcon,
+  cardio_5k:           ZapIcon,
+  cardio_10k:          RocketIcon,
+  cardio_half:         CrownIcon,
+  cardio_100mi:        TrophyIcon,
 }
 
 const CATEGORY_DEFAULT: Record<Badge['category'], IconComponent> = {
-  lifting:    DumbbellIcon,
-  skate:      SkateIcon,
-  books:      BookIcon,
-  fortnite:   GamepadIcon,
-  sleep:      MoonIcon,
-  challenges: SwordIcon,
-  general:    StarIcon,
+  general:      StarIcon,
+  lifting:      DumbbellIcon,
+  skate:        SkateIcon,
+  books:        BookIcon,
+  fortnite:     GamepadIcon,
+  sleep:        MoonIcon,
+  challenges:   SwordIcon,
+  basketball:   BasketballIcon,
+  pickleball:   TargetIcon,
+  golf:         GolfIcon,
+  disc_golf:    DiscIcon,
+  hiking:       MountainIcon,
+  table_tennis: TableTennisIcon,
+  chess:        ChessIcon,
+  pool:         PoolIcon,
+  volleyball:   VolleyballIcon,
+  spikeball:    SpikeballIcon,
+  cardio:       ActivityIcon,
 }
 
 function badgeIcon(badge: Badge, size = 22): ReactNode {
