@@ -15,9 +15,21 @@ import { supabase } from '../lib/supabase'
 import { formatDate, toRoman, localDateStr } from '../lib/utils'
 import { ArrowUpIcon, ArrowDownIcon, FlameIcon, ActivityIcon, BadgeIcon, ActivityIconComp } from '../components/ui/Icon'
 import { xpForLevel, getLevelTitle } from '../lib/xp'
+import { checkStreakBreakWarning } from '../lib/notifications'
 import { loadHiddenSections } from '../lib/sections'
 import { useStrengthSnapshot } from '../components/StrengthTab'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { StatCardSkeleton } from '../components/ui/Skeleton'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
+
+function getGreeting(): string {
+  const h = new Date().getHours()
+  if (h < 5)  return 'Up late'
+  if (h < 12) return 'Good morning'
+  if (h < 17) return 'Good afternoon'
+  if (h < 21) return 'Good evening'
+  return 'Good night'
+}
 
 // ── Types ────────────────────────────────────────────────────
 type TrendDir = 'up' | 'down' | 'flat'
@@ -167,11 +179,26 @@ export function Home() {
   const { totalXP, level, progress, loading } = useXP()
   const { stats }    = useStats()
   const activity     = useStore(s => s.recentActivity)
+  const refreshXP       = useStore(s => s.refreshXP)
+  const refreshActivity = useStore(s => s.refreshActivity)
   const trends       = useTrends()
   const userName     = useUserName()
   const { earned, loading: badgesLoading } = useAchievements()
   const streak       = useStreak()
+
+  // Fire streak-break warning once streak data loads
+  useEffect(() => {
+    if (!streak.loading) {
+      checkStreakBreakWarning(streak.current, streak.activeToday)
+    }
+  }, [streak.loading, streak.current, streak.activeToday])
+
   const toNext       = xpForLevel(level + 1) - totalXP
+  const nextTitle    = getLevelTitle(level + 1)
+  const { refreshing, pullDistance, threshold } = usePullToRefresh(async () => {
+    await refreshXP()
+    refreshActivity()
+  })
   const levelStyle   = (localStorage.getItem('benxp-level-style') as 'number' | 'roman') ?? 'number'
   const displayLevel = loading ? '—' : levelStyle === 'roman' ? toRoman(level) : String(level)
   const title        = getLevelTitle(level)
@@ -197,8 +224,43 @@ export function Home() {
       <TopBar />
       <PageWrapper>
 
+        {/* ── Pull-to-refresh indicator ── */}
+        {(pullDistance > 0 || refreshing) && (
+          <div style={{
+            position: 'fixed', top: 'calc(60px + env(safe-area-inset-top))', left: 0, right: 0,
+            display: 'flex', justifyContent: 'center', zIndex: 40, pointerEvents: 'none',
+            transform: `translateY(${Math.min(pullDistance, 40)}px)`,
+            transition: refreshing ? 'none' : 'transform 0.1s',
+          }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'rgba(12,14,30,0.92)', border: '1px solid var(--border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+            }}>
+              {refreshing ? (
+                <div className="spin" style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--accent)', borderTopColor: 'transparent' }} />
+              ) : (
+                <div style={{
+                  width: 14, height: 14, borderRadius: '50%',
+                  border: `2px solid ${pullDistance >= threshold ? 'var(--accent)' : '#444'}`,
+                  borderTopColor: 'transparent',
+                  transform: `rotate(${(pullDistance / threshold) * 360}deg)`,
+                  transition: 'border-color 0.15s',
+                }} />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Greeting ── */}
+        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12,
+          letterSpacing: '0.12em', textTransform: 'uppercase', paddingTop: 24 }}>
+          {getGreeting()}{userName ? `, ${userName}` : ''}
+        </p>
+
         {/* ── Level hero ── */}
-        <div className="text-center py-8">
+        <div className="text-center py-6">
 
           <h1
             className="xp-number glow-pulse"
@@ -220,7 +282,9 @@ export function Home() {
           <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 8 }}>
             {parseInt(animatedXP).toLocaleString()} XP
             <span style={{ color: 'var(--text-muted)', margin: '0 6px' }}>·</span>
-            <span style={{ color: 'var(--accent)' }}>{toNext.toLocaleString()} to next</span>
+            <span style={{ color: 'var(--accent)' }}>
+              {toNext.toLocaleString()} XP → {nextTitle}
+            </span>
           </p>
         </div>
 
@@ -274,7 +338,11 @@ export function Home() {
         </div>
 
         {/* ── Stats grid ── */}
-        {statCards.length > 0 && (
+        {loading ? (
+          <div className="grid grid-cols-3 gap-2 mb-5">
+            {[1,2,3,4,5,6].map(i => <StatCardSkeleton key={i} />)}
+          </div>
+        ) : statCards.length > 0 && (
           <div className="grid grid-cols-3 gap-2 mb-5">
             {statCards.map(c => {
               const card = (

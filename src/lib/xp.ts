@@ -40,7 +40,8 @@ export const XP_RATES = {
   new_pr:              200,   // PRs are rare, meaningful milestones
   book_finished:       250,   // finishing a book = hours of dedication
   skate_per_mile:       12,   // outdoor effort
-  fortnite_win:        100,   // wins happen frequently
+  fortnite_win:        100,   // wins happen frequently (~30 min game)
+  fortnite_blitz_win:   30,   // blitz wins (~5 min game, ~3x less XP)
   fortnite_kill:         3,   // kills contribute to global XP
   sleep_log:            20,   // consistency tracking matters
   sleep_quality_bonus:  35,   // reward disciplined sleep
@@ -107,7 +108,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     supabase.from('skate_sessions').select('miles'),
     supabase.from('pr_history').select('lift, est_1rm'),
     supabase.from('books').select('date_finished').not('date_finished', 'is', null),
-    supabase.from('fortnite_games').select('win, kills'),
+    supabase.from('fortnite_games').select('win, kills, mode'),
     supabase.from('challenges').select('xp_reward').eq('status', 'completed'),
     supabase.from('sleep_log').select('hours_slept').eq('is_nap', false),  // exclude naps
     supabase.from('cardio_sessions').select('distance_miles'),
@@ -140,8 +141,11 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
   const prXP        = prRows.length * XP_RATES.new_pr
   const bookXP      = bookRows.length * XP_RATES.book_finished
   const skateXP     = skateRows.reduce((s: number, r: { miles: number }) => s + (r.miles ?? 0), 0) * XP_RATES.skate_per_mile
-  const fnXP        = gameRows.reduce((s: number, r: { win: boolean; kills: number }) =>
-    s + (r.win ? XP_RATES.fortnite_win : 0) + ((r.kills ?? 0) * XP_RATES.fortnite_kill), 0)
+  const fnXP        = gameRows.reduce((s: number, r: { win: boolean; kills: number; mode?: string | null }) => {
+    const isBlitz = r.mode === 'Blitz' || (typeof r.mode === 'string' && r.mode.startsWith('Blitz '))
+    const winXP   = r.win ? (isBlitz ? XP_RATES.fortnite_blitz_win : XP_RATES.fortnite_win) : 0
+    return s + winXP + ((r.kills ?? 0) * XP_RATES.fortnite_kill)
+  }, 0)
   const challengeXP = (challenges.data ?? []).reduce((s: number, r: { xp_reward: number }) => s + (r.xp_reward ?? 0), 0)
   const sleepXP     = (sleepLogs.data ?? []).reduce(
     (s: number, r: { hours_slept: number | null }) =>

@@ -1,45 +1,47 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import type { ReactNode } from 'react'
 import { BottomNav } from './components/layout/BottomNav'
 import { SideNav } from './components/layout/SideNav'
+// Critical routes — always in the main bundle
 import { Home } from './pages/Home'
-import { Records } from './pages/Records'
-import { Challenges } from './pages/Challenges'
-import { Books } from './pages/Books'
-import { Sleep } from './pages/Sleep'
-import { Skate } from './pages/Skate'
-import { Fortnite } from './pages/Fortnite'
-import { More } from './pages/More'
-import { Settings } from './pages/Settings'
 import { Login } from './pages/Login'
-import { Profile } from './pages/Profile'
-import { Weekly } from './pages/Weekly'
-import { Monthly } from './pages/Monthly'
-import { Mood } from './pages/Mood'
-import { DevSettings } from './pages/DevSettings'
-import { ShareCard } from './pages/ShareCard'
-import { XPHistory } from './pages/XPHistory'
-import { Goals } from './pages/Goals'
-import { Cardio } from './pages/Cardio'
-import { Water } from './pages/Water'
-import { PRFeed } from './pages/PRFeed'
-import { Strength } from './pages/Strength'
-import { Measurements } from './pages/Measurements'
 import { ResetPassword } from './pages/ResetPassword'
-import { Basketball } from './pages/Basketball'
-import { Hobbies } from './pages/Hobbies'
-import { Pickleball } from './pages/Pickleball'
-import { Terms } from './pages/Terms'
-import { Privacy } from './pages/Privacy'
-import { Golf } from './pages/Golf'
-import { DiscGolf } from './pages/DiscGolf'
-import { Hiking } from './pages/Hiking'
-import { TableTennis } from './pages/TableTennis'
-import { Chess } from './pages/Chess'
-import { Volleyball } from './pages/Volleyball'
-import { Spikeball } from './pages/Spikeball'
-import { Pool } from './pages/Pool'
+// All other pages — code-split into their own chunks
+const Records      = lazy(() => import('./pages/Records').then(m => ({ default: m.Records })))
+const Challenges   = lazy(() => import('./pages/Challenges').then(m => ({ default: m.Challenges })))
+const Books        = lazy(() => import('./pages/Books').then(m => ({ default: m.Books })))
+const Sleep        = lazy(() => import('./pages/Sleep').then(m => ({ default: m.Sleep })))
+const Skate        = lazy(() => import('./pages/Skate').then(m => ({ default: m.Skate })))
+const Fortnite     = lazy(() => import('./pages/Fortnite').then(m => ({ default: m.Fortnite })))
+const More         = lazy(() => import('./pages/More').then(m => ({ default: m.More })))
+const Settings     = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })))
+const Profile      = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })))
+const Weekly       = lazy(() => import('./pages/Weekly').then(m => ({ default: m.Weekly })))
+const Monthly      = lazy(() => import('./pages/Monthly').then(m => ({ default: m.Monthly })))
+const Mood         = lazy(() => import('./pages/Mood').then(m => ({ default: m.Mood })))
+const DevSettings  = lazy(() => import('./pages/DevSettings').then(m => ({ default: m.DevSettings })))
+const ShareCard    = lazy(() => import('./pages/ShareCard').then(m => ({ default: m.ShareCard })))
+const XPHistory    = lazy(() => import('./pages/XPHistory').then(m => ({ default: m.XPHistory })))
+const Goals        = lazy(() => import('./pages/Goals').then(m => ({ default: m.Goals })))
+const Cardio       = lazy(() => import('./pages/Cardio').then(m => ({ default: m.Cardio })))
+const Water        = lazy(() => import('./pages/Water').then(m => ({ default: m.Water })))
+const PRFeed       = lazy(() => import('./pages/PRFeed').then(m => ({ default: m.PRFeed })))
+const Strength     = lazy(() => import('./pages/Strength').then(m => ({ default: m.Strength })))
+const Measurements = lazy(() => import('./pages/Measurements').then(m => ({ default: m.Measurements })))
+const Basketball   = lazy(() => import('./pages/Basketball').then(m => ({ default: m.Basketball })))
+const Hobbies      = lazy(() => import('./pages/Hobbies').then(m => ({ default: m.Hobbies })))
+const Pickleball   = lazy(() => import('./pages/Pickleball').then(m => ({ default: m.Pickleball })))
+const Terms        = lazy(() => import('./pages/Terms').then(m => ({ default: m.Terms })))
+const Privacy      = lazy(() => import('./pages/Privacy').then(m => ({ default: m.Privacy })))
+const Golf         = lazy(() => import('./pages/Golf').then(m => ({ default: m.Golf })))
+const DiscGolf     = lazy(() => import('./pages/DiscGolf').then(m => ({ default: m.DiscGolf })))
+const Hiking       = lazy(() => import('./pages/Hiking').then(m => ({ default: m.Hiking })))
+const TableTennis  = lazy(() => import('./pages/TableTennis').then(m => ({ default: m.TableTennis })))
+const Chess        = lazy(() => import('./pages/Chess').then(m => ({ default: m.Chess })))
+const Volleyball   = lazy(() => import('./pages/Volleyball').then(m => ({ default: m.Volleyball })))
+const Spikeball    = lazy(() => import('./pages/Spikeball').then(m => ({ default: m.Spikeball })))
+const Pool         = lazy(() => import('./pages/Pool').then(m => ({ default: m.Pool })))
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
@@ -171,6 +173,7 @@ function AppInner() {
         <TutorialOverlay onDone={() => setShowTutorial(false)} />
       )}
       {helpVisible && <ShortcutHelp onClose={() => setHelpVisible(false)} />}
+      <Suspense fallback={<div style={{ background: 'var(--base-bg)', minHeight: '100dvh' }} />}>
       <Routes>
         <Route path="/login"         element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
@@ -211,6 +214,7 @@ function AppInner() {
         <Route path="/spikeball"    element={<ProtectedRoute><Spikeball /></ProtectedRoute>} />
         <Route path="/pool"         element={<ProtectedRoute><Pool /></ProtectedRoute>} />
       </Routes>
+      </Suspense>
       {showNav && <BottomNav />}
       {showNav && <SideNav />}
 

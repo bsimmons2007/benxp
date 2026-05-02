@@ -42,6 +42,39 @@ export function permissionGranted(): boolean {
 // Call this on app load. Shows a notification if it's within 5 min of the
 // user's chosen reminder time AND they haven't been notified today yet.
 
+// ── Streak-break warning ──────────────────────────────────────────────────────
+// Call this after the streak loads if the user hasn't logged today yet.
+// Only fires when: streak ≥ 3, it's 6pm or later, and we haven't already
+// warned today.
+
+const STREAK_WARN_KEY = 'benxp-streak-warn-date'
+
+export function checkStreakBreakWarning(currentStreak: number, activeToday: boolean): void {
+  if (!permissionGranted()) return
+  if (activeToday) return                     // already logged — streak safe
+  if (currentStreak < 3) return               // streak not long enough to care about
+
+  const now   = new Date()
+  const today = now.toLocaleDateString('en-CA')
+  if (localStorage.getItem(STREAK_WARN_KEY) === today) return   // already warned today
+  if (now.getHours() < 18) return             // wait until 6pm
+
+  localStorage.setItem(STREAK_WARN_KEY, today)
+  try {
+    new Notification('BenXP — Streak at risk! 🔥', {
+      body: `Your ${currentStreak}-day streak will reset at midnight. Log something to keep it alive!`,
+      icon: '/favicon.svg',
+      badge: '/favicon.svg',
+    })
+  } catch {
+    // silently ignore
+  }
+}
+
+// ── Daily reminder check ──────────────────────────────────────────────────────
+// Call this on app load. Shows a notification if it's within 5 min of the
+// user's chosen reminder time AND they haven't been notified today yet.
+
 export function checkDailyReminder(): void {
   if (!permissionGranted()) return
   const prefs = getNotifPrefs()

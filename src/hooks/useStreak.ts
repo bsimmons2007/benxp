@@ -25,7 +25,11 @@ export function useStreak(): StreakData {
     if (streakCache && Date.now() - streakCache.ts < STREAK_TTL) return
 
     async function load() {
-      const [lifting, skate, games, books, sleep, mood, cardio] = await Promise.all([
+      const [
+        lifting, skate, games, books, sleep, mood, cardio,
+        basketball, pickleball, golf, discGolf, hiking,
+        tableTennis, chess, pool, volleyball, spikeball,
+      ] = await Promise.all([
         supabase.from('lifting_log').select('date'),
         supabase.from('skate_sessions').select('date'),
         supabase.from('fortnite_games').select('date'),
@@ -33,6 +37,16 @@ export function useStreak(): StreakData {
         supabase.from('sleep_log').select('date'),
         supabase.from('mood_log').select('date'),
         supabase.from('cardio_sessions').select('date'),
+        supabase.from('basketball_sessions').select('date'),
+        supabase.from('pickleball_games').select('date'),
+        supabase.from('golf_rounds').select('date'),
+        supabase.from('disc_golf_rounds').select('date'),
+        supabase.from('hiking_sessions').select('date'),
+        supabase.from('table_tennis_games').select('date'),
+        supabase.from('chess_games').select('date'),
+        supabase.from('pool_games').select('date'),
+        supabase.from('volleyball_sessions').select('date'),
+        supabase.from('spikeball_games').select('date'),
       ])
 
       const allDates = new Set<string>([
@@ -43,6 +57,16 @@ export function useStreak(): StreakData {
         ...(sleep.data ?? []).map((r: { date: string }) => r.date),
         ...(mood.data ?? []).map((r: { date: string }) => r.date),
         ...(cardio.data ?? []).map((r: { date: string }) => r.date),
+        ...(basketball.data ?? []).map((r: { date: string }) => r.date),
+        ...(pickleball.data ?? []).map((r: { date: string }) => r.date),
+        ...(golf.data ?? []).map((r: { date: string }) => r.date),
+        ...(discGolf.data ?? []).map((r: { date: string }) => r.date),
+        ...(hiking.data ?? []).map((r: { date: string }) => r.date),
+        ...(tableTennis.data ?? []).map((r: { date: string }) => r.date),
+        ...(chess.data ?? []).map((r: { date: string }) => r.date),
+        ...(pool.data ?? []).map((r: { date: string }) => r.date),
+        ...(volleyball.data ?? []).map((r: { date: string }) => r.date),
+        ...(spikeball.data ?? []).map((r: { date: string }) => r.date),
       ])
 
       const today = appToday()
