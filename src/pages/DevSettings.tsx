@@ -7,11 +7,12 @@ import { XP_RATES, calculateLevel, xpForLevel } from '../lib/xp'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── PIN gate ──────────────────────────────────────────────────────────
-// PIN is read from env so it is never shipped in the JS bundle.
-// Set VITE_DEV_PIN in .env.local (e.g. VITE_DEV_PIN=your-pin-here).
-// Falls back to a random value at build time so the gate is always locked
-// if the env var is absent.
-const DEV_PIN = import.meta.env.VITE_DEV_PIN as string | undefined ?? crypto.randomUUID()
+// In dev: use VITE_DEV_PIN from .env.local (never commit a real PIN to source).
+// In prod: always falls back to crypto.randomUUID() — Rollup dead-code-eliminates
+// the truthy branch so VITE_DEV_PIN is never present in the production bundle.
+const DEV_PIN: string = import.meta.env.DEV
+  ? ((import.meta.env.VITE_DEV_PIN as string | undefined) ?? crypto.randomUUID())
+  : crypto.randomUUID()
 const SESSION_KEY = 'youxp-dev-unlocked'
 
 function PinGate({ onUnlock }: { onUnlock: () => void }) {

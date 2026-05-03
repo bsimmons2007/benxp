@@ -72,17 +72,20 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const miles = parseFloat(data.distance)
+    // Guard against NaN / negative values from cleared or malformed input (P1-13)
+    if (!isFinite(miles) || miles <= 0) return
 
     if (isSkate) {
-      await supabase.from('skate_sessions').insert({
+      const { error } = await supabase.from('skate_sessions').insert({
         user_id: user.id,
         date: data.date,
         miles,
         duration: data.duration_mins ? `${data.duration_mins}m` : null,
         fastest_mile: data.fastest_mile ? parseFloat(data.fastest_mile) : null,
       })
+      if (error) { setToast('Failed to save. Please try again.'); return }
     } else {
-      await supabase.from('cardio_sessions').insert({
+      const { error } = await supabase.from('cardio_sessions').insert({
         user_id: user.id,
         date: data.date,
         activity: data.activity,
@@ -90,6 +93,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
         duration_mins: data.duration_mins ? parseInt(data.duration_mins) : null,
         notes: data.notes || null,
       })
+      if (error) { setToast('Failed to save. Please try again.'); return }
     }
 
     const xp = isSkate

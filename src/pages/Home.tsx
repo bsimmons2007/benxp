@@ -196,8 +196,7 @@ export function Home() {
   const toNext       = xpForLevel(level + 1) - totalXP
   const nextTitle    = getLevelTitle(level + 1)
   const { refreshing, pullDistance, threshold } = usePullToRefresh(async () => {
-    await refreshXP()
-    refreshActivity()
+    await Promise.all([refreshXP(), refreshActivity()])
   })
   const levelStyle   = (localStorage.getItem('benxp-level-style') as 'number' | 'roman') ?? 'number'
   const displayLevel = loading ? '—' : levelStyle === 'roman' ? toRoman(level) : String(level)
@@ -215,7 +214,7 @@ export function Home() {
       { label: 'Strength SQ', value: strengthSQ !== null ? String(strengthSQ) : '—', unit: '/100', to: '/strength' },
     ] : []),
     ...(!hidden.includes('skate')    ? [{ label: 'Total Miles', value: stats.totalMiles.toFixed(1), unit: 'mi', trendKey: 'miles' }] : []),
-    ...(!hidden.includes('books')    ? [{ label: `Books ${new Date().getFullYear()}`,  value: stats.books2026, trendKey: 'books' }] : []),
+    ...(!hidden.includes('books')    ? [{ label: `Books ${new Date().getFullYear()}`,  value: stats.booksThisYear, trendKey: 'books' }] : []),
     ...(!hidden.includes('fortnite') ? [{ label: 'FN Wins',     value: stats.winCount,  trendKey: 'wins'  }] : []),
   ]
 
@@ -280,7 +279,7 @@ export function Home() {
           </p>
 
           <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 8 }}>
-            {parseInt(animatedXP).toLocaleString()} XP
+            {Number(animatedXP).toLocaleString()} XP
             <span style={{ color: 'var(--text-muted)', margin: '0 6px' }}>·</span>
             <span style={{ color: 'var(--accent)' }}>
               {toNext.toLocaleString()} XP → {nextTitle}
@@ -311,9 +310,9 @@ export function Home() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <p className="section-label">Badges</p>
-              <a href="/profile" style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 600 }}>
+              <Link to="/profile" style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 600 }}>
                 See all →
-              </a>
+              </Link>
             </div>
             <div className="flex gap-2 flex-wrap">
               {recentBadges.map(b => (
@@ -371,8 +370,8 @@ export function Home() {
             </div>
           ) : (
             <div className="flex flex-col gap-2.5">
-              {activity.map((a, i) => (
-                <div key={i} className="flex items-center justify-between">
+              {activity.map((a) => (
+                <div key={`${a.type}-${a.date}-${a.label}`} className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <ActivityIconComp activityKey={a.icon} size={17} color="var(--text-muted)" />
                     <span style={{ fontSize: 13, color: 'var(--text-primary)' }}>{a.label}</span>

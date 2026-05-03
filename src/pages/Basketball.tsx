@@ -11,7 +11,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
-import { today, formatDate } from '../lib/utils'
+import { today, formatDate, localDateStr } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
@@ -32,7 +32,7 @@ function fmt(n: number, decimals = 1) {
 function localDate(daysAgo = 0) {
   const d = new Date()
   d.setDate(d.getDate() - daysAgo)
-  return d.toLocaleDateString('en-CA')
+  return localDateStr(d)
 }
 
 // ── Log form ─────────────────────────────────────────────────────

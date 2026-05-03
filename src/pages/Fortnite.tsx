@@ -411,7 +411,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (isWin) {
       playPR()
-      setToast(`+${XP_RATES.fortnite_win} XP — Blitz Victory!`)
+      setToast(`+${XP_RATES.fortnite_blitz_win} XP — Blitz Victory!`)
     } else {
       playXPGain()
       setToast('Blitz game logged!')

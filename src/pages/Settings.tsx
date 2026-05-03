@@ -43,10 +43,15 @@ const XP_BREAKDOWN: { label: string; icon: ReactNode; xp: string }[] = [
   { label: 'Goal completed',        icon: <TargetIcon    size={14} color={C} />, xp: 'Variable' },
 ]
 
+// All tables that hold user data. body_measurements is the correct table
+// for weight/measurements — bodyweight_log does not exist (P0-5 fix).
 const ALL_TABLES = [
   'lifting_log', 'skate_sessions', 'pr_history', 'books',
-  'fortnite_games', 'challenges', 'sleep_log', 'bodyweight_log', 'to_read',
+  'fortnite_games', 'challenges', 'sleep_log', 'to_read',
   'mood_log', 'body_measurements', 'cardio_sessions', 'goals',
+  'basketball_sessions', 'pickleball_games', 'golf_rounds', 'disc_golf_rounds',
+  'hiking_sessions', 'table_tennis_games', 'chess_games', 'pool_games',
+  'volleyball_sessions', 'spikeball_games', 'water_log',
 ]
 
 function toCSV(rows: Record<string, unknown>[]): string {
@@ -59,10 +64,13 @@ function toCSV(rows: Record<string, unknown>[]): string {
 }
 
 function triggerDownload(filename: string, content: string) {
+  const url = URL.createObjectURL(new Blob([content], { type: 'text/csv' }))
   const a = document.createElement('a')
-  a.href = URL.createObjectURL(new Blob([content], { type: 'text/csv' }))
+  a.href = url
   a.download = filename
   a.click()
+  // Revoke after a tick so the browser has time to start the download (P2-9)
+  setTimeout(() => URL.revokeObjectURL(url), 100)
 }
 
 async function compressAvatar(file: File): Promise<string> {
@@ -71,12 +79,14 @@ async function compressAvatar(file: File): Promise<string> {
     canvas.width = 96; canvas.height = 96
     const ctx = canvas.getContext('2d')!
     const img = new Image()
+    const objectUrl = URL.createObjectURL(file)
     img.onload = () => {
       const size = Math.min(img.width, img.height)
       ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 96, 96)
+      URL.revokeObjectURL(objectUrl)  // prevent Blob URL leak (P2-9)
       resolve(canvas.toDataURL('image/jpeg', 0.82))
     }
-    img.src = URL.createObjectURL(file)
+    img.src = objectUrl
   })
 }
 
@@ -188,9 +198,22 @@ export function Settings() {
   async function handleDeleteAccount() {
     setDeleting(true)
     const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      await Promise.all(ALL_TABLES.map(t => supabase.from(t).delete().eq('user_id', user.id)))
+    if (!user) { setDeleting(false); return }
+
+    // Delete all user data first — only sign out if every delete succeeds (P0-4)
+    const results = await Promise.all(
+      ALL_TABLES.map(t => supabase.from(t).delete().eq('user_id', user.id))
+    )
+    const failed = results.filter(r => r.error)
+    if (failed.length > 0) {
+      console.error('[deleteAccount] Some deletions failed:', failed.map(r => r.error))
+      setDeleting(false)
+      setDeleteStep('idle')
+      // Surface the error — a proper toast would be ideal but alert is safe here
+      alert('Failed to delete some data. Please try again or contact support.')
+      return
     }
+
     await supabase.auth.signOut()
     resetStore()
     navigate('/login')

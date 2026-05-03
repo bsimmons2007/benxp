@@ -94,7 +94,7 @@ export interface AppStats {
   squatPR: number | null
   deadliftPR: number | null
   totalMiles: number
-  books2026: number
+  booksThisYear: number
   winCount: number
 }
 
@@ -231,7 +231,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     squatPR:    prMap['Squat']    ?? null,
     deadliftPR: prMap['Deadlift'] ?? null,
     totalMiles: skateRows.reduce((s: number, r: { miles: number }) => s + (r.miles ?? 0), 0),
-    books2026:  bookRows.filter((r: { date_finished: string }) => r.date_finished >= `${new Date().getFullYear()}-01-01`).length,
+    booksThisYear:  bookRows.filter((r: { date_finished: string }) => r.date_finished >= `${new Date().getFullYear()}-01-01`).length,
     winCount:   gameRows.filter((r: { win: boolean }) => r.win).length,
   }
 

@@ -214,7 +214,7 @@ function saveTemplates(ts: WorkoutTemplate[]) {
   localStorage.setItem(TMPL_KEY, JSON.stringify(ts))
 }
 function addTemplate(name: string, exercises: Omit<SessionEntry, 'uid'>[]): WorkoutTemplate {
-  const t: WorkoutTemplate = { id: Math.random().toString(36).slice(2), name, exercises, createdAt: new Date().toISOString() }
+  const t: WorkoutTemplate = { id: crypto.randomUUID(), name, exercises, createdAt: new Date().toISOString() }
   saveTemplates([t, ...getTemplates()])
   return t
 }
@@ -260,7 +260,7 @@ interface SessionEntry {
 
 function newEntry(): SessionEntry {
   return {
-    uid: Math.random().toString(36).slice(2),
+    uid: crypto.randomUUID(),
     liftName: '', isBodyweight: false, isTimed: false,
     weight: '', sets: '', reps: '', duration: '', rpe: '', bodyweight: '',
   }
@@ -432,7 +432,8 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
   const [entries,    setEntries]    = useState<SessionEntry[]>([newEntry()])
   const [submitting, setSubmitting] = useState(false)
   const [toast,      setToast]      = useState<string | null>(null)
-  const [milestone,  setMilestone]  = useState<import('../lib/xp').StrengthMilestone | null>(null)
+  const [milestone,      setMilestone]      = useState<import('../lib/xp').StrengthMilestone | null>(null)
+  const [milestoneLift,  setMilestoneLift]  = useState('')
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
   const [lastWorkout, setLastWorkout] = useState<Omit<SessionEntry, 'uid'>[] | null>(null)
@@ -470,11 +471,28 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setSubmitting(false); return }
 
-    let totalXP = 0
-    let prCount = 0
-    let lastMilestone: import('../lib/xp').StrengthMilestone | null = null
+    // ── Step 1: Pre-fetch all previous bests in parallel ──────────────
+    // Only needed for lifts that have milestone thresholds defined.
+    const prevBestMap: Record<string, number> = {}
+    await Promise.all(
+      valid
+        .filter(e => LIFT_MILESTONES[e.liftName] && !(e.isTimed || TIMED_EXERCISES.has(e.liftName)))
+        .map(async e => {
+          const isBW = e.isBodyweight
+          const { data } = await supabase
+            .from('lifting_log')
+            .select(isBW ? 'reps' : 'est_1rm')
+            .eq('lift', e.liftName)
+            .order(isBW ? 'reps' : 'est_1rm', { ascending: false })
+            .limit(1)
+          prevBestMap[e.liftName] = isBW
+            ? ((data?.[0] as { reps?: number } | undefined)?.reps ?? 0)
+            : ((data?.[0] as { est_1rm?: number } | undefined)?.est_1rm ?? 0)
+        })
+    )
 
-    for (const entry of valid) {
+    // ── Step 2: Batch-insert all exercises in one query ───────────────
+    const insertPayloads = valid.map(entry => {
       const isTimed = entry.isTimed || TIMED_EXERCISES.has(entry.liftName)
       const sets    = parseInt(entry.sets) || 1
       const reps    = isTimed ? 0 : (parseInt(entry.reps) || 0)
@@ -484,27 +502,8 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       const est1rm  = !isTimed && weight > 0 && reps > 0
         ? Math.round((1 + reps / 30) * weight * 10) / 10
         : null
-
-      // Check previous best for PR milestone
-      let previousBest = 0
-      const liftMilestones = LIFT_MILESTONES[entry.liftName]
-      if (liftMilestones && !isTimed) {
-        const isBWRepLift = entry.isBodyweight
-        const { data: prev } = await supabase
-          .from('lifting_log')
-          .select(isBWRepLift ? 'reps' : 'est_1rm')
-          .eq('lift', entry.liftName)
-          .order(isBWRepLift ? 'reps' : 'est_1rm', { ascending: false })
-          .limit(1)
-        previousBest = isBWRepLift
-          ? ((prev?.[0] as { reps?: number } | undefined)?.reps ?? 0)
-          : ((prev?.[0] as { est_1rm?: number } | undefined)?.est_1rm ?? 0)
-      }
-
-      const { data: inserted, error } = await supabase.from('lifting_log').insert({
-        user_id:       user.id,
-        date,
-        lift:          entry.liftName,
+      return {
+        user_id: user.id, date, lift: entry.liftName,
         weight:        entry.isBodyweight ? null : (weight || null),
         sets,
         reps:          isTimed ? null : (reps || null),
@@ -513,37 +512,77 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
         is_pr:         false,
         rpe:           entry.rpe ? parseFloat(entry.rpe) : null,
         duration_secs: durSecs,
-      }).select().single()
-
-      if (error || !inserted) continue
-
-      let isPR = false
-      if (est1rm) isPR = await checkForPR(supabase, entry.liftName, est1rm, date, inserted.id, user.id)
-      if (isPR) {
-        await supabase.from('lifting_log').update({ is_pr: true }).eq('id', inserted.id)
-        prCount++
       }
+    })
 
-      if (liftMilestones && !isTimed) {
-        const newVal = entry.isBodyweight ? reps : (est1rm ?? 0)
-        const hit    = getMilestoneHit(entry.liftName, previousBest, newVal)
-        if (hit) lastMilestone = hit
-      }
+    const { data: inserted, error: insertError } = await supabase
+      .from('lifting_log')
+      .insert(insertPayloads)
+      .select()
 
-      totalXP += sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0)
+    if (insertError || !inserted?.length) {
+      setToast('Failed to save workout. Please try again.')
+      setSubmitting(false)
+      return
     }
+
+    // ── Step 3: PR checks in parallel, then aggregate results ─────────
+    type RowResult = { isPR: boolean; xp: number; milestone: import('../lib/xp').StrengthMilestone | null; liftName: string }
+
+    const rowResults: RowResult[] = await Promise.all(
+      inserted.map(async (row, i) => {
+        const entry   = valid[i]
+        const isTimed = entry.isTimed || TIMED_EXERCISES.has(entry.liftName)
+        const sets    = parseInt(entry.sets) || 1
+        const reps    = isTimed ? 0 : (parseInt(entry.reps) || 0)
+        const est1rm  = row.est_1rm as number | null
+        let isPR      = false
+
+        if (est1rm) {
+          isPR = await checkForPR(supabase, entry.liftName, est1rm, date, row.id, user.id)
+          if (isPR) await supabase.from('lifting_log').update({ is_pr: true }).eq('id', row.id)
+        }
+
+        let milestone: import('../lib/xp').StrengthMilestone | null = null
+        if (LIFT_MILESTONES[entry.liftName] && !isTimed) {
+          const newVal    = entry.isBodyweight ? reps : (est1rm ?? 0)
+          const prevBest  = prevBestMap[entry.liftName] ?? 0
+          milestone       = getMilestoneHit(entry.liftName, prevBest, newVal) ?? null
+        }
+
+        return {
+          isPR,
+          xp:       sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0),
+          milestone,
+          liftName: entry.liftName,
+        }
+      })
+    )
+
+    const totalXP     = rowResults.reduce((s, r) => s + r.xp, 0)
+    const prCount     = rowResults.filter(r => r.isPR).length
+    const hitMilestone = rowResults.findLast(r => r.milestone)
+
+    // Capture lift name BEFORE resetting form state (P1-2 fix)
+    const liftNameForOverlay = hitMilestone?.liftName ?? ''
 
     const prMsg = prCount > 0 ? ` — ${prCount} PR${prCount > 1 ? 's' : ''}!` : ''
     setToast(`+${totalXP} XP · ${valid.length} exercise${valid.length > 1 ? 's' : ''} logged${prMsg}`)
-    if (lastMilestone) setMilestone(lastMilestone)
+    if (hitMilestone?.milestone) {
+      setMilestone(hitMilestone.milestone)
+      setMilestoneLift(liftNameForOverlay)
+    }
+
     await refreshXP()
     refreshActivity()
-    // Save session template for "Repeat Last Workout"
-    const template = valid.map(e => ({
-      liftName: e.liftName, isBodyweight: e.isBodyweight, isTimed: e.isTimed,
-      weight: e.weight, sets: e.sets, reps: e.reps, duration: e.duration, rpe: e.rpe, bodyweight: e.bodyweight,
-    }))
-    localStorage.setItem('benxp-last-workout', JSON.stringify(template))
+
+    // Save last workout for "Repeat" button
+    localStorage.setItem('benxp-last-workout', JSON.stringify(
+      valid.map(e => ({
+        liftName: e.liftName, isBodyweight: e.isBodyweight, isTimed: e.isTimed,
+        weight: e.weight, sets: e.sets, reps: e.reps, duration: e.duration, rpe: e.rpe, bodyweight: e.bodyweight,
+      }))
+    ))
 
     setEntries([newEntry()])
     setDate(today())
@@ -573,7 +612,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
         {!open && lastWorkout && (
           <button
             onClick={() => {
-              setEntries(lastWorkout.map(e => ({ ...e, uid: Math.random().toString(36).slice(2) })))
+              setEntries(lastWorkout.map(e => ({ ...e, uid: crypto.randomUUID() })))
               setOpen(true)
               setTmplOpen(false)
             }}
@@ -632,7 +671,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
               </div>
               <button
                 onClick={() => {
-                  setEntries(t.exercises.map(e => ({ ...e, uid: Math.random().toString(36).slice(2) })))
+                  setEntries(t.exercises.map(e => ({ ...e, uid: crypto.randomUUID() })))
                   setOpen(true)
                   setTmplOpen(false)
                 }}
@@ -798,11 +837,11 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       )}
 
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
-      {milestone && entries[0] && (
+      {milestone && (
         <MilestoneOverlay
           milestone={milestone}
-          liftName={entries[0].liftName}
-          onDismiss={() => setMilestone(null)}
+          liftName={milestoneLift}
+          onDismiss={() => { setMilestone(null); setMilestoneLift('') }}
         />
       )}
     </div>

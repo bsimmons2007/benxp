@@ -80,7 +80,28 @@ function evaluate(data: RawData): Badge[] {
   const maxPullupReps = liftingRows.filter(r => r.lift === 'PullUps').reduce((m, r) => Math.max(m, r.reps ?? 0), 0)
   const maxPushupReps = liftingRows.filter(r => r.lift === 'PushUps').reduce((m, r) => Math.max(m, r.reps ?? 0), 0)
   const plTotal       = topBench + topSquat + topDeadlift
-  const hasAllCategories = totalSets >= 1 && totalSessions >= 1 && booksRead >= 1 && totalGames >= 1 && totalSleepLogs >= 1
+  // Count how many distinct activity categories have at least one entry.
+  // Requires 8 of 16 to earn the Renaissance badge — achievable but meaningful (P1-7 fix).
+  const categoryFlags = [
+    totalSets >= 1,          // lifting
+    totalSessions >= 1,      // skating
+    booksRead >= 1,          // books
+    totalGames >= 1,         // fortnite
+    totalSleepLogs >= 1,     // sleep
+    bbRows.length >= 1,      // basketball
+    pbRows.length >= 1,      // pickleball
+    golfRows.length >= 1,    // golf
+    dgRows.length >= 1,      // disc golf
+    hikeRows.length >= 1,    // hiking
+    ttRows.length >= 1,      // table tennis
+    chessRows.length >= 1,   // chess
+    poolRows.length >= 1,    // pool
+    vbRows.length >= 1,      // volleyball
+    sbRows.length >= 1,      // spikeball
+    cardioRows.length >= 1,  // cardio
+  ]
+  const activeCategories  = categoryFlags.filter(Boolean).length
+  const hasAllCategories  = activeCategories >= 8
 
   function longestStreak(dates: string[]): number {
     if (!dates.length) return 0
@@ -169,7 +190,7 @@ function evaluate(data: RawData): Badge[] {
   return [
     // ── GENERAL — First Step & XP ────────────────────────────
     { id: 'first_login',   icon: 'Star',   name: 'First Step',         description: 'Log into YouXP for the first time.',            category: 'general', earned: true },
-    { id: 'all_categories',icon: 'Files',  name: 'Renaissance',        description: 'Log data in all 5 tracked categories.',         category: 'general', earned: hasAllCategories },
+    { id: 'all_categories',icon: 'Files',  name: 'Renaissance',        description: 'Log activities in 8 or more different categories.', category: 'general', earned: hasAllCategories },
     { id: 'xp_500',        icon: 'Zap',    name: 'Spark',              description: 'Earn 500 total XP.',                            category: 'general', earned: totalXP >= 500 },
     { id: 'xp_1000',       icon: 'Fire',   name: 'Ignition',           description: 'Earn 1,000 total XP.',                          category: 'general', earned: totalXP >= 1000 },
     { id: 'xp_5000',       icon: 'Rocket', name: 'Liftoff',            description: 'Earn 5,000 total XP.',                          category: 'general', earned: totalXP >= 5000 },
@@ -416,21 +437,41 @@ function evaluate(data: RawData): Badge[] {
   ] as Badge[]
 }
 
-// Module-level cache — survives re-renders, cleared when XP changes
-let badgeCache: { xp: number; badges: Badge[] } | null = null
+// Module-level cache — keyed on both XP and a revision counter so that any
+// logged activity (even one that earns 0 XP) busts the cache (P1-9 fix).
+let badgeCache: { xp: number; rev: number; badges: Badge[] } | null = null
+let badgeCacheRevision = 0
+
+/** Call this whenever any activity is logged to ensure badge re-evaluation. */
+export function invalidateBadgeCache() {
+  badgeCacheRevision++
+}
+
+function cacheHit(xp: number): boolean {
+  return badgeCache !== null && badgeCache.xp === xp && badgeCache.rev === badgeCacheRevision
+}
 
 export function useAchievements() {
   const totalXP     = useStore(s => s.totalXP)
   const level       = useStore(s => s.level)
   const initialized = useStore(s => s.initialized)
 
-  const [badges, setBadges]   = useState<Badge[]>(badgeCache?.xp === totalXP ? badgeCache.badges : [])
-  const [loading, setLoading] = useState(badgeCache?.xp !== totalXP)
+  const [badges, setBadges]   = useState<Badge[]>(cacheHit(totalXP) ? badgeCache!.badges : [])
+  const [loading, setLoading] = useState(!cacheHit(totalXP))
+  // Local revision mirror so the effect re-runs when the cache is busted
+  const [rev, setRev] = useState(badgeCacheRevision)
 
   useEffect(() => {
     if (!initialized) return
-    if (badgeCache?.xp === totalXP) {
-      setBadges(badgeCache.badges)
+    // Sync rev to the current module-level value on every render cycle
+    // so that external invalidation triggers a re-fetch
+    if (rev !== badgeCacheRevision) setRev(badgeCacheRevision)
+  })
+
+  useEffect(() => {
+    if (!initialized) return
+    if (cacheHit(totalXP)) {
+      setBadges(badgeCache!.badges)
       setLoading(false)
       return
     }
@@ -486,13 +527,13 @@ export function useAchievements() {
         level,
       })
 
-      badgeCache = { xp: totalXP, badges: result }
+      badgeCache = { xp: totalXP, rev: badgeCacheRevision, badges: result }
       setBadges(result)
       setLoading(false)
     }
     load()
     return () => { cancelled = true }
-  }, [initialized, totalXP, level])
+  }, [initialized, totalXP, level, rev])
 
   const earned   = badges.filter(b => b.earned)
   const unearned = badges.filter(b => !b.earned && !b.secret)

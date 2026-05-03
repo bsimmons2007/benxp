@@ -11,7 +11,7 @@ import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
-import { today, formatDate } from '../lib/utils'
+import { today, formatDate, localDateStr } from '../lib/utils'
 import { playXPGain, playPR } from '../lib/sounds'
 import type { SleepLog } from '../types'
 import { MoonIcon, CheckIcon, EditIcon } from '../components/ui/Icon'
@@ -30,11 +30,11 @@ function sleepQuality(hours: number | null): { label: string; color: string } {
   return { label: 'Poor', color: '#E94560' }
 }
 
-/** Local YYYY-MM-DD, i days ago (0 = today) */
-function localDateStr(daysAgo = 0): string {
+/** YYYY-MM-DD for N days ago (0 = today) using the canonical localDateStr from utils */
+function nDaysAgo(n: number): string {
   const d = new Date()
-  d.setDate(d.getDate() - daysAgo)
-  return d.toLocaleDateString('en-CA')
+  d.setDate(d.getDate() - n)
+  return localDateStr(d)
 }
 
 // ── Log form ──────────────────────────────────────────────────────────────────
@@ -65,16 +65,19 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   }, [watchedBedtime, watchedWakeTime, setValue])
 
   const onSubmit = async (data: SleepForm) => {
+    const parsedHours = data.hours_slept !== '' ? parseFloat(data.hours_slept) : null
+    if (parsedHours !== null && !isFinite(parsedHours)) return
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('sleep_log').insert({
+    const { error } = await supabase.from('sleep_log').insert({
       user_id: user.id,
       date: data.date,
       bedtime: data.bedtime || null,
-      hours_slept: data.hours_slept ? parseFloat(data.hours_slept) : null,
+      hours_slept: parsedHours,
       wake_time: data.wake_time || null,
     })
-    const hrs = parseFloat(data.hours_slept)
+    if (error) { setToast('Failed to save — try again'); return }
+    const hrs = parsedHours ?? 0
     const q   = sleepQuality(hrs)
     const xp  = XP_RATES.sleep_log + (hrs >= 7 ? XP_RATES.sleep_quality_bonus : 0)
     if (hrs >= 8.5) playPR(); else playXPGain()
@@ -126,14 +129,16 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
 
   async function submit(e: FormEvent) {
     e.preventDefault()
-    if (!hours) return
+    const napHours = parseFloat(hours)
+    if (!isFinite(napHours) || napHours <= 0) return
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setSaving(false); return }
-    await supabase.from('sleep_log').insert({
-      user_id: user.id, date, hours_slept: parseFloat(hours), is_nap: true,
+    const { error } = await supabase.from('sleep_log').insert({
+      user_id: user.id, date, hours_slept: napHours, is_nap: true,
     })
     setSaving(false)
+    if (error) { setToast('Failed to save — try again'); return }
     setToast(`Nap logged — ${hours}h`)
     setOpen(false)
     setHours('')
@@ -172,9 +177,11 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
   const [saving,   setSaving]   = useState(false)
 
   async function save() {
+    const parsedHours = hours !== '' ? parseFloat(hours) : null
+    if (parsedHours !== null && !isFinite(parsedHours)) return
     setSaving(true)
     await supabase.from('sleep_log').update({
-      hours_slept: hours ? parseFloat(hours) : null,
+      hours_slept: parsedHours,
       bedtime: bedtime || null,
       wake_time: wakeTime || null,
     }).eq('id', entry.id)
@@ -326,7 +333,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
   const daysNeeded      = deltaMinutes <= 0 ? 0 : Math.ceil(deltaMinutes / shiftMins)
 
   // Build the day-by-day schedule starting from today
-  const todayStr = localDateStr(0)
+  const todayStr = today()
   const schedule = Array.from({ length: daysNeeded + 1 }, (_, i) => {
     const wakeMin  = currentWakeMins - i * shiftMins
     const bedMin   = wakeMin - sleepDuration * 60
@@ -598,13 +605,13 @@ export function Sleep() {
   const streak = (() => {
     if (!nightLogs.length) return 0
     const dateSet = new Set(nightLogs.map(r => r.date))
-    const todayStr = localDateStr(0)
-    const yesterStr = localDateStr(1)
+    const todayStr = today()
+    const yesterStr = nDaysAgo(1)
     // Start from today if logged, else yesterday
     const startDaysAgo = dateSet.has(todayStr) ? 0 : dateSet.has(yesterStr) ? 1 : null
     if (startDaysAgo === null) return 0
     let s = 0, i = startDaysAgo
-    while (dateSet.has(localDateStr(i))) { s++; i++ }
+    while (dateSet.has(nDaysAgo(i))) { s++; i++ }
     return s
   })()
 

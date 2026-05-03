@@ -12,6 +12,7 @@ import { useStore } from '../store/useStore'
 import { playGoalComplete } from '../lib/sounds'
 import type { Goal } from '../types'
 import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, TrophyIcon, TrashIcon, MoonIcon } from '../components/ui/Icon'
+import { localDateStr } from '../lib/utils'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Preset metric options ────────────────────────────────────
@@ -62,7 +63,7 @@ function useMetricValues() {
     async function load() {
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-      const cutoff = thirtyDaysAgo.toISOString().split('T')[0]
+      const cutoff = localDateStr(thirtyDaysAgo)
 
       const [prs, skate, cardio, books, wins, sleep] = await Promise.all([
         supabase.from('pr_history').select('lift, est_1rm'),
@@ -328,12 +329,12 @@ export function Goals() {
     playGoalComplete()
     setToast(`+${goal.xp_reward} XP — Goal complete!`)
     await refreshXP()
-    load()
+    await load()  // P1-11: must await so goal list reflects completion immediately
   }
 
   async function deleteGoal(id: string) {
     await supabase.from('goals').delete().eq('id', id)
-    load()
+    await load()
   }
 
   const active    = goals.filter(g => g.status === 'active')
@@ -366,11 +367,11 @@ export function Goals() {
             <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet — try one of these:</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { label: 'Bench 225 lbs',  metric: 'bench_1rm',         target: 225 },
-                { label: 'Skate 100 miles', metric: 'total_skate_miles', target: 100 },
-                { label: 'Run 50 miles',   metric: 'total_cardio_miles', target: 50  },
-                { label: 'Read 5 books',   metric: 'books_read',         target: 5   },
-                { label: 'Sleep 7h avg',   metric: 'avg_sleep',          target: 7   },
+                { label: 'Bench 225 lbs',   metric: 'bench_1rm',         target: 225, unit: 'lbs',   xp: 500 },
+                { label: 'Skate 100 miles', metric: 'total_skate_miles', target: 100, unit: 'miles', xp: 400 },
+                { label: 'Run 50 miles',    metric: 'total_cardio_miles', target: 50,  unit: 'miles', xp: 300 },
+                { label: 'Read 5 books',    metric: 'books_read',         target: 5,   unit: 'books', xp: 250 },
+                { label: 'Sleep 7h avg',    metric: 'avg_sleep',          target: 7,   unit: 'hrs',   xp: 200 },
               ].map(t => (
                 <button
                   key={t.metric}
@@ -379,9 +380,11 @@ export function Goals() {
                     if (!user) return
                     await supabase.from('goals').insert({
                       user_id: user.id, title: t.label,
-                      metric_key: t.metric, target_value: t.target, status: 'active',
+                      metric_key: t.metric, target_value: t.target,
+                      target_unit: t.unit, xp_reward: t.xp,        // P1-10: required fields
+                      status: 'active',
                     })
-                    load()
+                    await load()  // P1-11: await so list refreshes immediately
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,

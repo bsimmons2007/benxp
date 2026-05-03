@@ -24,7 +24,7 @@ export interface TutorialStep {
 export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id:    'welcome',
-    title: 'Welcome to BenXP',
+    title: 'Welcome to YouXP',
     body:  'Your personal life tracker. Log workouts, sleep, games, books & more — everything earns XP and levels you up.',
     tooltipPosition: 'center',
     navigateTo: '/',

@@ -33,13 +33,18 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const miles = parseFloat(data.miles)
-    await supabase.from('skate_sessions').insert({
+    if (!miles || miles <= 0) return
+    const { error } = await supabase.from('skate_sessions').insert({
       user_id: user.id,
       date: data.date,
       miles,
       duration: data.duration || null,
       fastest_mile: data.fastest_mile ? parseFloat(data.fastest_mile) : null,
     })
+    if (error) {
+      setToast('Failed to save session. Please try again.')
+      return
+    }
     const xp = Math.round(miles * XP_RATES.skate_per_mile)
     setToast(`+${xp} XP — Session logged!`)
     await refreshXP()

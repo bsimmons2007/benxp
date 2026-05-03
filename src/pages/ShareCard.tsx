@@ -129,7 +129,7 @@ function Card() {
           stats.deadliftPR ? { label: 'Deadlift', value: `${stats.deadliftPR.toFixed(0)}` } : null,
           stats.totalMiles ? { label: 'Miles',  value: stats.totalMiles.toFixed(1) }      : null,
           stats.winCount   ? { label: 'FN Wins', value: String(stats.winCount) }           : null,
-          stats.books2026  ? { label: 'Books',  value: String(stats.books2026) }           : null,
+          stats.booksThisYear  ? { label: 'Books',  value: String(stats.booksThisYear) }           : null,
         ].filter(Boolean).slice(0, 6).map((s, i) => s && (
           <div key={i} style={{
             background: 'rgba(255,255,255,0.05)',

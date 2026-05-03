@@ -42,6 +42,8 @@ export default defineConfig({
               cacheName: 'supabase-cache',
               expiration: { maxEntries: 50, maxAgeSeconds: 5 * 60 },
               networkTimeoutSeconds: 10,
+              // Only cache successful responses — prevents caching 4xx/5xx errors
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
         ],

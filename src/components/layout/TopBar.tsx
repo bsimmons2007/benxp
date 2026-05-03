@@ -42,7 +42,7 @@ export function TopBar({ title, hideSettings = false, back = false }: TopBarProp
         paddingTop:           'env(safe-area-inset-top)',
         paddingLeft:          '12px',
         paddingRight:         '12px',
-        background:           'rgba(10,12,28,0.92)',
+        background:           'var(--nav-bg)',
         backdropFilter:       'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderBottom:         '1px solid var(--border-faint)',

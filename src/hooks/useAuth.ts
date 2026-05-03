@@ -12,6 +12,13 @@ export function useAuth() {
   useEffect(() => {
     let mounted = true
 
+    // Subscribe BEFORE getSession() per Supabase best-practice — ensures no
+    // auth state change (token refresh, sign-out) is missed between the
+    // getSession() call and its resolution (P1-8 fix).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (mounted) setSession(session)
+    })
+
     const timeout = setTimeout(() => {
       if (mounted && loading) {
         setLoading(false)
@@ -33,10 +40,6 @@ export function useAuth() {
         setError(err instanceof Error ? err : new Error(String(err)))
         setLoading(false)
       })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) setSession(session)
-    })
 
     return () => {
       mounted = false

@@ -9,8 +9,9 @@ import { today as appToday } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-const GOAL_OZ    = 64   // daily goal in oz
-const QUICK_ADDS = [8, 12, 16, 20, 24] // oz presets
+const DEFAULT_goalOz = 64
+const GOAL_LS_KEY     = 'benxp-water-goal-oz'
+const QUICK_ADDS      = [8, 12, 16, 20, 24] // oz presets
 
 interface WaterEntry { id: string; oz: number; created_at: string }
 
@@ -163,7 +164,22 @@ export function Water() {
   const [editEntry,   setEditEntry]   = useState<WaterEntry | null>(null)
   const [editOz,      setEditOz]      = useState('')
   const [saving,      setSaving]      = useState(false)
+  const [goalOz,      setGoalOz]      = useState<number>(() => {
+    const stored = parseInt(localStorage.getItem(GOAL_LS_KEY) ?? '', 10)
+    return isFinite(stored) && stored > 0 ? stored : DEFAULT_goalOz
+  })
+  const [editingGoal, setEditingGoal] = useState(false)
+  const [goalInput,   setGoalInput]   = useState('')
   const refreshXP = useStore(s => s.refreshXP)
+
+  function saveGoal() {
+    const v = parseInt(goalInput, 10)
+    if (isFinite(v) && v > 0) {
+      localStorage.setItem(GOAL_LS_KEY, String(v))
+      setGoalOz(v)
+    }
+    setEditingGoal(false)
+  }
 
   const todayStr = appToday()
 
@@ -187,10 +203,10 @@ export function Water() {
 
   async function addWater(oz: number) {
     if (!userId || oz <= 0) return
-    const wasGoalMet = totalOz >= GOAL_OZ
+    const wasGoalMet = totalOz >= goalOz
     await supabase.from('water_log').insert({ user_id: userId, date: todayStr, oz })
     const newTotal = totalOz + oz
-    const goalJustMet = !wasGoalMet && newTotal >= GOAL_OZ
+    const goalJustMet = !wasGoalMet && newTotal >= goalOz
     if (goalJustMet) {
       setToast('Daily goal reached! +50 XP')
       await refreshXP()
@@ -225,22 +241,31 @@ export function Water() {
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2 mb-5">
-          {[
-            { label: 'Today',    value: `${totalOz.toFixed(0)}oz` },
-            { label: 'Goal',     value: `${GOAL_OZ}oz` },
-            { label: 'Remaining', value: totalOz >= GOAL_OZ ? 'Done!' : `${Math.max(0, GOAL_OZ - totalOz).toFixed(0)}oz` },
-          ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{s.value}</p>
-              <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
-            </div>
-          ))}
+          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{totalOz.toFixed(0)}oz</p>
+            <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Today</p>
+          </div>
+
+          {/* Goal tile — tap to edit */}
+          <button
+            onClick={() => { setGoalInput(String(goalOz)); setEditingGoal(true) }}
+            className="rounded-xl p-3 text-center"
+            style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer' }}
+          >
+            <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{goalOz}oz</p>
+            <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Goal ✏️</p>
+          </button>
+
+          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{totalOz >= goalOz ? 'Done!' : `${Math.max(0, goalOz - totalOz).toFixed(0)}oz`}</p>
+            <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Remaining</p>
+          </div>
         </div>
 
         {/* Cup */}
         {!loading && (
           <div className="flex justify-center mb-6">
-            <WaterCup ozDrunk={totalOz} goal={GOAL_OZ} />
+            <WaterCup ozDrunk={totalOz} goal={goalOz} />
           </div>
         )}
 
@@ -342,6 +367,24 @@ export function Water() {
             <label style={{ fontSize: 12, color: '#888' }}>Amount (oz)</label>
             <input
               type="number" value={editOz} onChange={e => setEditOz(e.target.value)}
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 16, width: '100%' }}
+            />
+          </div>
+        </EditModal>
+      )}
+      {editingGoal && (
+        <EditModal
+          title="Set Daily Goal"
+          onClose={() => setEditingGoal(false)}
+          onSave={saveGoal}
+          saving={false}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <label style={{ fontSize: 12, color: '#888' }}>Daily goal (oz)</label>
+            <input
+              type="number" value={goalInput} onChange={e => setGoalInput(e.target.value)}
+              placeholder="e.g. 64"
+              autoFocus
               style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 16, width: '100%' }}
             />
           </div>

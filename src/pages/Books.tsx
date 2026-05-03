@@ -30,6 +30,8 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'pages_asc',   label: 'Fewest pages' },
 ]
 
+const EXTRA_GENRES_KEY = 'benxp-extra-genres'
+
 const BASE_GENRES = [
   'Action',
   'Adventure',
@@ -440,7 +442,12 @@ interface BookForm {
 function LogBookPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
-  const [extraGenres, setExtraGenres] = useState<string[]>([])
+  const [extraGenres, setExtraGenres] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem(EXTRA_GENRES_KEY)
+      return stored ? (JSON.parse(stored) as string[]) : []
+    } catch { return [] }
+  })
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
 
@@ -457,7 +464,9 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
 
     const finalGenre = data.genre === 'Other' && data.customGenre.trim() ? data.customGenre.trim() : data.genre
     if (data.genre === 'Other' && data.customGenre.trim() && !BASE_GENRES.includes(data.customGenre.trim()) && !extraGenres.includes(data.customGenre.trim())) {
-      setExtraGenres(p => [...p, data.customGenre.trim()])
+      const updated = [...extraGenres, data.customGenre.trim()]
+      setExtraGenres(updated)
+      localStorage.setItem(EXTRA_GENRES_KEY, JSON.stringify(updated))
     }
 
     const isFinished = data.status === 'finished'

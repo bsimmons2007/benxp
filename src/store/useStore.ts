@@ -3,6 +3,7 @@ import { calculateLevel, levelProgress, fetchXPAndStats } from '../lib/xp'
 import type { AppStats } from '../lib/xp'
 import { supabase } from '../lib/supabase'
 import { invalidateStreakCache } from '../hooks/useStreak'
+import { invalidateBadgeCache } from '../hooks/useAchievements'
 
 export type { AppStats }
 
@@ -101,7 +102,7 @@ async function fetchUser(): Promise<{ userName: string; avatarUrl: string | null
 
 const DEFAULT_STATS: AppStats = {
   benchPR: null, squatPR: null, deadliftPR: null,
-  totalMiles: 0, books2026: 0, winCount: 0,
+  totalMiles: 0, booksThisYear: 0, winCount: 0,
 }
 
 interface AppState {
@@ -121,7 +122,8 @@ interface AppState {
   recentActivity: ActivityEntry[]
 
   // Init state
-  initialized: boolean
+  initialized:   boolean
+  _initializing: boolean
 
   // Actions
   dismissLevelUp:  () => void
@@ -143,6 +145,10 @@ export const useStore = create<AppState>((set, get) => ({
   stats:          DEFAULT_STATS,
   recentActivity: [],
   initialized:    false,
+  // Set synchronously before first await so concurrent callers
+  // (e.g. StrictMode double-mount) can't pass the guard while
+  // the first load is still in-flight (P0-3 race condition fix)
+  _initializing:  false,
 
   dismissLevelUp: () => {
     localStorage.setItem(LS_LEVEL_KEY, String(get().level))
@@ -160,51 +166,67 @@ export const useStore = create<AppState>((set, get) => ({
     stats:          DEFAULT_STATS,
     recentActivity: [],
     initialized:    false,
+    _initializing:  false,
   }),
 
-  /** Full cold-start load — 7 + 4 + 1 = 12 queries in parallel, called once. */
+  /** Full cold-start load — called once on boot. */
   init: async () => {
-    if (get().initialized) return
+    // Guard: bail if already done OR already in-flight (P0-3 race condition)
+    const { initialized, _initializing } = get()
+    if (initialized || _initializing) return
+    set({ _initializing: true })  // synchronous — blocks any concurrent caller
 
-    const [{ totalXP, stats }, userData, recentActivity] = await Promise.all([
-      fetchXPAndStats(supabase),
-      fetchUser(),
-      fetchActivity(),
-    ])
+    try {
+      const [{ totalXP, stats }, userData, recentActivity] = await Promise.all([
+        fetchXPAndStats(supabase),
+        fetchUser(),
+        fetchActivity(),
+      ])
 
-    const level    = calculateLevel(totalXP)
-    const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10)
+      const level    = calculateLevel(totalXP)
+      const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10)
 
-    set({
-      totalXP,
-      level,
-      progress:       levelProgress(totalXP),
-      loading:        false,
-      initialized:    true,
-      levelUpPending: level > lastSeen ? level : null,
-      stats,
-      recentActivity,
-      ...userData,
-    })
+      set({
+        totalXP,
+        level,
+        progress:       levelProgress(totalXP),
+        loading:        false,
+        initialized:    true,
+        _initializing:  false,
+        levelUpPending: level > lastSeen ? level : null,
+        stats,
+        recentActivity,
+        ...userData,
+      })
+    } catch (err) {
+      console.error('[useStore] init() failed:', err)
+      // Reset initializing flag so a retry is possible (e.g. on reconnect)
+      set({ loading: false, _initializing: false })
+    }
   },
 
   /** XP + stats refresh — called after logging any activity. */
   refreshXP: async () => {
-    const { totalXP, stats } = await fetchXPAndStats(supabase)
-    const level    = calculateLevel(totalXP)
-    const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10)
-    set({
-      totalXP,
-      level,
-      progress: levelProgress(totalXP),
-      loading:  false,
-      stats,
-      ...(level > lastSeen ? { levelUpPending: level } : {}),
-    })
+    try {
+      const { totalXP, stats } = await fetchXPAndStats(supabase)
+      const level    = calculateLevel(totalXP)
+      const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10)
+      set({
+        totalXP,
+        level,
+        progress: levelProgress(totalXP),
+        loading:  false,
+        stats,
+        ...(level > lastSeen ? { levelUpPending: level } : {}),
+      })
+    } catch (err) {
+      console.error('[useStore] refreshXP() failed:', err)
+    }
   },
 
   refreshActivity: async () => {
     invalidateStreakCache()
+    invalidateBadgeCache()
     const recentActivity = await fetchActivity()
     set({ recentActivity })
   },
