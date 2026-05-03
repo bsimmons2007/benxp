@@ -14,7 +14,6 @@ import { formatDate, toRoman, localDateStr, today as appToday } from '../lib/uti
 import { ArrowUpIcon, ArrowDownIcon, ActivityIconComp } from '../components/ui/Icon'
 import { xpForLevel, getLevelTitle } from '../lib/xp'
 import { checkStreakBreakWarning } from '../lib/notifications'
-import { loadHiddenSections } from '../lib/sections'
 import { useStrengthSnapshot } from '../components/StrengthTab'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
@@ -27,6 +26,22 @@ interface TrendResult {
   dirs:      Record<string, TrendDir>
   prDeltas:  { bench: number | null; squat: number | null; deadlift: number | null }
 }
+
+// ── Stat picker config ────────────────────────────────────────
+const HOME_STATS_KEY = 'benxp-home-stat-picks'
+const DEFAULT_STAT_PICKS = ['bench', 'squat', 'deadlift', 'miles', 'books', 'wins']
+
+const STAT_DEFS = [
+  { id: 'bench',    label: 'Bench PR',        unit: 'lbs',  section: 'Lifting' },
+  { id: 'squat',    label: 'Squat PR',         unit: 'lbs',  section: 'Lifting' },
+  { id: 'deadlift', label: 'Deadlift PR',      unit: 'lbs',  section: 'Lifting' },
+  { id: 'strength', label: 'Strength Score',   unit: '/100', section: 'Lifting' },
+  { id: 'books',    label: 'Books This Year',  unit: '',     section: 'Books'   },
+  { id: 'miles',    label: 'Skate Miles',      unit: 'mi',   section: 'Skating' },
+  { id: 'wins',     label: 'FN Wins',          unit: '',     section: 'Gaming'  },
+] as const
+
+type StatId = typeof STAT_DEFS[number]['id']
 
 // ── Trend arrow ───────────────────────────────────────────────
 function TrendArrow({ direction }: { direction: TrendDir }) {
@@ -115,12 +130,12 @@ function WeekDotStrip({ activityDates, streak }: {
   activityDates: Set<string>
   streak: { current: number; longest: number; loading: boolean }
 }) {
-  const todayStr = appToday()
+  const todayStr  = appToday()
   const todayDate = new Date(todayStr + 'T12:00:00')
-  const dow = todayDate.getDay() // 0=Sun
+  const dow       = todayDate.getDay() // 0=Sun
   const monOffset = dow === 0 ? -6 : 1 - dow
 
-  const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+  const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   const days = DAY_LABELS.map((label, i) => {
     const d = new Date(todayDate)
     d.setDate(d.getDate() + monOffset + i)
@@ -131,18 +146,19 @@ function WeekDotStrip({ activityDates, streak }: {
   return (
     <div className="flex items-center justify-between mb-5 px-1">
       {/* Day squares */}
-      <div className="flex gap-1.5">
+      <div className="flex gap-1">
         {days.map((day, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <div style={{
               width: 34, height: 34, borderRadius: 8,
-              background: day.isActive ? 'rgba(255,107,53,0.85)' : 'rgba(255,255,255,0.06)',
-              outline: day.isToday ? '1.5px solid rgba(255,255,255,0.3)' : 'none',
-              outlineOffset: 1,
-              transition: 'background 0.2s ease',
+              background: day.isActive ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+              outline: day.isToday ? '1.5px solid rgba(255,255,255,0.35)' : 'none',
+              outlineOffset: 2,
+              boxShadow: day.isActive ? '0 0 10px var(--accent-dim)' : 'none',
+              transition: 'background 0.2s ease, box-shadow 0.2s ease',
             }} />
             <span style={{
-              fontSize: 9, fontWeight: 600, letterSpacing: '0.04em',
+              fontSize: 9, fontWeight: 600, letterSpacing: '0.02em',
               color: day.isToday ? 'var(--text-primary)' : 'var(--text-dim)',
             }}>
               {day.label}
@@ -153,9 +169,11 @@ function WeekDotStrip({ activityDates, streak }: {
 
       {/* Streak info */}
       {!streak.loading && (
-        <div style={{ textAlign: 'right', paddingLeft: 8 }}>
-          <p style={{ fontFamily: 'Cinzel, serif', fontSize: 22, fontWeight: 700,
-            color: streak.current > 0 ? '#ff6b35' : 'var(--text-muted)', lineHeight: 1 }}>
+        <div style={{ textAlign: 'right', paddingLeft: 10 }}>
+          <p style={{
+            fontFamily: 'Cinzel, serif', fontSize: 22, fontWeight: 700,
+            color: streak.current > 0 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1,
+          }}>
             {streak.current}
           </p>
           <p style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>day streak</p>
@@ -167,6 +185,94 @@ function WeekDotStrip({ activityDates, streak }: {
         </div>
       )}
     </div>
+  )
+}
+
+// ── Stats Picker Modal ────────────────────────────────────────
+function StatsPickerModal({ picks, onChange, onClose }: {
+  picks: StatId[]
+  onChange: (picks: StatId[]) => void
+  onClose: () => void
+}) {
+  const [local, setLocal] = useState<StatId[]>(picks)
+
+  const toggle = (id: StatId) => {
+    setLocal(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+
+  const save = () => { onChange(local); onClose() }
+
+  // Group by section
+  const sections = Array.from(new Set(STAT_DEFS.map(d => d.section)))
+
+  return (
+    <>
+      {/* Overlay */}
+      <div onClick={onClose} style={{
+        position: 'fixed', inset: 0, zIndex: 100,
+        background: 'rgba(0,0,0,0.65)',
+      }} />
+
+      {/* Sheet */}
+      <div className="pop-in" style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 101,
+        background: '#12152b',
+        borderRadius: '20px 20px 0 0',
+        padding: '20px 20px 44px',
+        border: '1px solid var(--border)',
+        borderBottom: 'none',
+        boxShadow: '0 -8px 40px rgba(0,0,0,0.5)',
+      }}>
+        {/* Handle */}
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.12)',
+          margin: '0 auto 18px' }} />
+
+        <div className="flex items-center justify-between" style={{ marginBottom: 18 }}>
+          <p style={{ fontFamily: 'Cinzel, serif', fontSize: 14, fontWeight: 700,
+            color: 'var(--text-primary)' }}>
+            Customize Stats
+          </p>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{local.length} selected</p>
+        </div>
+
+        {sections.map(section => (
+          <div key={section} style={{ marginBottom: 14 }}>
+            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em',
+              textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>
+              {section}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {STAT_DEFS.filter(d => d.section === section).map(def => {
+                const active = local.includes(def.id)
+                return (
+                  <button key={def.id} onClick={() => toggle(def.id)} style={{
+                    padding: '7px 14px',
+                    borderRadius: 999,
+                    border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+                    background: active ? 'var(--accent-dim)' : 'rgba(255,255,255,0.04)',
+                    color: active ? 'var(--accent)' : 'var(--text-muted)',
+                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}>
+                    {def.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        ))}
+
+        <button onClick={save} style={{
+          marginTop: 8, width: '100%', padding: '13px',
+          background: 'var(--accent)', color: '#0d0d1a',
+          border: 'none', borderRadius: 12,
+          fontWeight: 700, fontSize: 14, cursor: 'pointer',
+          fontFamily: 'Cinzel, serif', letterSpacing: '0.04em',
+        }}>
+          Save
+        </button>
+      </div>
+    </>
   )
 }
 
@@ -250,6 +356,20 @@ export function Home() {
   const userName        = useUserName()
   const streak          = useStreak()
 
+  // Stat picker
+  const [statPicks, setStatPicks] = useState<StatId[]>(() => {
+    try {
+      const saved = localStorage.getItem(HOME_STATS_KEY)
+      return saved ? JSON.parse(saved) : DEFAULT_STAT_PICKS
+    } catch { return DEFAULT_STAT_PICKS as StatId[] }
+  })
+  const [showPicker, setShowPicker] = useState(false)
+
+  const savePicks = (picks: StatId[]) => {
+    setStatPicks(picks)
+    localStorage.setItem(HOME_STATS_KEY, JSON.stringify(picks))
+  }
+
   useEffect(() => {
     if (!streak.loading) checkStreakBreakWarning(streak.current, streak.activeToday)
   }, [streak.loading, streak.current, streak.activeToday])
@@ -263,15 +383,25 @@ export function Home() {
   const title        = getLevelTitle(level)
   const { sq: strengthSQ } = useStrengthSnapshot()
   const animatedXP   = useCountUp(loading ? 0 : totalXP, 1200)
-  const hidden       = loadHiddenSections()
 
-  // Derive which days this week had activity (from recentActivity + streak data)
+  // Derive which days this week had activity
   const activityDates = new Set(activity.map(a => a.date))
 
-  const showLifting  = !hidden.includes('lifting')
-  const showSkate    = !hidden.includes('skate')
-  const showBooks    = !hidden.includes('books')
-  const showFortnite = !hidden.includes('fortnite')
+  // Build card props for a given stat ID
+  const getCardProps = (id: StatId) => {
+    switch (id) {
+      case 'bench':    return { label: 'Bench PR',       value: stats.benchPR    ? stats.benchPR.toFixed(1)    : '—', unit: 'lbs',  trendDir: trends.dirs['bench']    as TrendDir, delta: trends.prDeltas.bench    }
+      case 'squat':    return { label: 'Squat PR',       value: stats.squatPR    ? stats.squatPR.toFixed(1)    : '—', unit: 'lbs',  trendDir: trends.dirs['squat']    as TrendDir, delta: trends.prDeltas.squat    }
+      case 'deadlift': return { label: 'Deadlift PR',    value: stats.deadliftPR ? stats.deadliftPR.toFixed(1) : '—', unit: 'lbs',  trendDir: trends.dirs['deadlift'] as TrendDir, delta: trends.prDeltas.deadlift }
+      case 'strength': return { label: 'Strength Score', value: strengthSQ !== null ? String(strengthSQ) : '—', unit: '/100', to: '/strength' }
+      case 'books':    return { label: `Books ${new Date().getFullYear()}`, value: stats.booksThisYear, trendDir: trends.dirs['books'] as TrendDir }
+      case 'miles':    return { label: 'Skate Miles',    value: stats.totalMiles.toFixed(1), unit: 'mi', trendDir: trends.dirs['miles'] as TrendDir }
+      case 'wins':     return { label: 'FN Wins',        value: stats.winCount,  trendDir: trends.dirs['wins'] as TrendDir }
+    }
+  }
+
+  const heroCards      = statPicks.slice(0, 2)
+  const secondaryCards = statPicks.slice(2)
 
   return (
     <>
@@ -313,10 +443,8 @@ export function Home() {
           {/* Ring SVG */}
           <div style={{ flexShrink: 0 }}>
             <svg width="100" height="100" viewBox="0 0 100 100" style={{ display: 'block' }}>
-              {/* Track */}
               <circle cx="50" cy="50" r="44" fill="none"
                 stroke="var(--accent)" strokeWidth="2.5" opacity="0.08" />
-              {/* Progress arc */}
               <circle cx="50" cy="50" r="44" fill="none"
                 stroke="var(--accent)" strokeWidth="2.5"
                 strokeDasharray={`${2 * Math.PI * 44 * Math.min(progress, 1)} ${2 * Math.PI * 44 * (1 - Math.min(progress, 1))}`}
@@ -324,7 +452,6 @@ export function Home() {
                 transform="rotate(-90 50 50)"
                 style={{ filter: 'drop-shadow(0 0 5px var(--accent))', transition: 'stroke-dasharray 1s ease' }}
               />
-              {/* Level number */}
               <text x="50" y="46" textAnchor="middle" dominantBaseline="middle"
                 fill="var(--accent)" fontFamily="Cinzel, serif" fontSize="26" fontWeight="700">
                 {displayLevel}
@@ -355,7 +482,6 @@ export function Home() {
               <span style={{ color: 'var(--text-dim)', margin: '0 3px' }}>←→</span>
               {' '}{toNext.toLocaleString()} to go
             </p>
-            {/* Meta row */}
             <p style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 3 }}>
               {streak.current > 0 && <>{streak.current} Streak · </>}
               {stats.booksThisYear} Books · {stats.winCount} Wins
@@ -370,94 +496,63 @@ export function Home() {
         {/* ── Week Dot Strip ── */}
         <WeekDotStrip activityDates={activityDates} streak={streak} />
 
-        {/* ── Personal Records ── */}
-        {showLifting && (
-          <div className="mb-5">
-            <div className="flex items-center justify-between mb-3">
-              <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em' }}>
-                Personal Records
-              </p>
-              <Link to="/strength" style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)' }}>
-                See all →
-              </Link>
-            </div>
-
-            {/* 2 hero cards */}
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <PRHeroCard
-                label="Bench PR"
-                value={stats.benchPR ? stats.benchPR.toFixed(1) : '—'}
-                trendDir={trends.dirs['bench']}
-                delta={trends.prDeltas.bench}
-              />
-              <PRHeroCard
-                label="Squat PR"
-                value={stats.squatPR ? stats.squatPR.toFixed(1) : '—'}
-                trendDir={trends.dirs['squat']}
-                delta={trends.prDeltas.squat}
-              />
-            </div>
-
-            {/* 2×2 secondary grid */}
-            <div className="grid grid-cols-2 gap-2">
-              <SecondaryStatCard
-                label="Deadlift PR"
-                value={stats.deadliftPR ? stats.deadliftPR.toFixed(1) : '—'}
-                unit="lbs"
-                trendDir={trends.dirs['deadlift']}
-              />
-              {showSkate && (
-                <SecondaryStatCard
-                  label="Total Miles"
-                  value={stats.totalMiles.toFixed(1)}
-                  unit="mi"
-                  trendDir={trends.dirs['miles']}
-                />
-              )}
-              {showBooks && (
-                <SecondaryStatCard
-                  label={`Books ${new Date().getFullYear()}`}
-                  value={stats.booksThisYear}
-                  trendDir={trends.dirs['books']}
-                />
-              )}
-              {showFortnite && (
-                <SecondaryStatCard
-                  label="FN Wins"
-                  value={stats.winCount}
-                  trendDir={trends.dirs['wins']}
-                />
-              )}
-              {strengthSQ !== null && (
-                <SecondaryStatCard
-                  label="Strength SQ"
-                  value={String(strengthSQ)}
-                  unit="/100"
-                  to="/strength"
-                />
-              )}
-            </div>
+        {/* ── My Stats ── */}
+        <div className="mb-5">
+          <div className="flex items-center justify-between mb-3">
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em' }}>
+              My Stats
+            </p>
+            <button
+              onClick={() => setShowPicker(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: 'var(--accent)', fontSize: 11, fontWeight: 600, padding: 0,
+              }}
+            >
+              {/* Pencil icon */}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Edit
+            </button>
           </div>
-        )}
 
-        {/* Non-lifting stat cards when lifting hidden */}
-        {!showLifting && (showSkate || showBooks || showFortnite) && (
-          <div className="mb-5">
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)',
-              letterSpacing: '-0.015em', marginBottom: 12 }}>Stats</p>
-            <div className="grid grid-cols-2 gap-2">
-              {showSkate && (
-                <SecondaryStatCard label="Total Miles" value={stats.totalMiles.toFixed(1)} unit="mi" trendDir={trends.dirs['miles']} />
+          {statPicks.length === 0 ? (
+            <button
+              onClick={() => setShowPicker(true)}
+              style={{
+                width: '100%', padding: '18px',
+                background: 'var(--card-bg)', border: '1px dashed var(--border)',
+                borderRadius: 14, cursor: 'pointer',
+                color: 'var(--text-muted)', fontSize: 13, fontWeight: 500,
+              }}
+            >
+              Tap Edit to choose which stats to display
+            </button>
+          ) : (
+            <>
+              {/* Hero cards — first 2 */}
+              {heroCards.length > 0 && (
+                <div className={`grid gap-3 mb-3 ${heroCards.length >= 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                  {heroCards.map(id => (
+                    <PRHeroCard key={id} {...getCardProps(id)} />
+                  ))}
+                </div>
               )}
-              {showBooks && (
-                <SecondaryStatCard label={`Books ${new Date().getFullYear()}`} value={stats.booksThisYear} trendDir={trends.dirs['books']} />
+
+              {/* Secondary cards — rest */}
+              {secondaryCards.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  {secondaryCards.map(id => (
+                    <SecondaryStatCard key={id} {...getCardProps(id)} />
+                  ))}
+                </div>
               )}
-              {showFortnite && (
-                <SecondaryStatCard label="FN Wins" value={stats.winCount} trendDir={trends.dirs['wins']} />
-              )}
-            </div>
-          </div>
-        )}
+            </>
+          )}
+        </div>
 
         {/* ── Recent Activity ── */}
         <Card>
@@ -490,6 +585,15 @@ export function Home() {
         </Card>
 
       </PageWrapper>
+
+      {/* ── Stats Picker ── */}
+      {showPicker && (
+        <StatsPickerModal
+          picks={statPicks}
+          onChange={savePicks}
+          onClose={() => setShowPicker(false)}
+        />
+      )}
     </>
   )
 }
