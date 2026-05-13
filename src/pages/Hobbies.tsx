@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+﻿import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -27,7 +27,7 @@ function HobbyCard({ icon, label, sub, path, statLabel, statValue, accentColor }
         width: '100%', textAlign: 'left', cursor: 'pointer',
         padding: '18px 20px', borderRadius: 16,
         background: 'var(--card-bg)',
-        border: `1px solid rgba(255,255,255,0.07)`,
+        border: `1px solid var(--border)`,
         backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
         display: 'flex', alignItems: 'center', gap: 16,
         transition: 'border-color 0.15s, transform 0.12s',
@@ -37,7 +37,7 @@ function HobbyCard({ icon, label, sub, path, statLabel, statValue, accentColor }
         e.currentTarget.style.transform = 'translateY(-1px)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
+        e.currentTarget.style.borderColor = 'var(--border)'
         e.currentTarget.style.transform = 'none'
       }}
     >

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -287,7 +287,7 @@ export function Measurements() {
                     onClick={() => setActiveChart(o.key)}
                     className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
                     style={{
-                      background: activeChart === o.key ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                      background: activeChart === o.key ? 'var(--accent)' : 'var(--input-bg)',
                       color:      activeChart === o.key ? 'var(--base-bg)' : '#888',
                     }}
                   >

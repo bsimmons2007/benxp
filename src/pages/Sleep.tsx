@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+﻿import { useEffect, useState, type FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
@@ -96,19 +96,19 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
         data-tutorial="log-sleep-btn"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? 'var(--accent)' : 'rgba(255,255,255,0.05)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ Log Sleep'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date"     type="date" {...register('date', { required: true })} />
             <Input label="Bedtime"  type="time" {...register('bedtime')} />
             <Input label="Wake Up"  type="time" {...register('wake_time')} />
             <Input label="Hours Slept (auto-calculated)" type="number" step="0.1" placeholder="7.5"
               {...register('hours_slept', { required: true })}
-              style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--accent)' }}
+              style={{ background: 'var(--input-bg)', color: 'var(--accent)' }}
             />
             <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Sleep'}</Button>
           </form>
@@ -151,12 +151,12 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all"
-        style={{ background: 'rgba(255,255,255,0.04)', color: '#888', border: '1px solid rgba(255,255,255,0.1)', fontSize: 14 }}
+        style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', fontSize: 14 }}
       >
         {open ? '✕ Cancel' : 'Log Nap'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={submit} className="flex flex-col gap-4">
             <Input label="Date" type="date" value={date} onChange={e => setDate(e.target.value)} />
             <Input label="Nap Length (hours)" type="number" step="0.25" placeholder="1.5" value={hours} onChange={e => setHours(e.target.value)} required />
@@ -259,7 +259,7 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
       </div>
 
       {/* Debt bar */}
-      <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden', marginBottom: 10 }}>
+      <div style={{ height: 6, borderRadius: 3, background: 'var(--input-bg)', overflow: 'hidden', marginBottom: 10 }}>
         <div style={{
           height: '100%', width: `${Math.min(100, (totalDebt / maxBar) * 100).toFixed(0)}%`,
           background: `linear-gradient(90deg, ${debtColor}88, ${debtColor})`,
@@ -269,17 +269,17 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
 
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p style={{ color: '#888', fontSize: 11 }}>Last 7 nights: <span style={{ color: '#ccc', fontWeight: 700 }}>{recentDebt.toFixed(1)}h deficit</span></p>
-          <p style={{ color: '#888', fontSize: 11 }}>14-day rolling: <span style={{ color: debtColor, fontWeight: 700 }}>{totalDebt.toFixed(1)}h</span></p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Last 7 nights: <span style={{ color: '#ccc', fontWeight: 700 }}>{recentDebt.toFixed(1)}h deficit</span></p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>14-day rolling: <span style={{ color: debtColor, fontWeight: 700 }}>{totalDebt.toFixed(1)}h</span></p>
         </div>
         <div style={{
           padding: '6px 12px', borderRadius: 8,
-          background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--input-bg)', border: '1px solid var(--border)',
           textAlign: 'center', flexShrink: 0,
         }}>
           <p style={{ color: '#fff', fontWeight: 700, fontSize: 18, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{recoveryNights}</p>
-          <p style={{ color: '#444', fontSize: 10 }}>nights @ 9h</p>
-          <p style={{ color: '#444', fontSize: 10 }}>to recover</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>nights @ 9h</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>to recover</p>
         </div>
       </div>
     </div>
@@ -379,7 +379,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="font-bold text-sm" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Wake Time Trainer</p>
-            <p style={{ color: '#888', fontSize: 11, marginTop: 2 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 2 }}>
               {avgWakeMins !== null
                 ? `Avg wake: ${fmtTime(avgWakeMins)} · Set a goal wake time`
                 : 'Plan a gradual wake time shift with a day-by-day schedule'}
@@ -394,7 +394,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
   return (
     <div className="rounded-xl mb-4 pop-in" style={{ background: 'rgba(10,12,28,0.95)', border: '1px solid rgba(245,166,35,0.25)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid var(--border-faint)' }}>
         <p className="font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 15 }}>Wake Time Trainer</p>
         <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18 }}>✕</button>
       </div>
@@ -403,7 +403,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
         {/* Current vs target */}
         <div className="flex items-center gap-3">
-          <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
             <p style={{ color: '#444', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
               {avgWakeMins !== null ? `Current avg (${wakeTimeLogs.length} nights)` : 'Current (estimated)'}
             </p>
@@ -419,7 +419,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
         {/* Settings */}
         <div className="flex flex-col gap-3">
           <div>
-            <label style={{ display: 'block', color: '#888', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Target Wake Time</label>
+            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Target Wake Time</label>
             <input
               type="time"
               value={targetWake}
@@ -430,7 +430,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
           <div className="flex gap-3">
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', color: '#888', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Sleep Duration (hrs)</label>
+              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Sleep Duration (hrs)</label>
               <input
                 type="number" step="0.5" min="5" max="10"
                 value={sleepHours}
@@ -439,7 +439,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', color: '#888', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Shift Speed</label>
+              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Shift Speed</label>
               <select
                 value={shiftMins}
                 onChange={e => setShiftMins(Number(e.target.value))}
@@ -471,7 +471,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                 { label: 'Shift per day', value: `${shiftMins}m earlier`          },
                 { label: 'Goal by',       value: formatDate(goalDate)              },
               ].map(s => (
-                <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
                   <p style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{s.value}</p>
                   <p style={{ color: '#555', fontSize: 9, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
                 </div>
@@ -482,10 +482,10 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
             {daysOnTrack > 0 && (
               <div>
                 <div className="flex justify-between mb-1">
-                  <p style={{ color: '#888', fontSize: 11 }}>Progress</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Progress</p>
                   <p style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700 }}>{daysOnTrack}/{daysNeeded} days on track</p>
                 </div>
-                <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                <div style={{ height: 6, borderRadius: 999, background: 'var(--input-bg)', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${progressPct}%`, background: 'var(--accent)', borderRadius: 999, transition: 'width 0.6s ease' }} />
                 </div>
               </div>
@@ -564,7 +564,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
             </div>
 
             {/* Science note */}
-            <p style={{ color: '#3a3a4a', fontSize: 10, textAlign: 'center', lineHeight: 1.4 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 10, textAlign: 'center', lineHeight: 1.4 }}>
               Based on chronobiology: shifting {shiftMins} min/day is within the body's natural circadian adaptation rate.
               Consistency is key — try to hit your bedtime every night, including weekends.
             </p>
@@ -645,7 +645,7 @@ export function Sleep() {
             { label: 'Best Night', value: best   ? best.toFixed(1) : '—' },
             { label: 'Day Streak', value: streak },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{s.value}</p>
               <p className="section-label mt-0.5">{s.label}</p>
             </div>
@@ -669,7 +669,7 @@ export function Sleep() {
           </div>
         )}
         {sorted.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Hours Slept</p>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={sorted} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -705,7 +705,7 @@ export function Sleep() {
 
         {/* Day of week breakdown */}
         {nightLogs.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>By Day of Week</p>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={dayData} barSize={28}>
@@ -736,16 +736,16 @@ export function Sleep() {
             <div
               key={entry.id}
               className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
-              style={{ background: isNap ? 'rgba(255,255,255,0.02)' : 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)', opacity: isNap ? 0.7 : 1 }}
+              style={{ background: isNap ? 'var(--input-bg)' : 'var(--card-bg)', border: '1px solid var(--border-faint)', opacity: isNap ? 0.7 : 1 }}
             >
               <div className="flex items-center gap-3">
                 <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: isNap ? '#555' : q.color }} />
                 <div>
                   <p className="text-white font-semibold text-sm">
                     {formatDate(entry.date)} <span style={{ color: '#555', fontWeight: 400 }}>({dayLabel})</span>
-                    {entry.is_nap && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(255,255,255,0.06)', color: '#888', padding: '1px 6px', borderRadius: 4 }}>NAP</span>}
+                    {entry.is_nap && <span style={{ marginLeft: 6, fontSize: 10, background: 'var(--input-bg)', color: 'var(--text-muted)', padding: '1px 6px', borderRadius: 4 }}>NAP</span>}
                   </p>
-                  <p className="text-xs mt-0.5" style={{ color: '#444' }}>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                     {entry.bedtime  && `Bed ${entry.bedtime} · `}
                     {entry.wake_time && `Up ${entry.wake_time}`}
                   </p>
@@ -758,7 +758,7 @@ export function Sleep() {
                 </div>
                 <button
                   onClick={() => setEditing(entry)}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
                 >
                   <EditIcon size={13} color="var(--text-muted)" />
                 </button>

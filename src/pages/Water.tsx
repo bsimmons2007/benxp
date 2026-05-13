@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+﻿import { useEffect, useState, useCallback } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Toast } from '../components/ui/Toast'
@@ -241,7 +241,7 @@ export function Water() {
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2 mb-5">
-          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{totalOz.toFixed(0)}oz</p>
             <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Today</p>
           </div>
@@ -250,13 +250,13 @@ export function Water() {
           <button
             onClick={() => { setGoalInput(String(goalOz)); setEditingGoal(true) }}
             className="rounded-xl p-3 text-center"
-            style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer' }}
+            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', cursor: 'pointer' }}
           >
             <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{goalOz}oz</p>
             <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Goal ✏️</p>
           </button>
 
-          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{totalOz >= goalOz ? 'Done!' : `${Math.max(0, goalOz - totalOz).toFixed(0)}oz`}</p>
             <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Remaining</p>
           </div>
@@ -270,7 +270,7 @@ export function Water() {
         )}
 
         {/* Quick add buttons */}
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 14 }}>Quick Add</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {QUICK_ADDS.map(oz => (
@@ -298,14 +298,14 @@ export function Water() {
               value={customOz}
               onChange={e => setCustomOz(e.target.value)}
               className="flex-1 px-3 py-2 rounded-lg text-white outline-none text-sm"
-              style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}
+              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}
             />
             <button
               onClick={() => { addWater(parseFloat(customOz) || 0); setCustomOz('') }}
               disabled={!customOz || parseFloat(customOz) <= 0}
               style={{
                 padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 700,
-                background: customOz && parseFloat(customOz) > 0 ? 'rgba(41,182,246,0.2)' : 'rgba(255,255,255,0.05)',
+                background: customOz && parseFloat(customOz) > 0 ? 'rgba(41,182,246,0.2)' : 'var(--input-bg)',
                 border: '1.5px solid rgba(41,182,246,0.3)',
                 color: '#29b6f6', cursor: 'pointer',
               }}
@@ -321,12 +321,12 @@ export function Water() {
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 14 }}>Today's Log</p>
             {entries.map(e => (
               <div key={e.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2"
-                style={{ background: 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
                 <div className="flex items-center gap-3">
                   <DropletIcon size={18} color="#29b6f6" />
                   <div>
                     <p className="font-bold" style={{ color: '#29b6f6', fontSize: 15 }}>{Number(e.oz).toFixed(0)}oz</p>
-                    <p style={{ color: '#555', fontSize: 11 }}>{formatTime(e.created_at)}</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>{formatTime(e.created_at)}</p>
                   </div>
                 </div>
                 <button
@@ -335,7 +335,7 @@ export function Water() {
                   style={{
                     width: 28, height: 28, borderRadius: 8, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer',
+                    background: 'var(--input-bg)', border: 'none', cursor: 'pointer',
                   }}
                 >
                   <EditIcon size={13} color="var(--text-muted)" />
@@ -348,8 +348,8 @@ export function Water() {
         {entries.length === 0 && !loading && (
           <div style={{ textAlign: 'center', padding: '32px 0', color: '#444' }}>
             <DropletIcon size={36} color="var(--text-muted)" />
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#444' }}>No water logged yet today</p>
-            <p style={{ fontSize: 12, color: '#444', marginTop: 4 }}>Tap a quick add button to get started</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)' }}>No water logged yet today</p>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Tap a quick add button to get started</p>
           </div>
         )}
 
@@ -364,10 +364,10 @@ export function Water() {
           saving={saving}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <label style={{ fontSize: 12, color: '#888' }}>Amount (oz)</label>
+            <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Amount (oz)</label>
             <input
               type="number" value={editOz} onChange={e => setEditOz(e.target.value)}
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 16, width: '100%' }}
+              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 16, width: '100%' }}
             />
           </div>
         </EditModal>
@@ -380,12 +380,12 @@ export function Water() {
           saving={false}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <label style={{ fontSize: 12, color: '#888' }}>Daily goal (oz)</label>
+            <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Daily goal (oz)</label>
             <input
               type="number" value={goalInput} onChange={e => setGoalInput(e.target.value)}
               placeholder="e.g. 64"
               autoFocus
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 16, width: '100%' }}
+              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 16, width: '100%' }}
             />
           </div>
         </EditModal>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -114,7 +114,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{
-          background: open ? 'var(--accent)' : 'rgba(255,255,255,0.05)',
+          background: open ? 'var(--accent)' : 'var(--input-bg)',
           color: open ? '#1A1A2E' : 'var(--accent)',
           border: '1px solid var(--accent)', fontSize: 15,
         }}
@@ -123,7 +123,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
       </button>
 
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
 
           {/* Section toggles */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
@@ -176,7 +176,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
 function StatPill({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
+      background: 'var(--input-bg)', border: '1px solid var(--border)',
       borderRadius: 12, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 2,
     }}>
       <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</span>
@@ -257,7 +257,7 @@ function EditBbModal({ session, onClose, onSaved }: { session: BasketballSession
       <input
         type="number" value={vals[key]}
         onChange={e => setVals(v => ({ ...v, [key]: e.target.value }))}
-        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }}
+        style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }}
       />
     </div>
   )
@@ -268,7 +268,7 @@ function EditBbModal({ session, onClose, onSaved }: { session: BasketballSession
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <label style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Date</label>
           <input type="date" value={vals.date} onChange={e => setVals(v => ({ ...v, date: e.target.value }))}
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
+            style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
         </div>
         <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Shooting</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -286,7 +286,7 @@ function EditBbModal({ session, onClose, onSaved }: { session: BasketballSession
           <label style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Notes</label>
           <input value={vals.notes} onChange={e => setVals(v => ({ ...v, notes: e.target.value }))}
             placeholder="Optional notes…"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
+            style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
         </div>
       </div>
     </EditModal>
@@ -527,7 +527,7 @@ export function Basketball() {
                 {sessions.map(s => (
                   <div key={s.id} style={{
                     padding: '12px 14px', borderRadius: 10,
-                    background: 'rgba(255,255,255,0.03)',
+                    background: 'var(--input-bg)',
                     border: '1px solid var(--border-faint)',
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>

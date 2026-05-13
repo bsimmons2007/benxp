@@ -1,4 +1,4 @@
-// ResetPassword — handles the Supabase password-recovery redirect link.
+﻿// ResetPassword — handles the Supabase password-recovery redirect link.
 // Supabase sends an email link → user clicks → lands here with the session
 // already restored via the URL hash. We just show a "choose new password" form.
 
@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase'
 
 const INPUT: React.CSSProperties = {
   width: '100%', padding: '12px 16px', borderRadius: 12,
-  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
+  background: 'var(--input-bg)', border: '1px solid var(--border)',
   color: '#fff', fontSize: 15, outline: 'none', transition: 'border-color 0.18s ease',
   boxSizing: 'border-box',
 }
@@ -70,7 +70,7 @@ export function ResetPassword() {
         style={{
           maxWidth: 380, borderRadius: 20, padding: '30px 28px',
           background: 'rgba(13,17,40,0.88)', backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.08)',
+          WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--border)',
           boxShadow: '0 24px 64px rgba(0,0,0,0.55)',
         }}
       >
@@ -103,7 +103,7 @@ export function ResetPassword() {
                   autoComplete="new-password"
                   style={{ ...INPUT, paddingRight: 46 }}
                   onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-                  onBlur={e  => (e.target.style.borderColor = 'rgba(255,255,255,0.10)')}
+                  onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
                 />
                 <button
                   type="button"
@@ -132,7 +132,7 @@ export function ResetPassword() {
                 autoComplete="new-password"
                 style={INPUT}
                 onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-                onBlur={e  => (e.target.style.borderColor = 'rgba(255,255,255,0.10)')}
+                onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
               />
             </div>
 

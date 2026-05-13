@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
 import { Card } from '../components/ui/Card'
@@ -201,7 +201,7 @@ export function Weekly() {
                         borderRadius: 8,
                         background: active
                           ? 'linear-gradient(135deg, var(--accent) 0%, rgba(245,166,35,0.5) 100%)'
-                          : 'rgba(255,255,255,0.05)',
+                          : 'var(--input-bg)',
                         border: isToday ? '1px solid var(--accent)' : '1px solid transparent',
                         boxShadow: active ? '0 0 12px var(--accent-dim)' : 'none',
                         transition: 'all 0.2s ease',
@@ -310,7 +310,7 @@ export function Weekly() {
                       <span style={{ color: '#888', fontSize: 12 }}>{score}/100</span>
                     </div>
                   </div>
-                  <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 999, overflow: 'hidden' }}>
+                  <div style={{ height: 8, background: 'var(--input-bg)', borderRadius: 999, overflow: 'hidden' }}>
                     <div style={{
                       height: '100%', width: `${score}%`, borderRadius: 999,
                       background: `linear-gradient(90deg, ${gradeColor}88, ${gradeColor})`,

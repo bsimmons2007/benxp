@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
@@ -142,7 +142,7 @@ export function Mood() {
                 className="card-animate"
                 style={{
                   background: 'var(--card-bg)', backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14,
+                  border: '1px solid var(--border)', borderRadius: 14,
                   padding: '12px 10px', textAlign: 'center',
                   boxShadow: `0 0 16px ${s.color}15`,
                 }}
@@ -219,7 +219,7 @@ export function Mood() {
             ].map(({ label, name, val, color }) => (
               <div key={name} className="flex flex-col gap-1">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <label style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif', fontSize: 15, fontWeight: 500 }}>
+                  <label style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif', fontSize: 15, fontWeight: 500 }}>
                     {label}
                   </label>
                   <span style={{ color, fontWeight: 700, fontSize: 16, fontFamily: 'Cinzel, serif', minWidth: 20, textAlign: 'right' }}>
@@ -237,14 +237,14 @@ export function Mood() {
 
             <Input label="Activities" type="text" placeholder="Gym, reading, skating…" {...register('activities')} />
             <div className="flex flex-col gap-1">
-              <label style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif', fontSize: 15, fontWeight: 500 }}>
+              <label style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif', fontSize: 15, fontWeight: 500 }}>
                 Notes
               </label>
               <textarea
                 {...register('notes')}
                 rows={3}
                 className="px-3 py-2 rounded-lg text-white outline-none resize-none"
-                style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)', fontSize: 14 }}
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: 14 }}
                 placeholder="How was today?"
               />
             </div>
@@ -267,7 +267,7 @@ export function Mood() {
                   style={{
                     padding: '9px 10px', borderRadius: 8, marginBottom: 2,
                     background: 'rgba(255,255,255,0.025)',
-                    border: '1px solid rgba(255,255,255,0.04)',
+                    border: '1px solid var(--border-faint)',
                   }}
                 >
                   <div className="flex justify-between items-center">
@@ -324,13 +324,13 @@ export function Mood() {
               <label style={{ fontSize: 13, color: '#aaa' }}>Activities</label>
               <input value={editVals.activities} onChange={e => setEditVals(v => ({ ...v, activities: e.target.value }))}
                 placeholder="Gym, reading…"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#fff', fontSize: 14, width: '100%' }} />
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={{ fontSize: 13, color: '#aaa' }}>Notes</label>
               <textarea value={editVals.notes} onChange={e => setEditVals(v => ({ ...v, notes: e.target.value }))}
                 rows={3} placeholder="How was today?"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 10px', color: '#fff', fontSize: 14, width: '100%', resize: 'none' }} />
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%', resize: 'none' }} />
             </div>
           </div>
         </EditModal>

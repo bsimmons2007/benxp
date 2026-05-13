@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
@@ -180,7 +180,7 @@ export function XPHistory() {
             background: 'var(--card-bg)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            border: '1px solid var(--border)',
             boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
           }}
         >
@@ -219,7 +219,7 @@ export function XPHistory() {
                       background: 'var(--card-bg)',
                       backdropFilter: 'blur(12px)',
                       WebkitBackdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(255,255,255,0.05)',
+                      border: '1px solid var(--border-faint)',
                     }}
                   >
                     <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{ev.icon}</span>

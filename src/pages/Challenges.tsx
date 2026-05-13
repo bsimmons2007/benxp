@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -53,9 +53,9 @@ function ChallengeCard({
     <div
       className={`rounded-xl p-4 mb-3 slide-in ${isBoss ? 'border-glow' : ''}`}
       style={{
-        background: 'rgba(15, 20, 40, 0.7)',
+        background: 'var(--card-bg)',
         backdropFilter: 'blur(12px)',
-        border: `1px solid ${isCompleted || autoCompleted ? tierColor : 'rgba(255,255,255,0.08)'}`,
+        border: `1px solid ${isCompleted || autoCompleted ? tierColor : 'var(--border)'}`,
         boxShadow: isCompleted || autoCompleted ? `0 0 20px ${tierGlow}` : 'none',
         transition: 'all 0.3s ease',
         opacity: isCompleted ? 0.55 : 1,
@@ -94,7 +94,7 @@ function ChallengeCard({
             <button
               onClick={onComplete}
               className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all"
-              style={{ background: 'rgba(255,255,255,0.08)', color: '#CCCCCC' }}
+              style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)' }}
             >
               Done
             </button>
@@ -111,7 +111,7 @@ function ChallengeCard({
               {progress.current} / {progress.target}
             </span>
           </div>
-          <div className="w-full rounded-full overflow-hidden" style={{ height: 6, background: 'rgba(255,255,255,0.08)' }}>
+          <div className="w-full rounded-full overflow-hidden" style={{ height: 6, background: 'var(--input-bg)' }}>
             <div
               className="h-full rounded-full progress-bar-fill"
               style={{
@@ -197,10 +197,10 @@ export function Challenges() {
                 onClick={() => setActiveTier(t.key)}
                 className="flex-1 flex flex-col items-center py-3 rounded-xl font-semibold transition-all duration-200"
                 style={{
-                  background: isActive ? t.color : 'rgba(255,255,255,0.04)',
+                  background: isActive ? t.color : 'var(--input-bg)',
                   color: isActive ? '#fff' : '#888',
                   boxShadow: isActive ? `0 4px 20px ${t.glow}` : 'none',
-                  border: `1px solid ${isActive ? t.color : 'rgba(255,255,255,0.06)'}`,
+                  border: `1px solid ${isActive ? t.color : 'var(--border-faint)'}``,
                   transform: isActive ? 'translateY(-2px)' : 'none',
                 }}
               >
@@ -230,7 +230,7 @@ export function Challenges() {
           </div>
           {/* Mini completion bar */}
           <div className="w-16">
-            <div className="w-full rounded-full overflow-hidden" style={{ height: 6, background: 'rgba(255,255,255,0.1)' }}>
+            <div className="w-full rounded-full overflow-hidden" style={{ height: 6, background: 'var(--input-bg)' }}>
               <div
                 className="h-full rounded-full"
                 style={{

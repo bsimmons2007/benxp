@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
@@ -147,12 +147,12 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? 'var(--accent)' : 'rgba(255,255,255,0.05)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ New Goal'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Type</label>
@@ -160,7 +160,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
                 {...register('metric_key')}
                 onChange={e => handleMetricChange(e.target.value as MetricKey)}
                 className="px-3 py-2 rounded-lg text-white outline-none"
-                style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}
               >
                 {GOAL_PRESETS.map(p => (
                   <option key={p.key} value={p.key}>{p.label}</option>
@@ -235,13 +235,13 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
         WebkitBackdropFilter: 'blur(12px)',
         border: isAutoComplete
           ? '1px solid rgba(245,166,35,0.5)'
-          : '1px solid rgba(255,255,255,0.07)',
+          : '1px solid var(--border)',
         boxShadow: isAutoComplete ? '0 0 20px rgba(245,166,35,0.15)' : 'none',
       }}
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.05)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'var(--input-bg)', flexShrink: 0 }}>
             <GoalIcon metricKey={goal.metric_key} size={17} color="var(--text-secondary)" />
           </div>
           <p className="font-semibold text-white text-sm truncate">{goal.title}</p>
@@ -272,7 +272,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
               <button
                 onClick={() => onNavigate(linkedPage)}
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1"
-                style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--accent)', border: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}
+                style={{ background: 'var(--input-bg)', color: 'var(--accent)', border: '1px solid var(--border)', flexShrink: 0 }}
                 title="View history for this metric"
               >
                 History ↗
@@ -282,9 +282,9 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
               onClick={onComplete}
               className="flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5"
               style={{
-                background: isAutoComplete ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
-                color: isAutoComplete ? 'var(--base-bg)' : '#888',
-                border: isAutoComplete ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                background: isAutoComplete ? 'var(--accent)' : 'var(--input-bg)',
+                color: isAutoComplete ? 'var(--base-bg)' : 'var(--text-muted)',
+                border: isAutoComplete ? 'none' : '1px solid var(--border)',
               }}
             >
               {isAutoComplete ? <><TrophyIcon size={12} color="currentColor" /> Complete!</> : 'Mark Complete'}
@@ -292,7 +292,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
             <button
               onClick={() => setConfirming(true)}
               className="px-3 py-1.5 rounded-lg flex items-center justify-center"
-              style={{ background: 'rgba(255,255,255,0.04)', color: '#444', border: '1px solid rgba(255,255,255,0.06)' }}
+              style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', border: '1px solid var(--border-faint)' }}
             >
               <TrashIcon size={14} color="#666" />
             </button>
@@ -300,7 +300,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
         ) : (
           <>
             <button onClick={onDelete} className="flex-1 py-1.5 rounded-lg text-xs font-bold" style={{ background: '#E94560', color: '#fff' }}>Delete</button>
-            <button onClick={() => setConfirming(false)} className="flex-1 py-1.5 rounded-lg text-xs" style={{ background: 'rgba(255,255,255,0.06)', color: '#888' }}>Cancel</button>
+            <button onClick={() => setConfirming(false)} className="flex-1 py-1.5 rounded-lg text-xs" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)' }}>Cancel</button>
           </>
         )}
       </div>
@@ -352,7 +352,7 @@ export function Goals() {
             { label: 'Complete',  value: completed.length },
             { label: 'XP Earned', value: completed.reduce((s, g) => s + g.xp_reward, 0) },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{s.value.toLocaleString()}</p>
               <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
             </div>
@@ -389,12 +389,12 @@ export function Goals() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,
                     padding: '12px 14px', borderRadius: 12, textAlign: 'left',
-                    background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)',
+                    background: 'var(--input-bg)', border: '1px dashed var(--border)',
                     color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13, fontWeight: 600,
                     transition: 'all 0.15s',
                   }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
                 >
                   <GoalIcon metricKey={t.metric} size={16} color="var(--accent)" />
                   <span>{t.label}</span>
@@ -424,7 +424,7 @@ export function Goals() {
               <div
                 key={g.id}
                 className="rounded-xl px-4 py-3 mb-2 flex items-center justify-between"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', opacity: 0.6 }}
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)', opacity: 0.6 }}
               >
                 <div className="flex items-center gap-2">
                   <GoalIcon metricKey={g.metric_key} size={15} color="var(--text-muted)" />

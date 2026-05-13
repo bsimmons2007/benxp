@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
@@ -181,7 +181,7 @@ export function Monthly() {
             {data.highlights.length > 0 && (
               <div className="grid grid-cols-3 gap-2 mb-4">
                 {data.highlights.map(h => (
-                  <div key={h.label} className="card-animate rounded-xl p-3" style={{ background: 'var(--card-bg)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: h.accent ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.07)', boxShadow: h.accent ? '0 0 16px var(--accent-dim)' : '0 4px 16px rgba(0,0,0,0.15)' }}>
+                  <div key={h.label} className="card-animate rounded-xl p-3" style={{ background: 'var(--card-bg)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: h.accent ? '1px solid var(--accent)' : '1px solid var(--border)', boxShadow: h.accent ? '0 0 16px var(--accent-dim)' : '0 4px 16px rgba(0,0,0,0.15)' }}>
                     <div style={{ marginBottom: 4 }}>{h.icon}</div>
                     <p style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 700, lineHeight: 1 }}>{h.value}</p>
                     <p style={{ color: '#aaa', fontSize: 10, marginTop: 2 }}>{h.label}</p>

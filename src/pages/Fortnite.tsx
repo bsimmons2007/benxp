@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -79,7 +79,7 @@ function StatCards({ items, accent }: { items: { label: string; value: string | 
   return (
     <div className="grid grid-cols-3 gap-2 mb-4">
       {items.map(s => (
-        <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <p className="text-xl font-bold" style={{ color: accent, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
           <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
         </div>
@@ -104,7 +104,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
   return (
     <>
       {cumulativeWins.length >= 3 && (
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Cumulative Wins</p>
           <ResponsiveContainer width="100%" height={160}>
             <AreaChart data={cumulativeWins} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -125,7 +125,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
       )}
 
       {monthlyWins.length >= 2 && (
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Monthly Wins</p>
           <ResponsiveContainer width="100%" height={130}>
             <BarChart data={monthlyWins} barSize={26} margin={{ top: 4 }}>
@@ -144,7 +144,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
       )}
 
       {killsData.length >= 3 && (
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Kills per Game</p>
           <ResponsiveContainer width="100%" height={140}>
             <AreaChart data={killsData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -167,7 +167,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
       )}
 
       {accuracyData.length >= 3 && (
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Accuracy %</p>
           <ResponsiveContainer width="100%" height={120}>
             <AreaChart data={accuracyData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -232,7 +232,7 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
           <input type="number" step="0.1" value={accuracy} onChange={e => setAccuracy(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
         </div>
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setWin(w => !w)}>
-          <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? '#27AE60' : 'rgba(255,255,255,0.15)' }}>
+          <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? '#27AE60' : 'var(--border)' }}>
             <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: win ? 'translateX(26px)' : 'translateX(2px)' }} />
           </div>
           <span className="font-medium text-white">Win</span>
@@ -299,12 +299,12 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT_NORMAL : 'rgba(255,255,255,0.05)', color: open ? 'var(--base-bg)' : ACCENT_NORMAL, border: `1px solid ${ACCENT_NORMAL}`, fontSize: 15 }}
+        style={{ background: open ? ACCENT_NORMAL : 'var(--input-bg)', color: open ? 'var(--base-bg)' : ACCENT_NORMAL, border: `1px solid ${ACCENT_NORMAL}`, fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
@@ -327,7 +327,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
-              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? 'var(--accent)' : 'rgba(255,255,255,0.15)' }}>
+              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? 'var(--accent)' : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
               <span className="font-semibold" style={{ color: isWin ? 'var(--accent)' : '#888', fontFamily: 'Cinzel, serif', fontSize: 13 }}>
@@ -339,7 +339,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
 
             {/* Ranked toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsRanked(r => !r)}>
-              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isRanked ? '#5c85d6' : 'rgba(255,255,255,0.15)' }}>
+              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isRanked ? '#5c85d6' : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isRanked ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
               <span className="font-semibold" style={{ color: isRanked ? '#5c85d6' : '#888', fontFamily: 'Cinzel, serif', fontSize: 13 }}>
@@ -357,7 +357,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
                   {FN_RANKS.map(r => (
                     <button key={r} type="button" onClick={() => setRankName(r)} style={{
                       padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700,
-                      background: rankName === r ? `${RANK_COLORS[r]}22` : 'rgba(255,255,255,0.04)',
+                      background: rankName === r ? `${RANK_COLORS[r]}22` : 'var(--input-bg)',
                       border: `1.5px solid ${rankName === r ? RANK_COLORS[r] : 'rgba(255,255,255,0.1)'}`,
                       color: rankName === r ? RANK_COLORS[r] : '#666', cursor: 'pointer', transition: 'all 0.12s ease',
                     }}>{r}</button>
@@ -433,7 +433,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
         {open ? '✕ Cancel' : '+ Log Blitz Game'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
@@ -454,7 +454,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
-              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT_BLITZ : 'rgba(255,255,255,0.15)' }}>
+              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT_BLITZ : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
               <span className="font-semibold" style={{ color: isWin ? ACCENT_BLITZ : '#888', fontFamily: 'Cinzel, serif', fontSize: 13 }}>
@@ -512,7 +512,7 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
           <div
             key={g.id}
             className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
-            style={{ background: 'rgba(16,24,52,0.65)', border: `1px solid ${g.win ? 'rgba(245,166,35,0.3)' : 'rgba(255,255,255,0.06)'}` }}
+            style={{ background: 'var(--card-bg)', border: `1px solid ${g.win ? 'rgba(245,166,35,0.3)' : 'var(--border-faint)'}` }}
           >
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: g.win ? ACCENT_NORMAL : '#444' }} />
@@ -541,7 +541,7 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
                 <p className="font-bold text-white text-base">{g.kills}K</p>
                 {g.accuracy != null && <p className="text-xs" style={{ color: '#888' }}>{g.accuracy}%</p>}
               </div>
-              <button onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}>
+              <button onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
@@ -593,7 +593,7 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
         <div
           key={g.id}
           className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
-          style={{ background: 'rgba(16,24,52,0.65)', border: `1px solid ${g.win ? 'rgba(168,85,247,0.3)' : 'rgba(255,255,255,0.06)'}` }}
+          style={{ background: 'var(--card-bg)', border: `1px solid ${g.win ? 'rgba(168,85,247,0.3)' : 'var(--border-faint)'}` }}
         >
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: g.win ? ACCENT_BLITZ : '#444' }} />
@@ -612,7 +612,7 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
               <p className="font-bold text-white text-base">{g.kills}K</p>
               {g.accuracy != null && <p className="text-xs" style={{ color: '#888' }}>{g.accuracy}%</p>}
             </div>
-            <button onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}>
+            <button onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
               <EditIcon size={13} color="var(--text-muted)" />
             </button>
           </div>
@@ -653,7 +653,7 @@ export function Fortnite() {
       <PageWrapper>
 
         {/* Tab switcher */}
-        <div className="flex gap-1 mb-5 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="flex gap-1 mb-5 p-1 rounded-xl" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
           {([['normal', 'Normal', ACCENT_NORMAL], ['blitz', 'Blitz', ACCENT_BLITZ]] as const).map(([t, label, color]) => (
             <button
               key={t}

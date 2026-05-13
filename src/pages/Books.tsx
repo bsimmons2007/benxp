@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -214,8 +214,8 @@ function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: ()
 
 // ── Edit book modal ──────────────────────────────────────────
 const inputCls = "px-3 py-3 rounded-lg text-white outline-none text-base w-full"
-const inputStyle = { background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }
-const labelStyle = { color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }
+const inputStyle = { background: 'var(--input-bg)', border: '1px solid var(--border)' }
+const labelStyle = { color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return <label className="text-base font-medium" style={labelStyle}>{children}</label>
@@ -339,7 +339,7 @@ function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () =
           <div style={{ width: 4, borderRadius: 2, alignSelf: 'stretch', background: 'var(--accent)', flexShrink: 0 }} />
           <div className="flex-1 min-w-0">
             <p className="font-bold text-white leading-tight" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>{book.title}</p>
-            {book.author && <p className="text-sm mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{book.author}</p>}
+            {book.author && <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>{book.author}</p>}
             <div className="flex items-center gap-2 mt-2">
               <GenreChip genre={book.genre} />
               {book.pages && <span style={{ color: '#444', fontSize: 11 }}>{book.pages} pp</span>}
@@ -360,7 +360,7 @@ function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () =
             </button>
             <button
               onClick={() => setEditing(true)}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
             >
               <EditIcon size={13} color="var(--text-muted)" />
             </button>
@@ -382,9 +382,9 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
       <div
         className="rounded-xl p-4 mb-3 card-animate cursor-pointer"
         style={{
-          background: 'rgba(16,24,52,0.7)',
+          background: 'var(--card-bg)',
           backdropFilter: 'blur(12px)',
-          border: `1px solid ${expanded ? 'var(--accent)' : 'rgba(255,255,255,0.07)'}`,
+          border: `1px solid ${expanded ? 'var(--accent)' : 'var(--border)'}`,
           boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
           transition: 'border-color 0.2s',
         }}
@@ -394,7 +394,7 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
           <div className="w-1 rounded-full flex-shrink-0 self-stretch" style={{ background: GENRE_COLORS[book.genre ?? ''] ?? '#555', minHeight: 40 }} />
           <div className="flex-1 min-w-0">
             <p className="font-bold text-white leading-tight" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>{book.title}</p>
-            {book.author && <p className="text-sm mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{book.author}</p>}
+            {book.author && <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>{book.author}</p>}
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <GenreChip genre={book.genre} />
               <Stars rating={book.rating} />
@@ -403,14 +403,14 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
           <div className="flex flex-col items-end gap-1 flex-shrink-0">
             {book.date_finished && <p className="text-xs" style={{ color: '#888' }}>{formatDate(book.date_finished)}</p>}
             {book.pages && <p className="text-xs" style={{ color: '#444' }}>{book.pages} pp</p>}
-            <button onClick={e => { e.stopPropagation(); setEditing(true) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer', marginTop: 4 }}>
+            <button onClick={e => { e.stopPropagation(); setEditing(true) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer', marginTop: 4 }}>
               <EditIcon size={13} color="var(--text-muted)" />
             </button>
           </div>
         </div>
 
         {expanded && (
-          <div className="mt-3 pt-3 pop-in" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="mt-3 pt-3 pop-in" style={{ borderTop: '1px solid var(--border-faint)' }}>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {[
                 { label: 'Genre',    value: book.genre ?? '—' },
@@ -499,13 +499,13 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? 'var(--accent)' : 'rgba(255,255,255,0.05)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ Add Book'}
       </button>
 
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 
             {/* Status toggle */}
@@ -529,7 +529,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Author" type="text" placeholder="Author name" {...register('author')} />
 
             <div className="flex flex-col gap-1">
-              <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Genre</label>
+              <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Genre</label>
               <select {...register('genre')} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}>
                 {allGenres.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
@@ -594,20 +594,20 @@ function ToReadSection() {
         <button
           onClick={() => setShowForm(s => !s)}
           className="text-sm px-3 py-1.5 rounded-lg font-medium"
-          style={{ background: showForm ? 'var(--accent)' : 'rgba(255,255,255,0.06)', color: showForm ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)' }}
+          style={{ background: showForm ? 'var(--accent)' : 'var(--input-bg)', color: showForm ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)' }}
         >
           {showForm ? '✕' : '+ Add'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl p-4 mb-4 pop-in flex flex-col gap-3" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl p-4 mb-4 pop-in flex flex-col gap-3" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <Input label="Title" type="text" {...register('title', { required: true })} />
           <Input label="Author" type="text" {...register('author')} />
           <div className="flex gap-2">
             <Input label="Genre" type="text" className="flex-1" {...register('genre')} />
             <div className="flex flex-col gap-1 flex-1">
-              <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Priority</label>
+              <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Priority</label>
               <select {...register('priority')} className="px-3 py-3 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <option>High</option><option>Medium</option><option>Low</option>
               </select>
@@ -619,7 +619,7 @@ function ToReadSection() {
 
       <div className="flex flex-col gap-2">
         {books.map(b => (
-          <div key={b.id} className="flex items-center justify-between px-4 py-3 rounded-xl card-animate" style={{ background: 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div key={b.id} className="flex items-center justify-between px-4 py-3 rounded-xl card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-1.5 h-8 rounded-full flex-shrink-0" style={{ background: b.priority ? PRIORITY_COLORS[b.priority] : '#555' }} />
               <div className="min-w-0">
@@ -692,9 +692,9 @@ export function Books() {
             { label: 'Avg Rating', value: avgRating ? avgRating.toFixed(1) + '★' : '—' },
             { label: 'Pages',      value: totalPages.toLocaleString() },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'rgba(16,24,52,0.7)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{s.value}</p>
-              <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -737,7 +737,7 @@ export function Books() {
                   className="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0 transition-all"
                   style={filterGenre === g
                     ? { background: 'var(--accent)', color: '#1A1A2E' }
-                    : { background: 'rgba(255,255,255,0.06)', color: '#888', border: '1px solid rgba(255,255,255,0.08)' }}
+                    : { background: 'var(--input-bg)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
                 >
                   {g}
                 </button>
@@ -750,7 +750,7 @@ export function Books() {
                 value={sort}
                 onChange={e => setSort(e.target.value as SortKey)}
                 className="text-sm px-3 py-1.5 rounded-lg outline-none"
-                style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)', color: '#CCCCCC' }}
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: '#CCCCCC' }}
               >
                 {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
               </select>

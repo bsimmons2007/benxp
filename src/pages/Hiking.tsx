@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -87,12 +87,12 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'rgba(255,255,255,0.05)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ Log Hike'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
             <Input label="Trail" type="text" placeholder="Camelback Mountain — Echo Canyon" {...register('trail', { required: true })} />
@@ -210,7 +210,7 @@ export function Hiking() {
             { label: 'Total mi', value: totalMiles > 0 ? totalMiles.toFixed(1) : '—' },
             { label: 'Total ft', value: totalElev > 0 ? `${(totalElev / 1000).toFixed(1)}k` : '—' },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
               <p className="text-xs mt-0.5 section-label">{s.label}</p>
             </div>
@@ -232,7 +232,7 @@ export function Hiking() {
 
         {/* Monthly miles chart */}
         {chartData.length >= 2 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Miles / Month</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={chartData} barSize={24}>
@@ -249,7 +249,7 @@ export function Hiking() {
         {/* History */}
         {sessions.length > 0 && <p className="section-label mb-3">Hike Log</p>}
         {sessions.map(h => (
-          <div key={h.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div key={h.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
             <div className="flex items-center gap-3 min-w-0">
               <div style={{
                 width: 38, height: 38, borderRadius: 10, flexShrink: 0,
@@ -278,7 +278,7 @@ export function Hiking() {
                   <p style={{ fontSize: 11, color: '#666', marginTop: 1 }}>↑ {h.elevation_gain_ft.toLocaleString()} ft</p>
                 )}
               </div>
-              <button onClick={() => setEditing(h)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}>
+              <button onClick={() => setEditing(h)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>

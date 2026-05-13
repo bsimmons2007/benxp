@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -27,8 +27,8 @@ const INPUT_BASE: React.CSSProperties = {
   width:        '100%',
   padding:      '12px 16px',
   borderRadius: 12,
-  background:   'rgba(255,255,255,0.05)',
-  border:       '1px solid rgba(255,255,255,0.10)',
+  background:   'var(--input-bg)',
+  border:       '1px solid var(--border)',
   color:        '#fff',
   fontSize:     15,
   outline:      'none',
@@ -79,7 +79,7 @@ export function Login() {
           padding:      '52px 56px',
           position:     'relative',
           overflow:     'hidden',
-          borderRight:  '1px solid rgba(255,255,255,0.05)',
+          borderRight:  '1px solid var(--border-faint)',
           background:   'linear-gradient(155deg, rgba(22,18,48,0.95) 0%, rgba(8,10,22,1) 100%)',
         }}
       >
@@ -129,7 +129,7 @@ export function Login() {
           <div style={{
             padding: '14px 18px', borderRadius: 12,
             background: 'rgba(255,255,255,0.025)',
-            border: '1px solid rgba(255,255,255,0.05)',
+            border: '1px solid var(--border-faint)',
           }}>
             <p style={{ color: '#444', fontSize: 13, fontStyle: 'italic', lineHeight: 1.7, margin: 0 }}>
               "Every rep. Every mile. Every page.{' '}
@@ -184,7 +184,7 @@ export function Login() {
               background:           'rgba(13,17,40,0.88)',
               backdropFilter:       'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
-              border:     '1px solid rgba(255,255,255,0.08)',
+              border:     '1px solid var(--border)',
               boxShadow:  '0 24px 64px rgba(0,0,0,0.55)',
             }}
           >
@@ -216,7 +216,7 @@ export function Login() {
                   {...register('name', { required: mode === 'signup', maxLength: 64 })}
                   style={INPUT_BASE}
                   onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-                  onBlur={e  => (e.target.style.borderColor = 'rgba(255,255,255,0.10)')}
+                  onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
                 />
               </div>
 
@@ -230,7 +230,7 @@ export function Login() {
                   {...register('email', { required: true })}
                   style={INPUT_BASE}
                   onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-                  onBlur={e  => (e.target.style.borderColor = 'rgba(255,255,255,0.10)')}
+                  onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
                 />
               </div>
 
@@ -266,7 +266,7 @@ export function Login() {
                     {...register('password', { required: true, minLength: { value: 8, message: 'Password must be at least 8 characters' } })}
                     style={{ ...INPUT_BASE, paddingRight: 46 }}
                     onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-                    onBlur={e  => (e.target.style.borderColor = 'rgba(255,255,255,0.10)')}
+                    onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
                   />
                   <button
                     type="button"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -33,7 +33,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
   return (
     <div
       className="rounded-xl mb-4 overflow-hidden"
-      style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.08)', padding: '16px' }}
+      style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', padding: '16px' }}
     >
       <div className="flex items-center gap-2 mb-3">
         <TrophyIcon size={13} color="var(--text-muted)" />
@@ -58,7 +58,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
                   {r.est1rm.toFixed(0)} <span style={{ color: '#888', fontSize: 11, fontWeight: 400 }}>lbs</span>
                 </span>
               </div>
-              <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 999, overflow: 'hidden' }}>
+              <div style={{ height: 6, background: 'var(--input-bg)', borderRadius: 999, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%', width: `${pct}%`, borderRadius: 999,
                   background: i === 0
@@ -124,8 +124,8 @@ export function PRFeed() {
                 fontWeight: 600,
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
-                background: filter === l ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
-                color:      filter === l ? 'var(--base-bg)' : '#888',
+                background: filter === l ? 'var(--accent)' : 'var(--input-bg)',
+                color:      filter === l ? 'var(--base-bg)' : 'var(--text-muted)',
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
@@ -166,10 +166,10 @@ export function PRFeed() {
                       : 'var(--card-bg)',
                     border: isBest && i < 5
                       ? '1px solid rgba(255,255,255,0.12)'
-                      : '1px solid rgba(255,255,255,0.06)',
+                      : '1px solid var(--border-faint)',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,0.05)', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, background: 'var(--input-bg)', flexShrink: 0 }}>
                     <DumbbellIcon size={16} color="var(--text-secondary)" />
                   </div>
                   <div className="flex-1">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine, Cell } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -86,12 +86,12 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'rgba(255,255,255,0.05)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ Log Round'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
             <Input label="Course" type="text" placeholder="Papago Disc Golf" {...register('course', { required: true })} />
@@ -183,7 +183,7 @@ export function DiscGolf() {
             { label: 'Best',      value: bestDiff !== null ? vsParLabel(bestDiff) : '—', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
             { label: 'Under Par', value: underPar || '—', color: '#34d399' },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: s.color ?? ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
               <p className="text-xs mt-0.5 section-label">{s.label}</p>
             </div>
@@ -205,7 +205,7 @@ export function DiscGolf() {
 
         {/* Score vs Par chart */}
         {chartData.length >= 2 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Score vs Par</p>
             <p className="section-label mb-3">Green = under par</p>
             <ResponsiveContainer width="100%" height={140}>
@@ -230,11 +230,11 @@ export function DiscGolf() {
         {rounds.map(r => {
           const diff = r.score - r.par
           return (
-            <div key={r.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div key={r.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
               <div className="flex items-center gap-3">
                 <div style={{
                   width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                  background: diff <= 0 ? 'rgba(52,211,153,0.15)' : 'rgba(255,255,255,0.04)',
+                  background: diff <= 0 ? 'rgba(52,211,153,0.15)' : 'var(--input-bg)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <DiscIcon size={18} color={diff <= 0 ? '#34d399' : '#555'} />
@@ -249,7 +249,7 @@ export function DiscGolf() {
                   <p style={{ fontSize: 18, fontWeight: 800, color: vsParColor(diff), fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{vsParLabel(diff)}</p>
                   <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{r.score} / {r.par}</p>
                 </div>
-                <button onClick={() => setEditing(r)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}>
+                <button onClick={() => setEditing(r)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                   <EditIcon size={13} color="var(--text-muted)" />
                 </button>
               </div>

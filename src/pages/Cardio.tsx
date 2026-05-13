@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -123,16 +123,16 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
         data-tutorial="log-cardio-btn"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? 'var(--accent)' : 'rgba(255,255,255,0.05)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ Log Session'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Activity</label>
+              <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Activity</label>
               <div className="grid grid-cols-5 gap-2">
                 {ACTIVITIES.map(a => (
                   <label key={a.key} className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl cursor-pointer transition-all" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
@@ -170,8 +170,8 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
   const [notes, setNotes]   = useState(session.notes ?? '')
   const [saving, setSaving] = useState(false)
 
-  const inputStyle = { background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }
-  const labelStyle = { color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }
+  const inputStyle = { background: 'var(--input-bg)', border: '1px solid var(--border)' }
+  const labelStyle = { color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }
 
   async function save() {
     setSaving(true)
@@ -285,11 +285,11 @@ export function Cardio() {
             { label: 'Sessions',    value: sessions.length },
             { label: 'Total XP',    value: totalXP.toLocaleString() },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-lg font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
                 {s.value}{s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: '#888' }}>{s.unit}</span>}
               </p>
-              <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -303,7 +303,7 @@ export function Cardio() {
               key={k}
               onClick={() => setFilter(k)}
               className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5"
-              style={{ background: filter === k ? 'var(--accent)' : 'rgba(255,255,255,0.06)', color: filter === k ? 'var(--base-bg)' : '#888' }}
+              style={{ background: filter === k ? 'var(--accent)' : 'var(--input-bg)', color: filter === k ? 'var(--base-bg)' : 'var(--text-muted)' }}
             >
               {k === 'all' ? 'All' : (
                 <>
@@ -322,7 +322,7 @@ export function Cardio() {
           </div>
         )}
         {chartData.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Distance Trend</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>Avg {avgMiles.toFixed(1)} mi/session</p>
             <ResponsiveContainer width="100%" height={150}>
@@ -353,12 +353,12 @@ export function Cardio() {
 
         {/* Session history */}
         {filtered.length > 0 ? (
-          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="px-4 pt-4 pb-2 font-bold text-white" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Sessions</p>
             {filtered.map(s => {
               const pace = s.duration_mins && s.distance ? (s.duration_mins / s.distance).toFixed(1) : null
               return (
-                <div key={`${s.source}-${s.id}`} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div key={`${s.source}-${s.id}`} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
                   <div>
                     <p className="text-white text-sm font-semibold flex items-center gap-1.5">
                       <ActivityIconComp activityKey={s.activity} size={14} color="var(--text-secondary)" />
@@ -380,7 +380,7 @@ export function Cardio() {
                     <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>+{sessionXP(s)} XP</span>
                     <button
                       onClick={() => setEditing(s)}
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
                     >
                       <EditIcon size={13} color="var(--text-muted)" />
                     </button>

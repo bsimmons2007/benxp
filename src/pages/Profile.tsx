@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
@@ -619,7 +619,7 @@ export function Profile() {
             <div style={{ position: 'relative', flexShrink: 0 }}>
               <div style={{
                 width: 76, height: 76, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.06)',
+                background: 'var(--input-bg)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 overflow: 'hidden',
                 border: '2px solid var(--accent)',
@@ -691,7 +691,7 @@ export function Profile() {
                 {consistencyScore}%
               </span>
             </div>
-            <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 999, overflow: 'hidden' }}>
+            <div style={{ height: 8, background: 'var(--input-bg)', borderRadius: 999, overflow: 'hidden' }}>
               <div style={{
                 height: '100%',
                 width: `${consistencyScore}%`,

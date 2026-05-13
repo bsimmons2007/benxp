@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { LogWorkoutForm } from '../components/forms/LogWorkoutForm'
@@ -27,7 +27,7 @@ export function Log() {
         style={{
           top: 52,
           background: 'var(--base-bg)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          borderBottom: '1px solid var(--border)',
         }}
       >
         {TABS.map((tab) => (
@@ -38,7 +38,7 @@ export function Log() {
             style={
               active === tab.key
                 ? { background: 'var(--accent)', color: 'var(--base-bg)' }
-                : { background: 'rgba(255,255,255,0.05)', color: '#888888' }
+                : { background: 'var(--input-bg)', color: 'var(--text-muted)' }
             }
           >
             <span style={{ display: 'flex', alignItems: 'center' }}>{tab.icon}</span>

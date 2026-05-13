@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -80,19 +80,19 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'rgba(255,255,255,0.05)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
             {/* Game type */}
             <div className="flex flex-col gap-1">
-              <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Game Type</label>
-              <select {...register('game_type')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Game Type</label>
+              <select {...register('game_type')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
                 <option>Singles</option>
                 <option>Doubles</option>
               </select>
@@ -109,7 +109,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
-              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT : 'rgba(255,255,255,0.15)' }}>
+              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
               <span className="font-semibold" style={{ color: isWin ? ACCENT : '#888', fontFamily: 'Cinzel, serif', fontSize: 13 }}>
@@ -155,16 +155,16 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>My Score</label>
-            <input type="number" value={myScore} onChange={e => setMyScore(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
+            <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>My Score</label>
+            <input type="number" value={myScore} onChange={e => setMyScore(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }} />
           </div>
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Opp Score</label>
-            <input type="number" value={oppScore} onChange={e => setOppScore(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
+            <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Opp Score</label>
+            <input type="number" value={oppScore} onChange={e => setOppScore(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }} />
           </div>
         </div>
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setWin(w => !w)}>
-          <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? ACCENT : 'rgba(255,255,255,0.15)' }}>
+          <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? ACCENT : 'var(--border)' }}>
             <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: win ? 'translateX(26px)' : 'translateX(2px)' }} />
           </div>
           <span className="font-medium text-white">Win</span>
@@ -222,7 +222,7 @@ export function Pickleball() {
             { label: 'Win Rate', value: games.length ? `${winRate}%` : '—' },
             { label: 'Streak',   value: streak || '—' },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
               <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
             </div>
@@ -242,7 +242,7 @@ export function Pickleball() {
 
         {/* Monthly chart */}
         {monthData.length >= 2 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Monthly Record</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={monthData} barGap={4}>
@@ -265,7 +265,7 @@ export function Pickleball() {
           <div
             key={game.id}
             className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
-            style={{ background: 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}
+            style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}
           >
             <div className="flex items-center gap-3">
               <div style={{
@@ -299,7 +299,7 @@ export function Pickleball() {
               </div>
               <button
                 onClick={() => setEditing(game)}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
               >
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>

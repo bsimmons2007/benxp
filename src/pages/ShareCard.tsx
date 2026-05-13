@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -111,7 +111,7 @@ function Card() {
           <span style={{ color: '#888', fontSize: 10 }}>{totalXP.toLocaleString()} XP</span>
           <span style={{ color: theme.accent, fontSize: 10 }}>{toNext.toLocaleString()} to next</span>
         </div>
-        <div style={{ height: 8, background: 'rgba(255,255,255,0.07)', borderRadius: 999, overflow: 'hidden' }}>
+        <div style={{ height: 8, background: 'var(--input-bg)', borderRadius: 999, overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: 999,
             width: `${pct}%`,
@@ -163,7 +163,7 @@ function Card() {
                       <span style={{ color: '#ccc', fontSize: 10 }}>{s.title}</span>
                       <span style={{ color: theme.accent, fontSize: 10, fontWeight: 700 }}>Lvl {s.level}</span>
                     </div>
-                    <div style={{ height: 4, background: 'rgba(255,255,255,0.07)', borderRadius: 999, overflow: 'hidden' }}>
+                    <div style={{ height: 4, background: 'var(--input-bg)', borderRadius: 999, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${pctS}%`, background: theme.accent, borderRadius: 999 }} />
                     </div>
                   </div>
@@ -194,7 +194,7 @@ function Card() {
       )}
 
       {/* Footer */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, borderTop: '1px solid var(--border-faint)' }}>
         <p style={{ color: '#444', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>youxp.app</p>
         <p style={{ color: '#444', fontSize: 9, margin: 0 }}>{new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
       </div>
@@ -272,7 +272,7 @@ export function ShareCard() {
           </button>
 
           {hint && (
-            <div className="rounded-xl px-4 py-3 text-center pop-in" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="rounded-xl px-4 py-3 text-center pop-in" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
               <p style={{ color: '#444', fontSize: 12 }}>
                 Or take a screenshot of the card above to share directly.
               </p>

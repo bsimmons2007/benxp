@@ -1,4 +1,4 @@
-import { TopBar } from '../components/layout/TopBar'
+﻿import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import {
   PersonIcon, TargetIcon, RulerIcon, CalendarIcon, GridIcon,
@@ -43,7 +43,7 @@ export function More() {
               >
                 <div style={{
                   width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                  background: 'rgba(255,255,255,0.05)',
+                  background: 'var(--input-bg)',
                   border: '1px solid var(--border-faint)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>

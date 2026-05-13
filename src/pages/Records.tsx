@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
@@ -119,7 +119,7 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
         >
           {/* Group filter chips */}
           {query.length < 1 && (
-            <div style={{ display: 'flex', gap: 6, padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 6, padding: '8px 10px', borderBottom: '1px solid var(--border-faint)', flexWrap: 'wrap' }}>
               {groups.map(g => (
                 <button
                   type="button"
@@ -127,7 +127,7 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
                   onClick={() => setActiveGrp(prev => prev === g ? null : g)}
                   style={{
                     padding: '3px 10px', borderRadius: 12, fontSize: 11, cursor: 'pointer',
-                    background: activeGrp === g ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                    background: activeGrp === g ? 'var(--accent)' : 'var(--input-bg)',
                     color: activeGrp === g ? 'var(--base-bg)' : '#888',
                     border: 'none',
                     fontWeight: activeGrp === g ? 700 : 400,
@@ -163,10 +163,10 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
               style={{
                 width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10,
                 padding: '9px 12px', background: 'none', border: 'none', cursor: 'pointer',
-                borderBottom: '1px solid rgba(255,255,255,0.04)',
-                transition: 'background 0.1s',
+                borderBottom: '1px solid var(--border-faint)',
+              transition: 'background 0.1s',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--input-bg)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
               {liftIcon(ex.name, ex.muscle_group)}
@@ -185,7 +185,7 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
             <button
               type="button"
               onClick={() => { onChange(query, false); setOpen(false) }}
-              style={{ width: '100%', textAlign: 'left', color: '#444', fontSize: 11, background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderTop: '1px solid rgba(255,255,255,0.05)' }}
+              style={{ width: '100%', textAlign: 'left', color: 'var(--text-muted)', fontSize: 11, background: 'none', border: 'none', cursor: 'pointer', padding: '8px 12px', borderTop: '1px solid var(--border-faint)' }}
             >
               + Use "{query}" as custom exercise
             </button>
@@ -288,7 +288,7 @@ function ExerciseRow({
 
   return (
     <div className="pop-in" style={{
-      background: 'rgba(255,255,255,0.025)', border: '1px solid var(--border-faint)',
+      background: 'var(--input-bg)', border: '1px solid var(--border-faint)',
       borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10,
     }}>
       {/* Header */}
@@ -302,8 +302,8 @@ function ExerciseRow({
             type="button"
             onClick={() => onChange({ isTimed: !entry.isTimed })}
             style={{
-              background: isTimed ? 'rgba(245,166,35,0.15)' : 'rgba(255,255,255,0.04)',
-              border: isTimed ? '1px solid rgba(245,166,35,0.4)' : '1px solid rgba(255,255,255,0.08)',
+              background: isTimed ? 'rgba(245,166,35,0.15)' : 'var(--input-bg)',
+              border: isTimed ? '1px solid rgba(245,166,35,0.4)' : '1px solid var(--border)',
               color: isTimed ? 'var(--accent)' : '#555',
               borderRadius: 6, padding: '3px 8px', fontSize: 10, fontWeight: 700,
               cursor: 'pointer', letterSpacing: '0.06em',
@@ -371,7 +371,7 @@ function ExerciseRow({
             onChange={e => onChange({ sets: e.target.value })}
             style={FIELD_STYLE}
             onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-            onBlur={e  => (e.target.style.borderColor = 'rgba(255,255,255,0.10)')}
+            onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
           />
         </div>
 
@@ -415,7 +415,7 @@ function ExerciseRow({
             onChange={e => onChange({ rpe: e.target.value })}
             style={FIELD_STYLE}
             onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-            onBlur={e  => (e.target.style.borderColor = 'rgba(255,255,255,0.10)')}
+            onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
           />
           <p style={{ fontSize: 9, color: '#444', marginTop: 3 }}>1–10 · How hard did that feel? (e.g. 8 = 2 reps left)</p>
         </div>
@@ -600,7 +600,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
           className="flex items-center justify-center gap-2 rounded-xl font-semibold transition-all"
           style={{
             flex: 1, height: 44,
-            background: open ? 'rgba(255,255,255,0.04)' : 'var(--accent)',
+            background: open ? 'var(--input-bg)' : 'var(--accent)',
             color: open ? 'var(--text-secondary)' : '#1A1A2E',
             border: open ? '1px solid var(--border)' : 'none',
             fontSize: 14, letterSpacing: '0.01em',
@@ -619,7 +619,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
             title="Repeat your last logged workout"
             style={{
               height: 44, padding: '0 14px', borderRadius: 12, flexShrink: 0,
-              background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)',
+              background: 'var(--input-bg)', border: '1px solid var(--border)',
               color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13, fontWeight: 600,
               display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s',
             }}
@@ -635,7 +635,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
             title="Load a saved workout template"
             style={{
               height: 44, padding: '0 14px', borderRadius: 12, flexShrink: 0,
-              background: tmplOpen ? 'rgba(245,166,35,0.12)' : 'rgba(255,255,255,0.05)',
+              background: tmplOpen ? 'rgba(245,166,35,0.12)' : 'var(--input-bg)',
               border: tmplOpen ? '1px solid rgba(245,166,35,0.4)' : '1px solid var(--border)',
               color: tmplOpen ? 'var(--accent)' : 'var(--text-secondary)',
               cursor: 'pointer', fontSize: 13, fontWeight: 600,
@@ -655,13 +655,13 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
           background: 'rgba(12,16,36,0.95)', border: '1px solid rgba(245,166,35,0.2)',
           backdropFilter: 'blur(12px)', overflow: 'hidden',
         }}>
-          <p className="section-label" style={{ padding: '12px 14px 8px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <p className="section-label" style={{ padding: '12px 14px 8px', borderBottom: '1px solid var(--border-faint)' }}>
             Saved Templates
           </p>
           {templates.map(t => (
             <div key={t.id} style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.04)',
+              padding: '10px 14px', borderBottom: '1px solid var(--border-faint)',
             }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.2 }}>{t.name}</p>
@@ -732,11 +732,11 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
               onClick={addEntry}
               style={{
                 width: '100%', marginTop: 10, padding: '10px', borderRadius: 10,
-                background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)',
+                background: 'var(--input-bg)', border: '1px dashed var(--border)',
                 color: '#555', fontSize: 13, cursor: 'pointer', transition: 'all 0.15s ease',
               }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(245,166,35,0.4)'; e.currentTarget.style.color = 'var(--accent)' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = '#555' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)' }}
             >
               + Add Another Exercise
             </button>
@@ -787,7 +787,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                   }}
                   style={{
                     padding: '8px 14px', borderRadius: 8, flexShrink: 0,
-                    background: tmplName.trim() ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                    background: tmplName.trim() ? 'var(--accent)' : 'var(--input-bg)',
                     color: tmplName.trim() ? '#1A1A2E' : '#555', border: 'none',
                     fontSize: 12, fontWeight: 700, cursor: tmplName.trim() ? 'pointer' : 'not-allowed',
                   }}
@@ -797,7 +797,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                   onClick={() => { setSavingTmpl(false); setTmplName('') }}
                   style={{
                     width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
                     color: '#555', cursor: 'pointer', fontSize: 13,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
@@ -812,7 +812,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                 onClick={cancelSession}
                 style={{
                   flex: 1, height: 42, borderRadius: 10, fontSize: 13, fontWeight: 500,
-                  background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
+                  background: 'var(--input-bg)', border: '1px solid var(--border)',
                   color: 'var(--text-muted)', cursor: 'pointer',
                 }}
               >
@@ -903,8 +903,7 @@ function MiniStat({ label, value, color, wide }: { label: string; value: string;
       style={{
         padding: '10px 14px',
         borderRadius: 10,
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid var(--border-faint)',
+        background: 'var(--input-bg)', border: '1px solid var(--border-faint)',
         gridColumn: wide ? '1 / -1' : undefined,
         display: 'flex',
         flexDirection: wide ? 'row' : 'column',
@@ -981,7 +980,7 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
         borderRadius: 14,
         border: open
           ? '1px solid rgba(245,166,35,0.35)'
-          : hovered ? '1px solid rgba(255,255,255,0.14)' : '1px solid var(--border)',
+          : hovered ? '1px solid var(--border)' : '1px solid var(--border)',
         background: open
           ? 'linear-gradient(135deg, rgba(20,26,56,0.95) 0%, rgba(16,20,44,0.95) 100%)'
           : 'var(--card-bg)',
@@ -1009,7 +1008,7 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
         <div className="flex items-center gap-3 text-left min-w-0">
           <div style={{
             width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-            background: open ? 'rgba(245,166,35,0.12)' : 'rgba(255,255,255,0.06)',
+            background: open ? 'rgba(245,166,35,0.12)' : 'var(--input-bg)',
             border: open ? '1px solid rgba(245,166,35,0.25)' : '1px solid var(--border-faint)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 18, transition: 'all 0.18s ease',
@@ -1068,7 +1067,7 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
       {editing && <EditLiftModal row={editing} onClose={() => setEditing(null)} onSaved={onSaved} />}
 
       {open && (
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '16px 16px 16px 20px' }}>
+        <div style={{ borderTop: '1px solid var(--border-faint)', padding: '16px 16px 16px 20px' }}>
 
           {/* Stat mini-cards */}
           {isTimedLift && bestDurSecs > 0 && (
@@ -1111,7 +1110,7 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
                     style={{
                       padding: '8px 10px',
                       borderRadius: 8,
-                      background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent',
+                      background: i % 2 === 0 ? 'var(--input-bg)' : 'transparent',
                     }}
                   >
                     <div className="flex items-center gap-2 flex-wrap">
@@ -1146,12 +1145,12 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
                         style={{
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           width: 24, height: 24, borderRadius: 6,
-                          background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-faint)',
+                          background: 'var(--input-bg)', border: '1px solid var(--border-faint)',
                           color: 'var(--text-muted)', cursor: 'pointer',
                           transition: 'all 0.15s ease',
                         }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)' }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)' }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--input-bg)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}
                       >
                         <EditIcon />
                       </button>
@@ -1262,7 +1261,7 @@ export function Records() {
         {/* ── Tab switcher ── */}
         <div style={{
           display: 'flex', gap: 4, marginBottom: 20,
-          background: 'rgba(255,255,255,0.04)', borderRadius: 10,
+          background: 'var(--input-bg)', borderRadius: 10,
           padding: 4, border: '1px solid var(--border-faint)',
         }}>
           <TabPill label="Log" active={tab === 'log'}      onClick={() => switchTab('log')} />
@@ -1282,9 +1281,9 @@ export function Records() {
                     onClick={() => setMuscleFilter(null)}
                     style={{
                       flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                      background: muscleFilter === null ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                      background: muscleFilter === null ? 'var(--accent)' : 'var(--input-bg)',
                       color: muscleFilter === null ? 'var(--base-bg)' : 'var(--text-secondary)',
-                      border: `1px solid ${muscleFilter === null ? 'var(--accent)' : 'rgba(255,255,255,0.1)'}`,
+                      border: `1px solid ${muscleFilter === null ? 'var(--accent)' : 'var(--border)'}`,
                       cursor: 'pointer', transition: 'all 0.12s ease',
                     }}
                   >All</button>
@@ -1294,9 +1293,9 @@ export function Records() {
                       onClick={() => setMuscleFilter(g => g === grp ? null : grp)}
                       style={{
                         flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                        background: muscleFilter === grp ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                        background: muscleFilter === grp ? 'var(--accent)' : 'var(--input-bg)',
                         color: muscleFilter === grp ? 'var(--base-bg)' : 'var(--text-secondary)',
-                        border: `1px solid ${muscleFilter === grp ? 'var(--accent)' : 'rgba(255,255,255,0.1)'}`,
+                        border: `1px solid ${muscleFilter === grp ? 'var(--accent)' : 'var(--border)'}`,
                         cursor: 'pointer', transition: 'all 0.12s ease', whiteSpace: 'nowrap',
                       }}
                     ><MuscleGroupIcon group={grp} color={muscleFilter === grp ? 'var(--base-bg)' : 'var(--text-secondary)'} /> {grp}</button>

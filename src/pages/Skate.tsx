@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -59,12 +59,12 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? 'var(--accent)' : 'rgba(255,255,255,0.05)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ Log a Session'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
             <Input label="Miles" type="number" step="0.01" placeholder="5.5" {...register('miles', { required: true })} />
@@ -162,7 +162,7 @@ export function Skate() {
             { label: 'Sessions', value: sessions.length },
             { label: 'Fastest Mile', value: fastestMile ? fastestMile.toFixed(2) : '—', unit: fastestMile ? 'min' : '' },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl p-3" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={s.label} className="rounded-xl p-3" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="section-label">{s.label}</p>
               <p className="text-lg font-bold" style={{ color: 'var(--accent)' }}>
                 {s.value}
@@ -182,7 +182,7 @@ export function Skate() {
           </div>
         )}
         {milesTrend.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Miles per Session</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>
               Avg {avgMiles.toFixed(1)} mi/session
@@ -216,7 +216,7 @@ export function Skate() {
 
         {/* Fastest mile trend */}
         {fastestTrend.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Fastest Mile Trend</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>Lower is faster</p>
             <ResponsiveContainer width="100%" height={150}>
@@ -256,10 +256,10 @@ export function Skate() {
 
         {/* Session history */}
         {sessions.length > 0 && (
-          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="px-4 pt-4 pb-2 font-bold text-white" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Sessions</p>
             {sessions.map((s) => (
-              <div key={s.id} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <div key={s.id} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
                 <div>
                   <p className="text-white text-sm font-semibold">
                     {s.miles.toFixed(2)} mi
@@ -279,7 +279,7 @@ export function Skate() {
                   </span>
                   <button
                     onClick={() => setEditing(s)}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
                   >
                     <EditIcon size={13} color="var(--text-muted)" />
                   </button>

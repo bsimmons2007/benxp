@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -87,12 +87,12 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'rgba(255,255,255,0.05)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
         {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'rgba(16,24,52,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
@@ -105,9 +105,9 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
                     key={r}
                     style={{
                       flex: 1, textAlign: 'center', padding: '8px 4px', borderRadius: 10, cursor: 'pointer',
-                      background: result === r ? `${resultColor(r)}20` : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${result === r ? resultColor(r) : 'rgba(255,255,255,0.08)'}`,
-                      color: result === r ? resultColor(r) : '#666',
+                      background: result === r ? `${resultColor(r)}20` : 'var(--input-bg)',
+                      border: `1px solid ${result === r ? resultColor(r) : 'var(--border)'}`,
+                      color: result === r ? resultColor(r) : 'var(--text-muted)',
                       fontWeight: result === r ? 700 : 400, fontSize: 13,
                       transition: 'all 0.15s',
                     }}
@@ -179,9 +179,9 @@ function EditChessModal({ game, onClose, onSaved }: { game: ChessGame; onClose: 
               onClick={() => setResult(r)}
               style={{
                 flex: 1, padding: '8px 4px', borderRadius: 10, cursor: 'pointer',
-                background: result === r ? `${resultColor(r)}20` : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${result === r ? resultColor(r) : 'rgba(255,255,255,0.08)'}`,
-                color: result === r ? resultColor(r) : '#666',
+                background: result === r ? `${resultColor(r)}20` : 'var(--input-bg)',
+                border: `1px solid ${result === r ? resultColor(r) : 'var(--border)'}`,
+                color: result === r ? resultColor(r) : 'var(--text-muted)',
                 fontWeight: result === r ? 700 : 400, fontSize: 13,
               }}
             >{resultLabel(r)}</button>
@@ -267,7 +267,7 @@ export function Chess() {
             { label: 'Losses',   value: losses,  color: '#f87171' },
             { label: 'Win %',    value: filtered.length ? `${winRate}%` : '—', color: ACCENT },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-2 text-center" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={s.label} className="rounded-xl p-2 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-lg font-bold" style={{ color: s.color, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
               <p className="section-label" style={{ fontSize: 9 }}>{s.label}</p>
             </div>
@@ -293,7 +293,7 @@ export function Chess() {
                 onClick={() => setTcFilter(tc)}
                 style={{
                   flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                  background: tcFilter === tc ? ACCENT : 'rgba(255,255,255,0.06)',
+                  background: tcFilter === tc ? ACCENT : 'var(--input-bg)',
                   color: tcFilter === tc ? '#0d0d1a' : 'var(--text-secondary)',
                   border: `1px solid ${tcFilter === tc ? ACCENT : 'rgba(255,255,255,0.1)'}`,
                   cursor: 'pointer', transition: 'all 0.12s',
@@ -307,7 +307,7 @@ export function Chess() {
 
         {/* Rating trend */}
         {ratingData.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Rating Trend</p>
             <ResponsiveContainer width="100%" height={150}>
               <LineChart data={ratingData}>
@@ -333,7 +333,7 @@ export function Chess() {
         {/* History */}
         {filtered.length > 0 && <p className="section-label mb-3">Game History</p>}
         {filtered.map(g => (
-          <div key={g.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'rgba(16,24,52,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div key={g.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
             <div className="flex items-center gap-3">
               <div style={{
                 width: 36, height: 36, borderRadius: 10, flexShrink: 0, fontSize: 16,
@@ -346,7 +346,7 @@ export function Chess() {
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>
                   {formatDate(g.date)}
                   <span style={{ marginLeft: 8, fontSize: 11, color: '#555' }}>{g.time_control}</span>
-                  {g.color && <span style={{ marginLeft: 6, fontSize: 10, color: g.color === 'White' ? '#ddd' : '#888', background: g.color === 'White' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: 4 }}>{g.color}</span>}
+                  {g.color && <span style={{ marginLeft: 6, fontSize: 10, color: g.color === 'White' ? '#ddd' : '#888', background: g.color === 'White' ? 'var(--input-bg)' : 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: 4 }}>{g.color}</span>}
                 </p>
                 {g.opening && <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{g.opening}</p>}
                 {g.opponent && <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>vs {g.opponent}</p>}
@@ -357,7 +357,7 @@ export function Chess() {
                 <p style={{ fontSize: 14, fontWeight: 800, color: resultColor(g.result) }}>{resultLabel(g.result)}</p>
                 {g.rating_after && <p style={{ fontSize: 11, color: '#666', marginTop: 1 }}>{g.rating_after}</p>}
               </div>
-              <button onClick={() => setEditing(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer' }}>
+              <button onClick={() => setEditing(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
