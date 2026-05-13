@@ -27,7 +27,7 @@ export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'books', 'cardio', 'sleep
 
 export function loadSectionOrder(): SectionKey[] {
   try {
-    const saved = JSON.parse(localStorage.getItem('benxp-order') ?? 'null') as SectionKey[]
+    const saved = JSON.parse(localStorage.getItem('youxp-order') ?? 'null') as SectionKey[]
     if (Array.isArray(saved)) {
       // Drop removed/merged keys; basketball + fortnite are now inside /hobbies
       const dropped = new Set(['skate', 'energy', 'strength', 'basketball', 'fortnite'])
@@ -40,19 +40,19 @@ export function loadSectionOrder(): SectionKey[] {
 }
 
 export function saveSectionOrder(order: SectionKey[]): void {
-  localStorage.setItem('benxp-order', JSON.stringify(order))
+  localStorage.setItem('youxp-order', JSON.stringify(order))
   window.dispatchEvent(new Event('sections-updated'))
 }
 
 export function loadHiddenSections(): SectionKey[] {
   try {
-    const saved = JSON.parse(localStorage.getItem('benxp-hidden') ?? 'null') as SectionKey[]
+    const saved = JSON.parse(localStorage.getItem('youxp-hidden') ?? 'null') as SectionKey[]
     if (Array.isArray(saved)) return saved
   } catch { /* ignore */ }
   return ['mood']
 }
 
 export function saveHiddenSections(hidden: SectionKey[]): void {
-  localStorage.setItem('benxp-hidden', JSON.stringify(hidden))
+  localStorage.setItem('youxp-hidden', JSON.stringify(hidden))
   window.dispatchEvent(new Event('sections-updated'))
 }

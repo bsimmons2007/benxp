@@ -28,7 +28,7 @@ interface TrendResult {
 }
 
 // ── Stat picker config ────────────────────────────────────────
-const HOME_STATS_KEY = 'benxp-home-stat-picks'
+const HOME_STATS_KEY = 'youxp-home-stat-picks'
 const DEFAULT_STAT_PICKS = ['bench', 'squat', 'deadlift', 'sleep_avg', 'miles', 'wins']
 
 const STAT_DEFS = [
@@ -404,7 +404,7 @@ export function Home() {
   const { refreshing, pullDistance, threshold } = usePullToRefresh(async () => {
     await Promise.all([refreshXP(), refreshActivity()])
   })
-  const levelStyle   = (localStorage.getItem('benxp-level-style') as 'number' | 'roman') ?? 'number'
+  const levelStyle   = (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
   const displayLevel = loading ? '—' : levelStyle === 'roman' ? toRoman(level) : String(level)
   const title        = getLevelTitle(level)
   const { sq: strengthSQ } = useStrengthSnapshot()

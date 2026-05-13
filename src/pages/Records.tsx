@@ -205,7 +205,7 @@ interface WorkoutTemplate {
   createdAt:  string
 }
 
-const TMPL_KEY = 'benxp-workout-templates'
+const TMPL_KEY = 'youxp-workout-templates'
 
 function getTemplates(): WorkoutTemplate[] {
   try { return JSON.parse(localStorage.getItem(TMPL_KEY) ?? '[]') } catch { return [] }
@@ -444,7 +444,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('benxp-last-workout')
+      const saved = localStorage.getItem('youxp-last-workout')
       if (saved) setLastWorkout(JSON.parse(saved))
     } catch { /* ignore */ }
     setTemplates(getTemplates())
@@ -577,7 +577,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
     refreshActivity()
 
     // Save last workout for "Repeat" button
-    localStorage.setItem('benxp-last-workout', JSON.stringify(
+    localStorage.setItem('youxp-last-workout', JSON.stringify(
       valid.map(e => ({
         liftName: e.liftName, isBodyweight: e.isBodyweight, isTimed: e.isTimed,
         weight: e.weight, sets: e.sets, reps: e.reps, duration: e.duration, rpe: e.rpe, bodyweight: e.bodyweight,

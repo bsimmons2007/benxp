@@ -14,10 +14,10 @@ function getCtx(): AudioContext {
 
 // ── SFX settings ──────────────────────────────────────────────
 export function sfxEnabled(): boolean {
-  return localStorage.getItem('benxp-sfx') !== 'false'
+  return localStorage.getItem('youxp-sfx') !== 'false'
 }
 export function setSFX(on: boolean) {
-  localStorage.setItem('benxp-sfx', on ? 'true' : 'false')
+  localStorage.setItem('youxp-sfx', on ? 'true' : 'false')
 }
 
 // ── Tone primitive ────────────────────────────────────────────
@@ -156,18 +156,18 @@ export function getAmbientForTheme(themeId: string): string {
 }
 
 export function ambientScene(): string {
-  return localStorage.getItem('benxp-ambient-scene') ?? 'cosmic'
+  return localStorage.getItem('youxp-ambient-scene') ?? 'cosmic'
 }
 
 // ── Ambient volume ────────────────────────────────────────────
 export function getAmbientVolume(): number {
-  const v = parseFloat(localStorage.getItem('benxp-ambient-vol') ?? '')
+  const v = parseFloat(localStorage.getItem('youxp-ambient-vol') ?? '')
   return isNaN(v) ? 0.6 : Math.max(0, Math.min(1, v))
 }
 
 export function setAmbientVolume(v: number) {
   const clamped = Math.max(0, Math.min(1, v))
-  localStorage.setItem('benxp-ambient-vol', String(clamped))
+  localStorage.setItem('youxp-ambient-vol', String(clamped))
   if (_active) _active.audio.volume = clamped
 }
 
@@ -181,7 +181,7 @@ interface ActiveAmbient {
 let _active: ActiveAmbient | null = null
 
 export function ambientEnabled(): boolean {
-  return localStorage.getItem('benxp-ambient') === 'true'
+  return localStorage.getItem('youxp-ambient') === 'true'
 }
 
 export function ambientPlaying(): boolean {
@@ -189,13 +189,13 @@ export function ambientPlaying(): boolean {
 }
 
 export function setAmbient(on: boolean) {
-  localStorage.setItem('benxp-ambient', on ? 'true' : 'false')
+  localStorage.setItem('youxp-ambient', on ? 'true' : 'false')
   if (on) startAmbient()
   else stopAmbient()
 }
 
 export function setAmbientSceneId(id: string, autoStart = true) {
-  localStorage.setItem('benxp-ambient-scene', id)
+  localStorage.setItem('youxp-ambient-scene', id)
   stopAmbient()
   if (autoStart && ambientEnabled()) {
     setTimeout(startAmbient, 600)

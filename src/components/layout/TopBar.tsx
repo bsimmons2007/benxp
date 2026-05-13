@@ -30,7 +30,7 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
   // Show a one-time hint pulse on the hamburger for new users
   const [showHint, setShowHint] = useState(false)
   useEffect(() => {
-    if (!back && !localStorage.getItem('benxp-nav-opened')) {
+    if (!back && !localStorage.getItem('youxp-nav-opened')) {
       setShowHint(true)
     }
   }, [back])
@@ -51,7 +51,7 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
     if (back) navigate(-1)
     else {
       toggleNav()
-      localStorage.setItem('benxp-nav-opened', '1')
+      localStorage.setItem('youxp-nav-opened', '1')
       setShowHint(false)
     }
   }

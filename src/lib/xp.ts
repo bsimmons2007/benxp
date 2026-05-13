@@ -132,7 +132,7 @@ export interface AppStats {
 }
 
 // ── localStorage cache (stale-while-revalidate) ──────────────────
-const XP_CACHE_KEY = 'benxp-xp-cache-v2'
+const XP_CACHE_KEY = 'youxp-xp-cache-v2'
 const XP_CACHE_TTL = 5 * 60 * 1000
 
 export function getCachedXPData(): { totalXP: number; stats: AppStats } | null {

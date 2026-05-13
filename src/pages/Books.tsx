@@ -30,7 +30,7 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'pages_asc',   label: 'Fewest pages' },
 ]
 
-const EXTRA_GENRES_KEY = 'benxp-extra-genres'
+const EXTRA_GENRES_KEY = 'youxp-extra-genres'
 
 const BASE_GENRES = [
   'Action',

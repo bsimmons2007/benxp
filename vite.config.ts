@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons.svg'],
       manifest: {
-        name: 'BenXP',
-        short_name: 'BenXP',
+        name: 'YouXP',
+        short_name: 'YouXP',
         description: 'Gamified life tracker',
         id: '/',
         start_url: '/',

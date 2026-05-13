@@ -66,7 +66,7 @@ function Card() {
   const { skills } = useSkills()
   const theme     = loadTheme()
   const title     = getLevelTitle(level)
-  const levelStyle = (localStorage.getItem('benxp-level-style') as 'number' | 'roman') ?? 'number'
+  const levelStyle = (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
   const displayLevel = levelStyle === 'roman' ? toRoman(level) : String(level)
   const toNext    = xpForLevel(level + 1) - totalXP
   const pct       = Math.min(Math.max(progress * 100, 0), 100)

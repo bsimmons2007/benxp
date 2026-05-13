@@ -10,7 +10,7 @@ import { useStore } from '../store/useStore'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const DEFAULT_goalOz = 64
-const GOAL_LS_KEY     = 'benxp-water-goal-oz'
+const GOAL_LS_KEY     = 'youxp-water-goal-oz'
 const QUICK_ADDS      = [8, 12, 16, 20, 24] // oz presets
 
 interface WaterEntry { id: string; oz: number; created_at: string }

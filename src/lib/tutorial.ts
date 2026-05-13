@@ -1,4 +1,4 @@
-export const TUTORIAL_KEY = 'benxp-tutorial-done'
+export const TUTORIAL_KEY = 'youxp-tutorial-done'
 
 export function isTutorialDone(): boolean {
   return localStorage.getItem(TUTORIAL_KEY) === '1'

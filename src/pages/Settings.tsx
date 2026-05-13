@@ -141,7 +141,7 @@ export function Settings() {
   const [lightMode, setLightModeState]  = useState(isLightMode)
   const [timeTheme, setTimeThemeState]  = useState(timeThemeEnabled)
   const [levelStyle, setLevelStyle] = useState<'number' | 'roman'>(
-    () => (localStorage.getItem('benxp-level-style') as 'number' | 'roman') ?? 'number'
+    () => (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
   )
   const [sectionOrder, setSectionOrder] = useState<SectionKey[]>(loadSectionOrder)
   const [hiddenSections, setHiddenSections] = useState<SectionKey[]>(loadHiddenSections)
@@ -231,7 +231,7 @@ export function Settings() {
 
   function handleLevelStyle(style: 'number' | 'roman') {
     setLevelStyle(style)
-    localStorage.setItem('benxp-level-style', style)
+    localStorage.setItem('youxp-level-style', style)
   }
 
   function toggleHidden(key: SectionKey) {

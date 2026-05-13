@@ -7,7 +7,7 @@ import { invalidateBadgeCache } from '../hooks/useAchievements'
 
 export type { AppStats }
 
-const LS_LEVEL_KEY = 'benxp-last-seen-level'
+const LS_LEVEL_KEY = 'youxp-last-seen-level'
 
 export interface ActivityEntry {
   type: string

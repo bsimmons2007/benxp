@@ -585,7 +585,7 @@ export function Profile() {
   const stats      = useLifetimeStats()
   const title      = getLevelTitle(level)
   const toNext     = xpForLevel(level + 1) - totalXP
-  const levelStyle = (localStorage.getItem('benxp-level-style') as 'number' | 'roman') ?? 'number'
+  const levelStyle = (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
   const displayLevel = levelStyle === 'roman' ? toRoman(level) : String(level)
 
   const { score: consistencyScore, activeDays } = useConsistencyScore()

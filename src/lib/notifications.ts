@@ -1,7 +1,7 @@
 // ── Notification preferences ──────────────────────────────────────────────────
 
-const PREF_KEY       = 'benxp-notif-prefs'
-const LAST_SHOWN_KEY = 'benxp-notif-last-shown'
+const PREF_KEY       = 'youxp-notif-prefs'
+const LAST_SHOWN_KEY = 'youxp-notif-last-shown'
 
 export interface NotifPrefs {
   enabled: boolean
@@ -47,7 +47,7 @@ export function permissionGranted(): boolean {
 // Only fires when: streak ≥ 3, it's 6pm or later, and we haven't already
 // warned today.
 
-const STREAK_WARN_KEY = 'benxp-streak-warn-date'
+const STREAK_WARN_KEY = 'youxp-streak-warn-date'
 
 export function checkStreakBreakWarning(currentStreak: number, activeToday: boolean): void {
   if (!permissionGranted()) return

@@ -1,4 +1,4 @@
-# benxp — Project Context
+# YouXP — Project Context
 
 ## What it is
 A personal life-tracking PWA for one user (Ben). Tracks fitness, sports, lifestyle habits, and gaming with an XP/leveling system. Built mobile-first; deployed on Vercel.
@@ -47,3 +47,20 @@ All DB row types live here. Always check before adding new interfaces.
 - Hooks in `src/hooks/` — prefer hooks over inline Supabase calls in components
 - No comments unless the WHY is non-obvious
 - Inline styles for dynamic/themed values, Tailwind for layout/spacing
+- All localStorage keys are prefixed `youxp-` (previously `benxp-`, renamed May 2026)
+
+## Recent work & handoff (as of 2026-05-13)
+
+### Completed this session
+- **Light mode matte redesign** — replaced glassy/glowy dark-mode-flip with clean neutral bg (`#f2f2f4`), opaque white cards, real drop shadows, orbs/grid/glow animations all suppressed in light mode. Committed `e3c0e15`.
+- **Performance optimizations** — `useStrengthSnapshot` now has a 5-min TTL cache (was uncached, 4 queries per visit). `useStreak` TTL 2→5 min. `useAchievements` got a TTL alongside the existing XP+revision key. Committed `86b5df2`.
+- **localStorage prefix rename** — all `benxp-*` keys renamed to `youxp-*` (this session). Users will lose cached preferences on first load after deploy (they re-apply automatically).
+- **Stat chips expansion** — Home dashboard grew from 7 to 25 stat chips across 7 categories.
+- **TopBar + Log dropdown** — the `+` button in top-right drops a menu: Lifting / Sleep / Mind / Water.
+- **Stale-while-revalidate XP cache** — `init()` in `useStore.ts` shows localStorage cache instantly then fetches fresh in background.
+- **Measurements validation** — form now requires all numeric fields before saving.
+
+### Known areas to explore next
+- `useAchievements` (18 queries) and `useStreak` (17 queries) still have significant overlap with `fetchXPAndStats` — merging into the store fetch would eliminate the redundancy entirely.
+- The `useTrends` hook (`src/hooks/useTrends.ts`) fetches independently — could be folded into the store.
+- Light mode: test across all theme colors and verify accent readability on `#f2f2f4` background for all 40+ themes.

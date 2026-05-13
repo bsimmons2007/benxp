@@ -35,11 +35,11 @@ export function darkenForLight(hex: string): string {
 }
 
 export function isLightMode(): boolean {
-  return localStorage.getItem('benxp-light-mode') === 'true'
+  return localStorage.getItem('youxp-light-mode') === 'true'
 }
 
 export function setLightMode(on: boolean) {
-  localStorage.setItem('benxp-light-mode', String(on))
+  localStorage.setItem('youxp-light-mode', String(on))
 }
 
 export const THEMES: Theme[] = [
@@ -839,7 +839,7 @@ export function applyTheme(theme: Theme, light = isLightMode()) {
 }
 
 export function loadTheme(): Theme {
-  const saved = localStorage.getItem('benxp-theme')
+  const saved = localStorage.getItem('youxp-theme')
   return THEMES.find((t) => t.id === saved) ?? THEMES.find((t) => t.id === 'midnight') ?? THEMES[0]
 }
 
@@ -854,11 +854,11 @@ const TOD_MAP: Array<{ from: number; to: number; id: string }> = [
 ]
 
 export function timeThemeEnabled(): boolean {
-  return localStorage.getItem('benxp-time-theme') === 'true'
+  return localStorage.getItem('youxp-time-theme') === 'true'
 }
 
 export function setTimeThemeEnabled(on: boolean) {
-  localStorage.setItem('benxp-time-theme', String(on))
+  localStorage.setItem('youxp-time-theme', String(on))
 }
 
 /** Returns the theme override ID for the current hour, or null if no override. */
@@ -881,7 +881,7 @@ export function applyTimeOrSavedTheme() {
 }
 
 export function saveTheme(theme: Theme) {
-  localStorage.setItem('benxp-theme', theme.id)
+  localStorage.setItem('youxp-theme', theme.id)
   applyTheme(theme)
   // Auto-switch ambient scene to match theme (lazy import to avoid top-level side effects)
   import('./sounds').then(({ getAmbientForTheme, ambientScene, setAmbientSceneId, ambientEnabled }) => {
