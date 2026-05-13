@@ -315,6 +315,9 @@ html[data-mode="light"] body::after {
     linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
 }
 
+/* Light mode: invert Tailwind utility classes that hardcode white */
+html[data-mode="light"] .text-white { color: var(--text-primary) !important; }
+
 /* Cards/panels that use hardcoded white-alpha in inline styles */
 html[data-mode="light"] .glass {
   border: 1px solid rgba(0,0,0,0.08);

@@ -808,9 +808,10 @@ export function applyTheme(theme: Theme, light = isLightMode()) {
 
   if (light) {
     const la = theme.lightAccent ?? darkenForLight(theme.accent)
-    r.style.setProperty('--accent',     la)
-    r.style.setProperty('--accent-dim', hexToRgba(la, 0.15))
-    r.style.setProperty('--orb1',       hexToRgba(theme.accent, 0.10))
+    r.style.setProperty('--accent',        la)
+    r.style.setProperty('--accent-dim',    hexToRgba(la, 0.15))
+    r.style.setProperty('--accent-subtle', hexToRgba(la, 0.08))
+    r.style.setProperty('--orb1',          hexToRgba(theme.accent, 0.10))
     r.style.setProperty('--orb2',       hexToRgba(theme.accent, 0.06))
     r.style.setProperty('--orb3',       hexToRgba(theme.accent, 0.03))
     r.style.setProperty('--card-bg',    'rgba(255,255,255,0.88)')

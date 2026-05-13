@@ -151,8 +151,8 @@ function WeekDotStrip({ activityDates, streak }: {
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <div style={{
               width: 34, height: 34, borderRadius: 8,
-              background: day.isActive ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
-              outline: day.isToday ? '1.5px solid rgba(255,255,255,0.35)' : 'none',
+              background: day.isActive ? 'var(--accent)' : 'var(--input-bg)',
+              outline: day.isToday ? '1.5px solid var(--border)' : 'none',
               outlineOffset: 2,
               boxShadow: day.isActive ? '0 0 10px var(--accent-dim)' : 'none',
               transition: 'background 0.2s ease, box-shadow 0.2s ease',
@@ -224,7 +224,7 @@ function StatsPickerModal({ picks, onChange, onClose }: {
         boxShadow: '0 -8px 40px rgba(0,0,0,0.5)',
       }}>
         {/* Handle */}
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.12)',
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--border)',
           margin: '0 auto 18px' }} />
 
         <div className="flex items-center justify-between" style={{ marginBottom: 18 }}>
@@ -249,7 +249,7 @@ function StatsPickerModal({ picks, onChange, onClose }: {
                     padding: '7px 14px',
                     borderRadius: 999,
                     border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
-                    background: active ? 'var(--accent-dim)' : 'rgba(255,255,255,0.04)',
+                    background: active ? 'var(--accent-dim)' : 'var(--input-bg)',
                     color: active ? 'var(--accent)' : 'var(--text-muted)',
                     fontSize: 12, fontWeight: 600, cursor: 'pointer',
                     transition: 'all 0.15s ease',

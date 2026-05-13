@@ -100,7 +100,7 @@ function ThemeSquare({ theme, active, onSelect }: { theme: Theme; active: boolea
       style={{
         width: 40, height: 40,
         background: theme.baseBg,
-        border: active ? `2.5px solid ${theme.accent}` : '2px solid rgba(255,255,255,0.1)',
+        border: active ? `2.5px solid ${theme.accent}` : '2px solid var(--border)',
         boxShadow: active ? `0 0 12px ${theme.accent}88` : 'none',
         transform: active ? 'scale(1.12)' : 'scale(1)',
         overflow: 'hidden',
@@ -275,7 +275,7 @@ export function Settings() {
   // Reusable toggle pill
   function Toggle({ value, onToggle }: { value: boolean; onToggle: () => void }) {
     return (
-      <button onClick={onToggle} className="relative rounded-full transition-all duration-200 shrink-0" style={{ width: 44, height: 26, background: value ? 'var(--accent)' : 'rgba(255,255,255,0.1)' }}>
+      <button onClick={onToggle} className="relative rounded-full transition-all duration-200 shrink-0" style={{ width: 44, height: 26, background: value ? 'var(--accent)' : 'var(--border)' }}>
         <div style={{ position: 'absolute', top: 3, left: value ? 21 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left 0.2s ease' }} />
       </button>
     )
@@ -285,7 +285,7 @@ export function Settings() {
     <>
       <header
         className="fixed top-0 left-0 right-0 flex items-center px-4 py-3 z-40"
-        style={{ background: 'rgba(10,12,28,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+        style={{ background: 'var(--nav-bg)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--border-faint)' }}
       >
         <button onClick={() => navigate(-1)} className="mr-3 text-xl" style={{ color: 'var(--accent)' }}>←</button>
         <span className="text-2xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Settings</span>
@@ -325,19 +325,19 @@ export function Settings() {
                     ref={nameRef} autoFocus value={nameInput}
                     onChange={e => setNameInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditingName(false) }}
-                    className="flex-1 px-3 py-1.5 rounded-lg text-white outline-none text-base"
-                    style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--accent)' }}
+                    className="flex-1 px-3 py-1.5 rounded-lg outline-none text-base"
+                    style={{ background: 'var(--input-bg)', border: '1px solid var(--accent)', color: 'var(--text-primary)' }}
                     placeholder="Your name"
                   />
                   <button onClick={saveName} disabled={nameSaving} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{ background: 'var(--accent)', color: 'var(--base-bg)' }}>
                     {nameSaving ? '...' : 'Save'}
                   </button>
-                  <button onClick={() => setEditingName(false)} className="px-2 py-1.5 rounded-lg text-xs" style={{ color: '#888', background: 'rgba(255,255,255,0.06)' }}>✕</button>
+                  <button onClick={() => setEditingName(false)} className="px-2 py-1.5 rounded-lg text-xs" style={{ color: 'var(--text-muted)', background: 'var(--input-bg)' }}>✕</button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <p className="text-white font-bold text-xl truncate" style={{ fontFamily: 'Cinzel, serif' }}>{userName || '—'}</p>
-                  <button onClick={() => { setNameInput(userName); setEditingName(true) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer', flexShrink: 0 }}><EditIcon size={12} color="var(--text-muted)" /></button>
+                  <button onClick={() => { setNameInput(userName); setEditingName(true) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: 6, background: 'var(--input-bg)', border: 'none', cursor: 'pointer', flexShrink: 0 }}><EditIcon size={12} color="var(--text-muted)" /></button>
                 </div>
               )}
               <p className="mt-0.5" style={{ color: 'var(--accent)', fontSize: 13, fontFamily: 'Cinzel, serif' }}>
@@ -407,7 +407,7 @@ export function Settings() {
             />
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', margin: '2px 0' }} />
+          <div style={{ borderTop: '1px solid var(--border-faint)', margin: '2px 0' }} />
 
           {/* Level style row */}
           <button onClick={() => setLevelOpen(o => !o)} className="w-full flex items-center justify-between py-2">
@@ -429,9 +429,9 @@ export function Settings() {
                     onClick={() => handleLevelStyle(style)}
                     className="flex-1 py-3 rounded-xl font-bold transition-all"
                     style={{
-                      background: levelStyle === style ? 'var(--accent)' : 'rgba(255,255,255,0.05)',
-                      color: levelStyle === style ? 'var(--base-bg)' : '#666',
-                      border: `1px solid ${levelStyle === style ? 'var(--accent)' : 'rgba(255,255,255,0.08)'}`,
+                      background: levelStyle === style ? 'var(--accent)' : 'var(--input-bg)',
+                      color: levelStyle === style ? 'var(--base-bg)' : 'var(--text-muted)',
+                      border: `1px solid ${levelStyle === style ? 'var(--accent)' : 'var(--border)'}`,
                       fontFamily: 'Cinzel, serif', fontSize: 20,
                     }}
                   >
@@ -441,7 +441,7 @@ export function Settings() {
               </div>
             </div>
           )}
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', margin: '2px 0' }} />
+          <div style={{ borderTop: '1px solid var(--border-faint)', margin: '2px 0' }} />
 
           {/* Time of day auto-theme row */}
           <div className="flex items-center justify-between py-2">
@@ -491,20 +491,20 @@ export function Settings() {
                     <div
                       key={key}
                       className="flex items-center gap-3 py-2 px-3 rounded-xl"
-                      style={{ background: isHidden ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.05)', opacity: isHidden ? 0.5 : 1 }}
+                      style={{ background: isHidden ? 'var(--border-faint)' : 'var(--input-bg)', opacity: isHidden ? 0.5 : 1 }}
                     >
                       <SectionIcon sectionKey={key} size={18} color="var(--text-secondary)" />
                       <span className="flex-1 font-medium text-sm" style={{ color: isHidden ? '#555' : '#CCC' }}>{def.label}</span>
-                      <button onClick={() => moveSection(key, -1)} disabled={idx === 0} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === 0 ? '#333' : '#777', background: 'rgba(255,255,255,0.06)' }}>↑</button>
-                      <button onClick={() => moveSection(key, 1)} disabled={idx === sectionOrder.length - 1} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === sectionOrder.length - 1 ? '#333' : '#777', background: 'rgba(255,255,255,0.06)' }}>↓</button>
-                      <button onClick={() => toggleHidden(key)} className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: isHidden ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)' }}>
+                      <button onClick={() => moveSection(key, -1)} disabled={idx === 0} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === 0 ? 'var(--text-dim)' : 'var(--text-muted)', background: 'var(--input-bg)' }}>↑</button>
+                      <button onClick={() => moveSection(key, 1)} disabled={idx === sectionOrder.length - 1} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === sectionOrder.length - 1 ? 'var(--text-dim)' : 'var(--text-muted)', background: 'var(--input-bg)' }}>↓</button>
+                      <button onClick={() => toggleHidden(key)} className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: isHidden ? 'var(--border-faint)' : 'var(--border)' }}>
                         {isHidden ? 'Hide' : 'Show'}
                       </button>
                     </div>
                   )
                 })}
               </div>
-              <button onClick={resetSections} className="w-full py-2 rounded-lg text-xs" style={{ color: '#444', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <button onClick={resetSections} className="w-full py-2 rounded-lg text-xs" style={{ color: 'var(--text-muted)', background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
                 Reset to default order
               </button>
             </div>
@@ -532,7 +532,7 @@ export function Settings() {
                 { label: 'Sound Effects', sub: 'XP chimes, level-up, PR burst', icon: <ActivityIcon size={16} color="var(--accent)" /> as ReactNode, value: sfx, toggle: () => { const n = !sfx; setSfxState(n); setSFX(n) } },
                 { label: 'Ambient', sub: 'Background soundscape', icon: <StarIcon size={16} color="var(--accent)" /> as ReactNode, value: ambient, toggle: () => { const n = !ambient; setAmbientState(n); setAmbient(n) } },
               ].map(row => (
-                <div key={row.label} className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div key={row.label} className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
                   <div className="flex items-center gap-3">
                     <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{row.icon}</span>
                     <div>
@@ -545,7 +545,7 @@ export function Settings() {
               ))}
 
               {/* Volume */}
-              <div className="flex items-center gap-3 py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="flex items-center gap-3 py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
                 <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ActivityIcon size={16} color="#555" /></span>
                 <div className="flex-1">
                   <p className="text-white text-sm font-medium mb-1">Volume</p>
@@ -559,7 +559,7 @@ export function Settings() {
               </div>
 
               {/* Scene picker */}
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
+              <div style={{ borderTop: '1px solid var(--border-faint)', paddingTop: 12 }}>
                 <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#444' }}>Atmosphere</p>
                 <div className="flex flex-col gap-1.5">
                   {AMBIENT_SCENES.map(scene => {
@@ -570,8 +570,8 @@ export function Settings() {
                         onClick={() => { setActiveScene(scene.id); setAmbientSceneId(scene.id, ambient) }}
                         className="flex items-center gap-3 px-3 py-2 rounded-xl transition-all text-left"
                         style={{
-                          background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.02)',
-                          border: isActive ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.05)',
+                          background: isActive ? 'var(--border)' : 'var(--input-bg)',
+                          border: isActive ? '1px solid var(--accent)' : '1px solid var(--border-faint)',
                         }}
                       >
                         <span style={{ flexShrink: 0, minWidth: 36, display: 'flex', justifyContent: 'center' }}>
@@ -614,7 +614,7 @@ export function Settings() {
             {notifOpen && (
               <div className="pb-1 pop-in">
                 {/* Enable toggle */}
-                <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
                   <div className="flex items-center gap-3">
                     <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BellIcon size={16} color="var(--accent)" /></span>
                     <div>
@@ -657,7 +657,7 @@ export function Settings() {
 
                 {/* Time picker */}
                 {notifEnabled && (
-                  <div className="flex items-center justify-between py-2.5 pop-in" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div className="flex items-center justify-between py-2.5 pop-in" style={{ borderTop: '1px solid var(--border-faint)' }}>
                     <div className="flex items-center gap-3">
                       <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CalendarIcon size={16} color="#888" /></span>
                       <div>
@@ -701,7 +701,7 @@ export function Settings() {
           {xpOpen && (
             <div className="pb-1 pop-in">
               {XP_BREAKDOWN.map(r => (
-                <div key={r.label} className="flex items-center justify-between py-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div key={r.label} className="flex items-center justify-between py-2" style={{ borderTop: '1px solid var(--border-faint)' }}>
                   <div className="flex items-center gap-2">
                     <span>{r.icon}</span>
                     <span className="text-sm" style={{ color: '#BBBBBB' }}>{r.label}</span>
@@ -729,7 +729,7 @@ export function Settings() {
             <div className="pb-1 pop-in">
               <div
                 className="flex items-center justify-between py-2.5 cursor-pointer"
-                style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+                style={{ borderTop: '1px solid var(--border-faint)' }}
                 onClick={!exporting ? handleExportCSV : undefined}
               >
                 <div className="flex items-center gap-3">
@@ -741,7 +741,7 @@ export function Settings() {
 
               <div
                 className="flex items-center justify-between py-2.5 cursor-pointer"
-                style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+                style={{ borderTop: '1px solid var(--border-faint)' }}
                 onClick={() => { resetTutorial(); window.dispatchEvent(new Event('tutorial-reset')) }}
               >
                 <div className="flex items-center gap-3">
@@ -754,7 +754,7 @@ export function Settings() {
               {deleteStep === 'idle' ? (
                 <div
                   className="flex items-center justify-between py-2.5 cursor-pointer"
-                  style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+                  style={{ borderTop: '1px solid var(--border-faint)' }}
                   onClick={() => setDeleteStep('confirm')}
                 >
                   <div className="flex items-center gap-3">
@@ -764,10 +764,10 @@ export function Settings() {
                   <span style={{ color: '#555' }}>›</span>
                 </div>
               ) : (
-                <div className="py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
                   <p className="text-sm mb-3" style={{ color: '#E94560' }}>This will permanently delete all your data. This cannot be undone.</p>
                   <div className="flex gap-2">
-                    <button onClick={() => setDeleteStep('idle')} className="flex-1 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'rgba(255,255,255,0.06)', color: '#888' }}>Cancel</button>
+                    <button onClick={() => setDeleteStep('idle')} className="flex-1 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)' }}>Cancel</button>
                     <button onClick={handleDeleteAccount} disabled={deleting} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{ background: 'rgba(233,69,96,0.2)', color: '#E94560', border: '1px solid rgba(233,69,96,0.4)' }}>
                       {deleting ? 'Deleting...' : 'Yes, delete everything'}
                     </button>

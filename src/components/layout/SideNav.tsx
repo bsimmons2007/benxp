@@ -106,10 +106,10 @@ export function SideNav() {
           zIndex:               49,
           display:              'flex',
           flexDirection:        'column',
-          background:           'rgba(8,10,22,0.98)',
+          background:           'var(--nav-bg)',
           backdropFilter:       'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          borderRight:          '1px solid rgba(255,255,255,0.08)',
+          borderRight:          '1px solid var(--border)',
           transform:            isOpen ? 'translateX(0)' : 'translateX(-100%)',
           transition:           'transform 0.26s cubic-bezier(0.22,1,0.36,1)',
           willChange:           'transform',
@@ -124,7 +124,7 @@ export function SideNav() {
             textAlign:    'left',
             padding:      '20px 20px 16px',
             cursor:       'pointer',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            borderBottom: '1px solid var(--border-faint)',
           }}
         >
           <p style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 20, fontWeight: 700, lineHeight: 1, margin: 0 }}>
@@ -134,7 +134,7 @@ export function SideNav() {
             Lv {level} · {getLevelTitle(level)}
           </p>
           {/* XP mini-bar */}
-          <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+          <div style={{ height: 3, borderRadius: 2, background: 'var(--border)', overflow: 'hidden' }}>
             <div
               style={{
                 height:     '100%',
@@ -180,7 +180,7 @@ export function SideNav() {
           ))}
 
           {/* Separator */}
-          <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '8px 4px' }} />
+          <div style={{ height: 1, background: 'var(--border-faint)', margin: '8px 4px' }} />
 
           {SECONDARY_LINKS.map(link => (
             <NavLink
