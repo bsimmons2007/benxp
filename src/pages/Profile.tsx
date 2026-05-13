@@ -609,41 +609,68 @@ export function Profile() {
       <PageWrapper>
 
         {/* Hero card */}
-        <Card className="mb-4 text-center" goldBorder>
-          {/* Avatar */}
-          <div style={{
-            width: 72, height: 72, borderRadius: '50%',
-            border: '2px solid var(--accent)',
-            boxShadow: '0 0 20px var(--accent-dim)',
-            background: 'rgba(255,255,255,0.07)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden', margin: '0 auto 12px',
-          }}>
-            {avatarUrl
-              ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              : <PersonIcon size={32} color="var(--text-secondary)" />
-            }
-          </div>
-
-          <h2 className="font-bold text-xl text-white" style={{ fontFamily: 'Cinzel, serif' }}>
-            {userName ?? 'Player'}
-          </h2>
-          <p className="text-xs uppercase tracking-widest mt-0.5" style={{ color: 'var(--accent)' }}>
-            {title}
-          </p>
-          {stats.memberSince && (
-            <p className="text-xs mt-1" style={{ color: '#555' }}>Member since {stats.memberSince}</p>
-          )}
-
-          {/* Level + XP bar */}
-          <div className="mt-4 px-2">
-            <div className="flex justify-between text-xs mb-1" style={{ color: '#888' }}>
-              <span>Level {displayLevel}</span>
-              <span>{totalXP.toLocaleString()} XP · {toNext.toLocaleString()} to next</span>
+        <div className="mb-5" style={{
+          background: 'var(--card-bg)',
+          border: '1px solid var(--border)',
+          borderRadius: 18, padding: '20px 18px',
+        }}>
+          <div className="flex items-center gap-4">
+            {/* Avatar with decorative accent ring */}
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <div style={{
+                width: 76, height: 76, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.06)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                overflow: 'hidden',
+                border: '2px solid var(--accent)',
+              }}>
+                {avatarUrl
+                  ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  : <PersonIcon size={32} color="var(--text-secondary)" />
+                }
+              </div>
+              {/* Level badge pill */}
+              <div style={{
+                position: 'absolute', bottom: -4, right: -4,
+                background: 'var(--accent)', borderRadius: 10,
+                padding: '2px 7px', border: '2px solid var(--base-bg)',
+              }}>
+                <span style={{ fontFamily: 'Cinzel, serif', fontSize: 10, fontWeight: 700, color: '#1A1A2E' }}>
+                  {displayLevel}
+                </span>
+              </div>
             </div>
-            <ProgressBar value={progress} height={14} glow />
+
+            {/* Name + title + member since */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h2 style={{ fontFamily: 'Cinzel, serif', fontSize: 20, fontWeight: 700,
+                color: 'var(--text-primary)', lineHeight: 1.1, marginBottom: 3 }}>
+                {userName ?? 'Player'}
+              </h2>
+              <p style={{ fontFamily: 'Cinzel, serif', fontSize: 11, fontWeight: 700,
+                color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
+                {title}
+              </p>
+              {stats.memberSince && (
+                <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                  Since {stats.memberSince}
+                </p>
+              )}
+            </div>
           </div>
-        </Card>
+
+          {/* XP bar */}
+          <div className="mt-5">
+            <div className="flex justify-between mb-2" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              <span>Lv {displayLevel}</span>
+              <span>{totalXP.toLocaleString()} XP · Lv {level + 1}</span>
+            </div>
+            <ProgressBar value={progress} height={5} glow />
+            <p style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 4, textAlign: 'right' }}>
+              {toNext.toLocaleString()} XP to next level
+            </p>
+          </div>
+        </div>
 
         {/* Activity Heatmap — hero position */}
         <ActivityHeatmap />
@@ -680,8 +707,8 @@ export function Profile() {
           </Card>
         )}
 
-        {/* Lifetime stats */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
+        {/* Lifetime stats — 2-col */}
+        <div className="grid grid-cols-2 gap-2 mb-5">
           {[
             { label: 'Total Sets',  value: stats.totalSets.toLocaleString() },
             { label: 'Miles',       value: stats.totalMiles.toFixed(1) },
@@ -691,20 +718,22 @@ export function Profile() {
             { label: 'Badges',      value: `${earned.length}/${badges.filter(b => !b.secret).length}` },
           ].map(s => (
             <div key={s.label} style={{
-              background: 'var(--card-bg)', backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.07)',
-              borderRadius: 12, padding: '10px 12px',
+              background: 'var(--card-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 12, padding: '12px 14px',
             }}>
-              <p style={{ color: '#888', fontSize: 10, fontFamily: 'Cormorant Garamond, serif', marginBottom: 2 }}>{s.label}</p>
-              <p style={{ color: 'var(--accent)', fontSize: 18, fontWeight: 700, lineHeight: 1 }}>{s.value}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 600,
+                letterSpacing: '-0.01em', marginBottom: 4 }}>{s.label}</p>
+              <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20, fontWeight: 700,
+                color: 'var(--text-primary)', lineHeight: 1 }}>{s.value}</p>
             </div>
           ))}
         </div>
 
         {/* Skill Mastery */}
         <div className="mb-2">
-          <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: '#444' }}>Skill Mastery</p>
+          <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)',
+            letterSpacing: '-0.015em', marginBottom: 12 }}>Skill Mastery</p>
           {skillsLoading ? (
             <p style={{ color: '#444', fontSize: 13 }}>Loading skills…</p>
           ) : (

@@ -15,8 +15,6 @@ export function SkillCard({ skill }: SkillCardProps) {
       className="card-animate"
       style={{
         background: 'var(--card-bg)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
         border: '1px solid rgba(255,255,255,0.07)',
         borderRadius: 14,
         padding: '14px 16px',
@@ -41,7 +39,7 @@ export function SkillCard({ skill }: SkillCardProps) {
         </div>
       </div>
 
-      <ProgressBar value={skill.progress} height={6} glow />
+      <ProgressBar value={skill.progress} height={4} glow />
 
       <div className="flex justify-between mt-1.5">
         <p style={{ color: '#555', fontSize: 10 }}>{skill.xp.toLocaleString()} XP</p>

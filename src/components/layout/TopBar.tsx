@@ -7,9 +7,10 @@ interface TopBarProps {
   title?:        string
   hideSettings?: boolean
   back?:         boolean   // show back arrow instead of hamburger
+  logButton?:    boolean   // show + Log button on right (Home page)
 }
 
-export function TopBar({ title, hideSettings = false, back = false }: TopBarProps) {
+export function TopBar({ title, hideSettings = false, back = false, logButton = false }: TopBarProps) {
   const navigate      = useNavigate()
   const userName      = useUserName()
   const toggleNav     = useNavStore(s => s.toggleNav)
@@ -110,7 +111,22 @@ export function TopBar({ title, hideSettings = false, back = false }: TopBarProp
       </button>
 
       {/* Right */}
-      {!hideSettings ? (
+      {logButton ? (
+        <button
+          onClick={() => navigate('/lifting')}
+          aria-label="Log activity"
+          className="flex items-center justify-center rounded-lg"
+          style={{
+            width: 36, height: 36, flexShrink: 0,
+            background: 'var(--accent)', border: 'none', cursor: 'pointer',
+            borderRadius: 10,
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 3v10M3 8h10" stroke="#1A1A2E" strokeWidth="2.2" strokeLinecap="round" />
+          </svg>
+        </button>
+      ) : !hideSettings ? (
         <button
           data-tutorial="settings-btn"
           onClick={() => navigate('/settings')}
