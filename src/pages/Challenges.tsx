@@ -200,7 +200,7 @@ export function Challenges() {
                   background: isActive ? t.color : 'var(--input-bg)',
                   color: isActive ? '#fff' : '#888',
                   boxShadow: isActive ? `0 4px 20px ${t.glow}` : 'none',
-                  border: `1px solid ${isActive ? t.color : 'var(--border-faint)'}``,
+                  border: `1px solid ${isActive ? t.color : 'var(--border-faint)'}`,
                   transform: isActive ? 'translateY(-2px)' : 'none',
                 }}
               >
