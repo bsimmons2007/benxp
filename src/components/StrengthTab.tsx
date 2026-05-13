@@ -510,11 +510,15 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
 
 // ── Convenience hook for external SQ display (Home.tsx etc.) ─────────────────
 
+let snapshotCache: { sq: number | null; topRank: RankMeta | null; ts: number } | null = null
+const SNAPSHOT_TTL = 5 * 60 * 1000
+
 export function useStrengthSnapshot() {
-  const [sq, setSq]         = useState<number | null>(null)
-  const [topRank, setTopRank] = useState<RankMeta | null>(null)
+  const [sq, setSq]         = useState<number | null>(snapshotCache?.sq ?? null)
+  const [topRank, setTopRank] = useState<RankMeta | null>(snapshotCache?.topRank ?? null)
 
   useEffect(() => {
+    if (snapshotCache && Date.now() - snapshotCache.ts < SNAPSHOT_TTL) return
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
@@ -545,6 +549,7 @@ export function useStrengthSnapshot() {
       const ranked    = results.filter(r => r.rank.tier > 0).sort((a, b) => b.rank.tier - a.rank.tier)
       const best      = ranked[0]?.rank ?? null
 
+      snapshotCache = { sq: sqVal, topRank: best, ts: Date.now() }
       setSq(sqVal)
       setTopRank(best)
     }

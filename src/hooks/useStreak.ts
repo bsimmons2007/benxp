@@ -10,7 +10,7 @@ export interface StreakData {
 }
 
 let streakCache: { data: StreakData; ts: number } | null = null
-const STREAK_TTL = 2 * 60 * 1000
+const STREAK_TTL = 5 * 60 * 1000
 
 export function invalidateStreakCache() {
   streakCache = null

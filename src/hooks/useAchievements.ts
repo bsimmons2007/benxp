@@ -437,10 +437,11 @@ function evaluate(data: RawData): Badge[] {
   ] as Badge[]
 }
 
-// Module-level cache — keyed on both XP and a revision counter so that any
-// logged activity (even one that earns 0 XP) busts the cache (P1-9 fix).
-let badgeCache: { xp: number; rev: number; badges: Badge[] } | null = null
+// Module-level cache — keyed on XP + revision. TTL prevents re-fetch on minor
+// XP changes within the same session.
+let badgeCache: { xp: number; rev: number; ts: number; badges: Badge[] } | null = null
 let badgeCacheRevision = 0
+const BADGE_TTL = 5 * 60 * 1000
 
 /** Call this whenever any activity is logged to ensure badge re-evaluation. */
 export function invalidateBadgeCache() {
@@ -448,7 +449,12 @@ export function invalidateBadgeCache() {
 }
 
 function cacheHit(xp: number): boolean {
-  return badgeCache !== null && badgeCache.xp === xp && badgeCache.rev === badgeCacheRevision
+  return (
+    badgeCache !== null &&
+    badgeCache.xp === xp &&
+    badgeCache.rev === badgeCacheRevision &&
+    Date.now() - badgeCache.ts < BADGE_TTL
+  )
 }
 
 export function useAchievements() {
@@ -527,7 +533,7 @@ export function useAchievements() {
         level,
       })
 
-      badgeCache = { xp: totalXP, rev: badgeCacheRevision, badges: result }
+      badgeCache = { xp: totalXP, rev: badgeCacheRevision, ts: Date.now(), badges: result }
       setBadges(result)
       setLoading(false)
     }
