@@ -11,7 +11,7 @@ import { StrengthTab } from '../components/StrengthTab'
 import { supabase } from '../lib/supabase'
 import { playTabSwitch } from '../lib/sounds'
 import { formatDate, today } from '../lib/utils'
-import { checkForPR, getMilestoneHit, LIFT_MILESTONES, XP_RATES } from '../lib/xp'
+import { checkForPR, getMilestoneHit, LIFT_MILESTONES, XP_RATES, epleyEst1RM } from '../lib/xp'
 import { MilestoneOverlay } from '../components/ui/MilestoneOverlay'
 import { EmptyState } from '../components/ui/EmptyState'
 import { DumbbellIcon, RunIcon, ActivityIcon, ZapIcon, GridIcon, BookmarkIcon } from '../components/ui/Icon'
@@ -500,7 +500,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       const bw      = entry.bodyweight ? parseFloat(entry.bodyweight) : null
       const weight  = entry.isBodyweight ? (bw ?? 0) : (parseFloat(entry.weight) || 0)
       const est1rm  = !isTimed && weight > 0 && reps > 0
-        ? Math.round((1 + reps / 30) * weight * 10) / 10
+        ? epleyEst1RM(weight, reps)
         : null
       return {
         user_id: user.id, date, lift: entry.liftName,
@@ -968,7 +968,7 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
   // For weighted lifts: est 1RM from latest set
   const latestWeightedSet = !isBWLift ? history.find(r => r.lift === lift && r.weight && r.reps) : null
   const quick1rm = latestWeightedSet
-    ? Math.round((1 + latestWeightedSet.reps! / 30) * latestWeightedSet.weight! * 10) / 10
+    ? epleyEst1RM(latestWeightedSet.weight!, latestWeightedSet.reps!)
     : null
 
   const [hovered, setHovered] = useState(false)

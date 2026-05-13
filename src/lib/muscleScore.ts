@@ -242,12 +242,12 @@ export function computeMuscleScores(
 
       let load = row.est_1rm
       if (!load && row.weight && row.reps) {
-        load = Math.round((1 + row.reps / 30) * row.weight * 10) / 10
+        load = Math.round((1 + Math.min(row.reps, 12) / 30) * row.weight * 10) / 10
       }
       // Bodyweight exercises: use bodyweight as load if weight is null
       if (!load && row.reps && (row.weight === null || row.weight === 0)) {
         const bwLoad = row.bodyweight ?? bw
-        load = Math.round((1 + row.reps / 30) * bwLoad * 10) / 10
+        load = Math.round((1 + Math.min(row.reps, 12) / 30) * bwLoad * 10) / 10
       }
       // Timed exercises: duration_secs proxy — 60s hold ≈ 1× bodyweight load, capped at 3×
       if (!load && row.duration_secs && row.duration_secs > 0) {

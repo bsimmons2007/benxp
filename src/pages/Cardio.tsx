@@ -41,10 +41,18 @@ interface Session {
   fastest_mile?: number | null
 }
 
+function cardioRate(activity: string): number {
+  if (activity === 'run')  return XP_RATES.cardio_run_per_mile
+  if (activity === 'bike') return XP_RATES.cardio_bike_per_mile
+  if (activity === 'swim') return XP_RATES.cardio_swim_per_mile
+  if (activity === 'walk') return XP_RATES.cardio_walk_per_mile
+  return XP_RATES.cardio_per_mile
+}
+
 function sessionXP(s: Session) {
   return s.source === 'skate'
     ? Math.round(s.distance * XP_RATES.skate_per_mile)
-    : Math.round(s.distance * XP_RATES.cardio_per_mile)
+    : Math.round(s.distance * cardioRate(s.activity))
 }
 
 // ── Log form ─────────────────────────────────────────────────
@@ -98,7 +106,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
 
     const xp = isSkate
       ? Math.round(miles * XP_RATES.skate_per_mile)
-      : Math.round(miles * XP_RATES.cardio_per_mile)
+      : Math.round(miles * cardioRate(data.activity))
     const { label } = activityMeta(data.activity)
     playXPGain()
     setToast(`+${xp} XP — ${label} logged!`)

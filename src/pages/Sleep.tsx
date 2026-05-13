@@ -20,6 +20,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const SLEEP_GOAL = 8        // hours/night target
 const RECOVERY_EXTRA = 1    // extra hours per recovery night
+const DEBT_WINDOW = 14      // rolling window for debt (days)
 
 function sleepQuality(hours: number | null): { label: string; color: string } {
   if (!hours) return { label: '—', color: '#888' }
@@ -210,18 +211,21 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   const nights = logs.filter(r => !r.is_nap)
   if (nights.length < 3) return null
 
-  // Total debt = sum of nightly deficits minus all nap hours (naps pay back debt)
   const withHours = nights.filter(r => r.hours_slept != null)
   const allNaps   = logs.filter(r => r.is_nap && r.hours_slept != null)
-  const napTotal  = allNaps.reduce((s, r) => s + (r.hours_slept ?? 0), 0)
-  const rawDebt   = withHours.reduce((sum, r) => sum + Math.max(0, SLEEP_GOAL - (r.hours_slept ?? 0)), 0)
-  const totalDebt = Math.max(0, rawDebt - napTotal)
 
-  // Recent 7 nights — use actual dates so naps align to same window
+  // 14-night rolling window; surplus capped at RECOVERY_EXTRA/night so you can't bank infinite sleep credit
+  const recent14   = withHours.slice(0, DEBT_WINDOW)
+  const cutoff14   = recent14.length ? recent14[recent14.length - 1].date : ''
+  const naps14hrs  = allNaps.filter(r => r.date >= cutoff14).reduce((s, r) => s + (r.hours_slept ?? 0), 0)
+  const raw14      = recent14.reduce((sum, r) => sum + Math.max(-RECOVERY_EXTRA, SLEEP_GOAL - (r.hours_slept ?? 0)), 0)
+  const totalDebt  = Math.max(0, raw14 - naps14hrs)
+
+  // Last 7 nights sub-window
   const recent7Nights = withHours.slice(0, 7)
   const cutoffDate    = recent7Nights.length ? recent7Nights[recent7Nights.length - 1].date : ''
   const recentNapHrs  = allNaps.filter(r => r.date >= cutoffDate).reduce((s, r) => s + (r.hours_slept ?? 0), 0)
-  const recentRaw     = recent7Nights.reduce((sum, r) => sum + Math.max(0, SLEEP_GOAL - (r.hours_slept ?? 0)), 0)
+  const recentRaw     = recent7Nights.reduce((sum, r) => sum + Math.max(-RECOVERY_EXTRA, SLEEP_GOAL - (r.hours_slept ?? 0)), 0)
   const recentDebt    = Math.max(0, recentRaw - recentNapHrs)
 
   if (totalDebt < 0.1) {
@@ -266,7 +270,7 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p style={{ color: '#888', fontSize: 11 }}>Last 7 nights: <span style={{ color: '#ccc', fontWeight: 700 }}>{recentDebt.toFixed(1)}h deficit</span></p>
-          <p style={{ color: '#888', fontSize: 11 }}>Total accumulated: <span style={{ color: debtColor, fontWeight: 700 }}>{totalDebt.toFixed(1)}h</span></p>
+          <p style={{ color: '#888', fontSize: 11 }}>14-day rolling: <span style={{ color: debtColor, fontWeight: 700 }}>{totalDebt.toFixed(1)}h</span></p>
         </div>
         <div style={{
           padding: '6px 12px', borderRadius: 8,

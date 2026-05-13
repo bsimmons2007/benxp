@@ -25,6 +25,11 @@ const LEVEL_TITLES: [number, string][] = [
   [100, 'Godlike'],
 ]
 
+/** Epley 1RM formula — capped at 12 reps; beyond that the formula overestimates badly */
+export function epleyEst1RM(weight: number, reps: number): number {
+  return Math.round((1 + Math.min(reps, 12) / 30) * weight * 10) / 10
+}
+
 export function getLevelTitle(level: number): string {
   let title = LEVEL_TITLES[0][1]
   for (const [threshold, name] of LEVEL_TITLES) {
@@ -46,7 +51,11 @@ export const XP_RATES = {
   sleep_log:            20,   // consistency tracking matters
   sleep_quality_bonus:  35,   // reward disciplined sleep
   challenge:             0,   // fallback — each challenge carries its own xp_reward
-  cardio_per_mile:      12,   // matched to skate
+  cardio_per_mile:      12,   // fallback
+  cardio_run_per_mile:  15,   // ~8-10 min/mile effort
+  cardio_bike_per_mile:  6,   // ~4-5 min/mile, lower effort per distance
+  cardio_swim_per_mile: 25,   // ~30-40 min/mile, highest effort per distance
+  cardio_walk_per_mile:  4,   // ~15-20 min/mile, low intensity
   mood_log:             15,   // daily mental health tracking
   measurement_log:      25,   // body tracking
   water_goal_reached:   50,   // daily 64oz goal hit
@@ -111,7 +120,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     supabase.from('fortnite_games').select('win, kills, mode'),
     supabase.from('challenges').select('xp_reward').eq('status', 'completed'),
     supabase.from('sleep_log').select('hours_slept').eq('is_nap', false),  // exclude naps
-    supabase.from('cardio_sessions').select('distance_miles'),
+    supabase.from('cardio_sessions').select('distance_miles, activity'),
     supabase.from('goals').select('xp_reward').eq('status', 'completed'),
     supabase.from('mood_log').select('id'),
     supabase.from('body_measurements').select('id'),
@@ -152,7 +161,14 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
       s + XP_RATES.sleep_log + ((r.hours_slept ?? 0) >= 7 ? XP_RATES.sleep_quality_bonus : 0),
     0
   )
-  const cardioXP      = (cardio.data ?? []).reduce((s: number, r: { distance_miles: number }) => s + (r.distance_miles ?? 0), 0) * XP_RATES.cardio_per_mile
+  const cardioXP      = (cardio.data ?? []).reduce((s: number, r: { distance_miles: number; activity: string }) => {
+    const rate = r.activity === 'run'  ? XP_RATES.cardio_run_per_mile
+               : r.activity === 'bike' ? XP_RATES.cardio_bike_per_mile
+               : r.activity === 'swim' ? XP_RATES.cardio_swim_per_mile
+               : r.activity === 'walk' ? XP_RATES.cardio_walk_per_mile
+               : XP_RATES.cardio_per_mile
+    return s + (r.distance_miles ?? 0) * rate
+  }, 0)
   const goalXP        = (goals.data ?? []).reduce((s: number, r: { xp_reward: number }) => s + (r.xp_reward ?? 0), 0)
   const moodXP        = (moodLogs.data ?? []).length * XP_RATES.mood_log
   const measurementXP = (measurements.data ?? []).length * XP_RATES.measurement_log

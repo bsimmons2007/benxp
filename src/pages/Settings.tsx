@@ -6,7 +6,7 @@ import { useXP } from '../hooks/useXP'
 import { useUserName } from '../hooks/useUserName'
 import { useStore } from '../store/useStore'
 import { XP_RATES } from '../lib/xp'
-import { THEMES, saveTheme, loadTheme, timeThemeEnabled, setTimeThemeEnabled, applyTimeOrSavedTheme } from '../lib/theme'
+import { THEMES, saveTheme, loadTheme, timeThemeEnabled, setTimeThemeEnabled, applyTimeOrSavedTheme, isLightMode, setLightMode, applyTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
 import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon } from '../components/ui/Icon'
 import { getNotifPrefs, saveNotifPrefs, requestPermission, permissionGranted, notificationsSupported } from '../lib/notifications'
@@ -138,6 +138,7 @@ export function Settings() {
 
   const [activeTheme, setActiveTheme]   = useState<Theme>(loadTheme)
   const [themeOpen, setThemeOpen]       = useState(false)
+  const [lightMode, setLightModeState]  = useState(isLightMode)
   const [timeTheme, setTimeThemeState]  = useState(timeThemeEnabled)
   const [levelStyle, setLevelStyle] = useState<'number' | 'roman'>(
     () => (localStorage.getItem('benxp-level-style') as 'number' | 'roman') ?? 'number'
@@ -222,6 +223,7 @@ export function Settings() {
   function handleTheme(theme: Theme) {
     setActiveTheme(theme)
     saveTheme(theme)
+    applyTheme(theme, lightMode)
     // Sync the highlighted scene to whatever the theme maps to
     const mapped = getAmbientForTheme(theme.id)
     if (ambientScene() !== mapped) setActiveScene(mapped)
@@ -378,6 +380,32 @@ export function Settings() {
               </div>
             </div>
           )}
+
+          {/* Light / Dark mode toggle */}
+          <div className="flex items-center justify-between py-2 mt-1">
+            <div className="flex items-center gap-3">
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, fontSize: 16 }}>
+                {lightMode ? '☀️' : '🌙'}
+              </span>
+              <div>
+                <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                  {lightMode ? 'Light Mode' : 'Dark Mode'}
+                </p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>
+                  {lightMode ? 'Light background, dark accent' : 'Dark background, vivid accent'}
+                </p>
+              </div>
+            </div>
+            <Toggle
+              value={lightMode}
+              onToggle={() => {
+                const next = !lightMode
+                setLightModeState(next)
+                setLightMode(next)
+                applyTheme(activeTheme, next)
+              }}
+            />
+          </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', margin: '2px 0' }} />
 

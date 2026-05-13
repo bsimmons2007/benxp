@@ -3,6 +3,7 @@ export interface Theme {
   name: string
   emoji: string
   accent: string
+  lightAccent?: string  // explicit dark accent for light mode; auto-computed if absent
   accentDim: string
   orb1: string
   orb2: string
@@ -14,6 +15,33 @@ export interface Theme {
   bgDeep: string
 }
 
+// ── Light mode helpers ────────────────────────────────────────────────────────
+
+/** Convert 6-char hex + alpha (0–1) → rgba string */
+export function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r},${g},${b},${alpha})`
+}
+
+/** Darken a hex color by ~45% — makes bright dark-mode accents readable on white */
+export function darkenForLight(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  const f = 0.55
+  return `#${Math.round(r * f).toString(16).padStart(2, '0')}${Math.round(g * f).toString(16).padStart(2, '0')}${Math.round(b * f).toString(16).padStart(2, '0')}`
+}
+
+export function isLightMode(): boolean {
+  return localStorage.getItem('benxp-light-mode') === 'true'
+}
+
+export function setLightMode(on: boolean) {
+  localStorage.setItem('benxp-light-mode', String(on))
+}
+
 export const THEMES: Theme[] = [
 
   // ── Reds & Pinks ──────────────────────────────────────────────────
@@ -22,6 +50,7 @@ export const THEMES: Theme[] = [
     name: 'Crimson',
     emoji: 'Red',
     accent: '#E94560',
+    lightAccent: '#9B1830',
     accentDim: 'rgba(233,69,96,0.2)',
     orb1: 'rgba(233,69,96,0.24)',
     orb2: 'rgba(150,30,170,0.16)',
@@ -129,6 +158,7 @@ export const THEMES: Theme[] = [
     name: 'Copper',
     emoji: 'Brown',
     accent: '#E8956D',
+    lightAccent: '#8B4513',
     accentDim: 'rgba(232,149,109,0.2)',
     orb1: 'rgba(232,149,109,0.18)',
     orb2: 'rgba(180,90,50,0.14)',
@@ -159,6 +189,7 @@ export const THEMES: Theme[] = [
     name: 'Gold Rush',
     emoji: 'Zap',
     accent: '#F5A623',
+    lightAccent: '#8B6000',
     accentDim: 'rgba(245,166,35,0.22)',
     orb1: 'rgba(123,47,190,0.25)',
     orb2: 'rgba(26,188,156,0.18)',
@@ -238,6 +269,7 @@ export const THEMES: Theme[] = [
     name: 'Dark Forest',
     emoji: 'Tree',
     accent: '#2ECC71',
+    lightAccent: '#1A6B3A',
     accentDim: 'rgba(46,204,113,0.2)',
     orb1: 'rgba(39,174,96,0.22)',
     orb2: 'rgba(26,188,156,0.18)',
@@ -375,6 +407,7 @@ export const THEMES: Theme[] = [
     name: 'Midnight',
     emoji: 'Night',
     accent: '#4B9FFF',
+    lightAccent: '#1358A8',
     accentDim: 'rgba(75,159,255,0.2)',
     orb1: 'rgba(75,159,255,0.16)',
     orb2: 'rgba(90,70,210,0.12)',
@@ -467,6 +500,7 @@ export const THEMES: Theme[] = [
     name: 'Galaxy',
     emoji: 'Galaxy',
     accent: '#A855F7',
+    lightAccent: '#6B22B8',
     accentDim: 'rgba(168,85,247,0.2)',
     orb1: 'rgba(168,85,247,0.26)',
     orb2: 'rgba(59,130,246,0.18)',
@@ -559,6 +593,7 @@ export const THEMES: Theme[] = [
     name: 'Lemon',
     emoji: 'Lemon',
     accent: '#FFE03A',
+    lightAccent: '#8B6914',
     accentDim: 'rgba(255,224,58,0.2)',
     orb1: 'rgba(255,224,58,0.18)',
     orb2: 'rgba(220,160,0,0.14)',
@@ -768,18 +803,35 @@ export const THEMES: Theme[] = [
   },
 ]
 
-export function applyTheme(theme: Theme) {
+export function applyTheme(theme: Theme, light = isLightMode()) {
   const r = document.documentElement
-  r.style.setProperty('--accent', theme.accent)
-  r.style.setProperty('--accent-dim', theme.accentDim)
-  r.style.setProperty('--orb1', theme.orb1)
-  r.style.setProperty('--orb2', theme.orb2)
-  r.style.setProperty('--orb3', theme.orb3)
-  r.style.setProperty('--card-bg', theme.cardBg)
-  r.style.setProperty('--nav-bg', theme.navBg)
-  r.style.setProperty('--base-bg', theme.baseBg)
-  r.style.setProperty('--bg-mid', theme.bgMid)
-  r.style.setProperty('--bg-deep', theme.bgDeep)
+
+  if (light) {
+    const la = theme.lightAccent ?? darkenForLight(theme.accent)
+    r.style.setProperty('--accent',     la)
+    r.style.setProperty('--accent-dim', hexToRgba(la, 0.15))
+    r.style.setProperty('--orb1',       hexToRgba(theme.accent, 0.10))
+    r.style.setProperty('--orb2',       hexToRgba(theme.accent, 0.06))
+    r.style.setProperty('--orb3',       hexToRgba(theme.accent, 0.03))
+    r.style.setProperty('--card-bg',    'rgba(255,255,255,0.88)')
+    r.style.setProperty('--nav-bg',     'rgba(252,251,249,0.97)')
+    r.style.setProperty('--base-bg',    '#f5f3ef')
+    r.style.setProperty('--bg-mid',     '#ece9e2')
+    r.style.setProperty('--bg-deep',    '#e2ddd5')
+    r.setAttribute('data-mode', 'light')
+  } else {
+    r.style.setProperty('--accent',     theme.accent)
+    r.style.setProperty('--accent-dim', theme.accentDim)
+    r.style.setProperty('--orb1',       theme.orb1)
+    r.style.setProperty('--orb2',       theme.orb2)
+    r.style.setProperty('--orb3',       theme.orb3)
+    r.style.setProperty('--card-bg',    theme.cardBg)
+    r.style.setProperty('--nav-bg',     theme.navBg)
+    r.style.setProperty('--base-bg',    theme.baseBg)
+    r.style.setProperty('--bg-mid',     theme.bgMid)
+    r.style.setProperty('--bg-deep',    theme.bgDeep)
+    r.removeAttribute('data-mode')
+  }
 }
 
 export function loadTheme(): Theme {
@@ -820,7 +872,7 @@ export function applyTimeOrSavedTheme() {
   const override = getTimeOfDayThemeId()
   const base     = loadTheme()
   const target   = (override ? THEMES.find(t => t.id === override) : null) ?? base
-  applyTheme(target)
+  applyTheme(target, isLightMode())
   return target
 }
 
