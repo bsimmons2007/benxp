@@ -299,22 +299,22 @@ button:not(:disabled):active { transform: scale(0.97); }
 
 /* ── Light mode overrides ── */
 html[data-mode="light"] {
-  --text-primary:   #1a1824;
-  --text-secondary: rgba(26,24,36,0.64);
-  --text-muted:     rgba(26,24,36,0.44);
-  --text-dim:       rgba(26,24,36,0.27);
-  --border:         rgba(0,0,0,0.13);
-  --border-faint:   rgba(0,0,0,0.08);
+  --text-primary:   #111118;
+  --text-secondary: rgba(17,17,24,0.60);
+  --text-muted:     rgba(17,17,24,0.40);
+  --text-dim:       rgba(17,17,24,0.25);
+  --border:         rgba(0,0,0,0.10);
+  --border-faint:   rgba(0,0,0,0.06);
   --input-bg:       rgba(0,0,0,0.04);
-  /* Cards are pure white; background is warm parchment so they pop */
-  --card-shadow:    0 1px 3px rgba(0,0,0,0.08), 0 4px 20px rgba(0,0,0,0.10);
+  --card-shadow:    0 1px 2px rgba(0,0,0,0.06), 0 3px 12px rgba(0,0,0,0.08);
   --green: #166534;
   --red:   #b91c1c;
   --error: #b91c1c;
 }
 
-/* Hide the grid in light mode — shadows provide depth instead */
-html[data-mode="light"] body::after { display: none; }
+/* No orb, no grid — flat matte background */
+html[data-mode="light"] body::before { display: none; }
+html[data-mode="light"] body::after  { display: none; }
 
 /* Light mode: invert Tailwind utility classes that hardcode white */
 html[data-mode="light"] .text-white { color: var(--text-primary) !important; }
@@ -322,12 +322,24 @@ html[data-mode="light"] .text-white { color: var(--text-primary) !important; }
 /* Cards/panels that use hardcoded white-alpha in inline styles */
 html[data-mode="light"] .glass {
   border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  box-shadow: var(--card-shadow);
 }
 
-/* Nav active dot needs no change — uses var(--accent) */
+/* Nav active dot — no glow in light mode */
+html[data-mode="light"] .nav-active-dot {
+  box-shadow: none;
+}
+
+/* Suppress glow animations in light mode */
+html[data-mode="light"] .glow-pulse      { animation: none; }
+html[data-mode="light"] .pr-badge        { animation: none; }
+html[data-mode="light"] .border-glow     { animation: none; }
+html[data-mode="light"] .card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
 
 /* Gradient text in light mode */
 html[data-mode="light"] .gradient-text {
-  background: linear-gradient(135deg, var(--accent), #1a1824 80%);
+  background: linear-gradient(135deg, var(--accent), #111118 80%);
 }
