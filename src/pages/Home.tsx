@@ -29,16 +29,41 @@ interface TrendResult {
 
 // ── Stat picker config ────────────────────────────────────────
 const HOME_STATS_KEY = 'benxp-home-stat-picks'
-const DEFAULT_STAT_PICKS = ['bench', 'squat', 'deadlift', 'miles', 'books', 'wins']
+const DEFAULT_STAT_PICKS = ['bench', 'squat', 'deadlift', 'sleep_avg', 'miles', 'wins']
 
 const STAT_DEFS = [
-  { id: 'bench',    label: 'Bench PR',        unit: 'lbs',  section: 'Lifting' },
-  { id: 'squat',    label: 'Squat PR',         unit: 'lbs',  section: 'Lifting' },
-  { id: 'deadlift', label: 'Deadlift PR',      unit: 'lbs',  section: 'Lifting' },
-  { id: 'strength', label: 'Strength Score',   unit: '/100', section: 'Lifting' },
-  { id: 'books',    label: 'Books This Year',  unit: '',     section: 'Books'   },
-  { id: 'miles',    label: 'Skate Miles',      unit: 'mi',   section: 'Skating' },
-  { id: 'wins',     label: 'FN Wins',          unit: '',     section: 'Gaming'  },
+  // Lifting
+  { id: 'bench',       label: 'Bench PR',        unit: 'lbs',     section: 'Lifting'  },
+  { id: 'squat',       label: 'Squat PR',         unit: 'lbs',     section: 'Lifting'  },
+  { id: 'deadlift',    label: 'Deadlift PR',      unit: 'lbs',     section: 'Lifting'  },
+  { id: 'ohp',         label: 'OHP PR',           unit: 'lbs',     section: 'Lifting'  },
+  { id: 'strength',    label: 'Strength Score',   unit: '/100',    section: 'Lifting'  },
+  { id: 'total_sets',  label: 'Sets Logged',      unit: '',        section: 'Lifting'  },
+  // Cardio
+  { id: 'cardio_miles',label: 'Cardio Miles',     unit: 'mi',      section: 'Cardio'   },
+  { id: 'run_miles',   label: 'Run Miles',        unit: 'mi',      section: 'Cardio'   },
+  { id: 'hike_miles',  label: 'Hike Miles',       unit: 'mi',      section: 'Cardio'   },
+  // Skating
+  { id: 'miles',       label: 'Skate Miles',      unit: 'mi',      section: 'Skating'  },
+  // Wellness
+  { id: 'sleep_avg',   label: 'Sleep Avg',        unit: 'hrs',     section: 'Wellness' },
+  { id: 'mood_avg',    label: 'Mood Avg',         unit: '/10',     section: 'Wellness' },
+  { id: 'water_today', label: 'Water Today',      unit: 'oz',      section: 'Wellness' },
+  { id: 'weight',      label: 'Bodyweight',       unit: 'lbs',     section: 'Wellness' },
+  { id: 'body_fat',    label: 'Body Fat',         unit: '%',       section: 'Wellness' },
+  // Books
+  { id: 'books',       label: 'Books This Year',  unit: '',        section: 'Books'    },
+  // Sports
+  { id: 'basketball',  label: 'Basketball',       unit: 'games',   section: 'Sports'   },
+  { id: 'pickleball',  label: 'Pickleball',       unit: 'games',   section: 'Sports'   },
+  { id: 'golf',        label: 'Golf',             unit: 'rounds',  section: 'Sports'   },
+  { id: 'disc_golf',   label: 'Disc Golf',        unit: 'rounds',  section: 'Sports'   },
+  { id: 'chess',       label: 'Chess',            unit: 'games',   section: 'Sports'   },
+  { id: 'pool',        label: 'Pool',             unit: 'games',   section: 'Sports'   },
+  // Gaming
+  { id: 'wins',        label: 'FN Wins',          unit: '',        section: 'Gaming'   },
+  { id: 'fn_games',    label: 'FN Games',         unit: '',        section: 'Gaming'   },
+  { id: 'fn_kills',    label: 'FN Avg Kills',     unit: '',        section: 'Gaming'   },
 ] as const
 
 type StatId = typeof STAT_DEFS[number]['id']
@@ -216,7 +241,7 @@ function StatsPickerModal({ picks, onChange, onClose }: {
       {/* Sheet */}
       <div className="pop-in" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 101,
-        background: '#12152b',
+        background: 'var(--bg-mid)',
         borderRadius: '20px 20px 0 0',
         padding: '20px 20px 44px',
         border: '1px solid var(--border)',
@@ -277,21 +302,21 @@ function StatsPickerModal({ picks, onChange, onClose }: {
 }
 
 // ── PR Hero Card ──────────────────────────────────────────────
-function PRHeroCard({ label, value, unit = 'lbs', trendDir, delta }: {
+function PRHeroCard({ label, value, unit = 'lbs', trendDir, delta, to }: {
   label: string; value: string | number; unit?: string
-  trendDir?: TrendDir; delta?: number | null
+  trendDir?: TrendDir; delta?: number | null; to?: string
 }) {
   const num      = typeof value === 'number' ? value : parseFloat(String(value))
   const isNum    = !isNaN(num)
   const decimals = String(value).includes('.') ? (String(value).split('.')[1]?.length ?? 0) : 0
   const animated = useCountUp(isNum ? num : 0, 900, decimals)
 
-  return (
+  const inner = (
     <div style={{
       background: 'var(--card-bg)',
       border: '1px solid var(--border)',
       borderRadius: 14, padding: '14px 16px',
-      boxShadow: '0 2px 16px rgba(0,0,0,0.2)',
+      boxShadow: 'var(--card-shadow)',
     }}>
       <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)',
         letterSpacing: '-0.01em', marginBottom: 6 }}>
@@ -310,11 +335,12 @@ function PRHeroCard({ label, value, unit = 'lbs', trendDir, delta }: {
       )}
     </div>
   )
+  return to ? <Link to={to} style={{ textDecoration: 'none' }}>{inner}</Link> : inner
 }
 
 // ── Secondary stat card (2×2 grid) ───────────────────────────
 function SecondaryStatCard({ label, value, unit, trendDir, to }: {
-  label: string; value: string | number; unit?: string; trendDir?: TrendDir; to?: string
+  label: string; value: string | number; unit?: string; trendDir?: TrendDir; to?: string; delta?: number | null
 }) {
   const num      = typeof value === 'number' ? value : parseFloat(String(value))
   const isNum    = !isNaN(num)
@@ -326,7 +352,7 @@ function SecondaryStatCard({ label, value, unit, trendDir, to }: {
       background: 'var(--card-bg)',
       border: '1px solid var(--border)',
       borderRadius: 12, padding: '12px 14px',
-      boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+      boxShadow: 'var(--card-shadow)',
     }}>
       <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)',
         letterSpacing: '-0.01em', marginBottom: 4 }}>
@@ -389,14 +415,33 @@ export function Home() {
 
   // Build card props for a given stat ID
   const getCardProps = (id: StatId) => {
+    const yr = new Date().getFullYear()
     switch (id) {
-      case 'bench':    return { label: 'Bench PR',       value: stats.benchPR    ? stats.benchPR.toFixed(1)    : '—', unit: 'lbs',  trendDir: trends.dirs['bench']    as TrendDir, delta: trends.prDeltas.bench    }
-      case 'squat':    return { label: 'Squat PR',       value: stats.squatPR    ? stats.squatPR.toFixed(1)    : '—', unit: 'lbs',  trendDir: trends.dirs['squat']    as TrendDir, delta: trends.prDeltas.squat    }
-      case 'deadlift': return { label: 'Deadlift PR',    value: stats.deadliftPR ? stats.deadliftPR.toFixed(1) : '—', unit: 'lbs',  trendDir: trends.dirs['deadlift'] as TrendDir, delta: trends.prDeltas.deadlift }
-      case 'strength': return { label: 'Strength Score', value: strengthSQ !== null ? String(strengthSQ) : '—', unit: '/100', to: '/strength' }
-      case 'books':    return { label: `Books ${new Date().getFullYear()}`, value: stats.booksThisYear, trendDir: trends.dirs['books'] as TrendDir }
-      case 'miles':    return { label: 'Skate Miles',    value: stats.totalMiles.toFixed(1), unit: 'mi', trendDir: trends.dirs['miles'] as TrendDir }
-      case 'wins':     return { label: 'FN Wins',        value: stats.winCount,  trendDir: trends.dirs['wins'] as TrendDir }
+      case 'bench':        return { label: 'Bench PR',       value: stats.benchPR    ? stats.benchPR.toFixed(1)    : '—', unit: 'lbs',  trendDir: trends.dirs['bench']    as TrendDir, delta: trends.prDeltas.bench,    to: '/records' }
+      case 'squat':        return { label: 'Squat PR',       value: stats.squatPR    ? stats.squatPR.toFixed(1)    : '—', unit: 'lbs',  trendDir: trends.dirs['squat']    as TrendDir, delta: trends.prDeltas.squat,    to: '/records' }
+      case 'deadlift':     return { label: 'Deadlift PR',    value: stats.deadliftPR ? stats.deadliftPR.toFixed(1) : '—', unit: 'lbs',  trendDir: trends.dirs['deadlift'] as TrendDir, delta: trends.prDeltas.deadlift, to: '/records' }
+      case 'ohp':          return { label: 'OHP PR',         value: stats.ohpPR      ? stats.ohpPR.toFixed(1)      : '—', unit: 'lbs',  to: '/records' }
+      case 'strength':     return { label: 'Strength Score', value: strengthSQ !== null ? String(strengthSQ) : '—', unit: '/100', to: '/strength' }
+      case 'total_sets':   return { label: 'Sets Logged',    value: stats.totalSets,  to: '/lifting' }
+      case 'cardio_miles': return { label: 'Cardio Miles',   value: stats.cardioMiles.toFixed(1), unit: 'mi', to: '/cardio' }
+      case 'run_miles':    return { label: 'Run Miles',      value: stats.runMiles.toFixed(1),    unit: 'mi', to: '/cardio' }
+      case 'hike_miles':   return { label: 'Hike Miles',     value: stats.hikeMiles.toFixed(1),   unit: 'mi', to: '/hiking' }
+      case 'miles':        return { label: 'Skate Miles',    value: stats.totalMiles.toFixed(1),  unit: 'mi', trendDir: trends.dirs['miles'] as TrendDir, to: '/skate' }
+      case 'sleep_avg':    return { label: 'Sleep Avg (7d)', value: stats.sleepAvg7 != null ? stats.sleepAvg7.toFixed(1) : '—', unit: 'hrs', to: '/sleep' }
+      case 'mood_avg':     return { label: 'Mood Avg (30d)', value: stats.moodAvg30 != null ? stats.moodAvg30.toFixed(1) : '—', unit: '/10', to: '/mood' }
+      case 'water_today':  return { label: 'Water Today',    value: stats.waterOzToday, unit: 'oz', to: '/water' }
+      case 'weight':       return { label: 'Bodyweight',     value: stats.latestWeight  != null ? stats.latestWeight.toFixed(1)  : '—', unit: 'lbs', to: '/measurements' }
+      case 'body_fat':     return { label: 'Body Fat',       value: stats.latestBodyFat != null ? stats.latestBodyFat.toFixed(1) : '—', unit: '%',   to: '/measurements' }
+      case 'books':        return { label: `Books ${yr}`,    value: stats.booksThisYear, trendDir: trends.dirs['books'] as TrendDir, to: '/books' }
+      case 'basketball':   return { label: 'Basketball',     value: stats.basketballGames, unit: 'games', to: '/basketball' }
+      case 'pickleball':   return { label: 'Pickleball',     value: stats.pickleballGames, unit: 'games', to: '/pickleball' }
+      case 'golf':         return { label: 'Golf',           value: stats.golfRounds,      unit: 'rounds', to: '/golf' }
+      case 'disc_golf':    return { label: 'Disc Golf',      value: stats.discGolfRounds,  unit: 'rounds', to: '/disc-golf' }
+      case 'chess':        return { label: 'Chess',          value: stats.chessGames,      unit: 'games',  to: '/chess' }
+      case 'pool':         return { label: 'Pool',           value: stats.poolGames,       unit: 'games',  to: '/pool' }
+      case 'wins':         return { label: 'FN Wins',        value: stats.winCount,  trendDir: trends.dirs['wins'] as TrendDir, to: '/fortnite' }
+      case 'fn_games':     return { label: 'FN Games',       value: stats.fnGamesTotal, to: '/fortnite' }
+      case 'fn_kills':     return { label: 'FN Avg Kills',   value: stats.fnKillsAvg != null ? stats.fnKillsAvg.toFixed(1) : '—', to: '/fortnite' }
     }
   }
 

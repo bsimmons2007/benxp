@@ -1,7 +1,14 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useUserName } from '../../hooks/useUserName'
 import { useNavStore } from '../../store/useNavStore'
+
+const LOG_MENU = [
+  { label: 'Lifting',  emoji: '🏋️', to: '/lifting' },
+  { label: 'Sleep',    emoji: '🌙', to: '/sleep'   },
+  { label: 'Mind',     emoji: '🧠', to: '/mood'    },
+  { label: 'Water',    emoji: '💧', to: '/water'   },
+]
 
 interface TopBarProps {
   title?:        string
@@ -17,6 +24,9 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
   const logoLabel     = title ?? (userName ? `${userName}XP` : 'YouXP')
   const logoClickable = !title
 
+  const [showLogMenu, setShowLogMenu] = useState(false)
+  const logMenuRef = useRef<HTMLDivElement>(null)
+
   // Show a one-time hint pulse on the hamburger for new users
   const [showHint, setShowHint] = useState(false)
   useEffect(() => {
@@ -24,6 +34,18 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
       setShowHint(true)
     }
   }, [back])
+
+  // Close log menu on outside click
+  useEffect(() => {
+    if (!showLogMenu) return
+    function handle(e: MouseEvent) {
+      if (logMenuRef.current && !logMenuRef.current.contains(e.target as Node)) {
+        setShowLogMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [showLogMenu])
 
   function handleLeft() {
     if (back) navigate(-1)
@@ -112,20 +134,48 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
 
       {/* Right */}
       {logButton ? (
-        <button
-          onClick={() => navigate('/lifting')}
-          aria-label="Log activity"
-          className="flex items-center justify-center rounded-lg"
-          style={{
-            width: 36, height: 36, flexShrink: 0,
-            background: 'var(--accent)', border: 'none', cursor: 'pointer',
-            borderRadius: 10,
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 3v10M3 8h10" stroke="#1A1A2E" strokeWidth="2.2" strokeLinecap="round" />
-          </svg>
-        </button>
+        <div ref={logMenuRef} style={{ position: 'relative', flexShrink: 0 }}>
+          <button
+            onClick={() => setShowLogMenu(v => !v)}
+            aria-label="Log activity"
+            style={{
+              width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'var(--accent)', border: 'none', cursor: 'pointer', borderRadius: 10,
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3v10M3 8h10" stroke="var(--base-bg)" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+          </button>
+
+          {showLogMenu && (
+            <div className="pop-in" style={{
+              position: 'absolute', top: 44, right: 0, zIndex: 200,
+              background: 'var(--card-bg)', border: '1px solid var(--border)',
+              borderRadius: 14, padding: '6px', minWidth: 160,
+              boxShadow: 'var(--card-shadow)',
+            }}>
+              {LOG_MENU.map(item => (
+                <button
+                  key={item.to}
+                  onClick={() => { setShowLogMenu(false); navigate(item.to) }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    width: '100%', padding: '10px 12px', borderRadius: 10,
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'var(--text-primary)', fontSize: 14, fontWeight: 500,
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--input-bg)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                >
+                  <span style={{ fontSize: 18, lineHeight: 1 }}>{item.emoji}</span>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       ) : !hideSettings ? (
         <button
           data-tutorial="settings-btn"

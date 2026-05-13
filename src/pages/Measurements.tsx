@@ -158,15 +158,21 @@ export function Measurements() {
   useEffect(() => { load() }, [])
 
   async function onSubmit(form: MeasureForm) {
+    // Require every numeric field to be filled before saving
+    const numericKeys = Object.keys(form).filter(k => k !== 'date' && k !== 'notes') as (keyof MeasureForm)[]
+    const missing = numericKeys.filter(k => form[k].trim() === '' || isNaN(parseFloat(form[k])))
+    if (missing.length > 0) {
+      setToast('Fill in all measurements before saving')
+      return
+    }
+
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setSaving(false); return }
 
     const payload: Record<string, unknown> = { user_id: user.id, date: form.date }
-    for (const k of Object.keys(form) as (keyof MeasureForm)[]) {
-      if (k === 'date' || k === 'notes') continue
-      const v = parseFloat(form[k])
-      if (!isNaN(v)) payload[k] = v
+    for (const k of numericKeys) {
+      payload[k] = parseFloat(form[k])
     }
     if (form.notes.trim()) payload['notes'] = form.notes.trim()
 

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { calculateLevel, levelProgress, fetchXPAndStats } from '../lib/xp'
+import { calculateLevel, levelProgress, fetchXPAndStats, getCachedXPData, setCachedXPData } from '../lib/xp'
 import type { AppStats } from '../lib/xp'
 import { supabase } from '../lib/supabase'
 import { invalidateStreakCache } from '../hooks/useStreak'
@@ -101,8 +101,14 @@ async function fetchUser(): Promise<{ userName: string; avatarUrl: string | null
 }
 
 const DEFAULT_STATS: AppStats = {
-  benchPR: null, squatPR: null, deadliftPR: null,
-  totalMiles: 0, booksThisYear: 0, winCount: 0,
+  benchPR: null, squatPR: null, deadliftPR: null, ohpPR: null,
+  totalSets: 0, cardioMiles: 0, runMiles: 0, hikeMiles: 0,
+  totalMiles: 0, booksThisYear: 0,
+  winCount: 0, fnGamesTotal: 0, fnKillsAvg: null,
+  basketballGames: 0, pickleballGames: 0, golfRounds: 0,
+  discGolfRounds: 0, chessGames: 0, poolGames: 0,
+  sleepAvg7: null, moodAvg30: null, waterOzToday: 0,
+  latestWeight: null, latestBodyFat: null,
 }
 
 interface AppState {
@@ -176,12 +182,26 @@ export const useStore = create<AppState>((set, get) => ({
     if (initialized || _initializing) return
     set({ _initializing: true })  // synchronous — blocks any concurrent caller
 
+    // Show stale cache immediately so the UI isn't blank while fetching
+    const cached = getCachedXPData()
+    if (cached) {
+      const cachedLevel = calculateLevel(cached.totalXP)
+      set({
+        totalXP:  cached.totalXP,
+        level:    cachedLevel,
+        progress: levelProgress(cached.totalXP),
+        stats:    cached.stats,
+        loading:  false,
+      })
+    }
+
     try {
       const [{ totalXP, stats }, userData, recentActivity] = await Promise.all([
         fetchXPAndStats(supabase),
         fetchUser(),
         fetchActivity(),
       ])
+      setCachedXPData({ totalXP, stats })
 
       const level    = calculateLevel(totalXP)
       const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10)
@@ -209,6 +229,7 @@ export const useStore = create<AppState>((set, get) => ({
   refreshXP: async () => {
     try {
       const { totalXP, stats } = await fetchXPAndStats(supabase)
+      setCachedXPData({ totalXP, stats })
       const level    = calculateLevel(totalXP)
       const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10)
       set({

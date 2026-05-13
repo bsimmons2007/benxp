@@ -99,12 +99,54 @@ export function levelProgress(totalXP: number): number {
 }
 
 export interface AppStats {
-  benchPR: number | null
-  squatPR: number | null
-  deadliftPR: number | null
-  totalMiles: number
+  // Lifting
+  benchPR:       number | null
+  squatPR:       number | null
+  deadliftPR:    number | null
+  ohpPR:         number | null
+  totalSets:     number
+  // Cardio / outdoor
+  cardioMiles:   number
+  runMiles:      number
+  hikeMiles:     number
+  // Skating
+  totalMiles:    number
+  // Books / gaming
   booksThisYear: number
-  winCount: number
+  winCount:      number
+  fnGamesTotal:  number
+  fnKillsAvg:    number | null
+  // Sports counts
+  basketballGames:  number
+  pickleballGames:  number
+  golfRounds:       number
+  discGolfRounds:   number
+  chessGames:       number
+  poolGames:        number
+  // Wellness
+  sleepAvg7:     number | null
+  moodAvg30:     number | null
+  waterOzToday:  number
+  latestWeight:  number | null
+  latestBodyFat: number | null
+}
+
+// ── localStorage cache (stale-while-revalidate) ──────────────────
+const XP_CACHE_KEY = 'benxp-xp-cache-v2'
+const XP_CACHE_TTL = 5 * 60 * 1000
+
+export function getCachedXPData(): { totalXP: number; stats: AppStats } | null {
+  try {
+    const raw = localStorage.getItem(XP_CACHE_KEY)
+    if (!raw) return null
+    const { data, ts } = JSON.parse(raw)
+    if (Date.now() - ts > XP_CACHE_TTL) return null
+    return data
+  } catch { return null }
+}
+
+export function setCachedXPData(data: { totalXP: number; stats: AppStats }) {
+  try { localStorage.setItem(XP_CACHE_KEY, JSON.stringify({ data, ts: Date.now() })) } catch {}
 }
 
 /**
@@ -119,11 +161,11 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     supabase.from('books').select('date_finished').not('date_finished', 'is', null),
     supabase.from('fortnite_games').select('win, kills, mode'),
     supabase.from('challenges').select('xp_reward').eq('status', 'completed'),
-    supabase.from('sleep_log').select('hours_slept').eq('is_nap', false),  // exclude naps
+    supabase.from('sleep_log').select('hours_slept, date').eq('is_nap', false),
     supabase.from('cardio_sessions').select('distance_miles, activity'),
     supabase.from('goals').select('xp_reward').eq('status', 'completed'),
-    supabase.from('mood_log').select('id'),
-    supabase.from('body_measurements').select('id'),
+    supabase.from('mood_log').select('rating, date'),
+    supabase.from('body_measurements').select('date, weight_lbs, body_fat_pct').order('date', { ascending: false }).limit(1),
     supabase.from('water_log').select('date, oz'),
     supabase.from('basketball_sessions').select('points'),
     supabase.from('pickleball_games').select('win'),
@@ -242,13 +284,71 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     if (!prMap[r.lift] || r.est_1rm > prMap[r.lift]) prMap[r.lift] = r.est_1rm
   })
 
+  // Sleep: avg of last 7 nights
+  const sleepByDate: Record<string, number> = {}
+  ;(sleepLogs.data ?? []).forEach((r: { hours_slept: number | null; date: string }) => {
+    if (r.hours_slept != null) sleepByDate[r.date] = r.hours_slept
+  })
+  const sleepDates = Object.keys(sleepByDate).sort().slice(-7)
+  const sleepAvg7  = sleepDates.length
+    ? Math.round((sleepDates.reduce((s, d) => s + sleepByDate[d], 0) / sleepDates.length) * 10) / 10
+    : null
+
+  // Mood: avg last 30 days
+  const thirtyAgo = new Date(); thirtyAgo.setDate(thirtyAgo.getDate() - 30)
+  const thirtyAgoStr = thirtyAgo.toISOString().slice(0, 10)
+  const recentMoods = (moodLogs.data ?? []).filter(
+    (r: { rating: number; date: string }) => r.date >= thirtyAgoStr && r.rating != null
+  ) as { rating: number; date: string }[]
+  const moodAvg30 = recentMoods.length
+    ? Math.round((recentMoods.reduce((s, r) => s + r.rating, 0) / recentMoods.length) * 10) / 10
+    : null
+
+  // Water: today's total oz
+  const todayStr = new Date().toISOString().slice(0, 10)
+  const waterOzToday = (waterLog.data ?? [])
+    .filter((r: { date: string; oz: number }) => r.date === todayStr)
+    .reduce((s: number, r: { oz: number }) => s + Number(r.oz), 0)
+
+  // Cardio breakdowns
+  const cardioRows = (cardio.data ?? []) as { distance_miles: number; activity: string }[]
+  const cardioMiles = Math.round(cardioRows.reduce((s, r) => s + (r.distance_miles ?? 0), 0) * 10) / 10
+  const runMiles    = Math.round(cardioRows.filter(r => r.activity === 'run').reduce((s, r) => s + (r.distance_miles ?? 0), 0) * 10) / 10
+  const hikeMiles   = Math.round((hiking.data ?? []).reduce((s: number, r: { distance_miles: number }) => s + (r.distance_miles ?? 0), 0) * 10) / 10
+
+  // FN stats
+  const fnKillsAvg = gameRows.length
+    ? Math.round((gameRows.reduce((s: number, r: { kills: number }) => s + (r.kills ?? 0), 0) / gameRows.length) * 10) / 10
+    : null
+
+  // Latest body measurement
+  const latestMeas = (measurements.data ?? [])[0] as { weight_lbs: number | null; body_fat_pct: number | null } | undefined
+
   const stats: AppStats = {
     benchPR:    prMap['Bench']    ?? null,
     squatPR:    prMap['Squat']    ?? null,
     deadliftPR: prMap['Deadlift'] ?? null,
-    totalMiles: skateRows.reduce((s: number, r: { miles: number }) => s + (r.miles ?? 0), 0),
+    ohpPR:      prMap['OHP']      ?? null,
+    totalSets:  liftRows.length,
+    cardioMiles,
+    runMiles,
+    hikeMiles,
+    totalMiles:     skateRows.reduce((s: number, r: { miles: number }) => s + (r.miles ?? 0), 0),
     booksThisYear:  bookRows.filter((r: { date_finished: string }) => r.date_finished >= `${new Date().getFullYear()}-01-01`).length,
-    winCount:   gameRows.filter((r: { win: boolean }) => r.win).length,
+    winCount:       gameRows.filter((r: { win: boolean }) => r.win).length,
+    fnGamesTotal:   gameRows.length,
+    fnKillsAvg,
+    basketballGames:  (basketball.data ?? []).length,
+    pickleballGames:  (pickleball.data ?? []).length,
+    golfRounds:       (golf.data ?? []).length,
+    discGolfRounds:   (discGolf.data ?? []).length,
+    chessGames:       (chess.data ?? []).length,
+    poolGames:        (pool.data ?? []).length,
+    sleepAvg7,
+    moodAvg30,
+    waterOzToday,
+    latestWeight:   latestMeas?.weight_lbs   ?? null,
+    latestBodyFat:  latestMeas?.body_fat_pct ?? null,
   }
 
   return { totalXP, stats }
