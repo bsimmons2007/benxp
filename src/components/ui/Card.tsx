@@ -20,7 +20,7 @@ export function Card({ children, className = '', style, accent = false, goldBord
       style={{
         background: 'var(--card-bg)',
         border:     highlighted ? '1px solid var(--accent)' : '1px solid var(--border)',
-        boxShadow:  highlighted ? '0 0 20px var(--accent-dim)' : '0 2px 16px rgba(0,0,0,0.2)',
+        boxShadow:  highlighted ? '0 0 20px var(--accent-dim)' : 'var(--card-shadow)',
         ...style,
       }}
     >

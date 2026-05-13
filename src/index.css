@@ -18,14 +18,17 @@
   --input-bg:        rgba(255,255,255,0.04);
 
   /* Text scale */
-  --text-primary:    #e8e8e8;
-  --text-secondary:  rgba(255,255,255,0.55);
+  --text-primary:    #eaeaea;
+  --text-secondary:  rgba(255,255,255,0.60);
   --text-muted:      rgba(255,255,255,0.38);
   --text-dim:        rgba(255,255,255,0.22);
 
   /* Borders */
-  --border:          rgba(255,255,255,0.08);
-  --border-faint:    rgba(255,255,255,0.05);
+  --border:          rgba(255,255,255,0.09);
+  --border-faint:    rgba(255,255,255,0.055);
+
+  /* Elevation */
+  --card-shadow:     0 2px 12px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05);
 
   /* Radius scale */
   --r-sm:  8px;
@@ -297,23 +300,21 @@ button:not(:disabled):active { transform: scale(0.97); }
 /* ── Light mode overrides ── */
 html[data-mode="light"] {
   --text-primary:   #1a1824;
-  --text-secondary: rgba(26,24,36,0.62);
-  --text-muted:     rgba(26,24,36,0.42);
-  --text-dim:       rgba(26,24,36,0.25);
-  --border:         rgba(0,0,0,0.09);
-  --border-faint:   rgba(0,0,0,0.055);
-  --input-bg:       rgba(0,0,0,0.045);
+  --text-secondary: rgba(26,24,36,0.64);
+  --text-muted:     rgba(26,24,36,0.44);
+  --text-dim:       rgba(26,24,36,0.27);
+  --border:         rgba(0,0,0,0.13);
+  --border-faint:   rgba(0,0,0,0.08);
+  --input-bg:       rgba(0,0,0,0.04);
+  /* Cards are pure white; background is warm parchment so they pop */
+  --card-shadow:    0 1px 3px rgba(0,0,0,0.08), 0 4px 20px rgba(0,0,0,0.10);
   --green: #166534;
   --red:   #b91c1c;
   --error: #b91c1c;
 }
 
-/* Flip grid lines to dark */
-html[data-mode="light"] body::after {
-  background-image:
-    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
-}
+/* Hide the grid in light mode — shadows provide depth instead */
+html[data-mode="light"] body::after { display: none; }
 
 /* Light mode: invert Tailwind utility classes that hardcode white */
 html[data-mode="light"] .text-white { color: var(--text-primary) !important; }
