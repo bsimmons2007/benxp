@@ -1,4 +1,4 @@
-﻿// ResetPassword — handles the Supabase password-recovery redirect link.
+// ResetPassword — handles the Supabase password-recovery redirect link.
 // Supabase sends an email link → user clicks → lands here with the session
 // already restored via the URL hash. We just show a "choose new password" form.
 
@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase'
 const INPUT: React.CSSProperties = {
   width: '100%', padding: '12px 16px', borderRadius: 12,
   background: 'var(--input-bg)', border: '1px solid var(--border)',
-  color: '#fff', fontSize: 15, outline: 'none', transition: 'border-color 0.18s ease',
+  color: 'var(--text-primary)', fontSize: 15, outline: 'none', transition: 'border-color 0.18s ease',
   boxSizing: 'border-box',
 }
 

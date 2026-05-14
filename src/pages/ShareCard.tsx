@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -132,9 +132,9 @@ function Card() {
           stats.booksThisYear  ? { label: 'Books',  value: String(stats.booksThisYear) }           : null,
         ].filter(Boolean).slice(0, 6).map((s, i) => s && (
           <div key={i} style={{
-            background: 'rgba(255,255,255,0.05)',
+            background: 'var(--input-bg)',
             borderRadius: 10, padding: '8px 10px',
-            border: '1px solid rgba(255,255,255,0.07)',
+            border: '1px solid var(--border-faint)',
           }}>
             <p style={{ color: theme.accent, fontSize: 16, fontWeight: 800, margin: 0, lineHeight: 1 }}>{s.value}</p>
             <p style={{ color: '#888', fontSize: 9, margin: '3px 0 0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
@@ -182,8 +182,8 @@ function Card() {
             {topBadges.map(b => (
               <div key={b.id} style={{
                 width: 36, height: 36, borderRadius: 9,
-                background: 'rgba(255,255,255,0.07)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'var(--input-bg)',
+                border: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {badgeIconSm(b, theme.accent)}

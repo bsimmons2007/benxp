@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
@@ -316,8 +316,8 @@ function BadgeTile({ badge }: { badge: Badge }) {
           ? 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)'
           : 'rgba(255,255,255,0.03)',
         border: badge.earned
-          ? '1px solid rgba(255,255,255,0.18)'
-          : '1px solid rgba(255,255,255,0.05)',
+          ? '1px solid var(--border)'
+          : '1px solid var(--border-faint)',
         boxShadow: badge.earned ? '0 4px 16px rgba(0,0,0,0.25)' : 'none',
         opacity: badge.earned ? 1 : 0.35,
         filter: badge.earned ? 'none' : 'grayscale(1)',
@@ -334,13 +334,13 @@ function BadgeTile({ badge }: { badge: Badge }) {
           position: 'absolute', bottom: 'calc(100% + 8px)', left: '50%',
           transform: 'translateX(-50%)',
           background: 'rgba(10,10,20,0.95)',
-          border: '1px solid rgba(255,255,255,0.1)',
+          border: '1px solid var(--border)',
           borderRadius: 8, padding: '6px 10px',
           whiteSpace: 'nowrap', zIndex: 50,
           pointerEvents: 'none',
           boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
         }}>
-          <p style={{ color: '#fff', fontSize: 12, fontWeight: 700, marginBottom: 2 }}>{badge.name}</p>
+          <p style={{ color: 'var(--text-primary)', fontSize: 12, fontWeight: 700, marginBottom: 2 }}>{badge.name}</p>
           <p style={{ color: '#888', fontSize: 10 }}>{badge.description}</p>
           {badge.earned && badge.earnedDate && (
             <p style={{ color: 'var(--accent)', fontSize: 9, marginTop: 2 }}>

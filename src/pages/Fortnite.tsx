@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -34,9 +34,9 @@ const RANK_COLORS: Record<FnRank, string> = {
 const ACCENT_NORMAL = 'var(--accent)'
 const ACCENT_BLITZ  = '#a855f7'
 
-const ttStyle  = { background: 'rgba(10,10,22,0.97)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, color: '#fff', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }
+const ttStyle  = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }
 const lblStyle = { color: '#aaa' }
-const itmStyle = { color: '#fff' }
+const itmStyle = { color: 'var(--text-primary)' }
 
 type FnTab = 'normal' | 'blitz'
 
@@ -220,16 +220,16 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
             <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Kills</label>
-            <input type="number" value={kills} onChange={e => setKills(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
+            <input type="number" value={kills} onChange={e => setKills(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }} />
           </div>
           <div className="flex flex-col gap-1 flex-1">
             <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Placement</label>
-            <input type="number" value={placement} onChange={e => setPlacement(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
+            <input type="number" value={placement} onChange={e => setPlacement(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }} />
           </div>
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Accuracy %</label>
-          <input type="number" step="0.1" value={accuracy} onChange={e => setAccuracy(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }} />
+          <input type="number" step="0.1" value={accuracy} onChange={e => setAccuracy(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }} />
         </div>
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setWin(w => !w)}>
           <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? '#27AE60' : 'var(--border)' }}>
@@ -310,7 +310,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
 
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Mode</label>
-              <select {...register('mode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <select {...register('mode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}>
                 <option>Solos</option>
                 <option>Duos</option>
                 <option>Trios</option>
@@ -439,7 +439,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
 
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Mode</label>
-              <select {...register('blitzMode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <select {...register('blitzMode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}>
                 <option>Solos</option>
                 <option>Duos</option>
                 <option>Squads</option>
@@ -600,7 +600,7 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
             <div>
               <p className="text-white font-semibold text-sm">
                 {formatDate(g.date)}
-                {g.win && <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: ACCENT_BLITZ, color: '#fff' }}>WIN</span>}
+                {g.win && <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: ACCENT_BLITZ, color: 'var(--text-primary)' }}>WIN</span>}
               </p>
               <p className="text-xs mt-0.5" style={{ color: '#888' }}>
                 Blitz {blitzDisplayMode(g.mode)}{g.placement ? ` · #${g.placement}` : ''}

@@ -15,7 +15,7 @@ export function SkillCard({ skill }: SkillCardProps) {
       className="card-animate"
       style={{
         background: 'var(--card-bg)',
-        border: '1px solid rgba(255,255,255,0.07)',
+        border: '1px solid var(--border-faint)',
         borderRadius: 14,
         padding: '14px 16px',
         boxShadow: '0 4px 20px rgba(0,0,0,0.15)',

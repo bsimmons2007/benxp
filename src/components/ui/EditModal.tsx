@@ -18,7 +18,7 @@ export function EditModal({ title, onClose, onDelete, onSave, saving, children }
     >
       <div
         className="w-full rounded-2xl px-5 pt-5 pb-6 pop-in"
-        style={{ background: 'rgba(18,22,46,0.98)', border: '1px solid rgba(255,255,255,0.12)', maxHeight: '80vh', overflowY: 'auto', maxWidth: 480 }}
+        style={{ background: 'rgba(18,22,46,0.98)', border: '1px solid var(--border)', maxHeight: '80vh', overflowY: 'auto', maxWidth: 480 }}
       >
         {/* Handle bar */}
         <div className="w-10 h-1 rounded-full mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.2)' }} />

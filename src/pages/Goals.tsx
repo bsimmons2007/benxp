@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
@@ -299,7 +299,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
           </>
         ) : (
           <>
-            <button onClick={onDelete} className="flex-1 py-1.5 rounded-lg text-xs font-bold" style={{ background: '#E94560', color: '#fff' }}>Delete</button>
+            <button onClick={onDelete} className="flex-1 py-1.5 rounded-lg text-xs font-bold" style={{ background: '#E94560', color: 'var(--text-primary)' }}>Delete</button>
             <button onClick={() => setConfirming(false)} className="flex-1 py-1.5 rounded-lg text-xs" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)' }}>Cancel</button>
           </>
         )}

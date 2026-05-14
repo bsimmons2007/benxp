@@ -113,7 +113,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
         </button>
 
         {/* Drain bar */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, borderRadius: '0 0 24px 24px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, borderRadius: '0 0 24px 24px', background: 'var(--input-bg)', overflow: 'hidden' }}>
           <div style={{
             height: '100%', background: 'var(--accent)',
             animationName: 'toastDrain', animationDuration: `${drainDuration.current}ms`,

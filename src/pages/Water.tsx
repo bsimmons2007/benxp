@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Toast } from '../components/ui/Toast'
@@ -367,7 +367,7 @@ export function Water() {
             <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Amount (oz)</label>
             <input
               type="number" value={editOz} onChange={e => setEditOz(e.target.value)}
-              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 16, width: '100%' }}
+              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: 'var(--text-primary)', fontSize: 16, width: '100%' }}
             />
           </div>
         </EditModal>
@@ -385,7 +385,7 @@ export function Water() {
               type="number" value={goalInput} onChange={e => setGoalInput(e.target.value)}
               placeholder="e.g. 64"
               autoFocus
-              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 16, width: '100%' }}
+              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: 'var(--text-primary)', fontSize: 16, width: '100%' }}
             />
           </div>
         </EditModal>

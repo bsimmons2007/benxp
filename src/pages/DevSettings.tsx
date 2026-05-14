@@ -323,7 +323,7 @@ export function DevSettings() {
               </div>
               <button
                 onClick={() => { sessionStorage.removeItem(SESSION_KEY); setUnlocked(false) }}
-                style={{ color: '#555', fontSize: 11, background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}
+                style={{ color: '#555', fontSize: 11, background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}
               >
                 Lock
               </button>

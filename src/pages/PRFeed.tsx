@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -165,7 +165,7 @@ export function PRFeed() {
                       ? 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)'
                       : 'var(--card-bg)',
                     border: isBest && i < 5
-                      ? '1px solid rgba(255,255,255,0.12)'
+                      ? '1px solid var(--border)'
                       : '1px solid var(--border-faint)',
                   }}
                 >

@@ -24,9 +24,9 @@ function CustomDot(props: any) {
 
 const TT_STYLE = {
   background: 'rgba(10,10,22,0.97)',
-  border: '1px solid rgba(255,255,255,0.12)',
+  border: '1px solid var(--border)',
   borderRadius: 8,
-  color: '#fff',
+  color: 'var(--text-primary)',
   fontSize: 12,
   boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }

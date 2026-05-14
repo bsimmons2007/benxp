@@ -107,7 +107,7 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
         onClick={e => e.stopPropagation()}
         className="pop-in"
         style={{
-          background: 'rgba(12,16,36,0.98)', border: '1px solid rgba(255,255,255,0.12)',
+          background: 'rgba(12,16,36,0.98)', border: '1px solid var(--border)',
           borderRadius: 16, padding: '20px 24px', minWidth: 220,
           boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
         }}
@@ -116,10 +116,10 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
           Keyboard Shortcuts
         </p>
         {SHORTCUTS.map(s => (
-          <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: '1px solid var(--border-faint)' }}>
             <kbd style={{
               display: 'inline-block', width: 24, height: 24, lineHeight: '24px', textAlign: 'center',
-              borderRadius: 5, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 5, background: 'var(--input-bg)', border: '1px solid var(--border)',
               color: 'var(--accent)', fontSize: 12, fontWeight: 700, fontFamily: 'monospace', flexShrink: 0,
             }}>
               {s.key.toUpperCase()}
@@ -130,14 +130,14 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0' }}>
           <kbd style={{
             display: 'inline-block', width: 24, height: 24, lineHeight: '24px', textAlign: 'center',
-            borderRadius: 5, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: 5, background: 'var(--input-bg)', border: '1px solid var(--border)',
             color: '#888', fontSize: 11, fontWeight: 700, fontFamily: 'monospace', flexShrink: 0,
           }}>?</kbd>
           <span style={{ fontSize: 13, color: '#888' }}>Toggle this help</span>
         </div>
         <button
           onClick={onClose}
-          style={{ marginTop: 14, width: '100%', padding: '8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#888', cursor: 'pointer', fontSize: 12 }}
+          style={{ marginTop: 14, width: '100%', padding: '8px', borderRadius: 8, border: '1px solid var(--border-faint)', background: 'var(--input-bg)', color: '#888', cursor: 'pointer', fontSize: 12 }}
         >
           Close (Esc)
         </button>

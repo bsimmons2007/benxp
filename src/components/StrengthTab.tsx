@@ -45,7 +45,7 @@ function RankProgressBar({ result }: { result: MuscleScoreResult }) {
         <span style={{ fontSize: 10, color: '#444' }}>Progress to next rank</span>
         <span style={{ fontSize: 10, color: glow, fontWeight: 700 }}>{pct}%</span>
       </div>
-      <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+      <div style={{ height: 6, borderRadius: 3, background: 'var(--input-bg)', overflow: 'hidden' }}>
         <div
           style={{
             height: '100%', width: `${pct}%`, borderRadius: 3,
@@ -75,7 +75,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
           <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>
             {muscle?.group}
           </p>
-          <p style={{ color: '#fff', fontWeight: 700, fontSize: 17, fontFamily: 'Cinzel, serif' }}>
+          <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 17, fontFamily: 'Cinzel, serif' }}>
             {muscle?.name ?? result.muscleKey}
           </p>
         </div>
@@ -102,7 +102,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
       )}
 
       {nextRank && result.rank.tier > 0 && (
-        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
           <span style={{ fontSize: 11, color: '#555' }}>
             Need{' '}
             <span style={{ color: nextRank.glow !== 'none' ? nextRank.glow : '#aaa', fontWeight: 700 }}>
@@ -135,7 +135,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
                         {pct}%
                       </span>
                     </div>
-                    <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                    <div style={{ height: 3, borderRadius: 2, background: 'var(--input-bg)', overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${pct}%`, background: glow, borderRadius: 2, opacity: 0.7 }} />
                     </div>
                   </div>
@@ -216,7 +216,7 @@ function ImbalanceCard({ warnings }: { warnings: ReturnType<typeof detectImbalan
         ⚠ Muscle Imbalances Detected
       </p>
       {warnings.map((w, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < warnings.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < warnings.length - 1 ? '1px solid var(--border-faint)' : 'none' }}>
           <div>
             <p style={{ fontSize: 12, color: '#ddd', fontWeight: 600 }}>{w.label}</p>
             <p style={{ fontSize: 10, color: '#888' }}>
@@ -274,7 +274,7 @@ function RankDropdown() {
           cursor: 'pointer', listStyle: 'none', display: 'flex', alignItems: 'center',
           justifyContent: 'space-between', padding: '10px 0',
           fontSize: 13, fontWeight: 700, color: '#ccc', fontFamily: 'Cinzel, serif',
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
+          borderBottom: '1px solid var(--border-faint)',
           userSelect: 'none',
         }}
       >
@@ -440,7 +440,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
                     padding: '5px 20px', borderRadius: 20, fontSize: 12, fontWeight: 700,
                     background: view === v ? 'var(--accent)' : 'rgba(255,255,255,0.05)',
                     color:      view === v ? 'var(--base-bg)' : '#888',
-                    border:     view === v ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.08)',
+                    border:     view === v ? '1px solid var(--accent)' : '1px solid var(--border-faint)',
                     cursor: 'pointer', transition: 'all 0.15s ease',
                     textTransform: 'capitalize',
                   }}
@@ -453,7 +453,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
             <BodyMap view={view} scores={results} selected={selected} onSelect={handleSelect} imbalancedKeys={lagKeys.size > 0 ? lagKeys : undefined} />
 
             {selectedResult && (
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: 8 }}>
+              <div style={{ borderTop: '1px solid var(--border-faint)', marginTop: 8 }}>
                 <MuscleDetail result={selectedResult} />
               </div>
             )}

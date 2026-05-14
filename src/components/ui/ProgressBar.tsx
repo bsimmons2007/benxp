@@ -10,7 +10,7 @@ export function ProgressBar({ value, color = 'var(--accent)', height = 12, glow 
   return (
     <div
       className="w-full rounded-full overflow-hidden"
-      style={{ height, background: 'rgba(255,255,255,0.07)', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)' }}
+      style={{ height, background: 'var(--input-bg)', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)' }}
     >
       <div
         className="h-full rounded-full progress-bar-fill relative overflow-hidden"

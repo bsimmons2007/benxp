@@ -12,9 +12,9 @@ interface DataPoint {
 
 const TT_STYLE = {
   background: 'rgba(10,10,22,0.97)',
-  border: '1px solid rgba(255,255,255,0.12)',
+  border: '1px solid var(--border)',
   borderRadius: 8,
-  color: '#fff',
+  color: 'var(--text-primary)',
   fontSize: 12,
   boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
@@ -113,7 +113,7 @@ export function BodyweightChart() {
         </div>
         <button
           onClick={() => { setGoalInput(goal ? String(goal) : ''); setEditingGoal(e => !e) }}
-          style={{ fontSize: 11, color: 'var(--accent)', background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}
+          style={{ fontSize: 11, color: 'var(--accent)', background: 'var(--input-bg)', border: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}
         >
           {editingGoal ? 'Cancel' : goal ? 'Edit Goal' : 'Set Goal'}
         </button>
@@ -132,12 +132,12 @@ export function BodyweightChart() {
             autoFocus
             style={{
               flex: 1, padding: '6px 12px', borderRadius: 8, fontSize: 13,
-              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-              color: '#fff', outline: 'none',
+              background: 'var(--input-bg)', border: '1px solid var(--border)',
+              color: 'var(--text-primary)', outline: 'none',
             }}
           />
           <button onClick={saveGoal} style={{ padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}>Save</button>
-          {goal && <button onClick={clearGoal} style={{ padding: '6px 10px', borderRadius: 8, fontSize: 12, color: '#888', background: 'rgba(255,255,255,0.04)', border: 'none', cursor: 'pointer' }}>Clear</button>}
+          {goal && <button onClick={clearGoal} style={{ padding: '6px 10px', borderRadius: 8, fontSize: 12, color: '#888', background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>Clear</button>}
         </div>
       )}
 

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -171,7 +171,7 @@ function Stars({ rating }: { rating: number | null }) {
 function GenreChip({ genre }: { genre: string | null }) {
   if (!genre) return null
   return (
-    <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: GENRE_COLORS[genre] ?? '#555', color: '#fff' }}>
+    <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: GENRE_COLORS[genre] ?? '#555', color: 'var(--text-primary)' }}>
       {genre}
     </span>
   )
@@ -281,7 +281,7 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
         </div>
 
         {/* Status toggle */}
-        <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
           {[
             { val: false, label: 'Currently Reading' },
             { val: true,  label: 'Finished' },
@@ -509,7 +509,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 
             {/* Status toggle */}
-            <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+            <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
               {(['reading', 'finished'] as const).map(s => (
                 <label key={s} style={{ flex: 1, textAlign: 'center', cursor: 'pointer' }}>
                   <input type="radio" value={s} {...register('status')} style={{ display: 'none' }} />
@@ -530,7 +530,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
 
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Genre</label>
-              <select {...register('genre')} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <select {...register('genre')} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}>
                 {allGenres.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
@@ -608,7 +608,7 @@ function ToReadSection() {
             <Input label="Genre" type="text" className="flex-1" {...register('genre')} />
             <div className="flex flex-col gap-1 flex-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Priority</label>
-              <select {...register('priority')} className="px-3 py-3 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <select {...register('priority')} className="px-3 py-3 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}>
                 <option>High</option><option>Medium</option><option>Low</option>
               </select>
             </div>
@@ -629,7 +629,7 @@ function ToReadSection() {
             </div>
             <div className="flex items-center gap-2 flex-shrink-0 ml-2">
               {b.priority && (
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: PRIORITY_COLORS[b.priority], color: '#fff' }}>{b.priority}</span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: PRIORITY_COLORS[b.priority], color: 'var(--text-primary)' }}>{b.priority}</span>
               )}
               <button onClick={() => remove(b.id)} style={{ color: '#444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>

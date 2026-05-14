@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
@@ -29,8 +29,8 @@ interface MoodForm {
 
 
 const TT_STYLE = {
-  background: 'rgba(10,10,22,0.97)', border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: 8, color: '#fff', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+  background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)',
+  borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
 
 function moodLabel(v: number) {
@@ -266,7 +266,7 @@ export function Mood() {
                   key={r.id}
                   style={{
                     padding: '9px 10px', borderRadius: 8, marginBottom: 2,
-                    background: 'rgba(255,255,255,0.025)',
+                    background: 'var(--input-bg)',
                     border: '1px solid var(--border-faint)',
                   }}
                 >

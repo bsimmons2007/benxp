@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
@@ -277,7 +277,7 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
           background: 'var(--input-bg)', border: '1px solid var(--border)',
           textAlign: 'center', flexShrink: 0,
         }}>
-          <p style={{ color: '#fff', fontWeight: 700, fontSize: 18, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{recoveryNights}</p>
+          <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 18, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{recoveryNights}</p>
           <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>nights @ 9h</p>
           <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>to recover</p>
         </div>
@@ -424,7 +424,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               type="time"
               value={targetWake}
               onChange={e => setTargetWake(e.target.value)}
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', color: '#fff', fontSize: 15, outline: 'none' }}
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 15, outline: 'none' }}
             />
           </div>
 
@@ -435,7 +435,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                 type="number" step="0.5" min="5" max="10"
                 value={sleepHours}
                 onChange={e => setSleepHours(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', color: '#fff', fontSize: 15, outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 15, outline: 'none' }}
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -443,7 +443,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               <select
                 value={shiftMins}
                 onChange={e => setShiftMins(Number(e.target.value))}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'rgba(10,12,24,0.9)', border: '1px solid var(--border)', color: '#fff', fontSize: 13, outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'rgba(10,12,24,0.9)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, outline: 'none' }}
               >
                 <option value={10}>Slow (10 min/day)</option>
                 <option value={15}>Gentle (15 min/day)</option>
@@ -579,12 +579,12 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
 const ttStyle = {
   background: 'rgba(10,10,22,0.97)',
-  border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: 8, color: '#fff', fontSize: 12,
+  border: '1px solid var(--border)',
+  borderRadius: 8, color: 'var(--text-primary)', fontSize: 12,
   boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
 const labelStyle = { color: '#aaa' }
-const itemStyle  = { color: '#fff' }
+const itemStyle  = { color: 'var(--text-primary)' }
 
 export function Sleep() {
   usePageTitle('Sleep')

@@ -27,7 +27,7 @@ export function StatCardSkeleton() {
   return (
     <div style={{
       padding: '10px 12px', borderRadius: 12,
-      background: 'rgba(16,24,52,0.6)', border: '1px solid rgba(255,255,255,0.08)',
+      background: 'rgba(16,24,52,0.6)', border: '1px solid var(--border-faint)',
     }}>
       <Skeleton height={10} width="55%" borderRadius={4} style={{ marginBottom: 10 }} />
       <Skeleton height={20} width="70%" borderRadius={4} />

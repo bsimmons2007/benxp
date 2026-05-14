@@ -80,7 +80,7 @@ export function LogBookForm() {
         <select
           {...register('genre')}
           className="px-3 py-2 rounded-lg text-white outline-none"
-          style={{ background: '#0D1B2A', border: '1px solid rgba(255,255,255,0.1)' }}
+          style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}
         >
           {allGenres.map((g) => <option key={g} value={g}>{g}</option>)}
         </select>

@@ -211,7 +211,7 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
           key={stepIndex}
           style={{
             background:   'rgba(8,10,22,0.99)',
-            border:       '1px solid rgba(255,255,255,0.13)',
+            border:       '1px solid var(--border)',
             borderRadius: 18,
             padding:      '20px 22px 18px',
             boxShadow:    '0 28px 72px rgba(0,0,0,0.85), 0 0 0 1px rgba(245,166,35,0.08)',
@@ -266,7 +266,7 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
             {!isFirst && (
               <button
                 onClick={() => goTo(stepIndex - 1)}
-                style={{ flex: 1, padding: '9px 0', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: '#888', fontSize: 13, cursor: 'pointer', fontWeight: 500 }}
+                style={{ flex: 1, padding: '9px 0', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--input-bg)', color: '#888', fontSize: 13, cursor: 'pointer', fontWeight: 500 }}
               >
                 ← Back
               </button>

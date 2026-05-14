@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -128,7 +128,7 @@ export function Login() {
           {/* Quote */}
           <div style={{
             padding: '14px 18px', borderRadius: 12,
-            background: 'rgba(255,255,255,0.025)',
+            background: 'var(--input-bg)',
             border: '1px solid var(--border-faint)',
           }}>
             <p style={{ color: '#444', fontSize: 13, fontStyle: 'italic', lineHeight: 1.7, margin: 0 }}>
