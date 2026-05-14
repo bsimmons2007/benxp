@@ -287,15 +287,25 @@ function StatsPickerModal({ picks, onChange, onClose }: {
           </div>
         ))}
 
-        <button onClick={save} style={{
-          marginTop: 8, width: '100%', padding: '13px',
-          background: 'var(--accent)', color: '#0d0d1a',
-          border: 'none', borderRadius: 12,
-          fontWeight: 700, fontSize: 14, cursor: 'pointer',
-          fontFamily: 'Cinzel, serif', letterSpacing: '0.04em',
-        }}>
-          Save
-        </button>
+        <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
+          <button onClick={onClose} style={{
+            flex: 1, padding: '13px',
+            background: 'var(--input-bg)', color: 'var(--text-secondary)',
+            border: '1px solid var(--border)', borderRadius: 12,
+            fontWeight: 600, fontSize: 14, cursor: 'pointer',
+          }}>
+            Cancel
+          </button>
+          <button onClick={save} style={{
+            flex: 2, padding: '13px',
+            background: 'var(--accent)', color: '#0d0d1a',
+            border: 'none', borderRadius: 12,
+            fontWeight: 700, fontSize: 14, cursor: 'pointer',
+            fontFamily: 'Cinzel, serif', letterSpacing: '0.04em',
+          }}>
+            Save
+          </button>
+        </div>
       </div>
     </>
   )

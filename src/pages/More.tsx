@@ -1,4 +1,5 @@
-﻿import { TopBar } from '../components/layout/TopBar'
+﻿import { Link } from 'react-router-dom'
+import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import {
   PersonIcon, TargetIcon, RulerIcon, CalendarIcon, GridIcon,
@@ -17,8 +18,11 @@ const NAV_LINKS: { to: string; Icon: IconFn; label: string; sub: string }[] = [
   { to: '/monthly',      Icon: GridIcon,     label: 'Monthly Reel',       sub: 'Your best moments this month' },
   { to: '/pr-feed',      Icon: TrophyIcon,   label: 'PR Feed',            sub: "Every record you've set"      },
   { to: '/share',        Icon: ShareIcon,    label: 'Share Card',         sub: 'Export your progress card'    },
-  { to: '/xp-history',   Icon: TrendingIcon,  label: 'XP History',   sub: 'Every XP event, ever'         },
-  { to: '/dev',          Icon: TerminalIcon,  label: 'Dev Tools',    sub: 'XP engine & diagnostics'      },
+  { to: '/xp-history',   Icon: TrendingIcon, label: 'XP History',        sub: 'Every XP event, ever'         },
+  // Dev tools only visible in local development
+  ...(import.meta.env.DEV ? [
+    { to: '/dev', Icon: TerminalIcon, label: 'Dev Tools', sub: 'XP engine & diagnostics' },
+  ] : []),
 ]
 
 export function More() {
@@ -29,7 +33,7 @@ export function More() {
       <PageWrapper>
         <div className="flex flex-col gap-2">
           {NAV_LINKS.map(link => (
-            <a key={link.to} href={link.to} style={{ textDecoration: 'none' }}>
+            <Link key={link.to} to={link.to} style={{ textDecoration: 'none' }}>
               <div
                 className="card-hover"
                 style={{
@@ -57,7 +61,7 @@ export function More() {
 
                 <ChevronRightIcon size={16} color="var(--text-dim)" />
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </PageWrapper>

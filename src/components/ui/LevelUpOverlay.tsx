@@ -1,25 +1,32 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore } from '../../store/useStore'
 import { getLevelTitle } from '../../lib/xp'
 import { playLevelUp } from '../../lib/sounds'
 
 export function LevelUpOverlay() {
   const { levelUpPending, dismissLevelUp } = useStore()
+  const [dismissing, setDismissing] = useState(false)
 
   useEffect(() => {
     if (!levelUpPending) return
+    setDismissing(false)
     playLevelUp()
-    const t = setTimeout(dismissLevelUp, 4000)
+    const t = setTimeout(handleDismiss, 4000)
     return () => clearTimeout(t)
-  }, [levelUpPending, dismissLevelUp])
+  }, [levelUpPending]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!levelUpPending) return null
 
   const title = getLevelTitle(levelUpPending)
 
+  function handleDismiss() {
+    setDismissing(true)
+    setTimeout(dismissLevelUp, 250)
+  }
+
   return (
     <div
-      onClick={dismissLevelUp}
+      onClick={handleDismiss}
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -27,6 +34,9 @@ export function LevelUpOverlay() {
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         cursor: 'pointer',
+        opacity: dismissing ? 0 : 1,
+        transform: dismissing ? 'scale(1.03)' : 'scale(1)',
+        transition: 'opacity 0.25s ease, transform 0.25s ease',
       }}
     >
       {/* Particle ring */}

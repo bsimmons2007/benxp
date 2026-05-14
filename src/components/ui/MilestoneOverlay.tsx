@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { StrengthMilestone } from '../../lib/xp'
 import { TrophyIcon, FlameIcon } from './Icon'
 
@@ -8,8 +8,11 @@ interface Props {
   onDismiss: () => void
 }
 
+const MILESTONE_DURATION = 5000
+
 export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
   const [visible, setVisible] = useState(false)
+  const drainDuration = useRef(MILESTONE_DURATION)
 
   useEffect(() => {
     // Pop in on next frame
@@ -18,7 +21,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
     const t2 = setTimeout(() => {
       setVisible(false)
       setTimeout(onDismiss, 400)
-    }, 5000)
+    }, MILESTONE_DURATION)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [onDismiss])
 
@@ -113,7 +116,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, borderRadius: '0 0 24px 24px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
           <div style={{
             height: '100%', background: 'var(--accent)',
-            animationName: 'toastDrain', animationDuration: '5000ms',
+            animationName: 'toastDrain', animationDuration: `${drainDuration.current}ms`,
             animationTimingFunction: 'linear', animationFillMode: 'forwards',
           }} />
         </div>

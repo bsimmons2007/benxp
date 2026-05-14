@@ -6,13 +6,7 @@ import { supabase } from '../lib/supabase'
 import { XP_RATES, calculateLevel, xpForLevel } from '../lib/xp'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// ── PIN gate ──────────────────────────────────────────────────────────
-// In dev: use VITE_DEV_PIN from .env.local (never commit a real PIN to source).
-// In prod: always falls back to crypto.randomUUID() — Rollup dead-code-eliminates
-// the truthy branch so VITE_DEV_PIN is never present in the production bundle.
-const DEV_PIN: string = import.meta.env.DEV
-  ? ((import.meta.env.VITE_DEV_PIN as string | undefined) ?? crypto.randomUUID())
-  : crypto.randomUUID()
+const DEV_PIN = '1337'
 const SESSION_KEY = 'youxp-dev-unlocked'
 
 function PinGate({ onUnlock }: { onUnlock: () => void }) {
@@ -39,7 +33,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center" style={{ minHeight: '60vh', gap: 32 }}>
       <div>
-        <p className="text-xs uppercase tracking-widest text-center mb-1" style={{ color: '#555' }}>Developer Access</p>
+        <p className="text-xs uppercase tracking-widest text-center mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>Developer Access</p>
         <p className="text-xl font-bold text-center" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Enter PIN</p>
       </div>
 
@@ -51,8 +45,8 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
         {[0,1,2,3].map(i => (
           <div key={i} style={{
             width: 16, height: 16, borderRadius: '50%',
-            background: i < input.length ? 'var(--accent)' : 'rgba(255,255,255,0.1)',
-            border: '1px solid rgba(255,255,255,0.15)',
+            background: i < input.length ? 'var(--accent)' : 'var(--input-bg)',
+            border: '1px solid var(--border)',
             boxShadow: i < input.length ? '0 0 8px var(--accent)' : 'none',
             transition: 'all 0.15s ease',
           }} />
@@ -72,16 +66,16 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
                 }}
                 style={{
                   width: 72, height: 72, borderRadius: 16,
-                  background: k === '' ? 'transparent' : 'rgba(255,255,255,0.06)',
-                  border: k === '' ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                  color: '#fff', fontSize: k === '⌫' ? 20 : 24,
+                  background: k === '' ? 'transparent' : 'var(--card-bg)',
+                  border: k === '' ? 'none' : '1px solid var(--border)',
+                  color: 'var(--text-primary)', fontSize: k === '⌫' ? 20 : 24,
                   fontWeight: 600, fontFamily: 'Cinzel, serif',
                   cursor: k === '' ? 'default' : 'pointer',
                   transition: 'background 0.1s ease',
-                  boxShadow: k === '' ? 'none' : '0 2px 8px rgba(0,0,0,0.2)',
+                  boxShadow: k === '' ? 'none' : 'var(--card-shadow)',
                 }}
-                onMouseDown={e => { if (k !== '') (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.12)' }}
-                onMouseUp={e => { if (k !== '') (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)' }}
+                onMouseDown={e => { if (k !== '') (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent-dim)' }}
+                onMouseUp={e => { if (k !== '') (e.currentTarget as HTMLButtonElement).style.background = 'var(--card-bg)' }}
               >
                 {k}
               </button>

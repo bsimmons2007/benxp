@@ -11,7 +11,6 @@ export function PageWrapper({ children, noPadding = false }: PageWrapperProps) {
 
   return (
     <main
-      key={pathname}
       className="page-main"
       style={{
         paddingTop:    'calc(72px + env(safe-area-inset-top))',
@@ -19,10 +18,12 @@ export function PageWrapper({ children, noPadding = false }: PageWrapperProps) {
         paddingLeft:   noPadding ? 0 : 20,
         paddingRight:  noPadding ? 0 : 20,
         minHeight:     '100dvh',
-        animation:     'pageEnter 0.24s cubic-bezier(0.22,1,0.36,1) both',
       }}
     >
-      {children}
+      {/* key here triggers pageEnter animation on each route without remounting <main> */}
+      <div key={pathname} style={{ animation: 'pageEnter 0.24s cubic-bezier(0.22,1,0.36,1) both' }}>
+        {children}
+      </div>
     </main>
   )
 }

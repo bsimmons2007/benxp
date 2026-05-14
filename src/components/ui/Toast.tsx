@@ -10,6 +10,8 @@ interface ToastProps {
 
 export function Toast({ message, onDone, onUndo, duration }: ToastProps) {
   const ms      = duration ?? (onUndo ? 4500 : 2800)
+  // Freeze ms at mount so the drain bar animation never resets mid-life
+  const msRef   = useRef(ms)
   const [vis, setVis] = useState(true)
   const timerRef      = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -66,7 +68,7 @@ export function Toast({ message, onDone, onUndo, duration }: ToastProps) {
             height: '100%',
             background: 'rgba(0,0,0,0.3)',
             animationName: 'toastDrain',
-            animationDuration: `${ms}ms`,
+            animationDuration: `${msRef.current}ms`,
             animationTimingFunction: 'linear',
             animationFillMode: 'forwards',
           }}
