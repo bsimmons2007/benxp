@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+﻿import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { today } from '../../lib/utils'
@@ -33,7 +33,7 @@ export function LogSleepForm() {
 
     const hrs = parseFloat(data.hours_slept)
     const quality = hrs >= 8 ? 'Great sleep!' : hrs >= 7 ? 'Good sleep' : 'Could be better'
-    setToast(`Sleep logged — ${quality}`)
+    setToast(`Sleep logged â€” ${quality}`)
     reset({ date: today(), bedtime: '', hours_slept: '', wake_time: '' })
   }
 
@@ -43,7 +43,7 @@ export function LogSleepForm() {
       <Input label="Bedtime" type="time" {...register('bedtime')} />
       <Input label="Hours Slept" type="number" step="0.1" placeholder="7.5" {...register('hours_slept', { required: true })} />
       <Input label="Wake Up" type="time" {...register('wake_time')} />
-      <Button type="submit" fullWidth disabled={isSubmitting}>
+      <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>
         {isSubmitting ? 'Logging...' : 'Log Sleep'}
       </Button>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}

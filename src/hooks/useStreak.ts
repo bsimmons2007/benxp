@@ -7,6 +7,12 @@ export interface StreakData {
   longest: number
   activeToday: boolean
   loading: boolean
+  sleepCurrent: number
+  sleepLongest: number
+  gymCurrent: number
+  gymLongest: number
+  cardioCurrent: number
+  cardioLongest: number
 }
 
 let streakCache: { data: StreakData; ts: number } | null = null
@@ -18,7 +24,7 @@ export function invalidateStreakCache() {
 
 export function useStreak(): StreakData {
   const [streak, setStreak] = useState<StreakData>(
-    streakCache?.data ?? { current: 0, longest: 0, activeToday: false, loading: true }
+    streakCache?.data ?? { current: 0, longest: 0, activeToday: false, loading: true, sleepCurrent: 0, sleepLongest: 0, gymCurrent: 0, gymLongest: 0, cardioCurrent: 0, cardioLongest: 0 }
   )
 
   useEffect(() => {
@@ -110,7 +116,59 @@ export function useStreak(): StreakData {
         prev = d
       }
 
-      const data: StreakData = { current, longest, activeToday, loading: false }
+      // Sleep-specific streak
+      const sleepDates = new Set<string>((sleep.data ?? []).map((r: { date: string }) => r.date))
+      const sleepSorted = Array.from(sleepDates).sort((a, b) => b.localeCompare(a))
+      const sleepActivToday = sleepDates.has(today)
+      const sleepStartFrom  = sleepActivToday ? today : prevDay(today)
+      const sleepCurrent    = sleepDates.has(sleepStartFrom) ? (() => {
+        let c = 0; let d = sleepStartFrom
+        while (sleepDates.has(d)) { c++; d = prevDay(d) }
+        return c
+      })() : 0
+      let sleepLongest = 0; let sleepRun = 0; let sleepPrev: string | null = null
+      for (const d of sleepSorted) {
+        if (sleepPrev === null) { sleepRun = 1 }
+        else {
+          const gap = (new Date(sleepPrev + 'T12:00:00').getTime() - new Date(d + 'T12:00:00').getTime()) / 86400000
+          sleepRun = gap === 1 ? sleepRun + 1 : 1
+        }
+        if (sleepRun > sleepLongest) sleepLongest = sleepRun
+        sleepPrev = d
+      }
+
+      function calcStreakPair(dates: Set<string>): { cur: number; long: number } {
+        const sorted = Array.from(dates).sort((a, b) => b.localeCompare(a))
+        const activeT = dates.has(today)
+        const start = activeT ? today : prevDay(today)
+        let cur = 0
+        if (dates.has(start)) {
+          let d = start
+          while (dates.has(d)) { cur++; d = prevDay(d) }
+        }
+        let long = 0; let run = 0; let p: string | null = null
+        for (const d of sorted) {
+          if (p === null) { run = 1 }
+          else {
+            const gap = (new Date(p + 'T12:00:00').getTime() - new Date(d + 'T12:00:00').getTime()) / 86400000
+            run = gap === 1 ? run + 1 : 1
+          }
+          if (run > long) long = run
+          p = d
+        }
+        return { cur, long }
+      }
+
+      const gymDates = new Set<string>((lifting.data ?? []).map((r: { date: string }) => r.date))
+      const { cur: gymCurrent, long: gymLongest } = calcStreakPair(gymDates)
+
+      const cardioDates = new Set<string>([
+        ...(cardio.data ?? []).map((r: { date: string }) => r.date),
+        ...(skate.data ?? []).map((r: { date: string }) => r.date),
+      ])
+      const { cur: cardioCurrent, long: cardioLongest } = calcStreakPair(cardioDates)
+
+      const data: StreakData = { current, longest, activeToday, loading: false, sleepCurrent, sleepLongest, gymCurrent, gymLongest, cardioCurrent, cardioLongest }
       streakCache = { data, ts: Date.now() }
       setStreak(data)
     }

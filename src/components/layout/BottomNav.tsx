@@ -52,7 +52,7 @@ export function BottomNav() {
         >
           {({ isActive }) => (
             <>
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 22 }}>
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 22, transform: isActive ? 'scale(1.15)' : 'scale(1)', transition: 'transform 0.15s ease' }}>
                 {tab.iconKey === '__home'
                   ? <HomeIcon size={20} />
                   : tab.iconKey === '__more'

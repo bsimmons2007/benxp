@@ -221,7 +221,7 @@ export function Challenges() {
           }}
         >
           <div>
-            <p className="font-bold text-white" style={{ fontFamily: 'Cinzel, serif', fontSize: 16 }}>
+            <p className="card-title">
               {tier.icon} {tier.label} Challenges
             </p>
             <p className="text-xs mt-0.5" style={{ color: '#888' }}>

@@ -149,6 +149,15 @@ export function setCachedXPData(data: { totalXP: number; stats: AppStats }) {
   try { localStorage.setItem(XP_CACHE_KEY, JSON.stringify({ data, ts: Date.now() })) } catch {}
 }
 
+export function getCachedXPTimestamp(): number | null {
+  try {
+    const raw = localStorage.getItem(XP_CACHE_KEY)
+    if (!raw) return null
+    const { ts } = JSON.parse(raw)
+    return typeof ts === 'number' ? ts : null
+  } catch { return null }
+}
+
 /**
  * Single 7-query fetch that computes both totalXP and stats.
  * Previously these were two separate fetch calls (7 + 4 queries) with 4 overlapping tables.

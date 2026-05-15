@@ -18,6 +18,7 @@ import { DumbbellIcon, RunIcon, ActivityIcon, ZapIcon, GridIcon, BookmarkIcon } 
 import { useStore } from '../store/useStore'
 import type { LiftType, LiftingLog, PrHistory } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { useStreak } from '../hooks/useStreak'
 
 // ── Exercise library (loaded once from Supabase) ──────────────────────────────
 
@@ -293,7 +294,7 @@ function ExerciseRow({
     }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ color: '#555', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <span style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           Exercise {index + 1}
         </span>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -1213,6 +1214,7 @@ function EditIcon() {
 
 export function Records() {
   usePageTitle('Lifting')
+  const streak = useStreak()
   const [tab,             setTab]           = useState<'log' | 'strength'>('log')
   const [strengthLoaded,  setStrengthLoaded] = useState(false)
   const [prs,             setPrs]           = useState<Record<string, PrHistory>>({})
@@ -1257,6 +1259,26 @@ export function Records() {
     <>
       <TopBar title="Lifting" />
       <PageWrapper>
+
+        {/* ── Gym streak banner ── */}
+        {!streak.loading && (streak.gymCurrent > 0 || streak.gymLongest > 0) && (
+          <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+            <div>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Gym Streak</p>
+              <p style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif', color: streak.gymCurrent > 0 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1.2 }}>
+                {streak.gymCurrent} <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-muted)' }}>days</span>
+              </p>
+            </div>
+            {streak.gymLongest > 0 && (
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Best</p>
+                <p style={{ fontSize: 18, fontWeight: 700, fontFamily: 'Cinzel, serif', color: 'var(--text-secondary)', lineHeight: 1.2 }}>
+                  {streak.gymLongest}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ── Tab switcher ── */}
         <div style={{

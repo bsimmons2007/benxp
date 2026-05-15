@@ -271,7 +271,7 @@ export function Water() {
 
         {/* Quick add buttons */}
         <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-          <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 14 }}>Quick Add</p>
+          <p className="card-title mb-3">Quick Add</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {QUICK_ADDS.map(oz => (
               <button
@@ -318,7 +318,7 @@ export function Water() {
         {/* Today's log */}
         {entries.length > 0 && (
           <div>
-            <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 14 }}>Today's Log</p>
+            <p className="card-title mb-3">Today's Log</p>
             {entries.map(e => (
               <div key={e.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2"
                 style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>

@@ -146,20 +146,30 @@ function formatDate(iso: string): string {
 
 export function XPHistory() {
   usePageTitle('XP History')
-  const [events, setEvents] = useState<XPEvent[]>([])
-  const [loading, setLoading] = useState(true)
+  const [events,    setEvents]    = useState<XPEvent[]>([])
+  const [loading,      setLoading]      = useState(true)
+  const [loadError,    setLoadError]    = useState(false)
+  const [visibleCount, setVisibleCount] = useState(30)
   const { totalXP, loading: xpLoading } = useXP()
 
-  useEffect(() => {
+  function load() {
+    setLoadError(false)
+    setLoading(true)
     fetchXPEvents().then(evs => {
       setEvents(evs)
       setLoading(false)
+    }).catch(() => {
+      setLoadError(true)
+      setLoading(false)
     })
-  }, [])
+  }
 
-  // Group events by date for visual separators
+  useEffect(() => { load() }, [])
+
+  // Group events by date for visual separators (paginated)
+  const visibleEvents = events.slice(0, visibleCount)
   const grouped: { date: string; items: XPEvent[] }[] = []
-  for (const ev of events) {
+  for (const ev of visibleEvents) {
     const last = grouped[grouped.length - 1]
     if (last && last.date === ev.date) {
       last.items.push(ev)
@@ -192,15 +202,25 @@ export function XPHistory() {
           </div>
           <div className="text-right">
             <p className="section-label">Events</p>
-            <p className="font-bold text-2xl" style={{ color: '#ccc', fontFamily: 'Cinzel, serif' }}>
+            <p className="font-bold text-2xl" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>
               {loading ? '—' : events.length}
             </p>
           </div>
         </div>
 
         {/* Event list */}
-        {loading ? (
-          <p style={{ color: '#555', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
+        {loadError ? (
+          <div className="flex flex-col items-center py-12 gap-3 fade-in">
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Could not load XP history</p>
+            <button
+              onClick={load}
+              style={{ padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}
+            >
+              Try again
+            </button>
+          </div>
+        ) : loading ? (
+          <p style={{ color: 'var(--text-muted)', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
         ) : (
           <div className="flex flex-col gap-1">
             {grouped.map(group => (
@@ -223,10 +243,10 @@ export function XPHistory() {
                     }}
                   >
                     <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{ev.icon}</span>
-                    <span className="flex-1 text-sm text-white truncate">{ev.label}</span>
+                    <span className="flex-1 text-sm truncate" style={{ color: 'var(--text-primary)' }}>{ev.label}</span>
                     <span
                       className="font-bold text-sm shrink-0"
-                      style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}
+                      style={{ color: 'var(--accent)', fontFamily: 'var(--font-serif)', minWidth: 56, textAlign: 'right' }}
                     >
                       +{ev.xp}
                     </span>
@@ -234,6 +254,18 @@ export function XPHistory() {
                 ))}
               </div>
             ))}
+            {visibleCount < events.length && (
+              <button
+                onClick={() => setVisibleCount(c => c + 30)}
+                style={{
+                  marginTop: 12, width: '100%', padding: '10px', borderRadius: 12,
+                  background: 'var(--input-bg)', border: '1px solid var(--border)',
+                  color: 'var(--text-muted)', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                Show more ({events.length - visibleCount} remaining)
+              </button>
+            )}
           </div>
         )}
       </PageWrapper>

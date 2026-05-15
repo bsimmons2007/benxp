@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
@@ -9,7 +9,7 @@ import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { supabase } from '../lib/supabase'
-import { today, formatDate } from '../lib/utils'
+import { today, formatDate, formatDateTooltip } from '../lib/utils'
 import { playXPGain } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
@@ -17,6 +17,7 @@ import type { MoodLog } from '../types'
 import { HeartIcon, ZapIcon, ActivityIcon, EditIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { EditModal } from '../components/ui/EditModal'
+import { ChartSkeleton, ChartEmptyState } from '../components/ui/Skeleton'
 
 interface MoodForm {
   date: string
@@ -46,11 +47,12 @@ export function Mood() {
   const { register, handleSubmit, watch, reset, formState: { isSubmitting } } = useForm<MoodForm>({
     defaultValues: { date: today(), mood: '7', energy: '7', stress: '5', activities: '', notes: '' },
   })
-  const [recent,    setRecent]    = useState<MoodLog[]>([])
-  const [toast,     setToast]     = useState<string | null>(null)
-  const [editEntry, setEditEntry] = useState<MoodLog | null>(null)
-  const [editVals,  setEditVals]  = useState({ mood: '7', energy: '7', stress: '5', activities: '', notes: '' })
-  const [saving,    setSaving]    = useState(false)
+  const [recent,       setRecent]       = useState<MoodLog[]>([])
+  const [toast,        setToast]        = useState<string | null>(null)
+  const [editEntry,    setEditEntry]    = useState<MoodLog | null>(null)
+  const [editVals,     setEditVals]     = useState({ mood: '7', energy: '7', stress: '5', activities: '', notes: '' })
+  const [saving,       setSaving]       = useState(false)
+  const [chartLoading, setChartLoading] = useState(true)
   const refreshXP = useStore(s => s.refreshXP)
 
   const moodVal   = parseInt(watch('mood')   ?? '7')
@@ -59,6 +61,7 @@ export function Mood() {
   async function loadRecent() {
     const { data } = await supabase.from('mood_log').select('*').order('date', { ascending: false }).limit(30)
     setRecent(data ?? [])
+    setChartLoading(false)
   }
 
   useEffect(() => { loadRecent() }, [])
@@ -106,7 +109,7 @@ export function Mood() {
       notes: data.notes || null,
     })
     playXPGain()
-    setToast(`+${XP_RATES.mood_log} XP · Check-in logged ${moodLabel(parseInt(data.mood))}`)
+    setToast(`+${XP_RATES.mood_log} XP Â· Check-in logged ${moodLabel(parseInt(data.mood))}`)
     refreshXP()
     reset({ date: today(), mood: '7', energy: '7', stress: '5', activities: '', notes: '' })
     loadRecent()
@@ -116,7 +119,7 @@ export function Mood() {
   const avgEnergy = recent.length ? recent.reduce((s, r) => s + (r.energy ?? 5), 0) / recent.length : null
   const avgStress = recent.length ? recent.reduce((s, r) => s + (r.stress ?? 5), 0) / recent.length : null
 
-  // Chart data — oldest first
+  // Chart data â€” oldest first
   const chartData = [...recent].reverse().map(r => ({
     date:   r.date,
     mood:   r.mood ?? 5,
@@ -133,9 +136,9 @@ export function Mood() {
         {recent.length > 0 && (
           <div className="grid grid-cols-3 gap-2 mb-5">
             {([
-              { label: 'Avg Mood',   value: avgMood?.toFixed(1)   ?? '—', color: 'var(--accent)', icon: <HeartIcon   size={18} color="var(--accent)" /> as ReactNode },
-              { label: 'Avg Energy', value: avgEnergy?.toFixed(1) ?? '—', color: '#4ade80',       icon: <ZapIcon     size={18} color="#4ade80"       /> as ReactNode },
-              { label: 'Avg Stress', value: avgStress?.toFixed(1) ?? '—', color: '#f87171',       icon: <ActivityIcon size={18} color="#f87171"      /> as ReactNode },
+              { label: 'Avg Mood',   value: avgMood?.toFixed(1)   ?? 'â€”', color: 'var(--accent)', icon: <HeartIcon   size={18} color="var(--accent)" /> as ReactNode },
+              { label: 'Avg Energy', value: avgEnergy?.toFixed(1) ?? 'â€”', color: '#4ade80',       icon: <ZapIcon     size={18} color="#4ade80"       /> as ReactNode },
+              { label: 'Avg Stress', value: avgStress?.toFixed(1) ?? 'â€”', color: '#f87171',       icon: <ActivityIcon size={18} color="#f87171"      /> as ReactNode },
             ] as { label: string; value: string; color: string; icon: ReactNode }[]).map(s => (
               <div
                 key={s.label}
@@ -159,18 +162,38 @@ export function Mood() {
           </div>
         )}
 
-        {/* Trend chart — Recharts area */}
-        {chartData.length >= 3 && (
+        {/* Trend chart */}
+        {chartLoading && <ChartSkeleton height={160} title=”Mood Trends” />}
+        {!chartLoading && recent.length === 0 && (
+          <ChartEmptyState title=”Mood Trends” message=”Log your first mood entry to start tracking trends” color=”#f472b6” />
+        )}
+        {!chartLoading && chartData.length > 0 && chartData.length < 3 && (
+          <Card className=”mb-5”>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', marginBottom: 8 }}>Mood Trends</p>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
+              {chartData.map(d => (
+                <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f472b6', boxShadow: '0 0 8px #f472b6' }} />
+                  <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>{d.mood}</p>
+                </div>
+              ))}
+            </div>
+            <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
+              Log {3 - chartData.length} more {3 - chartData.length > 1 ? 'entries' : 'entry'} to unlock your trend chart
+            </p>
+          </Card>
+        )}
+        {!chartLoading && chartData.length >= 3 && (
           <Card className="mb-5">
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#ccc', fontFamily: 'Cinzel, serif', marginBottom: 12 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', marginBottom: 12 }}>
               Mood Trends
             </p>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="mood-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stopColor="var(--accent)" stopOpacity={0.30} />
-                    <stop offset="100%" stopColor="var(--accent)" stopOpacity={0.02} />
+                    <stop offset="0%"   stopColor="#f472b6" stopOpacity={0.30} />
+                    <stop offset="100%" stopColor="#f472b6" stopOpacity={0.02} />
                   </linearGradient>
                   <linearGradient id="energy-grad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%"   stopColor="#4ade80" stopOpacity={0.22} />
@@ -187,25 +210,25 @@ export function Mood() {
                 <YAxis domain={[1, 10]} tick={{ fill: '#555', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
                 <Tooltip
                   contentStyle={TT_STYLE}
-                  labelFormatter={(l: unknown) => typeof l === 'string' ? formatDate(l) : String(l)}
+                  labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any, name: string) => [v, name.charAt(0).toUpperCase() + name.slice(1)]}
                   cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }}
                 />
-                <Area type="monotone" dataKey="mood"   stroke="var(--accent)" strokeWidth={2} fill="url(#mood-grad)"   dot={false} />
+                <Area type="monotone" dataKey="mood"   stroke="#f472b6" strokeWidth={2} fill="url(#mood-grad)"   dot={false} />
                 <Area type="monotone" dataKey="energy" stroke="#4ade80"        strokeWidth={1.5} fill="url(#energy-grad)" dot={false} />
               </AreaChart>
             </ResponsiveContainer>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 6 }}>
-              <span style={{ fontSize: 10, color: 'var(--accent)' }}>── Mood</span>
-              <span style={{ fontSize: 10, color: '#4ade80' }}>── Energy</span>
+              <span style={{ fontSize: 10, color: 'var(--accent)' }}>â”€â”€ Mood</span>
+              <span style={{ fontSize: 10, color: '#4ade80' }}>â”€â”€ Energy</span>
             </div>
           </Card>
         )}
 
         {/* Log form */}
         <Card className="mb-5">
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#ccc', fontFamily: 'Cinzel, serif', marginBottom: 16 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', marginBottom: 16 }}>
             {moodLabel(moodVal)} Daily Check-in
           </p>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -235,7 +258,7 @@ export function Mood() {
               </div>
             ))}
 
-            <Input label="Activities" type="text" placeholder="Gym, reading, skating…" {...register('activities')} />
+            <Input label="Activities" type="text" placeholder="Gym, reading, skatingâ€¦" {...register('activities')} />
             <div className="flex flex-col gap-1">
               <label style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif', fontSize: 15, fontWeight: 500 }}>
                 Notes
@@ -248,8 +271,8 @@ export function Mood() {
                 placeholder="How was today?"
               />
             </div>
-            <Button type="submit" fullWidth disabled={isSubmitting}>
-              {isSubmitting ? 'Logging…' : 'Log Check-in'}
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>
+              {isSubmitting ? 'Loggingâ€¦' : 'Log Check-in'}
             </Button>
           </form>
         </Card>
@@ -257,7 +280,7 @@ export function Mood() {
         {/* Recent entries */}
         {recent.length > 0 && (
           <Card>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#ccc', fontFamily: 'Cinzel, serif', marginBottom: 12 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', marginBottom: 12 }}>
               Recent Entries
             </p>
             <div className="flex flex-col gap-1">
@@ -295,7 +318,7 @@ export function Mood() {
 
       {editEntry && (
         <EditModal
-          title={`Edit — ${formatDate(editEntry.date)}`}
+          title={`Edit â€” ${formatDate(editEntry.date)}`}
           onClose={() => setEditEntry(null)}
           onDelete={deleteMoodEntry}
           onSave={saveMoodEdit}
@@ -323,7 +346,7 @@ export function Mood() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={{ fontSize: 13, color: '#aaa' }}>Activities</label>
               <input value={editVals.activities} onChange={e => setEditVals(v => ({ ...v, activities: e.target.value }))}
-                placeholder="Gym, reading…"
+                placeholder="Gym, readingâ€¦"
                 style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>

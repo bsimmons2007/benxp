@@ -44,10 +44,16 @@ export function EditModal({ title, onClose, onDelete, onSave, saving, children }
             <button
               onClick={onSave}
               disabled={saving}
-              className="flex-1 py-3 rounded-xl font-semibold transition-all"
-              style={{ background: 'var(--accent)', color: '#1A1A2E', opacity: saving ? 0.6 : 1 }}
+              className="flex-1 py-3 rounded-xl font-semibold transition-all inline-flex items-center justify-center gap-2"
+              style={{ background: 'var(--accent)', color: 'var(--base-bg)', opacity: saving ? 0.65 : 1 }}
             >
-              {saving ? 'Saving...' : 'Save'}
+              {saving && (
+                <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3" />
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              )}
+              {saving ? 'Saving…' : 'Save'}
             </button>
           )}
         </div>

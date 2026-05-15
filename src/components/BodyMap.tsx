@@ -1,7 +1,7 @@
 // Interactive SVG body map — front & back views.
 // Clean non-overlapping muscle regions, centered figure, vertical rank dots.
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import type { MuscleScoreResult } from '../lib/muscleScore'
 import { RANKS, MUSCLES } from '../lib/muscleScore'
 
@@ -16,18 +16,25 @@ interface Props {
 const EMPTY_COLOR  = '#14143a'
 const EMPTY_BORDER = '#2a2a52'
 
+function getAccentHex(): string {
+  const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
+  return v || '#F5A623'
+}
+
 // ── Shared SVG defs ───────────────────────────────────────────────────────────
 
-function SvgDefs() {
+function SvgDefs({ accentHex }: { accentHex: string }) {
   return (
     <defs>
       {RANKS.filter(r => r.tier > 0).map(rank => {
-        const hi = rank.glow !== 'none' ? rank.glow : '#ffffff'
+        const isTopTier = rank.tier >= 16
+        const hi   = isTopTier ? accentHex : (rank.glow !== 'none' ? rank.glow : '#ffffff')
+        const base = isTopTier ? accentHex : rank.color
         return (
           <linearGradient key={rank.id} id={`grad-${rank.id}`} x1="20%" y1="0%" x2="80%" y2="100%">
-            <stop offset="0%"   stopColor={hi}         stopOpacity={0.45} />
-            <stop offset="45%"  stopColor={rank.color} stopOpacity={0.97} />
-            <stop offset="100%" stopColor={rank.color} stopOpacity={1}    />
+            <stop offset="0%"   stopColor={hi}   stopOpacity={isTopTier ? 0.9 : 0.45} />
+            <stop offset="45%"  stopColor={base} stopOpacity={0.97} />
+            <stop offset="100%" stopColor={base} stopOpacity={1}    />
           </linearGradient>
         )
       })}
@@ -370,7 +377,7 @@ export function BodyMap({ view, scores, selected, onSelect, imbalancedKeys }: Pr
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, width: '100%' }}>
       <svg aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-        <SvgDefs />
+        <SvgDefs accentHex={getAccentHex()} />
       </svg>
 
       {/* Body centered, rank legend on right via absolute positioning */}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -12,7 +12,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EmptyState } from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
-import { today, formatDate } from '../lib/utils'
+import { today, formatDate, formatDateTooltip } from '../lib/utils'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
@@ -20,7 +20,7 @@ import type { FortniteGame } from '../types'
 import { TrophyIcon, StarIcon, EditIcon, ZapIcon, GamepadIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// ── Shared constants ───────────────────────────────────────────────
+// â”€â”€ Shared constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const FN_RANKS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Elite', 'Champion', 'Unreal'] as const
 type FnRank = typeof FN_RANKS[number]
@@ -46,11 +46,11 @@ const isBlitzMode = (mode: string | null) =>
 
 // Display mode string for blitz (strip prefix, handle legacy)
 const blitzDisplayMode = (mode: string | null) => {
-  if (!mode || mode === 'Blitz') return '—'
+  if (!mode || mode === 'Blitz') return 'â€”'
   return mode.replace('Blitz ', '')
 }
 
-// ── Chart helpers ──────────────────────────────────────────────────
+// â”€â”€ Chart helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function buildMonthlyWins(games: FortniteGame[]) {
   const map: Record<string, number> = {}
@@ -73,7 +73,7 @@ function buildCumulativeWins(games: FortniteGame[]) {
     .map(g => ({ date: g.date, wins: ++count }))
 }
 
-// ── Stat mini-cards ────────────────────────────────────────────────
+// â”€â”€ Stat mini-cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function StatCards({ items, accent }: { items: { label: string; value: string | number }[]; accent: string }) {
   return (
@@ -88,7 +88,7 @@ function StatCards({ items, accent }: { items: { label: string; value: string | 
   )
 }
 
-// ── Charts block ───────────────────────────────────────────────────
+// â”€â”€ Charts block â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: string; gradId: string }) {
   const sorted = [...games].sort((a, b) => a.date.localeCompare(b.date))
@@ -117,7 +117,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
               <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
-              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDate(l) : String(l)} formatter={(v: unknown) => [v as number, 'Total Wins']} />
+              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [v as number, 'Total Wins']} />
               <Area type="monotone" dataKey="wins" stroke={accent} strokeWidth={2.5} fill={`url(#${gradId}-cum)`} dot={false} activeDot={{ r: 5, fill: accent, stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
@@ -157,12 +157,12 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
               <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
-              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDate(l) : String(l)} formatter={(v: unknown) => [v as number, 'Kills']} />
+              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [v as number, 'Kills']} />
               <ReferenceLine y={avgKills} stroke={accent} strokeDasharray="4 2" strokeOpacity={0.4} />
               <Area type="monotone" dataKey="kills" stroke="#7B2FBE" strokeWidth={2.5} fill={`url(#${gradId}-kills)`} dot={{ fill: '#7B2FBE', r: 3, fillOpacity: 0.7 }} activeDot={{ r: 5, fill: '#7B2FBE', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
-          <p className="text-xs mt-1" style={{ color: accent }}>── avg {avgKills}K</p>
+          <p className="text-xs mt-1" style={{ color: accent }}>â”€â”€ avg {avgKills}K</p>
         </div>
       )}
 
@@ -180,7 +180,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
               <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
               <YAxis domain={[0, 100]} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
-              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDate(l) : String(l)} formatter={(v: unknown) => [`${v}%`, 'Accuracy']} />
+              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [`${v}%`, 'Accuracy']} />
               <Area type="monotone" dataKey="accuracy" stroke="#2ECC71" strokeWidth={2.5} fill={`url(#${gradId}-acc)`} dot={false} activeDot={{ r: 4, fill: '#2ECC71', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
@@ -190,7 +190,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
   )
 }
 
-// ── Edit modal (shared) ────────────────────────────────────────────
+// â”€â”€ Edit modal (shared) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onClose: () => void; onSaved: () => void }) {
   const [kills, setKills]       = useState(String(game.kills))
@@ -215,7 +215,7 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
   }
 
   return (
-    <EditModal title={`Edit — ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€” ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -242,7 +242,7 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
   )
 }
 
-// ── Normal log panel ───────────────────────────────────────────────
+// â”€â”€ Normal log panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface NormalForm {
   date: string
@@ -282,10 +282,10 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (isWin) {
       playPR()
-      setToast(`+${XP_RATES.fortnite_win} XP — Victory Royale!${isRanked ? ` (Ranked ${rankName})` : ''}`)
+      setToast(`+${XP_RATES.fortnite_win} XP â€” Victory Royale!${isRanked ? ` (Ranked ${rankName})` : ''}`)
     } else {
       playXPGain()
-      setToast('Game logged — keep grinding!')
+      setToast('Game logged â€” keep grinding!')
     }
     await refreshXP()
     refreshActivity()
@@ -301,7 +301,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT_NORMAL : 'var(--input-bg)', color: open ? 'var(--base-bg)' : ACCENT_NORMAL, border: `1px solid ${ACCENT_NORMAL}`, fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Game'}
+        {open ? 'âœ• Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -366,7 +366,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
               </div>
             )}
 
-            <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
         </div>
       )}
@@ -375,7 +375,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Blitz log panel ────────────────────────────────────────────────
+// â”€â”€ Blitz log panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface BlitzForm {
   date: string
@@ -411,7 +411,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (isWin) {
       playPR()
-      setToast(`+${XP_RATES.fortnite_blitz_win} XP — Blitz Victory!`)
+      setToast(`+${XP_RATES.fortnite_blitz_win} XP â€” Blitz Victory!`)
     } else {
       playXPGain()
       setToast('Blitz game logged!')
@@ -430,7 +430,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT_BLITZ : 'rgba(168,85,247,0.08)', color: open ? '#fff' : ACCENT_BLITZ, border: `1px solid ${ACCENT_BLITZ}`, fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Blitz Game'}
+        {open ? 'âœ• Cancel' : '+ Log Blitz Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -464,7 +464,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
               </span>
             </div>
 
-            <Button type="submit" fullWidth disabled={isSubmitting} style={{ background: ACCENT_BLITZ }}>{isSubmitting ? 'Logging...' : 'Log Blitz Game'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting} style={{ background: ACCENT_BLITZ }}>{isSubmitting ? 'Logging...' : 'Log Blitz Game'}</Button>
           </form>
         </div>
       )}
@@ -473,7 +473,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Normal tab ─────────────────────────────────────────────────────
+// â”€â”€ Normal tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged: () => void; onEdit: (g: FortniteGame) => void }) {
   const wins      = games.filter(g => g.win).length
@@ -485,8 +485,8 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
     <>
       <StatCards accent={ACCENT_NORMAL} items={[
         { label: 'Wins',       value: wins },
-        { label: 'Best Game',  value: bestKills ? `${bestKills}K` : '—' },
-        { label: 'Avg Kills',  value: games.length ? avgKills : '—' },
+        { label: 'Best Game',  value: bestKills ? `${bestKills}K` : 'â€”' },
+        { label: 'Avg Kills',  value: games.length ? avgKills : 'â€”' },
       ]} />
 
       {rankedWins > 0 && (
@@ -522,7 +522,7 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
                   {g.win && <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: ACCENT_NORMAL, color: 'var(--base-bg)' }}>WIN</span>}
                 </p>
                 <p className="text-xs mt-0.5" style={{ color: '#888' }}>
-                  {g.mode}{g.placement ? ` · #${g.placement}` : ''}
+                  {g.mode}{g.placement ? ` Â· #${g.placement}` : ''}
                   {gExt.is_ranked && gExt.rank_name && (
                     <span className="ml-2 font-bold px-1.5 py-0.5 rounded" style={{
                       background: `${RANK_COLORS[gExt.rank_name as FnRank] ?? '#888'}22`,
@@ -560,7 +560,7 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
   )
 }
 
-// ── Blitz tab ──────────────────────────────────────────────────────
+// â”€â”€ Blitz tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged: () => void; onEdit: (g: FortniteGame) => void }) {
   const wins      = games.filter(g => g.win).length
@@ -572,14 +572,14 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
       <div className="rounded-xl px-4 py-3 mb-4 flex items-center gap-2" style={{ background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.18)' }}>
         <ZapIcon size={14} color={ACCENT_BLITZ} />
         <p style={{ fontSize: 12, color: ACCENT_BLITZ, opacity: 0.85 }}>
-          Blitz: fast-paced rounds with a shrinking storm. Solos, Duos and Squads only — no ranked.
+          Blitz: fast-paced rounds with a shrinking storm. Solos, Duos and Squads only â€” no ranked.
         </p>
       </div>
 
       <StatCards accent={ACCENT_BLITZ} items={[
         { label: 'Blitz Wins', value: wins },
-        { label: 'Best Game',  value: bestKills ? `${bestKills}K` : '—' },
-        { label: 'Avg Kills',  value: games.length ? avgKills : '—' },
+        { label: 'Best Game',  value: bestKills ? `${bestKills}K` : 'â€”' },
+        { label: 'Avg Kills',  value: games.length ? avgKills : 'â€”' },
       ]} />
 
       <LogBlitzPanel onLogged={onLogged} />
@@ -603,7 +603,7 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
                 {g.win && <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: ACCENT_BLITZ, color: 'var(--text-primary)' }}>WIN</span>}
               </p>
               <p className="text-xs mt-0.5" style={{ color: '#888' }}>
-                Blitz {blitzDisplayMode(g.mode)}{g.placement ? ` · #${g.placement}` : ''}
+                Blitz {blitzDisplayMode(g.mode)}{g.placement ? ` Â· #${g.placement}` : ''}
               </p>
             </div>
           </div>
@@ -630,7 +630,7 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
   )
 }
 
-// ── Main page ──────────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function Fortnite() {
   usePageTitle('Fortnite')

@@ -273,7 +273,7 @@ function RankDropdown() {
         style={{
           cursor: 'pointer', listStyle: 'none', display: 'flex', alignItems: 'center',
           justifyContent: 'space-between', padding: '10px 0',
-          fontSize: 13, fontWeight: 700, color: '#ccc', fontFamily: 'Cinzel, serif',
+          fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)',
           borderBottom: '1px solid var(--border-faint)',
           userSelect: 'none',
         }}
@@ -481,7 +481,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
 
           {/* Muscle group breakdown */}
           <Card style={{ marginBottom: 12 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#ccc', fontFamily: 'Cinzel, serif', marginBottom: 12 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', marginBottom: 12 }}>
               All Muscles
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

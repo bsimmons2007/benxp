@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { formatDate } from '../../lib/utils'
+import { formatDate, formatDateTooltip } from '../../lib/utils'
 
 const BW_GOAL_KEY = 'youxp-bw-goal'
 
@@ -19,15 +19,19 @@ const TT_STYLE = {
   boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
 
+const todayStr = new Date().toISOString().slice(0, 10)
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomDot(props: any) {
   const { cx, cy, index, data } = props
-  const isLast = index === (data?.length ?? 0) - 1
-  if (!isLast) return <circle cx={cx} cy={cy} r={3} fill="var(--accent)" fillOpacity={0.7} />
+  const isLast  = index === (data?.length ?? 0) - 1
+  const isToday = isLast && data[index]?.date === todayStr
+  if (!isLast) return <circle cx={cx} cy={cy} r={3} fill="#34d399" fillOpacity={0.7} />
   return (
     <g>
-      <circle cx={cx} cy={cy} r={8} fill="var(--accent)" fillOpacity={0.15} />
-      <circle cx={cx} cy={cy} r={4} fill="var(--accent)" />
+      {isToday && <circle cx={cx} cy={cy} r={10} fill="#34d399" fillOpacity={0.1} className="chart-today-pulse" />}
+      <circle cx={cx} cy={cy} r={8} fill="#34d399" fillOpacity={0.15} />
+      <circle cx={cx} cy={cy} r={4} fill="#34d399" />
     </g>
   )
 }
@@ -90,8 +94,8 @@ export function BodyweightChart() {
 
   // Determine area color based on goal progress
   const areaColor = goal && latest
-    ? (latest <= goal ? '#4ade80' : 'var(--accent)')
-    : 'var(--accent)'
+    ? (latest <= goal ? '#4ade80' : '#34d399')
+    : '#34d399'
 
   return (
     <div>
@@ -167,7 +171,7 @@ export function BodyweightChart() {
           <Tooltip
             contentStyle={TT_STYLE}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            labelFormatter={(label: any) => (typeof label === 'string' ? formatDate(label) : label)}
+            labelFormatter={(label: any) => (typeof label === 'string' ? formatDateTooltip(label) : label)}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter={(v: any) => [`${v} lbs`, 'Bodyweight']}
             cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}

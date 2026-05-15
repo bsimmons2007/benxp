@@ -136,7 +136,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
 
             {showShooting && (
               <>
-                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: -8 }}>Shooting</p>
+                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: -8 }}>Shooting</p>
                 <div className="grid grid-cols-2 gap-3">
                   <Input label="FG Made"       type="number" placeholder="0" {...register('fg_made')} />
                   <Input label="FG Attempted"  type="number" placeholder="0" {...register('fg_attempted')} />
@@ -150,7 +150,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
 
             {showBox && (
               <>
-                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: -8 }}>Box Score</p>
+                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: -8 }}>Box Score</p>
                 <div className="grid grid-cols-2 gap-3">
                   <Input label="Points"    type="number" placeholder="0" {...register('points')} />
                   <Input label="Assists"   type="number" placeholder="0" {...register('assists')} />
@@ -163,7 +163,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
             )}
 
             <Input label="Notes (optional)" placeholder="e.g. pickup game at the rec" {...register('notes')} />
-            <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Session'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Session'}</Button>
           </form>
         </div>
       )}
@@ -179,7 +179,7 @@ function StatPill({ label, value, sub }: { label: string; value: string; sub?: s
       background: 'var(--input-bg)', border: '1px solid var(--border)',
       borderRadius: 12, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 2,
     }}>
-      <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</span>
+      <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{label}</span>
       <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.1 }}>{value}</span>
       {sub && <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{sub}</span>}
     </div>
@@ -196,12 +196,12 @@ function TrendChart({ data, dataKey, label, color = 'var(--accent)' }: {
   if (data.length < 2) return null
   return (
     <div style={{ marginBottom: 24 }}>
-      <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</p>
+      <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{label}</p>
       <ResponsiveContainer width="100%" height={120}>
         <LineChart data={data} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-          <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#888' }} />
-          <YAxis tick={{ fontSize: 9, fill: '#888' }} domain={[0, 100]} unit="%" />
+          <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
+          <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} domain={[0, 100]} unit="%" />
           <Tooltip
             contentStyle={{ background: '#1a1a2e', border: '1px solid #333', borderRadius: 8, fontSize: 11 }}
             formatter={(v: unknown) => [`${v}%`, label]}
@@ -253,7 +253,7 @@ function EditBbModal({ session, onClose, onSaved }: { session: BasketballSession
 
   const field = (label: string, key: keyof typeof vals) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <label style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</label>
+      <label style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>{label}</label>
       <input
         type="number" value={vals[key]}
         onChange={e => setVals(v => ({ ...v, [key]: e.target.value }))}
@@ -266,24 +266,24 @@ function EditBbModal({ session, onClose, onSaved }: { session: BasketballSession
     <EditModal title={`Edit — ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <label style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Date</label>
+          <label style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>Date</label>
           <input type="date" value={vals.date} onChange={e => setVals(v => ({ ...v, date: e.target.value }))}
             style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
         </div>
-        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Shooting</p>
+        <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Shooting</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           {field('FG Made', 'fg_made')}{field('FG Attempted', 'fg_attempted')}
           {field('3PT Made', 'three_made')}{field('3PT Attempted', 'three_attempted')}
           {field('FT Made', 'ft_made')}{field('FT Attempted', 'ft_attempted')}
         </div>
-        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Box Score</p>
+        <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Box Score</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           {field('Points', 'points')}{field('Assists', 'assists')}
           {field('Rebounds', 'rebounds')}{field('Steals', 'steals')}
           {field('Blocks', 'blocks')}{field('Turnovers', 'turnovers')}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <label style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Notes</label>
+          <label style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>Notes</label>
           <input value={vals.notes} onChange={e => setVals(v => ({ ...v, notes: e.target.value }))}
             placeholder="Optional notes…"
             style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
@@ -405,7 +405,7 @@ export function Basketball() {
 
             {/* ── Shooting percentages ── */}
             <Card style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>Shooting</p>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Shooting</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                 {[
                   { label: 'FG%',  val: fgPct,   made: totalFGM, att: totalFGA },
@@ -425,7 +425,7 @@ export function Basketball() {
 
             {/* ── Box score totals ── */}
             <Card style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>Career Totals</p>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Career Totals</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                 <StatPill label="Points"    value={String(totalPoints)} sub={`${fmt(ppg)} ppg avg`} />
                 <StatPill label="Assists"   value={String(totalAssists)} sub={`${fmt(totalAssists / totalSessions)} apg`} />
@@ -438,7 +438,7 @@ export function Basketball() {
 
             {/* ── Efficiency ── */}
             <Card style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>Efficiency</p>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Efficiency</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                 <StatPill label="Pts / Shot"   value={fmt(ppShot)} sub="scoring efficiency" />
                 <StatPill label="Pts / Game"   value={fmt(ppg)}    sub="rolling avg" />
@@ -450,7 +450,7 @@ export function Basketball() {
               <Card style={{ marginBottom: 16, borderColor: 'rgba(233,69,96,0.3)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                   <TrophyIcon size={16} color="var(--accent)" />
-                  <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Best Game</p>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Best Game</p>
                   <span style={{ fontSize: 11, color: 'var(--text-dim)', marginLeft: 'auto' }}>{formatDate(best.date)}</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, textAlign: 'center' }}>
@@ -493,7 +493,7 @@ export function Basketball() {
               <Card style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                   <TrendingIcon size={16} color="var(--text-secondary)" />
-                  <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Trends</p>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Trends</p>
                 </div>
                 <TrendChart data={fgTrend}   dataKey="fg"    label="FG% trend"   color="var(--accent)" />
                 <TrendChart data={threeTrend} dataKey="three" label="3PT% trend"  color="#9B59B6" />
@@ -522,7 +522,7 @@ export function Basketball() {
 
             {/* ── Session history ── */}
             <Card>
-              <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>Session History</p>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Session History</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {sessions.map(s => (
                   <div key={s.id} style={{

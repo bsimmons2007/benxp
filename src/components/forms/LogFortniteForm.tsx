@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+﻿import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { XP_RATES } from '../../lib/xp'
@@ -42,7 +42,7 @@ export function LogFortniteForm() {
     })
 
     const xp = data.win ? XP_RATES.fortnite_win : 0
-    setToast(data.win ? `+${xp} XP — Victory Royale!` : 'Game logged!')
+    setToast(data.win ? `+${xp} XP â€” Victory Royale!` : 'Game logged!')
     await refreshXP()
     reset({ date: today(), mode: 'Solos', season: '', placement: '', kills: '', accuracy: '', win: false })
   }
@@ -87,7 +87,7 @@ export function LogFortniteForm() {
         <input type="checkbox" className="sr-only" {...register('win')} />
       </label>
 
-      <Button type="submit" fullWidth disabled={isSubmitting}>
+      <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>
         {isSubmitting ? 'Logging...' : 'Log Game'}
       </Button>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}

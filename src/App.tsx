@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { useEffect, useState, lazy, Suspense } from 'react'
+import { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import type { ReactNode } from 'react'
 import { BottomNav } from './components/layout/BottomNav'
 import { SideNav } from './components/layout/SideNav'
@@ -45,9 +45,11 @@ const Pool         = lazy(() => import('./pages/Pool').then(m => ({ default: m.P
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
+import { setupOfflineQueue } from './lib/offlineQueue'
 import { isTutorialDone } from './lib/tutorial'
 import { checkDailyReminder } from './lib/notifications'
 import { useAuth } from './hooks/useAuth'
+import { useStore } from './store/useStore'
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { session, loading, error } = useAuth()
@@ -120,20 +122,20 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
             <kbd style={{
               display: 'inline-block', width: 24, height: 24, lineHeight: '24px', textAlign: 'center',
               borderRadius: 5, background: 'var(--input-bg)', border: '1px solid var(--border)',
-              color: 'var(--accent)', fontSize: 12, fontWeight: 700, fontFamily: 'monospace', flexShrink: 0,
+              color: 'var(--accent)', fontSize: 12, fontWeight: 700, fontFamily: 'var(--font-mono)', flexShrink: 0,
             }}>
               {s.key.toUpperCase()}
             </kbd>
-            <span style={{ fontSize: 13, color: '#ccc' }}>{s.label.split(' — ')[1]}</span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{s.label.split(' — ')[1]}</span>
           </div>
         ))}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0' }}>
           <kbd style={{
             display: 'inline-block', width: 24, height: 24, lineHeight: '24px', textAlign: 'center',
             borderRadius: 5, background: 'var(--input-bg)', border: '1px solid var(--border)',
-            color: '#888', fontSize: 11, fontWeight: 700, fontFamily: 'monospace', flexShrink: 0,
+            color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)', flexShrink: 0,
           }}>?</kbd>
-          <span style={{ fontSize: 13, color: '#888' }}>Toggle this help</span>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Toggle this help</span>
         </div>
         <button
           onClick={onClose}
@@ -146,12 +148,135 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
   )
 }
 
+const SPLASH_KEY = 'youxp-splashed'
+
+function SplashScreen({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 1800)
+    return () => clearTimeout(t)
+  }, [onDone])
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 99999,
+      background: 'var(--base-bg)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      animation: 'splashFadeOut 1.8s ease forwards',
+      pointerEvents: 'none',
+    }}>
+      {/* Glow orb */}
+      <div style={{
+        position: 'absolute', width: 280, height: 280, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      <p style={{
+        fontFamily: 'Cinzel, serif', fontSize: 42, fontWeight: 900,
+        color: 'var(--accent)', letterSpacing: '0.05em',
+        animation: 'splashLogoIn 0.9s cubic-bezier(0.34,1.56,0.64,1) both',
+        marginBottom: 8,
+      }}>
+        YouXP
+      </p>
+      <p style={{
+        fontFamily: 'Cormorant Garamond, serif', fontSize: 14,
+        color: 'var(--text-muted)', letterSpacing: '0.18em', textTransform: 'uppercase',
+        animation: 'splashSubIn 1.1s ease both',
+      }}>
+        Level up your life
+      </p>
+      {/* Loading bar */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'var(--border)' }}>
+        <div style={{
+          height: '100%', background: 'var(--accent)',
+          animation: 'splashBarFill 1.6s cubic-bezier(0.4,0,0.2,1) forwards',
+        }} />
+      </div>
+    </div>
+  )
+}
+
+function OfflineBanner() {
+  const [offline, setOffline] = useState(!navigator.onLine)
+  const [show, setShow] = useState(!navigator.onLine)
+
+  useEffect(() => {
+    function onOffline() { setOffline(true); setShow(true) }
+    function onOnline()  { setOffline(false); setTimeout(() => setShow(false), 2000) }
+    window.addEventListener('offline', onOffline)
+    window.addEventListener('online',  onOnline)
+    return () => {
+      window.removeEventListener('offline', onOffline)
+      window.removeEventListener('online',  onOnline)
+    }
+  }, [])
+
+  if (!show) return null
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9997,
+      padding: '10px 16px',
+      background: offline ? '#1a0a0a' : '#0a1a0a',
+      borderBottom: `1px solid ${offline ? '#7f1d1d' : '#14532d'}`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+      transition: 'background 0.3s ease',
+    }}>
+      <div style={{
+        width: 7, height: 7, borderRadius: '50%',
+        background: offline ? '#ef4444' : '#22c55e',
+        boxShadow: `0 0 8px ${offline ? '#ef4444' : '#22c55e'}`,
+        flexShrink: 0,
+      }} />
+      <p style={{ fontSize: 12, fontWeight: 600, color: offline ? '#fca5a5' : '#86efac', letterSpacing: '0.04em' }}>
+        {offline ? 'You\'re offline — changes will sync when reconnected' : 'Back online'}
+      </p>
+    </div>
+  )
+}
+
+function TopLoadBar() {
+  const loading = useStore(s => s.loading)
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, height: 2,
+      zIndex: 9998, pointerEvents: 'none',
+      opacity: loading ? 1 : 0,
+      transition: 'opacity 0.4s ease',
+    }}>
+      <div className="top-load-bar" style={{ height: '100%', background: 'var(--accent)' }} />
+    </div>
+  )
+}
+
 function AppInner() {
   const location = useLocation()
   const showNav = location.pathname !== '/login' && location.pathname !== '/reset-password'
   const { helpVisible, setHelpVisible } = useKeyboardShortcuts()
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/reset-password'
+  const refreshXP  = useStore(s => s.refreshXP)
+  const initialized = useStore(s => s.initialized)
 
+  // Refresh data when network comes back online
+  const lastOnlineAt = useRef<number>(0)
+  useEffect(() => {
+    function onOnline() {
+      if (!initialized) return
+      const now = Date.now()
+      if (now - lastOnlineAt.current < 10000) return  // debounce 10s
+      lastOnlineAt.current = now
+      refreshXP()
+    }
+    window.addEventListener('online', onOnline)
+    return () => window.removeEventListener('online', onOnline)
+  }, [initialized, refreshXP])
+
+  const [showSplash,   setShowSplash]   = useState(() => {
+    if (isAuthRoute) return false
+    const seen = sessionStorage.getItem(SPLASH_KEY)
+    if (!seen) { sessionStorage.setItem(SPLASH_KEY, '1'); return true }
+    return false
+  })
   const [showTutorial, setShowTutorial] = useState(() => !isAuthRoute && !isTutorialDone())
 
   useEffect(() => {
@@ -168,6 +293,9 @@ function AppInner() {
 
   return (
     <>
+      {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
+      <OfflineBanner />
+      <TopLoadBar />
       <LevelUpOverlay />
       {showTutorial && !isAuthRoute && (
         <TutorialOverlay onDone={() => setShowTutorial(false)} />
@@ -225,6 +353,7 @@ function AppInner() {
 export default function App() {
   useEffect(() => {
     applyTimeOrSavedTheme()
+    setupOfflineQueue()
 
     let id: ReturnType<typeof setInterval> | null = null
 

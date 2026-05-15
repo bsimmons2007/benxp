@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -20,7 +20,7 @@ import type { PoolGame } from '../types'
 const ACCENT = '#c084fc'
 const GAME_TYPES = ['8-Ball', '9-Ball', '10-Ball', 'Straight Pool', 'One Pocket', 'Bank Pool']
 
-// ── Log form ──────────────────────────────────────────────────────
+// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface PoolForm {
   date: string
@@ -57,8 +57,8 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
     const xp = XP_RATES.pool_game
       + (isWin       ? XP_RATES.pool_win           : 0)
       + (breakAndRun ? XP_RATES.pool_break_and_run : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — 🎱 Rack 'em!`) }
-    else        { playXPGain(); setToast(`+${xp} XP — Keep shooting!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP â€” ðŸŽ± Rack 'em!`) }
+    else        { playXPGain(); setToast(`+${xp} XP â€” Keep shooting!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), game_type: '8-Ball', opponent: '', run_count: '', notes: '' })
     setIsWin(true); setBreakAndRun(false); setOpen(false); onLogged()
@@ -71,7 +71,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Game'}
+        {open ? 'âœ• Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -85,9 +85,9 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
               </select>
             </div>
 
-            <Input label="Opponent (optional)" type="text" placeholder="Name…"    {...register('opponent')} />
+            <Input label="Opponent (optional)" type="text" placeholder="Nameâ€¦"    {...register('opponent')} />
             <Input label="Run Count (optional)" type="number" placeholder="e.g. 5" {...register('run_count')} />
-            <Input label="Notes (optional)"    type="text" placeholder="Location, table…" {...register('notes')} />
+            <Input label="Notes (optional)"    type="text" placeholder="Location, tableâ€¦" {...register('notes')} />
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
@@ -110,7 +110,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
               </div>
             </div>
 
-            <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
         </div>
       )}
@@ -119,7 +119,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Edit modal ────────────────────────────────────────────────────
+// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function EditPoolModal({ game, onClose, onSaved }: { game: PoolGame; onClose: () => void; onSaved: () => void }) {
   const [win,         setWin]         = useState(game.win)
@@ -141,7 +141,7 @@ function EditPoolModal({ game, onClose, onSaved }: { game: PoolGame; onClose: ()
   }
 
   return (
-    <EditModal title={`Edit — ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€” ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label className="section-label">Run Count</label>
@@ -164,7 +164,7 @@ function EditPoolModal({ game, onClose, onSaved }: { game: PoolGame; onClose: ()
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -207,9 +207,9 @@ export function Pool() {
         <div className="grid grid-cols-2 gap-2 mb-3">
           {[
             { label: 'Wins',         value: wins },
-            { label: 'Win Rate',     value: games.length ? `${winRate}%` : '—' },
-            { label: 'Win Streak',   value: streak || '—' },
-            { label: 'Break & Runs', value: breakAndRuns || '—' },
+            { label: 'Win Rate',     value: games.length ? `${winRate}%` : 'â€”' },
+            { label: 'Win Streak',   value: streak || 'â€”' },
+            { label: 'Break & Runs', value: breakAndRuns || 'â€”' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
@@ -265,7 +265,7 @@ export function Pool() {
                   <span style={{ marginLeft: 8, fontSize: 11, color: '#666' }}>{g.game_type}</span>
                 </p>
                 {g.break_and_run && (
-                  <p style={{ fontSize: 10, color: '#fbbf24', marginTop: 1, fontWeight: 600 }}>✨ Break &amp; Run</p>
+                  <p style={{ fontSize: 10, color: '#fbbf24', marginTop: 1, fontWeight: 600 }}>âœ¨ Break &amp; Run</p>
                 )}
                 {g.opponent && !g.break_and_run && (
                   <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>vs {g.opponent}</p>

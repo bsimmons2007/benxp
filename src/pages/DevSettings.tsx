@@ -218,8 +218,8 @@ function XPEngine() {
         <p className="text-4xl font-bold mb-1" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
           {data.total.toLocaleString()}
         </p>
-        <p style={{ color: '#aaa', fontSize: 12 }}>Level {level} · {toNext.toLocaleString()} to next</p>
-        <div className="mt-3 px-3 py-2 rounded-lg" style={{ background: 'rgba(0,0,0,0.3)', fontFamily: 'monospace', fontSize: 11, color: '#4ade80' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Level {level} · {toNext.toLocaleString()} to next</p>
+        <div className="mt-3 px-3 py-2 rounded-lg" style={{ background: 'rgba(0,0,0,0.3)', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--green)' }}>
           {formula}
         </div>
       </Card>
@@ -237,18 +237,18 @@ function XPEngine() {
             }}
           >
             <p style={{ color: CATEGORY_COLORS[cat], fontSize: 18, fontWeight: 700, lineHeight: 1 }}>{t.toLocaleString()}</p>
-            <p style={{ color: '#aaa', fontSize: 10, marginTop: 3 }}>{cat} · {es.length} entries</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 10, marginTop: 3 }}>{cat} · {es.length} entries</p>
           </button>
         ))}
       </div>
 
       {/* XP rates reference */}
       <Card className="mb-4">
-        <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#888' }}>XP Rate Table</p>
-        <div className="flex flex-col gap-1.5" style={{ fontFamily: 'monospace', fontSize: 11 }}>
+        <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>XP Rate Table</p>
+        <div className="flex flex-col gap-1.5" style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>
           {Object.entries(XP_RATES).map(([k, v]) => (
             <div key={k} className="flex justify-between">
-              <span style={{ color: '#444' }}>{k.replace(/_/g, ' ')}</span>
+              <span style={{ color: 'var(--text-secondary)' }}>{k.replace(/_/g, ' ')}</span>
               <span style={{ color: 'var(--accent)' }}>{v === 0 ? 'variable' : `${v} XP`}</span>
             </div>
           ))}
@@ -258,7 +258,7 @@ function XPEngine() {
       {/* Entry log */}
       <Card>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs uppercase tracking-widest" style={{ color: '#888' }}>
+          <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
             {filter ? `${filter} Entries` : 'All XP Entries'} ({visibleEntries.length})
           </p>
           {filter && (
@@ -282,14 +282,14 @@ function XPEngine() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span style={{ fontSize: 13 }}>{e.icon}</span>
-                  <span style={{ color: '#ccc', fontSize: 11 }}>{e.label}</span>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: 11 }}>{e.label}</span>
                 </div>
                 <span style={{ color: CATEGORY_COLORS[e.category], fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', marginLeft: 8 }}>
                   +{e.xp}
                 </span>
               </div>
               {expanded === `${i}` && e.detail && (
-                <p style={{ color: '#555', fontSize: 10, marginTop: 4, marginLeft: 22, fontFamily: 'monospace' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: 10, marginTop: 4, marginLeft: 22, fontFamily: 'var(--font-mono)' }}>
                   {e.detail} · {e.category}
                 </p>
               )}
@@ -318,12 +318,12 @@ export function DevSettings() {
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
               <div>
-                <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--accent)', fontFamily: 'monospace' }}>// developer mode</p>
+                <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>// developer mode</p>
                 <p className="font-bold text-white" style={{ fontFamily: 'Cinzel, serif' }}>Settings</p>
               </div>
               <button
                 onClick={() => { sessionStorage.removeItem(SESSION_KEY); setUnlocked(false) }}
-                style={{ color: '#555', fontSize: 11, background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}
+                style={{ color: 'var(--text-muted)', fontSize: 11, background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}
               >
                 Lock
               </button>

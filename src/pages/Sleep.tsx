@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+﻿import { useEffect, useState, type FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
@@ -9,26 +9,45 @@ import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
-import { EmptyState } from '../components/ui/EmptyState'
+import { EmptyState, FirstUseTip } from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
-import { today, formatDate, localDateStr } from '../lib/utils'
+import { today, formatDate, formatDateTooltip, localDateStr } from '../lib/utils'
 import { playXPGain, playPR } from '../lib/sounds'
 import type { SleepLog } from '../types'
 import { MoonIcon, CheckIcon, EditIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { ChartSkeleton, ChartEmptyState } from '../components/ui/Skeleton'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+const DREAMS_KEY = 'youxp-sleep-dreams'
+function getDreamsMap(): Record<string, boolean> {
+  try { return JSON.parse(localStorage.getItem(DREAMS_KEY) ?? '{}') } catch { return {} }
+}
+function saveDreamForLog(id: string) {
+  const m = getDreamsMap()
+  m[id] = true
+  localStorage.setItem(DREAMS_KEY, JSON.stringify(m))
+}
 const SLEEP_GOAL = 8        // hours/night target
 const RECOVERY_EXTRA = 1    // extra hours per recovery night
 const DEBT_WINDOW = 14      // rolling window for debt (days)
 
+function lerpColor(a: [number,number,number], b: [number,number,number], t: number): string {
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`
+}
+const SLEEP_GREEN:  [number,number,number] = [46, 204, 113]
+const SLEEP_YELLOW: [number,number,number] = [245, 166, 35]
+const SLEEP_RED:    [number,number,number] = [233, 69, 96]
+
 function sleepQuality(hours: number | null): { label: string; color: string } {
-  if (!hours) return { label: '—', color: '#888' }
-  if (hours >= 8.5) return { label: 'Excellent', color: '#2ECC71' }
-  if (hours >= 7.5) return { label: 'Great',     color: '#27AE60' }
-  if (hours >= 6.5) return { label: 'Good',      color: '#F5A623' }
-  if (hours >= 5.5) return { label: 'Fair',      color: '#E67E22' }
-  return { label: 'Poor', color: '#E94560' }
+  if (!hours) return { label: '—', color: 'var(--text-dim)' }
+  const clamped = Math.max(5, Math.min(9, hours))
+  const color = clamped >= 7
+    ? lerpColor(SLEEP_YELLOW, SLEEP_GREEN, (clamped - 7) / 2)
+    : lerpColor(SLEEP_RED, SLEEP_YELLOW, (clamped - 5) / 2)
+  const label = hours >= 8.5 ? 'Excellent' : hours >= 7.5 ? 'Great' : hours >= 6.5 ? 'Good' : hours >= 5.5 ? 'Fair' : 'Poor'
+  return { label, color }
 }
 
 /** YYYY-MM-DD for N days ago (0 = today) using the canonical localDateStr from utils */
@@ -38,15 +57,17 @@ function nDaysAgo(n: number): string {
   return localDateStr(d)
 }
 
-// ── Log form ──────────────────────────────────────────────────────────────────
+// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface SleepForm { date: string; bedtime: string; hours_slept: string; wake_time: string }
 
 function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   const [open, setOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
-  const refreshXP       = useStore((s) => s.refreshXP)
-  const refreshActivity = useStore((s) => s.refreshActivity)
+  const [hadDream, setHadDream] = useState(false)
+  const refreshXP             = useStore((s) => s.refreshXP)
+  const refreshActivity       = useStore((s) => s.refreshActivity)
+  const addOptimisticActivity = useStore((s) => s.addOptimisticActivity)
   const { register, handleSubmit, reset, watch, setValue, formState: { isSubmitting } } = useForm<SleepForm>({
     defaultValues: { date: today(), bedtime: '', hours_slept: '', wake_time: '' },
   })
@@ -68,24 +89,31 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: SleepForm) => {
     const parsedHours = data.hours_slept !== '' ? parseFloat(data.hours_slept) : null
     if (parsedHours !== null && !isFinite(parsedHours)) return
+    if (parsedHours !== null && (parsedHours < 1.5 || parsedHours > 18)) {
+      setToast('⚠️ Unusual sleep duration — check the hours value before saving.')
+      return
+    }
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error } = await supabase.from('sleep_log').insert({
+    const { data: inserted, error } = await supabase.from('sleep_log').insert({
       user_id: user.id,
       date: data.date,
       bedtime: data.bedtime || null,
       hours_slept: parsedHours,
       wake_time: data.wake_time || null,
-    })
+    }).select('id').single()
     if (error) { setToast('Failed to save — try again'); return }
+    if (inserted && hadDream) saveDreamForLog(inserted.id)
     const hrs = parsedHours ?? 0
     const q   = sleepQuality(hrs)
     const xp  = XP_RATES.sleep_log + (hrs >= 7 ? XP_RATES.sleep_quality_bonus : 0)
     if (hrs >= 8.5) playPR(); else playXPGain()
-    setToast(`+${xp} XP — ${q.label} sleep!`)
+    setToast(`+${xp} XP â€” ${q.label} sleep!`)
+    addOptimisticActivity({ type: 'sleep', label: `${hrs.toFixed(1)}h sleep`, date: data.date, icon: 'sleep' })
     await refreshXP()
     refreshActivity()
     reset({ date: today(), bedtime: '', hours_slept: '', wake_time: '' })
+    setHadDream(false)
     setOpen(false)
     onLogged()
   }
@@ -98,10 +126,11 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Sleep'}
+        {open ? 'âœ• Cancel' : '+ Log Sleep'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <FirstUseTip formKey="sleep" tip="Log bedtime + wake time to auto-calculate hours, or just enter hours directly. 7+ hours earns a quality bonus XP." />
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date"     type="date" {...register('date', { required: true })} />
             <Input label="Bedtime"  type="time" {...register('bedtime')} />
@@ -110,7 +139,20 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
               {...register('hours_slept', { required: true })}
               style={{ background: 'var(--input-bg)', color: 'var(--accent)' }}
             />
-            <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Sleep'}</Button>
+            {/* Dream toggle */}
+            <div
+              className="flex items-center gap-3 cursor-pointer select-none"
+              onClick={() => setHadDream(d => !d)}
+            >
+              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: hadDream ? 'var(--accent)' : 'var(--border)' }}>
+                <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: hadDream ? 'translateX(26px)' : 'translateX(2px)' }} />
+              </div>
+              <span style={{ fontSize: 13, color: hadDream ? 'var(--accent)' : 'var(--text-muted)', fontWeight: 600 }}>
+                💭 Had a dream
+              </span>
+            </div>
+
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Sleep'}</Button>
           </form>
         </div>
       )}
@@ -119,7 +161,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Nap log panel ─────────────────────────────────────────────────────────────
+// â”€â”€ Nap log panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function LogNapPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
@@ -139,8 +181,8 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
       user_id: user.id, date, hours_slept: napHours, is_nap: true,
     })
     setSaving(false)
-    if (error) { setToast('Failed to save — try again'); return }
-    setToast(`Nap logged — ${hours}h`)
+    if (error) { setToast('Failed to save â€” try again'); return }
+    setToast(`Nap logged â€” ${hours}h`)
     setOpen(false)
     setHours('')
     onLogged()
@@ -153,7 +195,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all"
         style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', fontSize: 14 }}
       >
-        {open ? '✕ Cancel' : 'Log Nap'}
+        {open ? 'âœ• Cancel' : 'Log Nap'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -169,7 +211,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Edit modal ────────────────────────────────────────────────────────────────
+// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose: () => void; onSaved: () => void }) {
   const [hours,    setHours]    = useState(String(entry.hours_slept ?? ''))
@@ -195,7 +237,7 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
   }
 
   return (
-    <EditModal title={`Edit — ${formatDate(entry.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€” ${formatDate(entry.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <Input label="Bedtime"     type="time"   value={bedtime}  onChange={e => setBedtime(e.target.value)} />
         <Input label="Hours Slept" type="number" step={0.1} value={hours}    onChange={e => setHours(e.target.value)} />
@@ -205,7 +247,7 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
   )
 }
 
-// ── Sleep debt card ───────────────────────────────────────────────────────────
+// â”€â”€ Sleep debt card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   const nights = logs.filter(r => !r.is_nap)
@@ -286,15 +328,15 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   )
 }
 
-// ── Wake Time Trainer ────────────────────────────────────────────────────────
+// â”€â”€ Wake Time Trainer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/** Parse "HH:MM" → total minutes since midnight */
+/** Parse "HH:MM" â†’ total minutes since midnight */
 function parseTime(t: string): number {
   const [h, m] = t.split(':').map(Number)
   return (h || 0) * 60 + (m || 0)
 }
 
-/** Format minutes-since-midnight → "h:mm AM/PM" */
+/** Format minutes-since-midnight â†’ "h:mm AM/PM" */
 function fmtTime(mins: number): string {
   const wrapped = ((mins % 1440) + 1440) % 1440          // handle < 0 or > 1440
   const h = Math.floor(wrapped / 60)
@@ -352,12 +394,12 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
     }
   })
 
-  // Check actual progress — how many recent wake times match or beat the plan?
+  // Check actual progress â€” how many recent wake times match or beat the plan?
   const recentWakes = logs
     .filter(l => l.wake_time && l.date >= todayStr)
     .map(l => ({ date: l.date, mins: parseTime(l.wake_time!) }))
 
-  // Days already on-track: wake time ≤ scheduled target for that day
+  // Days already on-track: wake time â‰¤ scheduled target for that day
   const daysOnTrack = recentWakes.filter(w => {
     const dayNum = Math.round((new Date(w.date + 'T12:00:00').getTime() - new Date(todayStr + 'T12:00:00').getTime()) / 86400000)
     const planned = currentWakeMins - dayNum * shiftMins
@@ -381,11 +423,11 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
             <p className="font-bold text-sm" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Wake Time Trainer</p>
             <p style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 2 }}>
               {avgWakeMins !== null
-                ? `Avg wake: ${fmtTime(avgWakeMins)} · Set a goal wake time`
+                ? `Avg wake: ${fmtTime(avgWakeMins)} Â· Set a goal wake time`
                 : 'Plan a gradual wake time shift with a day-by-day schedule'}
             </p>
           </div>
-          <span style={{ color: 'var(--accent)', fontSize: 18 }}>›</span>
+          <span style={{ color: 'var(--accent)', fontSize: 18 }}>â€º</span>
         </div>
       </button>
     )
@@ -396,7 +438,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
       {/* Header */}
       <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid var(--border-faint)' }}>
         <p className="font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 15 }}>Wake Time Trainer</p>
-        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18 }}>✕</button>
+        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18 }}>âœ•</button>
       </div>
 
       <div className="p-4 flex flex-col gap-4">
@@ -404,12 +446,12 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
         {/* Current vs target */}
         <div className="flex items-center gap-3">
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
-            <p style={{ color: '#444', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>
               {avgWakeMins !== null ? `Current avg (${wakeTimeLogs.length} nights)` : 'Current (estimated)'}
             </p>
-            <p style={{ color: '#ccc', fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif' }}>{fmtTime(currentWakeMins)}</p>
+            <p style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-serif)' }}>{fmtTime(currentWakeMins)}</p>
           </div>
-          <div style={{ color: '#555', fontSize: 22, fontWeight: 300 }}>→</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 22, fontWeight: 300 }}>â†’</div>
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.3)' }}>
             <p style={{ color: 'var(--accent)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Goal</p>
             <p style={{ color: 'var(--accent)', fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif' }}>{fmtTime(targetWakeMins)}</p>
@@ -419,7 +461,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
         {/* Settings */}
         <div className="flex flex-col gap-3">
           <div>
-            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Target Wake Time</label>
+            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Target Wake Time</label>
             <input
               type="time"
               value={targetWake}
@@ -430,7 +472,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
           <div className="flex gap-3">
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Sleep Duration (hrs)</label>
+              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Sleep Duration (hrs)</label>
               <input
                 type="number" step="0.5" min="5" max="10"
                 value={sleepHours}
@@ -439,7 +481,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Shift Speed</label>
+              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Shift Speed</label>
               <select
                 value={shiftMins}
                 onChange={e => setShiftMins(Number(e.target.value))}
@@ -473,7 +515,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               ].map(s => (
                 <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
                   <p style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{s.value}</p>
-                  <p style={{ color: '#555', fontSize: 9, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 9, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.10em', fontWeight: 600 }}>{s.label}</p>
                 </div>
               ))}
             </div>
@@ -493,22 +535,22 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
             {/* Tonight callout */}
             <div className="rounded-lg p-3" style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.35)' }}>
-              <p style={{ color: 'var(--accent)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Tonight</p>
+              <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>Tonight</p>
               <div className="flex justify-between items-center">
                 <div>
-                  <p style={{ color: '#e8e8e8', fontSize: 13 }}>Go to sleep by</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Go to sleep by</p>
                   <p style={{ color: 'var(--accent)', fontSize: 26, fontWeight: 700, fontFamily: 'Cinzel, serif', lineHeight: 1.1 }}>{schedule[0]?.bed}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ color: '#888', fontSize: 13 }}>Wake up at</p>
-                  <p style={{ color: '#ccc', fontSize: 20, fontWeight: 700, fontFamily: 'Cinzel, serif', lineHeight: 1.1 }}>{schedule[0]?.wake}</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Wake up at</p>
+                  <p style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700, fontFamily: 'Cinzel, serif', lineHeight: 1.1 }}>{schedule[0]?.wake}</p>
                 </div>
               </div>
             </div>
 
             {/* Day-by-day schedule */}
             <div>
-              <p style={{ color: '#555', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Full Schedule</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Full Schedule</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 280, overflowY: 'auto' }}>
                 {schedule.map((s, i) => {
                   const isToday    = s.date === todayStr
@@ -541,13 +583,13 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                       {/* Date */}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ color: isToday ? 'var(--accent)' : isGoalDay ? '#2ECC71' : '#ccc', fontSize: 12, fontWeight: isToday ? 700 : 500 }}>
-                          {dayLabel(s.date)} · {formatDate(s.date)}
+                          {dayLabel(s.date)} Â· {formatDate(s.date)}
                           {isToday && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(245,166,35,0.2)', color: 'var(--accent)', padding: '1px 6px', borderRadius: 4 }}>TODAY</span>}
                           {isGoalDay && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(46,204,113,0.15)', color: '#2ECC71', padding: '1px 6px', borderRadius: 4 }}>GOAL</span>}
                         </p>
                         {actualWake?.wake_time && (
                           <p style={{ color: onTrack ? '#2ECC71' : '#E94560', fontSize: 10, marginTop: 1 }}>
-                            Actual wake: {fmtTime(parseTime(actualWake.wake_time))} {onTrack ? '✓' : '✗'}
+                            Actual wake: {fmtTime(parseTime(actualWake.wake_time))} {onTrack ? 'âœ“' : 'âœ—'}
                           </p>
                         )}
                       </div>
@@ -566,7 +608,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
             {/* Science note */}
             <p style={{ color: 'var(--text-muted)', fontSize: 10, textAlign: 'center', lineHeight: 1.4 }}>
               Based on chronobiology: shifting {shiftMins} min/day is within the body's natural circadian adaptation rate.
-              Consistency is key — try to hit your bedtime every night, including weekends.
+              Consistency is key â€” try to hit your bedtime every night, including weekends.
             </p>
           </>
         )}
@@ -575,7 +617,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const ttStyle = {
   background: 'rgba(10,10,22,0.97)',
@@ -588,12 +630,19 @@ const itemStyle  = { color: 'var(--text-primary)' }
 
 export function Sleep() {
   usePageTitle('Sleep')
-  const [logs,    setLogs]    = useState<SleepLog[]>([])
-  const [editing, setEditing] = useState<SleepLog | null>(null)
+  const [logs,      setLogs]      = useState<SleepLog[]>([])
+  const [editing,   setEditing]   = useState<SleepLog | null>(null)
+  const [loadError, setLoadError] = useState(false)
+  const [chartLoading, setChartLoading] = useState(true)
+  const [dreamsMap, setDreamsMap] = useState<Record<string, boolean>>(() => getDreamsMap())
 
   async function load() {
-    const { data } = await supabase.from('sleep_log').select('*').order('date', { ascending: false })
+    setLoadError(false)
+    const { data, error } = await supabase.from('sleep_log').select('*').order('date', { ascending: false })
+    if (error) { setLoadError(true); setChartLoading(false); return }
     setLogs(data ?? [])
+    setDreamsMap(getDreamsMap())
+    setChartLoading(false)
   }
   useEffect(() => { load() }, [])
 
@@ -605,7 +654,7 @@ export function Sleep() {
   const avg  = withHours.length ? withHours.reduce((s, r) => s + (r.hours_slept ?? 0), 0) / withHours.length : 0
   const best = withHours.length ? Math.max(...withHours.map(r => r.hours_slept ?? 0)) : 0
 
-  // Streak — fixed: use local date strings, handle today-not-logged case
+  // Streak â€” fixed: use local date strings, handle today-not-logged case
   const streak = (() => {
     if (!nightLogs.length) return 0
     const dateSet = new Set(nightLogs.map(r => r.date))
@@ -617,6 +666,22 @@ export function Sleep() {
     let s = 0, i = startDaysAgo
     while (dateSet.has(nDaysAgo(i))) { s++; i++ }
     return s
+  })()
+
+  // Best streak — longest consecutive run in all sleep logs
+  const bestStreak = (() => {
+    if (!nightLogs.length) return 0
+    const sorted = [...new Set(nightLogs.map(r => r.date))].sort()
+    let best = 0, run = 0
+    for (let i = 0; i < sorted.length; i++) {
+      if (i === 0) { run = 1; continue }
+      const prev = new Date(sorted[i - 1] + 'T12:00:00')
+      const curr = new Date(sorted[i]     + 'T12:00:00')
+      const gap  = Math.round((curr.getTime() - prev.getTime()) / 86400000)
+      run = gap === 1 ? run + 1 : 1
+      if (run > best) best = run
+    }
+    return Math.max(best, run)
   })()
 
   // Day-of-week averages (nights only)
@@ -638,12 +703,25 @@ export function Sleep() {
       <TopBar title="Sleep" />
       <PageWrapper>
 
+        {loadError && (
+          <div className="flex flex-col items-center py-12 gap-3 fade-in">
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Could not load sleep logs</p>
+            <button
+              onClick={load}
+              style={{ padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
         {/* Stats row */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
+        <div className=”grid grid-cols-4 gap-2 mb-5”>
           {[
-            { label: 'Avg Hours',  value: avg    ? avg.toFixed(1)  : '—' },
-            { label: 'Best Night', value: best   ? best.toFixed(1) : '—' },
-            { label: 'Day Streak', value: streak },
+            { label: 'Avg Hours',   value: avg    ? avg.toFixed(1)  : '—' },
+            { label: 'Best Night',  value: best   ? best.toFixed(1) : '—' },
+            { label: 'Streak',      value: streak },
+            { label: 'Best Streak', value: bestStreak },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{s.value}</p>
@@ -663,20 +741,35 @@ export function Sleep() {
         <LogNapPanel onLogged={load} />
 
         {/* Hours slept trend */}
-        {sorted.length > 0 && sorted.length < 3 && (
-          <div style={{ textAlign: 'center', padding: '14px 0 8px', color: 'var(--text-muted)', fontSize: 12 }}>
-            Log {3 - sorted.length} more night{3 - sorted.length > 1 ? 's' : ''} to unlock your trend chart
+        {chartLoading && <ChartSkeleton height={160} title="Hours Slept" />}
+        {!chartLoading && nightLogs.length === 0 && (
+          <ChartEmptyState title="Hours Slept" message="Log your first night to start tracking sleep trends" color="#818cf8" />
+        )}
+        {!chartLoading && sorted.length > 0 && sorted.length < 3 && (
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+            <p className="font-bold mb-2" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Hours Slept</p>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
+              {sorted.map(d => (
+                <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#818cf8', boxShadow: '0 0 8px #818cf8' }} />
+                  <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>{d.hours_slept?.toFixed(1)}</p>
+                </div>
+              ))}
+            </div>
+            <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
+              Log {3 - sorted.length} more night{3 - sorted.length > 1 ? 's' : ''} to unlock your trend chart
+            </p>
           </div>
         )}
-        {sorted.length >= 3 && (
+        {!chartLoading && sorted.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Hours Slept</p>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={sorted} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="sleep-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="var(--accent)" stopOpacity={0.02} />
+                    <stop offset="0%" stopColor="#818cf8" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#818cf8" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -684,21 +777,21 @@ export function Sleep() {
                 <YAxis domain={[0, 12]} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
                 <Tooltip
                   contentStyle={ttStyle} labelStyle={labelStyle} itemStyle={itemStyle}
-                  labelFormatter={(l: unknown) => typeof l === 'string' ? formatDate(l) : String(l)}
+                  labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)}
                   formatter={(v: unknown) => [`${v}h`, 'Sleep']}
                   cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
                 />
                 <ReferenceLine y={8} stroke="#27AE60" strokeDasharray="4 2" strokeOpacity={0.45} />
-                <ReferenceLine y={7} stroke="var(--accent)" strokeDasharray="4 2" strokeOpacity={0.35} />
-                <Area type="monotone" dataKey="hours_slept" stroke="var(--accent)" strokeWidth={2.5}
+                <ReferenceLine y={7} stroke="#818cf8" strokeDasharray="4 2" strokeOpacity={0.35} />
+                <Area type="monotone" dataKey="hours_slept" stroke="#818cf8" strokeWidth={2.5}
                   fill="url(#sleep-grad)"
-                  dot={{ fill: 'var(--accent)', r: 3, fillOpacity: 0.8 }}
-                  activeDot={{ r: 5, fill: 'var(--accent)', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+                  dot={{ fill: '#818cf8', r: 3, fillOpacity: 0.8 }}
+                  activeDot={{ r: 5, fill: '#818cf8', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
             <div className="flex gap-4 mt-1">
-              <span className="text-xs" style={{ color: '#27AE60' }}>── 8h goal</span>
-              <span className="text-xs" style={{ color: 'var(--accent)' }}>── 7h min</span>
+              <span className="text-xs" style={{ color: '#27AE60' }}>â”€â”€ 8h goal</span>
+              <span className="text-xs" style={{ color: 'var(--accent)' }}>â”€â”€ 7h min</span>
             </div>
           </div>
         )}
@@ -727,7 +820,7 @@ export function Sleep() {
         )}
 
         {/* History */}
-        <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>History</p>
+        <p className="card-title mb-3">History</p>
         {logs.map(entry => {
           const isNap    = entry.is_nap
           const q        = isNap ? { label: 'Nap', color: '#888' } : sleepQuality(entry.hours_slept)
@@ -735,34 +828,56 @@ export function Sleep() {
           return (
             <div
               key={entry.id}
-              className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
+              className="rounded-xl mb-2 card-animate"
               style={{ background: isNap ? 'var(--input-bg)' : 'var(--card-bg)', border: '1px solid var(--border-faint)', opacity: isNap ? 0.7 : 1 }}
             >
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: isNap ? '#555' : q.color }} />
-                <div>
-                  <p className="text-white font-semibold text-sm">
-                    {formatDate(entry.date)} <span style={{ color: '#555', fontWeight: 400 }}>({dayLabel})</span>
-                    {entry.is_nap && <span style={{ marginLeft: 6, fontSize: 10, background: 'var(--input-bg)', color: 'var(--text-muted)', padding: '1px 6px', borderRadius: 4 }}>NAP</span>}
-                  </p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                    {entry.bedtime  && `Bed ${entry.bedtime} · `}
-                    {entry.wake_time && `Up ${entry.wake_time}`}
-                  </p>
+              <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: isNap ? 'var(--text-dim)' : q.color }} />
+                  <div>
+                    <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                      {formatDate(entry.date)} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({dayLabel})</span>
+                      {entry.is_nap && <span style={{ marginLeft: 6, fontSize: 10, background: 'var(--input-bg)', color: 'var(--text-muted)', padding: '1px 6px', borderRadius: 4 }}>NAP</span>}
+                      {dreamsMap[entry.id] && <span style={{ marginLeft: 6, fontSize: 11 }} title="Had a dream">💭</span>}
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                      {entry.bedtime  && `Bed ${entry.bedtime} Â· `}
+                      {entry.wake_time && `Up ${entry.wake_time}`}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="font-bold" style={{ color: q.color, fontSize: 18 }}>{entry.hours_slept ?? 'â€”'}h</p>
+                    <p className="text-xs" style={{ color: q.color }}>{q.label}</p>
+                  </div>
+                  <button
+                    onClick={() => setEditing(entry)}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
+                  >
+                    <EditIcon size={13} color="var(--text-muted)" />
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <p className="font-bold" style={{ color: q.color, fontSize: 18 }}>{entry.hours_slept ?? '—'}h</p>
-                  <p className="text-xs" style={{ color: q.color }}>{q.label}</p>
-                </div>
-                <button
-                  onClick={() => setEditing(entry)}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
-                >
-                  <EditIcon size={13} color="var(--text-muted)" />
-                </button>
-              </div>
+              {!isNap && entry.bedtime && entry.wake_time && (() => {
+                const [bh, bm] = entry.bedtime.split(':').map(Number)
+                const [wh, wm] = entry.wake_time.split(':').map(Number)
+                const bFrac = (bh * 60 + bm) / 1440
+                const wFrac = (wh * 60 + wm) / 1440
+                const overnight = bFrac >= wFrac
+                return (
+                  <div style={{ position: 'relative', height: 3, margin: '0 16px 10px', borderRadius: 2, background: 'var(--input-bg)', overflow: 'hidden' }}>
+                    {overnight ? (
+                      <>
+                        <div style={{ position: 'absolute', left: `${bFrac * 100}%`, right: 0, top: 0, bottom: 0, borderRadius: 2, background: q.color, opacity: 0.4 }} />
+                        <div style={{ position: 'absolute', left: 0, width: `${wFrac * 100}%`, top: 0, bottom: 0, borderRadius: 2, background: q.color, opacity: 0.4 }} />
+                      </>
+                    ) : (
+                      <div style={{ position: 'absolute', left: `${bFrac * 100}%`, width: `${(wFrac - bFrac) * 100}%`, top: 0, bottom: 0, borderRadius: 2, background: q.color, opacity: 0.4 }} />
+                    )}
+                  </div>
+                )
+              })()}
             </div>
           )
         })}

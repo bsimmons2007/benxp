@@ -91,7 +91,7 @@ export function ResetPassword() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* New password */}
             <div>
-              <label style={{ display: 'block', color: '#555', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>
                 New Password
               </label>
               <div style={{ position: 'relative' }}>
@@ -111,7 +111,7 @@ export function ResetPassword() {
                   style={{
                     position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
                     background: 'none', border: 'none', cursor: 'pointer',
-                    color: showPass ? 'var(--accent)' : '#555', fontSize: 15, padding: 3,
+                    color: showPass ? 'var(--accent)' : 'var(--text-muted)', fontSize: 15, padding: 3,
                   }}
                 >
                   {showPass ? 'Hide' : 'Show'}
@@ -121,7 +121,7 @@ export function ResetPassword() {
 
             {/* Confirm password */}
             <div>
-              <label style={{ display: 'block', color: '#555', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>
                 Confirm Password
               </label>
               <input

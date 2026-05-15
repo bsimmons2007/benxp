@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
+
+const LOGO_ANIMATED_KEY = 'youxp-logo-animated'
 import { useUserName } from '../../hooks/useUserName'
 import { useNavStore } from '../../store/useNavStore'
 
@@ -24,7 +26,14 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
   const logoLabel     = title ?? (userName ? `${userName}XP` : 'YouXP')
   const logoClickable = !title
 
-  const [showLogMenu, setShowLogMenu] = useState(false)
+  const [showLogMenu,   setShowLogMenu]   = useState(false)
+  const [logoShimmer,   setLogoShimmer]   = useState(false)
+  const [logoShimmerKey, setLogoShimmerKey] = useState(0)
+  const logoDrawIn = useMemo(() => {
+    const done = sessionStorage.getItem(LOGO_ANIMATED_KEY)
+    if (!done) { sessionStorage.setItem(LOGO_ANIMATED_KEY, '1'); return true }
+    return false
+  }, [])
   const logMenuRef = useRef<HTMLDivElement>(null)
 
   // Show a one-time hint pulse on the hamburger for new users
@@ -124,11 +133,22 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
             letterSpacing: title ? '0.08em' : '0.04em',
             whiteSpace:    'nowrap',
             transition:    'opacity 0.15s ease',
+            position:      'relative',
+            overflow:      'hidden',
+            display:       'inline-block',
+            ...(logoDrawIn && !title ? {
+              animation: 'splashLogoIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 1.8s both',
+            } : {}),
           }}
-          onMouseEnter={e => { if (logoClickable) (e.target as HTMLElement).style.opacity = '0.7' }}
-          onMouseLeave={e => { if (logoClickable) (e.target as HTMLElement).style.opacity = '1' }}
+          onMouseEnter={() => {
+            if (!logoClickable) return
+            setLogoShimmer(true)
+            setLogoShimmerKey(k => k + 1)
+          }}
+          onMouseLeave={() => setLogoShimmer(false)}
         >
           {logoLabel}
+          {logoShimmer && <span key={logoShimmerKey} className="logo-shimmer-sweep" />}
         </span>
       </button>
 

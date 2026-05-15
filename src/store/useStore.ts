@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { calculateLevel, levelProgress, fetchXPAndStats, getCachedXPData, setCachedXPData } from '../lib/xp'
+import { calculateLevel, levelProgress, fetchXPAndStats, getCachedXPData, setCachedXPData, getCachedXPTimestamp } from '../lib/xp'
 import type { AppStats } from '../lib/xp'
 import { supabase } from '../lib/supabase'
 import { invalidateStreakCache } from '../hooks/useStreak'
@@ -127,17 +127,21 @@ interface AppState {
   stats:          AppStats
   recentActivity: ActivityEntry[]
 
+  // Cache metadata
+  lastUpdated: number | null
+
   // Init state
   initialized:   boolean
   _initializing: boolean
 
   // Actions
-  dismissLevelUp:  () => void
-  reset:           () => void            // wipe state so next init() re-fetches for new user
-  init:            () => Promise<void>   // full load — called once on boot
-  refreshXP:       () => Promise<void>   // XP + stats — after any logging
-  refreshActivity: () => Promise<void>   // after logging anything
-  refreshUser:     () => Promise<void>   // after updating profile
+  dismissLevelUp:          () => void
+  reset:                   () => void
+  init:                    () => Promise<void>
+  refreshXP:               () => Promise<void>
+  refreshActivity:         () => Promise<void>
+  refreshUser:             () => Promise<void>
+  addOptimisticActivity:   (entry: ActivityEntry) => void
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -150,6 +154,7 @@ export const useStore = create<AppState>((set, get) => ({
   avatarUrl:      null,
   stats:          DEFAULT_STATS,
   recentActivity: [],
+  lastUpdated:    getCachedXPTimestamp(),
   initialized:    false,
   // Set synchronously before first await so concurrent callers
   // (e.g. StrictMode double-mount) can't pass the guard while
@@ -171,6 +176,7 @@ export const useStore = create<AppState>((set, get) => ({
     avatarUrl:      null,
     stats:          DEFAULT_STATS,
     recentActivity: [],
+    lastUpdated:    null,
     initialized:    false,
     _initializing:  false,
   }),
@@ -202,6 +208,7 @@ export const useStore = create<AppState>((set, get) => ({
         fetchActivity(),
       ])
       setCachedXPData({ totalXP, stats })
+      const now = Date.now()
 
       const level    = calculateLevel(totalXP)
       const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10)
@@ -216,6 +223,7 @@ export const useStore = create<AppState>((set, get) => ({
         levelUpPending: level > lastSeen ? level : null,
         stats,
         recentActivity,
+        lastUpdated:    now,
         ...userData,
       })
     } catch (err) {
@@ -235,9 +243,10 @@ export const useStore = create<AppState>((set, get) => ({
       set({
         totalXP,
         level,
-        progress: levelProgress(totalXP),
-        loading:  false,
+        progress:    levelProgress(totalXP),
+        loading:     false,
         stats,
+        lastUpdated: Date.now(),
         ...(level > lastSeen ? { levelUpPending: level } : {}),
       })
     } catch (err) {
@@ -250,6 +259,11 @@ export const useStore = create<AppState>((set, get) => ({
     invalidateBadgeCache()
     const recentActivity = await fetchActivity()
     set({ recentActivity })
+  },
+
+  addOptimisticActivity: (entry: ActivityEntry) => {
+    const prev = get().recentActivity
+    set({ recentActivity: [entry, ...prev].slice(0, 20) })
   },
 
   refreshUser: async () => {

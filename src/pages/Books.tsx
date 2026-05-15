@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -15,15 +15,16 @@ import { useStore } from '../store/useStore'
 import { playGoalComplete } from '../lib/sounds'
 import type { Book, ToRead } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { FirstUseTip } from '../components/ui/EmptyState'
 
-// ── Types ────────────────────────────────────────────────────
+// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type SortKey = 'date_desc' | 'date_asc' | 'title_asc' | 'title_desc' | 'rating_desc' | 'rating_asc' | 'pages_desc' | 'pages_asc'
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'date_desc',   label: 'Newest first' },
   { key: 'date_asc',    label: 'Oldest first' },
-  { key: 'title_asc',   label: 'A → Z' },
-  { key: 'title_desc',  label: 'Z → A' },
+  { key: 'title_asc',   label: 'A â†’ Z' },
+  { key: 'title_desc',  label: 'Z â†’ A' },
   { key: 'rating_desc', label: 'Highest rated' },
   { key: 'rating_asc',  label: 'Lowest rated' },
   { key: 'pages_desc',  label: 'Most pages' },
@@ -31,6 +32,17 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 ]
 
 const EXTRA_GENRES_KEY = 'youxp-extra-genres'
+const SERIES_KEY = 'youxp-book-series'
+
+function getSeriesMap(): Record<string, string> {
+  try { return JSON.parse(localStorage.getItem(SERIES_KEY) ?? '{}') } catch { return {} }
+}
+function setSeriesForBook(id: string, series: string) {
+  const m = getSeriesMap()
+  if (series.trim()) m[id] = series.trim()
+  else delete m[id]
+  localStorage.setItem(SERIES_KEY, JSON.stringify(m))
+}
 
 const BASE_GENRES = [
   'Action',
@@ -151,7 +163,7 @@ const GENRE_COLORS: Record<string, string> = {
   'Essays': '#5C6BC0', 'Other': '#555',
 }
 
-// ── Star rating ──────────────────────────────────────────────
+// â”€â”€ Star rating â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Stars({ rating }: { rating: number | null }) {
   if (!rating) return null
   const full = Math.floor(rating)
@@ -160,7 +172,7 @@ function Stars({ rating }: { rating: number | null }) {
     <span className="text-sm">
       {Array.from({ length: 5 }).map((_, i) => (
         <span key={i} style={{ color: i < full ? 'var(--accent)' : half && i === full ? 'var(--accent)' : 'rgba(255,255,255,0.2)' }}>
-          {i < full ? '★' : half && i === full ? '⯨' : '☆'}
+          {i < full ? 'â˜…' : half && i === full ? 'â¯¨' : 'â˜†'}
         </span>
       ))}
       <span className="ml-1 text-xs" style={{ color: '#888' }}>{rating.toFixed(1)}</span>
@@ -177,7 +189,7 @@ function GenreChip({ genre }: { genre: string | null }) {
   )
 }
 
-// ── Mark Finished modal ──────────────────────────────────────
+// â”€â”€ Mark Finished modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: () => void; onSaved: () => void }) {
   const [date,   setDate]   = useState(today())
   const [rating, setRating] = useState('')
@@ -206,13 +218,13 @@ function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: ()
           <p style={{ color: 'var(--accent)', fontSize: 13 }}>+{XP_RATES.book_finished} XP on save</p>
         </div>
         <Input label="Date Finished" type="date" value={date} onChange={e => setDate(e.target.value)} />
-        <Input label="Rating (1–5, optional)" type="number" step="0.1" min="1" max="5" placeholder="4.5" value={rating} onChange={e => setRating(e.target.value)} />
+        <Input label="Rating (1â€“5, optional)" type="number" step="0.1" min="1" max="5" placeholder="4.5" value={rating} onChange={e => setRating(e.target.value)} />
       </div>
     </EditModal>
   )
 }
 
-// ── Edit book modal ──────────────────────────────────────────
+// â”€â”€ Edit book modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const inputCls = "px-3 py-3 rounded-lg text-white outline-none text-base w-full"
 const inputStyle = { background: 'var(--input-bg)', border: '1px solid var(--border)' }
 const labelStyle = { color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }
@@ -229,6 +241,7 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
   const [rating,   setRating]   = useState(String(book.rating ?? ''))
   const [date,     setDate]     = useState(book.date_finished ?? '')
   const [finished, setFinished] = useState(!!book.date_finished)
+  const [series,   setSeries]   = useState(() => getSeriesMap()[book.id] ?? '')
   const [saving,   setSaving]   = useState(false)
 
   async function save() {
@@ -242,6 +255,7 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
       rating:        rating ? parseFloat(rating) : null,
       date_finished: finished && date ? date : null,
     }).eq('id', book.id)
+    setSeriesForBook(book.id, series)
     setSaving(false); onSaved(); onClose()
   }
 
@@ -264,6 +278,12 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
         <div className="flex flex-col gap-1">
           <FieldLabel>Author</FieldLabel>
           <input value={author} onChange={e => setAuthor(e.target.value)} className={inputCls} style={inputStyle} placeholder="Author name" />
+        </div>
+
+        {/* Series */}
+        <div className="flex flex-col gap-1">
+          <FieldLabel>Series (optional)</FieldLabel>
+          <input value={series} onChange={e => setSeries(e.target.value)} className={inputCls} style={inputStyle} placeholder="e.g. The Stormlight Archive" />
         </div>
 
         {/* Genre */}
@@ -310,7 +330,7 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
               <input type="date" value={date} onChange={e => setDate(e.target.value)} className={inputCls} style={inputStyle} />
             </div>
             <div className="flex flex-col gap-1">
-              <FieldLabel>Rating (1–5, optional)</FieldLabel>
+              <FieldLabel>Rating (1â€“5, optional)</FieldLabel>
               <input type="number" step="0.1" min="1" max="5" value={rating} onChange={e => setRating(e.target.value)} className={inputCls} style={inputStyle} placeholder="4.5" />
             </div>
           </>
@@ -321,7 +341,7 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
   )
 }
 
-// ── Currently Reading card ───────────────────────────────────
+// â”€â”€ Currently Reading card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () => void }) {
   const [finishing, setFinishing] = useState(false)
   const [editing,   setEditing]   = useState(false)
@@ -373,7 +393,7 @@ function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () =
   )
 }
 
-// ── Finished book card ───────────────────────────────────────
+// â”€â”€ Finished book card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
   const [expanded, setExpanded] = useState(false)
   const [editing,  setEditing]  = useState(false)
@@ -413,10 +433,10 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
           <div className="mt-3 pt-3 pop-in" style={{ borderTop: '1px solid var(--border-faint)' }}>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {[
-                { label: 'Genre',    value: book.genre ?? '—' },
-                { label: 'Pages',    value: book.pages ?? '—' },
+                { label: 'Genre',    value: book.genre ?? 'â€”' },
+                { label: 'Pages',    value: book.pages ?? 'â€”' },
                 { label: 'Rating',   value: <Stars rating={book.rating} /> },
-                { label: 'Finished', value: book.date_finished ? formatDate(book.date_finished) : '—' },
+                { label: 'Finished', value: book.date_finished ? formatDate(book.date_finished) : 'â€”' },
               ].map(item => (
                 <div key={item.label}>
                   <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#444', fontFamily: 'Cormorant Garamond, serif' }}>{item.label}</p>
@@ -432,11 +452,11 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
   )
 }
 
-// ── Log Book form ────────────────────────────────────────────
+// â”€â”€ Log Book form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface BookForm {
   title: string; author: string; genre: string; customGenre: string
   pages: string; date_finished: string; rating: string
-  status: 'reading' | 'finished'
+  status: 'reading' | 'finished'; series: string
 }
 
 function LogBookPanel({ onLogged }: { onLogged: () => void }) {
@@ -452,7 +472,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
   const refreshActivity = useStore(s => s.refreshActivity)
 
   const { register, handleSubmit, watch, reset, formState: { isSubmitting, errors } } = useForm<BookForm>({
-    defaultValues: { title: '', author: '', genre: 'Fiction', customGenre: '', pages: '', date_finished: today(), rating: '', status: 'reading' },
+    defaultValues: { title: '', author: '', genre: 'Fiction', customGenre: '', pages: '', date_finished: today(), rating: '', status: 'reading', series: '' },
   })
   const genre  = watch('genre')
   const status = watch('status')
@@ -471,7 +491,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
 
     const isFinished = data.status === 'finished'
 
-    await supabase.from('books').insert({
+    const { data: inserted } = await supabase.from('books').insert({
       user_id:       user.id,
       title:         data.title,
       author:        data.author || null,
@@ -479,10 +499,11 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
       pages:         data.pages ? parseInt(data.pages) : null,
       date_finished: isFinished ? data.date_finished : null,
       rating:        isFinished && data.rating ? parseFloat(data.rating) : null,
-    })
+    }).select('id').single()
+    if (inserted && data.series.trim()) setSeriesForBook(inserted.id, data.series)
 
     if (isFinished) {
-      setToast(`+${XP_RATES.book_finished} XP — Book logged!`)
+      setToast(`+${XP_RATES.book_finished} XP â€” Book logged!`)
       await refreshXP()
       refreshActivity()
     } else {
@@ -501,11 +522,12 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Add Book'}
+        {open ? 'âœ• Cancel' : '+ Add Book'}
       </button>
 
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <FirstUseTip formKey="books" tip="Add books you're currently reading too — mark them finished later to earn +250 XP. Genre tags power the breakdown chart." />
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 
             {/* Status toggle */}
@@ -519,7 +541,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
                     color: status === s ? 'var(--base-bg)' : '#888',
                     transition: 'all 0.15s ease',
                   }}>
-                    {s === 'reading' ? 'Currently Reading' : '✓ Finished'}
+                    {s === 'reading' ? 'Currently Reading' : 'âœ“ Finished'}
                   </div>
                 </label>
               ))}
@@ -527,6 +549,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
 
             <Input label="Title" type="text" placeholder="Book title" {...register('title', { required: true })} error={errors.title ? 'Required' : undefined} />
             <Input label="Author" type="text" placeholder="Author name" {...register('author')} />
+            <Input label="Series (optional)" type="text" placeholder="e.g. The Stormlight Archive" {...register('series')} />
 
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Genre</label>
@@ -535,7 +558,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
               </select>
             </div>
             {genre === 'Other' && (
-              <Input label="Custom genre" type="text" placeholder="e.g. Horror, Western…" {...register('customGenre')} />
+              <Input label="Custom genre" type="text" placeholder="e.g. Horror, Westernâ€¦" {...register('customGenre')} />
             )}
 
             <Input label="Pages (optional)" type="number" placeholder="350" {...register('pages')} />
@@ -543,12 +566,12 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
             {status === 'finished' && (
               <>
                 <Input label="Date Finished" type="date" {...register('date_finished')} />
-                <Input label="Rating (1–5, optional)" type="number" step="0.1" min="1" max="5" placeholder="4.5" {...register('rating')} />
+                <Input label="Rating (1â€“5, optional)" type="number" step="0.1" min="1" max="5" placeholder="4.5" {...register('rating')} />
               </>
             )}
 
-            <Button type="submit" fullWidth disabled={isSubmitting}>
-              {isSubmitting ? 'Saving…' : status === 'reading' ? 'Start Reading' : 'Log Finished Book'}
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>
+              {isSubmitting ? 'Savingâ€¦' : status === 'reading' ? 'Start Reading' : 'Log Finished Book'}
             </Button>
           </form>
         </div>
@@ -558,7 +581,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── To-Read section ──────────────────────────────────────────
+// â”€â”€ To-Read section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface ToReadForm { title: string; author: string; genre: string; priority: 'High' | 'Medium' | 'Low' }
 const PRIORITY_COLORS = { High: '#E94560', Medium: '#F5A623', Low: '#27AE60' }
 
@@ -590,13 +613,13 @@ function ToReadSection() {
   return (
     <div className="mt-6">
       <div className="flex items-center justify-between mb-3">
-        <p className="font-bold text-white" style={{ fontFamily: 'Cinzel, serif', fontSize: 16 }}>To-Read List</p>
+        <p className="card-title">To-Read List</p>
         <button
           onClick={() => setShowForm(s => !s)}
           className="text-sm px-3 py-1.5 rounded-lg font-medium"
           style={{ background: showForm ? 'var(--accent)' : 'var(--input-bg)', color: showForm ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)' }}
         >
-          {showForm ? '✕' : '+ Add'}
+          {showForm ? 'âœ•' : '+ Add'}
         </button>
       </div>
 
@@ -631,7 +654,7 @@ function ToReadSection() {
               {b.priority && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: PRIORITY_COLORS[b.priority], color: 'var(--text-primary)' }}>{b.priority}</span>
               )}
-              <button onClick={() => remove(b.id)} style={{ color: '#444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <button onClick={() => remove(b.id)} style={{ color: '#444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>âœ•</button>
             </div>
           </div>
         ))}
@@ -641,16 +664,19 @@ function ToReadSection() {
   )
 }
 
-// ── Main page ────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export function Books() {
   usePageTitle('Books')
   const [allBooks, setAllBooks] = useState<Book[]>([])
   const [sort, setSort]           = useState<SortKey>('date_desc')
   const [filterGenre, setFilterGenre] = useState('All')
+  const [groupBySeries, setGroupBySeries] = useState(false)
+  const [seriesMap, setSeriesMap] = useState<Record<string, string>>(() => getSeriesMap())
 
   async function load() {
     const { data } = await supabase.from('books').select('*').order('created_at', { ascending: false })
     setAllBooks(data ?? [])
+    setSeriesMap(getSeriesMap())
   }
   useEffect(() => { load() }, [])
 
@@ -680,6 +706,27 @@ export function Books() {
     : 0
   const totalPages = finished.reduce((s, b) => s + (b.pages ?? 0), 0)
 
+  // Series groups — only books that have a series tag
+  const hasSeries = finished.some(b => seriesMap[b.id])
+  const seriesGroups: Record<string, Book[]> = {}
+  const noSeries: Book[] = []
+  for (const b of sorted) {
+    const s = seriesMap[b.id]
+    if (s) { (seriesGroups[s] = seriesGroups[s] ?? []).push(b) }
+    else noSeries.push(b)
+  }
+
+  // Genre breakdown
+  const genreCounts: Record<string, number> = {}
+  for (const b of finished) {
+    const g = b.genre ?? 'Other'
+    genreCounts[g] = (genreCounts[g] ?? 0) + 1
+  }
+  const genreBreakdown = Object.entries(genreCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+  const maxGenreCount = genreBreakdown[0]?.[1] ?? 1
+
   return (
     <>
       <TopBar title="Books" />
@@ -689,7 +736,7 @@ export function Books() {
         <div className="grid grid-cols-3 gap-2 mb-5">
           {[
             { label: 'Read',       value: finished.length },
-            { label: 'Avg Rating', value: avgRating ? avgRating.toFixed(1) + '★' : '—' },
+            { label: 'Avg Rating', value: avgRating ? avgRating.toFixed(1) + 'â˜…' : 'â€”' },
             { label: 'Pages',      value: totalPages.toLocaleString() },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -698,6 +745,28 @@ export function Books() {
             </div>
           ))}
         </div>
+
+        {/* Genre breakdown */}
+        {genreBreakdown.length > 1 && (
+          <div className="rounded-xl p-4 mb-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+            <p className="font-bold mb-4" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Genre Breakdown</p>
+            <div className="flex flex-col gap-2.5">
+              {genreBreakdown.map(([genre, count]) => {
+                const color = GENRE_COLORS[genre] ?? '#555'
+                const pct = (count / maxGenreCount) * 100
+                return (
+                  <div key={genre} className="flex items-center gap-3">
+                    <p className="shrink-0 text-right" style={{ color: 'var(--text-secondary)', width: 100, fontFamily: 'Cormorant Garamond, serif', fontSize: 12 }}>{genre}</p>
+                    <div className="flex-1 rounded-full overflow-hidden" style={{ height: 8, background: 'var(--input-bg)' }}>
+                      <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 4, transition: 'width 0.6s ease' }} />
+                    </div>
+                    <p className="shrink-0 text-xs font-bold" style={{ color, width: 16, textAlign: 'right' }}>{count}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Add book */}
         <LogBookPanel onLogged={load} />
@@ -744,8 +813,23 @@ export function Books() {
               ))}
             </div>
 
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm font-semibold" style={{ color: '#888' }}>{sorted.length} books</p>
+            <div className="flex items-center justify-between mb-4 gap-2">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold" style={{ color: '#888' }}>{sorted.length} books</p>
+                {hasSeries && (
+                  <button
+                    onClick={() => setGroupBySeries(g => !g)}
+                    className="text-xs px-2.5 py-1 rounded-lg font-semibold"
+                    style={{
+                      background: groupBySeries ? 'var(--accent)' : 'var(--input-bg)',
+                      color: groupBySeries ? 'var(--base-bg)' : 'var(--text-muted)',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    Series
+                  </button>
+                )}
+              </div>
               <select
                 value={sort}
                 onChange={e => setSort(e.target.value as SortKey)}
@@ -756,7 +840,32 @@ export function Books() {
               </select>
             </div>
 
-            {sorted.map(book => <BookCard key={book.id} book={book} onEdited={load} />)}
+            {groupBySeries ? (
+              <>
+                {Object.entries(seriesGroups).map(([seriesName, books]) => (
+                  <div key={seriesName} className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div style={{ width: 3, height: 14, borderRadius: 2, background: 'var(--accent)', flexShrink: 0 }} />
+                      <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{seriesName}</p>
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{books.length} book{books.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    {books.map(book => <BookCard key={book.id} book={book} onEdited={load} />)}
+                  </div>
+                ))}
+                {noSeries.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div style={{ width: 3, height: 14, borderRadius: 2, background: 'var(--border)', flexShrink: 0 }} />
+                      <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)', fontFamily: 'Cinzel, serif' }}>Standalone</p>
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{noSeries.length}</span>
+                    </div>
+                    {noSeries.map(book => <BookCard key={book.id} book={book} onEdited={load} />)}
+                  </div>
+                )}
+              </>
+            ) : (
+              sorted.map(book => <BookCard key={book.id} book={book} onEdited={load} />)
+            )}
           </>
         )}
 

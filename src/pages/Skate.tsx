@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -10,13 +10,13 @@ import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
-import { today, formatDate } from '../lib/utils'
+import { today, formatDate, formatDateTooltip } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import type { SkateSession } from '../types'
 import { ZapIcon, EditIcon, SkateIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// ── Log form ─────────────────────────────────────────────────
+// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface SkateForm { date: string; miles: string; duration: string; fastest_mile: string }
 
@@ -46,7 +46,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
       return
     }
     const xp = Math.round(miles * XP_RATES.skate_per_mile)
-    setToast(`+${xp} XP — Session logged!`)
+    setToast(`+${xp} XP â€” Session logged!`)
     await refreshXP()
     refreshActivity()
     reset({ date: today(), miles: '', duration: '', fastest_mile: '' })
@@ -61,7 +61,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log a Session'}
+        {open ? 'âœ• Cancel' : '+ Log a Session'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -72,7 +72,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
               <Input label="Duration (e.g. 45m)" type="text" placeholder="45m" className="flex-1" {...register('duration')} />
               <Input label="Fastest Mile (min/mi)" type="number" step="0.01" placeholder="5.15" className="flex-1" {...register('fastest_mile')} />
             </div>
-            <Button type="submit" fullWidth disabled={isSubmitting}>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>
               {isSubmitting ? 'Logging...' : 'Log Session'}
             </Button>
           </form>
@@ -83,7 +83,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Edit modal ────────────────────────────────────────────────
+// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose: () => void; onSaved: () => void }) {
   const [miles, setMiles] = useState(String(row.miles ?? ''))
@@ -107,7 +107,7 @@ function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose:
   }
 
   return (
-    <EditModal title={`Skate — ${formatDate(row.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Skate â€” ${formatDate(row.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <Input label="Miles" type="number" step="0.01" value={miles} onChange={e => setMiles(e.target.value)} />
         <div className="flex gap-3">
@@ -119,7 +119,7 @@ function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose:
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function Skate() {
   usePageTitle('Skate')
@@ -143,7 +143,7 @@ export function Skate() {
   }, null as number | null)
   const avgMiles = sessions.length > 0 ? totalMiles / sessions.length : 0
 
-  // Chart data — chronological for trend lines
+  // Chart data â€” chronological for trend lines
   const sorted = [...sessions].sort((a, b) => a.date.localeCompare(b.date))
   const milesTrend = sorted.map((s) => ({ date: s.date, miles: s.miles }))
   const fastestTrend = sorted
@@ -160,7 +160,7 @@ export function Skate() {
           {[
             { label: 'Total Miles', value: totalMiles.toFixed(1), unit: 'mi' },
             { label: 'Sessions', value: sessions.length },
-            { label: 'Fastest Mile', value: fastestMile ? fastestMile.toFixed(2) : '—', unit: fastestMile ? 'min' : '' },
+            { label: 'Fastest Mile', value: fastestMile ? fastestMile.toFixed(2) : 'â€”', unit: fastestMile ? 'min' : '' },
           ].map((s) => (
             <div key={s.label} className="rounded-xl p-3" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="section-label">{s.label}</p>
@@ -201,7 +201,7 @@ export function Skate() {
                 <Tooltip
                   contentStyle={{ background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  labelFormatter={(l: any) => typeof l === 'string' ? formatDate(l) : l}
+                  labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${Number(v).toFixed(2)} mi`, 'Miles']}
                   cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
@@ -210,7 +210,7 @@ export function Skate() {
                 <Area type="monotone" dataKey="miles" stroke="var(--accent)" strokeWidth={2.5} fill="url(#skate-miles-grad)" dot={{ fill: 'var(--accent)', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: 'var(--accent)', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
-            <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>── avg</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>â”€â”€ avg</p>
           </div>
         )}
 
@@ -233,7 +233,7 @@ export function Skate() {
                 <Tooltip
                   contentStyle={{ background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  labelFormatter={(l: any) => typeof l === 'string' ? formatDate(l) : l}
+                  labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${Number(v).toFixed(2)} min/mi`, 'Fastest Mile']}
                   cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
@@ -242,7 +242,7 @@ export function Skate() {
                 <Area type="monotone" dataKey="fastest_mile" stroke="#2ECC71" strokeWidth={2.5} fill="url(#skate-speed-grad)" dot={{ fill: '#2ECC71', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#2ECC71', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
-            {fastestMile && <p className="text-xs mt-1" style={{ color: '#2ECC71' }}>── PR {fastestMile.toFixed(2)} min/mi</p>}
+            {fastestMile && <p className="text-xs mt-1" style={{ color: '#2ECC71' }}>â”€â”€ PR {fastestMile.toFixed(2)} min/mi</p>}
           </div>
         )}
 
@@ -270,7 +270,7 @@ export function Skate() {
                     )}
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: '#888' }}>
-                    {formatDate(s.date)}{s.duration ? ` · ${s.duration}` : ''}
+                    {formatDate(s.date)}{s.duration ? ` Â· ${s.duration}` : ''}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">

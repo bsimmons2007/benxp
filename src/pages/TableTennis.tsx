@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -19,7 +19,7 @@ import type { TableTennisGame } from '../types'
 
 const ACCENT = '#38bdf8'
 
-// ── Log form ──────────────────────────────────────────────────────
+// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface TTForm {
   date: string
@@ -54,8 +54,8 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes    || null,
     })
     const xp = XP_RATES.table_tennis_game + (isWin ? XP_RATES.table_tennis_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — 🏓 Game, set, match!`) }
-    else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP â€” ðŸ“ Game, set, match!`) }
+    else        { playXPGain(); setToast(`+${xp} XP â€” Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), game_type: 'Singles', my_score: '', opp_score: '', opponent: '', notes: '' })
     setIsWin(true); setOpen(false); onLogged()
@@ -68,7 +68,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Game'}
+        {open ? 'âœ• Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -89,7 +89,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
             </div>
 
             <Input label="Opponent (optional)" type="text" placeholder="John" {...register('opponent')} />
-            <Input label="Notes (optional)"    type="text" placeholder="Best-of-5 match…" {...register('notes')} />
+            <Input label="Notes (optional)"    type="text" placeholder="Best-of-5 matchâ€¦" {...register('notes')} />
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
@@ -103,7 +103,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
               </span>
             </div>
 
-            <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
         </div>
       )}
@@ -112,7 +112,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Edit modal ────────────────────────────────────────────────────
+// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClose: () => void; onSaved: () => void }) {
   const [myScore,  setMyScore]  = useState(String(game.my_score  ?? ''))
@@ -135,7 +135,7 @@ function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClos
   }
 
   return (
-    <EditModal title={`Edit — ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€” ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -158,14 +158,15 @@ function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClos
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function TableTennis() {
   usePageTitle('Table Tennis')
-  const [games,   setGames]   = useState<TableTennisGame[]>([])
-  const [editing, setEditing] = useState<TableTennisGame | null>(null)
+  const [games,         setGames]         = useState<TableTennisGame[]>([])
+  const [editing,       setEditing]       = useState<TableTennisGame | null>(null)
+  const [formatFilter,  setFormatFilter]  = useState<'All' | 'Singles' | 'Doubles'>('All')
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -175,14 +176,16 @@ export function TableTennis() {
   }
   useEffect(() => { load() }, [])
 
-  const wins    = games.filter(g => g.win).length
-  const losses  = games.length - wins
-  const winRate = games.length ? Math.round((wins / games.length) * 100) : 0
-  const streak  = (() => { let s = 0; for (const g of games) { if (g.win) s++; else break } return s })()
+  const filteredGames = formatFilter === 'All' ? games : games.filter(g => g.game_type === formatFilter)
+  const wins    = filteredGames.filter(g => g.win).length
+  const losses  = filteredGames.length - wins
+  const winRate = filteredGames.length ? Math.round((wins / filteredGames.length) * 100) : 0
+  const streak  = (() => { let s = 0; for (const g of filteredGames) { if (g.win) s++; else break } return s })()
+  const hasBothFormats = games.some(g => g.game_type === 'Singles') && games.some(g => g.game_type === 'Doubles')
 
   // Monthly W/L chart
   const monthMap: Record<string, { wins: number; losses: number }> = {}
-  games.forEach(g => {
+  filteredGames.forEach(g => {
     const k = g.date.slice(0, 7)
     if (!monthMap[k]) monthMap[k] = { wins: 0, losses: 0 }
     if (g.win) monthMap[k].wins++; else monthMap[k].losses++
@@ -196,10 +199,30 @@ export function TableTennis() {
       <TopBar title="Table Tennis" back />
       <PageWrapper>
 
-        <div className="grid grid-cols-3 gap-2 mb-3">
+        {/* Format filter */}
+        {hasBothFormats && (
+          <div className=”flex gap-2 mb-3”>
+            {(['All', 'Singles', 'Doubles'] as const).map(f => (
+              <button
+                key={f}
+                onClick={() => setFormatFilter(f)}
+                className=”px-3 py-1.5 rounded-full text-xs font-semibold”
+                style={{
+                  background: formatFilter === f ? ACCENT : 'var(--input-bg)',
+                  color: formatFilter === f ? '#0d0d1a' : 'var(--text-muted)',
+                  border: `1px solid ${formatFilter === f ? ACCENT : 'var(--border)'}`,
+                }}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className=”grid grid-cols-3 gap-2 mb-3”>
           {[
             { label: 'Wins',     value: wins },
-            { label: 'Win Rate', value: games.length ? `${winRate}%` : '—' },
+            { label: 'Win Rate', value: filteredGames.length ? `${winRate}%` : '—' },
             { label: 'Streak',   value: streak || '—' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -209,9 +232,9 @@ export function TableTennis() {
           ))}
         </div>
 
-        {games.length > 0 && (
+        {filteredGames.length > 0 && (
           <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(56,189,248,0.07)', border: '1px solid rgba(56,189,248,0.2)' }}>
-            <span style={{ fontSize: 13, color: '#888' }}>{games.length} games</span>
+            <span style={{ fontSize: 13, color: '#888' }}>{filteredGames.length} games{formatFilter !== 'All' ? ` (${formatFilter})` : ''}</span>
             <div className="flex items-center gap-4">
               <span style={{ fontSize: 14, fontWeight: 700, color: ACCENT }}>{wins}W</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: '#f87171' }}>{losses}L</span>
@@ -237,8 +260,8 @@ export function TableTennis() {
           </div>
         )}
 
-        {games.length > 0 && <p className="section-label mb-3">History</p>}
-        {games.map(g => (
+        {filteredGames.length > 0 && <p className="section-label mb-3">History</p>}
+        {filteredGames.map(g => (
           <div key={g.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
             <div className="flex items-center gap-3">
               <div style={{
@@ -262,7 +285,7 @@ export function TableTennis() {
               <div style={{ textAlign: 'right' }}>
                 {g.my_score != null && g.opp_score != null && (
                   <p style={{ fontSize: 16, fontWeight: 800, color: g.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
-                    {g.my_score}–{g.opp_score}
+                    {g.my_score}â€“{g.opp_score}
                   </p>
                 )}
                 <p style={{ fontSize: 11, fontWeight: 600, color: g.win ? ACCENT : '#f87171' }}>

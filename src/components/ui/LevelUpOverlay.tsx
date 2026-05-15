@@ -2,14 +2,17 @@ import { useEffect, useState } from 'react'
 import { useStore } from '../../store/useStore'
 import { getLevelTitle } from '../../lib/xp'
 import { playLevelUp } from '../../lib/sounds'
+import { Confetti } from './Confetti'
 
 export function LevelUpOverlay() {
   const { levelUpPending, dismissLevelUp } = useStore()
-  const [dismissing, setDismissing] = useState(false)
+  const [dismissing,   setDismissing]   = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   useEffect(() => {
     if (!levelUpPending) return
     setDismissing(false)
+    setShowConfetti(true)
     playLevelUp()
     const t = setTimeout(handleDismiss, 4000)
     return () => clearTimeout(t)
@@ -25,14 +28,16 @@ export function LevelUpOverlay() {
   }
 
   return (
+    <>
+      {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
     <div
       onClick={handleDismiss}
+      className="level-up-bg"
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: 'radial-gradient(ellipse 80% 80% at 50% 50%, rgba(123,47,190,0.35) 0%, rgba(13,13,26,0.97) 70%)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
         cursor: 'pointer',
         opacity: dismissing ? 0 : 1,
         transform: dismissing ? 'scale(1.03)' : 'scale(1)',
@@ -120,5 +125,6 @@ export function LevelUpOverlay() {
         }
       `}</style>
     </div>
+    </>
   )
 }

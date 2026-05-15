@@ -5,6 +5,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
   fullWidth?: boolean
+  loading?: boolean
 }
 
 export function Button({
@@ -12,6 +13,8 @@ export function Button({
   variant = 'primary',
   size = 'md',
   fullWidth = false,
+  loading = false,
+  disabled = false,
   className = '',
   style,
   ...props
@@ -52,7 +55,13 @@ export function Button({
         }
 
   return (
-    <button className={base} style={{ ...variantStyle, ...style }} {...props}>
+    <button className={base} style={{ ...variantStyle, ...style }} disabled={disabled || loading} {...props}>
+      {loading && (
+        <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3" />
+          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+      )}
       {children}
     </button>
   )

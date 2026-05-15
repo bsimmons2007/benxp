@@ -9,7 +9,8 @@ import { Toast } from '../components/ui/Toast'
 import { EmptyState } from '../components/ui/EmptyState'
 import { RulerIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
-import { today, formatDate } from '../lib/utils'
+import { today, formatDate, formatDateTooltip } from '../lib/utils'
+import { XP_RATES } from '../lib/xp'
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -99,7 +100,7 @@ function MiniTrend({ data, color }: { data: { date: string; v: number }[]; color
         <YAxis domain={['auto', 'auto']} hide />
         <Tooltip
           contentStyle={{ background: 'rgba(0,0,0,0.8)', border: 'none', borderRadius: 8, fontSize: 11 }}
-          labelFormatter={(l: string) => formatDate(l)}
+          labelFormatter={(l: string) => formatDateTooltip(l)}
           formatter={(v: number) => [v.toFixed(1), '']}
         />
         <Area type="monotone" dataKey="v" stroke={color ?? 'var(--accent)'} strokeWidth={2} fill="url(#trendGrad)" dot={false} />
@@ -179,7 +180,7 @@ export function Measurements() {
     await supabase.from('body_measurements').insert(payload)
     reset({ date: today() })
     setShowForm(false)
-    setToast('Measurements saved ✓')
+    setToast(`+${XP_RATES.measurement_log} XP — Measurements saved!`)
     load()
     setSaving(false)
   }

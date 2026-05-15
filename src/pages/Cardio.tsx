@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -9,11 +9,26 @@ import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
-import { today, formatDate } from '../lib/utils'
+import { today, formatDate, formatDateTooltip } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain } from '../lib/sounds'
 import { ActivityIconComp, EditIcon, ZapIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { useStreak } from '../hooks/useStreak'
+import { ChartSkeleton, ChartEmptyState } from '../components/ui/Skeleton'
+import { FirstUseTip } from '../components/ui/EmptyState'
+
+const SPLITS_KEY = 'youxp-run-splits'
+function getSplitsMap(): Record<string, string[]> {
+  try { return JSON.parse(localStorage.getItem(SPLITS_KEY) ?? '{}') } catch { return {} }
+}
+function saveSplitsForSession(id: string, raw: string) {
+  const splits = raw.split(',').map(s => s.trim()).filter(Boolean)
+  if (!splits.length) return
+  const m = getSplitsMap()
+  m[id] = splits
+  localStorage.setItem(SPLITS_KEY, JSON.stringify(m))
+}
 
 const ACTIVITIES = [
   { key: 'run',   label: 'Run'   },
@@ -29,7 +44,7 @@ function activityMeta(key: string) {
   return ACTIVITIES.find(a => a.key === key) ?? { key: 'run', label: 'Run' }
 }
 
-// ── Unified session type ──────────────────────────────────────
+// â”€â”€ Unified session type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface Session {
   id: string
   date: string
@@ -55,7 +70,7 @@ function sessionXP(s: Session) {
     : Math.round(s.distance * cardioRate(s.activity))
 }
 
-// ── Log form ─────────────────────────────────────────────────
+// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface CardioForm {
   date: string
   activity: ActivityKey
@@ -63,15 +78,17 @@ interface CardioForm {
   duration_mins: string
   fastest_mile: string
   notes: string
+  splits: string
 }
 
 function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
   const [open, setOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
-  const refreshXP       = useStore(s => s.refreshXP)
-  const refreshActivity = useStore(s => s.refreshActivity)
+  const refreshXP             = useStore(s => s.refreshXP)
+  const refreshActivity       = useStore(s => s.refreshActivity)
+  const addOptimisticActivity = useStore(s => s.addOptimisticActivity)
   const { register, handleSubmit, watch, reset, formState: { isSubmitting } } = useForm<CardioForm>({
-    defaultValues: { date: today(), activity: 'run', distance: '', duration_mins: '', fastest_mile: '', notes: '' },
+    defaultValues: { date: today(), activity: 'run', distance: '', duration_mins: '', fastest_mile: '', notes: '', splits: '' },
   })
   const activity = watch('activity')
   const isSkate  = activity === 'skate'
@@ -82,6 +99,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
     const miles = parseFloat(data.distance)
     // Guard against NaN / negative values from cleared or malformed input (P1-13)
     if (!isFinite(miles) || miles <= 0) return
+    if (miles > 100) { setToast('⚠️ That distance looks unusually large — check the value before saving.'); return }
 
     if (isSkate) {
       const { error } = await supabase.from('skate_sessions').insert({
@@ -93,15 +111,18 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
       })
       if (error) { setToast('Failed to save. Please try again.'); return }
     } else {
-      const { error } = await supabase.from('cardio_sessions').insert({
+      const { data: inserted, error } = await supabase.from('cardio_sessions').insert({
         user_id: user.id,
         date: data.date,
         activity: data.activity,
         distance_miles: miles,
         duration_mins: data.duration_mins ? parseInt(data.duration_mins) : null,
         notes: data.notes || null,
-      })
+      }).select('id').single()
       if (error) { setToast('Failed to save. Please try again.'); return }
+      if (inserted && data.splits.trim() && data.activity === 'run') {
+        saveSplitsForSession(inserted.id, data.splits)
+      }
     }
 
     const xp = isSkate
@@ -109,10 +130,11 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
       : Math.round(miles * cardioRate(data.activity))
     const { label } = activityMeta(data.activity)
     playXPGain()
-    setToast(`+${xp} XP — ${label} logged!`)
+    setToast(`+${xp} XP â€” ${label} logged!`)
+    addOptimisticActivity({ type: 'cardio', label: `${miles.toFixed(2)} mi ${label.toLowerCase()}`, date: data.date, icon: data.activity })
     await refreshXP()
     refreshActivity()
-    reset({ date: today(), activity: data.activity, distance: '', duration_mins: '', fastest_mile: '', notes: '' })
+    reset({ date: today(), activity: data.activity, distance: '', duration_mins: '', fastest_mile: '', notes: '', splits: '' })
     setOpen(false)
     onLogged()
   }
@@ -125,10 +147,11 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Session'}
+        {open ? 'âœ• Cancel' : '+ Log Session'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <FirstUseTip formKey="cardio" tip="Each activity has its own XP rate — runs earn more than walks. Log duration to track pace. Each mile brings you closer to your next level." />
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
             <div className="flex flex-col gap-1">
@@ -150,10 +173,13 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
             {isSkate && (
               <Input label="Fastest Mile (min/mi)" type="number" step="0.01" placeholder="5.15" {...register('fastest_mile')} />
             )}
-            {!isSkate && (
-              <Input label="Notes (optional)" type="text" placeholder="Morning run…" {...register('notes')} />
+            {activity === 'run' && (
+              <Input label="Mile Splits (optional)" type="text" placeholder="8:30, 8:15, 8:45â€¦" {...register('splits')} />
             )}
-            <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging…' : 'Log Session'}</Button>
+            {!isSkate && (
+              <Input label="Notes (optional)" type="text" placeholder="Morning runâ€¦" {...register('notes')} />
+            )}
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Loggingâ€¦' : 'Log Session'}</Button>
           </form>
         </div>
       )}
@@ -162,7 +188,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Edit modal ────────────────────────────────────────────────
+// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function EditSessionModal({ session, onClose, onSaved }: { session: Session; onClose: () => void; onSaved: () => void }) {
   const [miles, setMiles]   = useState(String(session.distance))
   const [mins, setMins]     = useState(String(session.duration_mins ?? ''))
@@ -199,7 +225,7 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
 
   const { label } = activityMeta(session.activity)
   return (
-    <EditModal title={`${label} — ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${label} â€” ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-base font-medium" style={labelStyle}>Miles</label>
@@ -226,14 +252,20 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export function Cardio() {
   usePageTitle('Cardio')
+  const streak = useStreak()
   const [sessions, setSessions] = useState<Session[]>([])
   const [filter, setFilter]     = useState<ActivityKey | 'all'>('all')
   const [editing, setEditing]   = useState<Session | null>(null)
+  const [loadError, setLoadError] = useState(false)
+  const [chartLoading, setChartLoading] = useState(true)
+  const [splitsMap, setSplitsMap] = useState<Record<string, string[]>>(() => getSplitsMap())
 
   async function load() {
+    setLoadError(false)
+    setSplitsMap(getSplitsMap())
     const [cardio, skate] = await Promise.all([
       supabase.from('cardio_sessions').select('*').order('date', { ascending: false }),
       supabase.from('skate_sessions').select('*').order('date', { ascending: false }),
@@ -258,8 +290,10 @@ export function Cardio() {
       fastest_mile: r.fastest_mile,
     }))
 
+    if (cardio.error || skate.error) { setLoadError(true); setChartLoading(false); return }
     const all = [...cardioSessions, ...skateSessions].sort((a, b) => b.date.localeCompare(a.date))
     setSessions(all)
+    setChartLoading(false)
   }
 
   useEffect(() => { load() }, [])
@@ -273,10 +307,39 @@ export function Cardio() {
     .map(s => ({ date: s.date, miles: s.distance }))
   const avgMiles = filtered.length ? filtered.reduce((s, r) => s + r.distance, 0) / filtered.length : 0
 
+  // Cardio PRs (run sessions only for pace/distance)
+  const runSessions = sessions.filter(s => s.activity === 'run')
+  const fastestMileVal = runSessions.filter(s => s.fastest_mile).length
+    ? Math.min(...runSessions.filter(s => s.fastest_mile).map(s => s.fastest_mile!))
+    : null
+  const longestRun = runSessions.length
+    ? Math.max(...runSessions.map(s => s.distance))
+    : null
+  const weekTotals: Record<string, number> = {}
+  for (const s of sessions) {
+    const d = new Date(s.date + 'T12:00:00')
+    const jan1 = new Date(d.getFullYear(), 0, 1)
+    const week = `${d.getFullYear()}-W${Math.ceil(((d.getTime() - jan1.getTime()) / 86400000 + jan1.getDay() + 1) / 7)}`
+    weekTotals[week] = (weekTotals[week] ?? 0) + s.distance
+  }
+  const mostMilesWeek = Object.values(weekTotals).length ? Math.max(...Object.values(weekTotals)) : null
+
   return (
     <>
       <TopBar title="Cardio" />
       <PageWrapper>
+
+        {loadError && (
+          <div className="flex flex-col items-center py-12 gap-3 fade-in">
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Could not load sessions</p>
+            <button
+              onClick={load}
+              style={{ padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}
+            >
+              Try again
+            </button>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2 mb-4">
@@ -293,6 +356,56 @@ export function Cardio() {
             </div>
           ))}
         </div>
+
+        {/* Cardio streak */}
+        {!streak.loading && (streak.cardioCurrent > 0 || streak.cardioLongest > 0) && (
+          <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+            <div>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Cardio Streak</p>
+              <p style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif', color: streak.cardioCurrent > 0 ? '#3b82f6' : 'var(--text-muted)', lineHeight: 1.2 }}>
+                {streak.cardioCurrent} <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-muted)' }}>days</span>
+              </p>
+            </div>
+            {streak.cardioLongest > 0 && (
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Best</p>
+                <p style={{ fontSize: 18, fontWeight: 700, fontFamily: 'Cinzel, serif', color: 'var(--text-secondary)', lineHeight: 1.2 }}>
+                  {streak.cardioLongest}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Cardio PRs */}
+        {(fastestMileVal !== null || longestRun !== null || mostMilesWeek !== null) && (
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+            <p className="font-bold mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Personal Records</p>
+            <div className="grid grid-cols-3 gap-2">
+              {fastestMileVal !== null && (
+                <div className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)' }}>
+                  <p className="text-base font-bold" style={{ color: '#3b82f6', fontFamily: 'Cinzel, serif' }}>{fastestMileVal.toFixed(2)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Fastest Mile</p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>min/mi</p>
+                </div>
+              )}
+              {longestRun !== null && (
+                <div className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)' }}>
+                  <p className="text-base font-bold" style={{ color: '#3b82f6', fontFamily: 'Cinzel, serif' }}>{longestRun.toFixed(1)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Longest Run</p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>miles</p>
+                </div>
+              )}
+              {mostMilesWeek !== null && (
+                <div className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)' }}>
+                  <p className="text-base font-bold" style={{ color: '#3b82f6', fontFamily: 'Cinzel, serif' }}>{mostMilesWeek.toFixed(1)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Best Week</p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>miles</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <LogCardioPanel onLogged={load} />
 
@@ -316,12 +429,27 @@ export function Cardio() {
         </div>
 
         {/* Distance trend */}
-        {chartData.length > 0 && chartData.length < 3 && (
-          <div style={{ textAlign: 'center', padding: '14px 0 8px', color: 'var(--text-muted)', fontSize: 12 }}>
-            Log {3 - chartData.length} more session{3 - chartData.length > 1 ? 's' : ''} to unlock your trend chart
+        {chartLoading && <ChartSkeleton height={150} title="Distance Trend" />}
+        {!chartLoading && sessions.length === 0 && (
+          <ChartEmptyState title="Distance Trend" message="Log your first session to start building your trend chart" color="#3b82f6" />
+        )}
+        {!chartLoading && chartData.length > 0 && chartData.length < 3 && (
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+            <p className="font-bold mb-2" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Distance Trend</p>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
+              {chartData.map(d => (
+                <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#3b82f6', boxShadow: '0 0 8px #3b82f6' }} />
+                  <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>{d.miles.toFixed(1)}</p>
+                </div>
+              ))}
+            </div>
+            <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
+              Log {3 - chartData.length} more session{3 - chartData.length > 1 ? 's' : ''} to unlock your trend chart
+            </p>
           </div>
         )}
-        {chartData.length >= 3 && (
+        {!chartLoading && chartData.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Distance Trend</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>Avg {avgMiles.toFixed(1)} mi/session</p>
@@ -329,8 +457,8 @@ export function Cardio() {
               <AreaChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="cardio-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="var(--accent)" stopOpacity={0.02} />
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -339,13 +467,13 @@ export function Cardio() {
                 <Tooltip
                   contentStyle={{ background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  labelFormatter={(l: any) => typeof l === 'string' ? formatDate(l) : l}
+                  labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${Number(v).toFixed(2)} mi`, 'Distance']}
                   cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
                 />
-                <ReferenceLine y={avgMiles} stroke="var(--accent)" strokeDasharray="4 2" strokeOpacity={0.4} />
-                <Area type="monotone" dataKey="miles" stroke="var(--accent)" strokeWidth={2.5} fill="url(#cardio-grad)" dot={{ fill: 'var(--accent)', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: 'var(--accent)', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+                <ReferenceLine y={avgMiles} stroke="#3b82f6" strokeDasharray="4 2" strokeOpacity={0.4} />
+                <Area type="monotone" dataKey="miles" stroke="#3b82f6" strokeWidth={2.5} fill="url(#cardio-grad)" dot={{ fill: '#3b82f6', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#3b82f6', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -375,6 +503,15 @@ export function Cardio() {
                       {s.duration_mins ? ` · ${s.duration_mins}min` : ''}
                       {s.notes ? ` · ${s.notes}` : ''}
                     </p>
+                    {splitsMap[s.id] && s.source === 'cardio' && s.activity === 'run' && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {splitsMap[s.id].map((split, i) => (
+                          <span key={i} className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--input-bg)', color: '#3b82f6', fontFamily: 'Space Grotesk, sans-serif' }}>
+                            {i + 1}: {split}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>+{sessionXP(s)} XP</span>

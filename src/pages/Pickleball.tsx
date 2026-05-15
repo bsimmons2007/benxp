@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -31,7 +31,7 @@ interface PickleballGame {
   notes: string | null
 }
 
-// ── Log panel ─────────────────────────────────────────────────────
+// â”€â”€ Log panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface PbForm {
   date: string
@@ -66,8 +66,8 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes     || null,
     })
     const xp = XP_RATES.pickleball_game + (isWin ? XP_RATES.pickleball_win : 0)
-    if (isWin) { playPR(); setToast(`+${xp} XP — Dink master!`) }
-    else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
+    if (isWin) { playPR(); setToast(`+${xp} XP â€” Dink master!`) }
+    else        { playXPGain(); setToast(`+${xp} XP â€” Keep grinding!`) }
     await refreshXP()
     refreshActivity()
     reset({ date: today(), game_type: 'Singles', my_score: '', opp_score: '', opponent: '', notes: '' })
@@ -82,7 +82,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Game'}
+        {open ? 'âœ• Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -119,7 +119,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
               </span>
             </div>
 
-            <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
         </div>
       )}
@@ -128,7 +128,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Edit modal ────────────────────────────────────────────────────
+// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame; onClose: () => void; onSaved: () => void }) {
   const [myScore,  setMyScore]  = useState(String(game.my_score  ?? ''))
@@ -151,7 +151,7 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
   }
 
   return (
-    <EditModal title={`Edit — ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€” ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -174,14 +174,15 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function Pickleball() {
   usePageTitle('Pickleball')
-  const [games,   setGames]   = useState<PickleballGame[]>([])
-  const [editing, setEditing] = useState<PickleballGame | null>(null)
+  const [games,         setGames]         = useState<PickleballGame[]>([])
+  const [editing,       setEditing]       = useState<PickleballGame | null>(null)
+  const [formatFilter,  setFormatFilter]  = useState<'All' | 'Singles' | 'Doubles'>('All')
 
   async function load() {
     const { data } = await supabase.from('pickleball_games').select('*').order('date', { ascending: false })
@@ -189,18 +190,20 @@ export function Pickleball() {
   }
   useEffect(() => { load() }, [])
 
-  const wins     = games.filter(g => g.win).length
-  const losses   = games.length - wins
-  const winRate  = games.length ? Math.round((wins / games.length) * 100) : 0
+  const filteredGames = formatFilter === 'All' ? games : games.filter(g => g.game_type === formatFilter)
+  const wins     = filteredGames.filter(g => g.win).length
+  const losses   = filteredGames.length - wins
+  const winRate  = filteredGames.length ? Math.round((wins / filteredGames.length) * 100) : 0
   const streak   = (() => {
     let s = 0
-    for (const g of games) { if (g.win) s++; else break }
+    for (const g of filteredGames) { if (g.win) s++; else break }
     return s
   })()
+  const hasBothFormats = games.some(g => g.game_type === 'Singles') && games.some(g => g.game_type === 'Doubles')
 
   // Monthly win/loss bar data
   const monthMap: Record<string, { wins: number; losses: number }> = {}
-  games.forEach(g => {
+  filteredGames.forEach(g => {
     const k = g.date.slice(0, 7)
     if (!monthMap[k]) monthMap[k] = { wins: 0, losses: 0 }
     if (g.win) monthMap[k].wins++; else monthMap[k].losses++
@@ -215,11 +218,31 @@ export function Pickleball() {
       <TopBar title="Pickleball" back />
       <PageWrapper>
 
+        {/* Format filter */}
+        {hasBothFormats && (
+          <div className=”flex gap-2 mb-3”>
+            {(['All', 'Singles', 'Doubles'] as const).map(f => (
+              <button
+                key={f}
+                onClick={() => setFormatFilter(f)}
+                className=”px-3 py-1.5 rounded-full text-xs font-semibold”
+                style={{
+                  background: formatFilter === f ? ACCENT : 'var(--input-bg)',
+                  color: formatFilter === f ? '#0d0d1a' : 'var(--text-muted)',
+                  border: `1px solid ${formatFilter === f ? ACCENT : 'var(--border)'}`,
+                }}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-2 mb-3">
+        <div className=”grid grid-cols-3 gap-2 mb-3”>
           {[
             { label: 'Wins',     value: wins },
-            { label: 'Win Rate', value: games.length ? `${winRate}%` : '—' },
+            { label: 'Win Rate', value: filteredGames.length ? `${winRate}%` : '—' },
             { label: 'Streak',   value: streak || '—' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -231,7 +254,7 @@ export function Pickleball() {
 
         {/* W/L row */}
         <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.2)' }}>
-          <span style={{ fontSize: 13, color: '#888' }}>{games.length} games</span>
+          <span style={{ fontSize: 13, color: '#888' }}>{filteredGames.length} games{formatFilter !== 'All' ? ` (${formatFilter})` : ''}</span>
           <div className="flex items-center gap-4">
             <span style={{ fontSize: 14, fontWeight: 700, color: ACCENT }}>{wins}W</span>
             <span style={{ fontSize: 14, fontWeight: 700, color: '#f87171' }}>{losses}L</span>
@@ -258,10 +281,10 @@ export function Pickleball() {
         )}
 
         {/* History */}
-        {games.length > 0 && (
+        {filteredGames.length > 0 && (
           <p className="section-label mb-3">History</p>
         )}
-        {games.map(game => (
+        {filteredGames.map(game => (
           <div
             key={game.id}
             className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
@@ -274,7 +297,7 @@ export function Pickleball() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 16,
               }}>
-                {game.win ? <TrophyIcon size={16} color='#22c55e' /> : <span style={{ color: '#555', fontSize: 14 }}>○</span>}
+                {game.win ? <TrophyIcon size={16} color='#22c55e' /> : <span style={{ color: '#555', fontSize: 14 }}>â—‹</span>}
               </div>
               <div>
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>
@@ -290,7 +313,7 @@ export function Pickleball() {
               <div style={{ textAlign: 'right' }}>
                 {(game.my_score != null && game.opp_score != null) && (
                   <p style={{ fontSize: 16, fontWeight: 800, color: game.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
-                    {game.my_score}–{game.opp_score}
+                    {game.my_score}â€“{game.opp_score}
                   </p>
                 )}
                 <p style={{ fontSize: 11, color: game.win ? ACCENT : '#f87171', fontWeight: 600 }}>

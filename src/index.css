@@ -8,8 +8,9 @@
   --accent:          #F5A623;
   --accent-dim:      rgba(245,166,35,0.18);
   --accent-subtle:   rgba(245,166,35,0.08);
+  --accent-tint:     rgba(245,166,35,0.04);
 
-  /* Backgrounds */
+  /* Borders */
   --base-bg:         #0d0d1a;
   --bg-mid:          #12152b;
   --bg-deep:         #0a1020;
@@ -23,12 +24,25 @@
   --text-muted:      rgba(255,255,255,0.38);
   --text-dim:        rgba(255,255,255,0.22);
 
+  /* Backgrounds */
+  --base-bg:         #0d0d1a;
+  --bg-mid:          #12152b;
+  --bg-deep:         #0a1020;
+  --card-bg:         #161824;
+  --nav-bg:          rgba(8,10,24,0.92);
+  --input-bg:        rgba(255,255,255,0.04);
+
   /* Borders */
   --border:          rgba(255,255,255,0.09);
   --border-faint:    rgba(255,255,255,0.055);
+  --border-strong:   rgba(255,255,255,0.18);
 
   /* Elevation */
   --card-shadow:     0 2px 12px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05);
+
+  /* Font stacks */
+  --font-mono:  'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --font-serif: 'Cinzel', serif;
 
   /* Radius scale */
   --r-sm:  8px;
@@ -166,6 +180,10 @@ body::after {
   to { transform: rotate(360deg); }
 }
 .spin { animation: spin 0.8s linear infinite; display: inline-block; }
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
 @keyframes tutorialCardEnter {
   from { opacity: 0; transform: scale(0.92) translateY(6px); }
@@ -261,11 +279,19 @@ button:not(:disabled):active { transform: scale(0.97); }
 .accent-bg     { background: var(--accent) !important; }
 .accent-border { border-color: var(--accent) !important; }
 
+/* ── Card / section titles (Cinzel, consistent across all pages) ── */
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 /* ── Section label ── */
 .section-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -284,6 +310,117 @@ button:not(:disabled):active { transform: scale(0.97); }
   from { transform: scaleX(0); opacity: 0; }
   to   { transform: scaleX(1); opacity: 1; }
 }
+
+/* ── Level up overlay background shift ── */
+@keyframes levelUpBgShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.level-up-bg {
+  background: linear-gradient(135deg,
+    rgba(123,47,190,0.4) 0%,
+    rgba(245,166,35,0.2) 25%,
+    rgba(79,70,229,0.4) 50%,
+    rgba(168,85,247,0.3) 75%,
+    rgba(123,47,190,0.4) 100%
+  );
+  background-size: 300% 300%;
+  animation: levelUpBgShift 5s ease infinite;
+}
+
+/* ── Logo hover shimmer ── */
+@keyframes logoShimmer {
+  0%   { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(220%) skewX(-18deg); }
+}
+.logo-shimmer-sweep {
+  pointer-events: none;
+  position: absolute; top: -2px; bottom: -2px; left: 0;
+  width: 45%; border-radius: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+  animation: logoShimmer 0.45s ease-out forwards;
+}
+
+/* ── Theme swatch hover sweep ── */
+@keyframes swatchSweep {
+  0%   { transform: translateX(-100%) skewX(-12deg); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translateX(200%) skewX(-12deg); opacity: 0; }
+}
+.swatch-sweep {
+  pointer-events: none;
+  position: absolute; top: 0; left: 0; width: 50%; height: 100%;
+  background: rgba(255,255,255,0.35);
+  animation: swatchSweep 0.35s ease-out forwards;
+}
+
+/* ── Top load bar ── */
+@keyframes topLoadBar {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(-20%); }
+  100% { transform: translateX(0%); }
+}
+.top-load-bar { animation: topLoadBar 1.4s cubic-bezier(0.4,0,0.2,1) infinite; }
+
+/* ── Chart today-dot pulse ── */
+@keyframes chartDotPulse {
+  0%, 100% { r: 10; opacity: 0.12; }
+  50%       { r: 16; opacity: 0.05; }
+}
+.chart-today-pulse { animation: chartDotPulse 2s ease-in-out infinite; }
+
+/* ── Login panel scanline scroll ── */
+@keyframes scanlineScroll {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(200vh); }
+}
+.login-scanline {
+  position: absolute; left: 0; right: 0; top: 0;
+  height: 180px; pointer-events: none; z-index: 2;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(255,255,255,0.025) 40%,
+    rgba(255,255,255,0.045) 50%,
+    rgba(255,255,255,0.025) 60%,
+    transparent 100%
+  );
+  animation: scanlineScroll 8s linear infinite;
+}
+
+/* ── Login mode switch pulse ── */
+@keyframes modeSwitchPulse {
+  0%   { box-shadow: 0 24px 64px rgba(0,0,0,0.45); }
+  35%  { box-shadow: 0 24px 64px rgba(0,0,0,0.45), 0 0 0 3px var(--accent-dim); }
+  100% { box-shadow: 0 24px 64px rgba(0,0,0,0.45); }
+}
+.mode-switch-pulse { animation: modeSwitchPulse 0.4s ease both; }
+
+/* ── Login success flash-out ── */
+@keyframes loginSuccessOut {
+  0%   { transform: scale(1)    translateY(0);    opacity: 1; }
+  30%  { transform: scale(1.03) translateY(-4px); opacity: 1; box-shadow: 0 0 40px var(--accent-dim); }
+  100% { transform: scale(0.94) translateY(12px);  opacity: 0; }
+}
+.login-success-out {
+  animation: loginSuccessOut 0.42s cubic-bezier(0.4,0,0.2,1) forwards;
+  pointer-events: none;
+}
+
+/* ── Checkbox/toggle animations ── */
+@keyframes checkPop {
+  0%   { transform: scale(0) rotate(-8deg); opacity: 0; }
+  60%  { transform: scale(1.25) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.check-pop { animation: checkPop 0.22s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+@keyframes toggleThumb {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.85); }
+  100% { transform: scale(1); }
+}
+.toggle-bounce { animation: toggleThumb 0.18s ease both; }
 
 /* ── Scrollbar hide ── */
 ::-webkit-scrollbar { display: none; }
@@ -360,6 +497,26 @@ html[data-mode="light"] .card-hover:hover {
 /* Gradient text in light mode */
 html[data-mode="light"] .gradient-text {
   background: linear-gradient(135deg, var(--accent), #111118 80%);
+}
+
+/* ── Cold-start splash ── */
+@keyframes splashFadeOut {
+  0%   { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes splashLogoIn {
+  0%   { opacity: 0; letter-spacing: 0.5em; transform: scale(0.85); }
+  60%  { opacity: 1; letter-spacing: 0.08em; transform: scale(1.02); }
+  100% { opacity: 1; letter-spacing: 0.05em; transform: scale(1); }
+}
+@keyframes splashSubIn {
+  0%,40% { opacity: 0; transform: translateY(8px); }
+  100%   { opacity: 1; transform: translateY(0); }
+}
+@keyframes splashBarFill {
+  0%   { width: 0%; }
+  100% { width: 100%; }
 }
 
 /* ── Reduced motion ── */

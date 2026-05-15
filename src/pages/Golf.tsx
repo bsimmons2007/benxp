@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -18,23 +18,44 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import type { GolfRound } from '../types'
 
 const ACCENT = '#34d399'
+const COURSES_KEY = 'youxp-golf-courses'
+const SCORECARDS_KEY = 'youxp-golf-scorecards'
 
-// ── Helpers ───────────────────────────────────────────────────────
+function getSavedCourses(): string[] {
+  try { return JSON.parse(localStorage.getItem(COURSES_KEY) ?? '[]') } catch { return [] }
+}
+function saveCourse(name: string) {
+  if (!name.trim()) return
+  const courses = getSavedCourses()
+  if (!courses.includes(name.trim())) {
+    localStorage.setItem(COURSES_KEY, JSON.stringify([name.trim(), ...courses].slice(0, 20)))
+  }
+}
+function getScorecardsMap(): Record<string, number[]> {
+  try { return JSON.parse(localStorage.getItem(SCORECARDS_KEY) ?? '{}') } catch { return {} }
+}
+function saveScorecardForRound(id: string, holes: number[]) {
+  const m = getScorecardsMap()
+  m[id] = holes
+  localStorage.setItem(SCORECARDS_KEY, JSON.stringify(m))
+}
+
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function vsParLabel(diff: number): string {
   if (diff === 0) return 'E'
   return diff > 0 ? `+${diff}` : String(diff)
 }
 function vsParColor(diff: number): string {
-  if (diff < 0) return '#34d399'   // under par → green
-  if (diff === 0) return '#f5a623' // even → gold
-  return '#f87171'                  // over par → red
+  if (diff < 0) return '#34d399'   // under par â†’ green
+  if (diff === 0) return '#f5a623' // even â†’ gold
+  return '#f87171'                  // over par â†’ red
 }
 function defaultPar(holes: number) {
   return holes === 9 ? 36 : 72
 }
 
-// ── Log form ──────────────────────────────────────────────────────
+// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface GolfForm {
   date: string
@@ -51,6 +72,11 @@ interface GolfForm {
 function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [showScorecard, setShowScorecard] = useState(false)
+  const [holeScores, setHoleScores] = useState<(number | '')[]>(Array(18).fill(''))
+  const [savedCourses, setSavedCourses] = useState<string[]>(() => getSavedCourses())
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const courseRef = useRef<HTMLInputElement>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
   const { register, handleSubmit, reset, watch, setValue, formState: { isSubmitting } } = useForm<GolfForm>({
@@ -58,10 +84,19 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
   })
 
   const holes = watch('holes')
+  const holeCount = parseInt(holes) || 18
   // Auto-update par when holes changes
   useEffect(() => {
     setValue('par', String(defaultPar(parseInt(holes) || 18)))
-  }, [holes, setValue])
+    setHoleScores(Array(holeCount).fill(''))
+  }, [holes, setValue]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-sum hole scores to score field
+  useEffect(() => {
+    if (!showScorecard) return
+    const total = holeScores.reduce((s: number, v) => s + (typeof v === 'number' ? v : 0), 0)
+    if (total > 0) setValue('score', String(total))
+  }, [holeScores, showScorecard, setValue])
 
   const onSubmit = async (data: GolfForm) => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -69,7 +104,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
     const score = parseInt(data.score)
     const par   = parseInt(data.par) || defaultPar(parseInt(data.holes) || 18)
     const diff  = score - par
-    await supabase.from('golf_rounds').insert({
+    const { data: inserted } = await supabase.from('golf_rounds').insert({
       user_id:           user.id,
       date:              data.date,
       course:            data.course,
@@ -80,13 +115,21 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
       fairways_hit:      data.fairways_hit      ? parseInt(data.fairways_hit)      : null,
       fairways_possible: data.fairways_possible ? parseInt(data.fairways_possible) : null,
       notes:             data.notes             || null,
-    })
+    }).select('id').single()
+    saveCourse(data.course)
+    setSavedCourses(getSavedCourses())
+    if (inserted && showScorecard) {
+      const filled = holeScores.map(v => typeof v === 'number' ? v : 0)
+      saveScorecardForRound(inserted.id, filled)
+    }
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.golf_under_par : 0
     const xp = XP_RATES.golf_round + underParBonus
-    if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} 🏌️ Under par!`) }
-    else          { playXPGain(); setToast(`+${xp} XP — Round logged (${vsParLabel(diff)})`) }
+    if (diff < 0) { playPR(); setToast(+{xp} XP — {vsParLabel(diff)} 🌿 Under par!) }
+    else          { playXPGain(); setToast(+{xp} XP — Round logged ({vsParLabel(diff)})) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), course: '', holes: '18', score: '', par: '72', putts: '', fairways_hit: '', fairways_possible: '', notes: '' })
+    setHoleScores(Array(18).fill(''))
+    setShowScorecard(false)
     setOpen(false); onLogged()
   }
 
@@ -97,13 +140,42 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Round'}
+        {open ? 'âœ• Cancel' : '+ Log Round'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
-            <Input label="Course" type="text" placeholder="Papago Golf Course" {...register('course', { required: true })} />
+
+            {/* Course with saved suggestions */}
+            <div className="flex flex-col gap-1 relative">
+              <label className="section-label">Course</label>
+              <input
+                ref={courseRef}
+                type="text"
+                placeholder="Papago Golf Course"
+                {...register('course', { required: true })}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                className="px-3 py-3 rounded-lg text-white outline-none text-base w-full"
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}
+              />
+              {showSuggestions && savedCourses.length > 0 && (
+                <div className="absolute top-full left-0 right-0 z-20 rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', marginTop: 2, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                  {savedCourses.slice(0, 6).map(c => (
+                    <button
+                      key={c}
+                      type="button"
+                      onMouseDown={() => { setValue('course', c); setShowSuggestions(false) }}
+                      className="w-full text-left px-3 py-2.5 text-sm"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-faint)' }}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Holes + Par */}
             <div className="flex gap-3">
@@ -118,6 +190,43 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="Score" type="number" placeholder="82" className="flex-1" {...register('score', { required: true })} />
             </div>
 
+            {/* Per-hole scorecard toggle */}
+            <button
+              type="button"
+              onClick={() => setShowScorecard(s => !s)}
+              className="text-sm font-semibold text-left"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: showScorecard ? 'var(--accent)' : 'var(--text-muted)', padding: 0 }}
+            >
+              {showScorecard ? '▾ Hide scorecard' : '▸ Enter per-hole scores'}
+            </button>
+            {showScorecard && (
+              <div className="rounded-xl p-3" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
+                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--text-muted)' }}>Per-hole scores (auto-sums to total)</p>
+                <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${Math.min(holeCount, 9)}, 1fr)` }}>
+                  {Array.from({ length: holeCount }, (_, i) => (
+                    <div key={i} className="flex flex-col items-center gap-0.5">
+                      <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>{i + 1}</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={holeScores[i] === '' ? '' : String(holeScores[i])}
+                        onChange={e => {
+                          const v = e.target.value === '' ? '' : parseInt(e.target.value)
+                          setHoleScores(prev => { const next = [...prev]; next[i] = v as number | ''; return next })
+                        }}
+                        className="w-full text-center rounded text-sm font-bold outline-none"
+                        style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '4px 2px' }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs mt-2 text-right" style={{ color: 'var(--accent)' }}>
+                  Total: {holeScores.reduce((s: number, v) => s + (typeof v === 'number' ? v : 0), 0)}
+                </p>
+              </div>
+            )}
+
             {/* Optional stats */}
             <div className="flex gap-3">
               <Input label="Putts (opt)" type="number" placeholder="32" className="flex-1" {...register('putts')} />
@@ -125,8 +234,8 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="FWY Tot" type="number" placeholder="14" className="flex-1" {...register('fairways_possible')} />
             </div>
 
-            <Input label="Notes (optional)" type="text" placeholder="Windy, back nine was tough…" {...register('notes')} />
-            <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Round'}</Button>
+            <Input label="Notes (optional)" type="text" placeholder="Windy, back nine was toughâ€¦" {...register('notes')} />
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Round'}</Button>
           </form>
         </div>
       )}
@@ -135,7 +244,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Edit modal ────────────────────────────────────────────────────
+// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose: () => void; onSaved: () => void }) {
   const [score, setScore] = useState(String(round.score))
@@ -156,7 +265,7 @@ function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose:
   }
 
   return (
-    <EditModal title={`${round.course} — ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${round.course} â€” ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -173,7 +282,7 @@ function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose:
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -181,12 +290,14 @@ export function Golf() {
   usePageTitle('Golf')
   const [rounds,  setRounds]  = useState<GolfRound[]>([])
   const [editing, setEditing] = useState<GolfRound | null>(null)
+  const [scorecardMap, setScorecardMap] = useState<Record<string, number[]>>(() => getScorecardsMap())
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const { data } = await supabase.from('golf_rounds').select('*').eq('user_id', user.id).order('date', { ascending: false })
     setRounds(data ?? [])
+    setScorecardMap(getScorecardsMap())
   }
   useEffect(() => { load() }, [])
 
@@ -194,7 +305,7 @@ export function Golf() {
   const bestDiff  = rounds.length ? Math.min(...diffs) : null
   const avgDiff   = rounds.length ? Math.round((diffs.reduce((a, b) => a + b, 0) / diffs.length) * 10) / 10 : null
 
-  // Trend chart data — most recent 10 rounds reversed to chronological
+  // Trend chart data â€” most recent 10 rounds reversed to chronological
   const chartData = [...rounds].reverse().slice(-12).map(r => ({
     label: formatDate(r.date).slice(0, 6),
     vsPar: r.score - r.par,
@@ -214,9 +325,9 @@ export function Golf() {
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
-            { label: 'Rounds',   value: rounds.length || '—' },
-            { label: 'Best',     value: bestDiff !== null ? vsParLabel(bestDiff) : '—', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
-            { label: 'Avg',      value: avgDiff  !== null ? vsParLabel(Math.round(avgDiff)) : '—', color: avgDiff !== null ? vsParColor(Math.round(avgDiff)) : undefined },
+            { label: 'Rounds',   value: rounds.length || 'â€”' },
+            { label: 'Best',     value: bestDiff !== null ? vsParLabel(bestDiff) : 'â€”', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
+            { label: 'Avg',      value: avgDiff  !== null ? vsParLabel(Math.round(avgDiff)) : 'â€”', color: avgDiff !== null ? vsParColor(Math.round(avgDiff)) : undefined },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: s.color ?? ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
@@ -242,7 +353,7 @@ export function Golf() {
         {chartData.length >= 2 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Score vs Par</p>
-            <p className="section-label mb-3">Lower is better · green = under par</p>
+            <p className="section-label mb-3">Lower is better Â· green = under par</p>
             <ResponsiveContainer width="100%" height={140}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -287,9 +398,18 @@ export function Golf() {
                 <div>
                   <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>{r.course}</p>
                   <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>
-                    {formatDate(r.date)} · {r.holes}H
+                    {formatDate(r.date)} Â· {r.holes}H
                     {r.putts != null && <span style={{ marginLeft: 6 }}>{r.putts} putts</span>}
                   </p>
+                  {scorecardMap[r.id] && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {scorecardMap[r.id].map((s, i) => (
+                        <span key={i} style={{ fontSize: 9, padding: '1px 4px', borderRadius: 3, background: 'var(--input-bg)', color: 'var(--text-muted)' }}>
+                          {i+1}:{s}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-3">

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { StrengthMilestone } from '../../lib/xp'
 import { TrophyIcon, FlameIcon } from './Icon'
+import { Confetti } from './Confetti'
 
 interface Props {
   milestone: StrengthMilestone
@@ -11,7 +12,8 @@ interface Props {
 const MILESTONE_DURATION = 5000
 
 export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
-  const [visible, setVisible] = useState(false)
+  const [visible,      setVisible]      = useState(false)
+  const [showConfetti, setShowConfetti] = useState(true)
   const drainDuration = useRef(MILESTONE_DURATION)
 
   useEffect(() => {
@@ -31,12 +33,14 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
   }
 
   return (
+    <>
+      {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
     <div
       onClick={dismiss}
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(0,0,0,0.75)',
+        background: `linear-gradient(160deg, rgba(245,166,35,0.08) 0%, rgba(0,0,0,0.78) 40%, rgba(0,0,0,0.78) 100%)`,
         backdropFilter: 'blur(10px)',
         transition: 'opacity 0.35s ease',
         opacity: visible ? 1 : 0,
@@ -122,5 +126,6 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
         </div>
       </div>
     </div>
+    </>
   )
 }

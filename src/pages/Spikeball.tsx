@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -19,7 +19,7 @@ import type { SpikeballGame } from '../types'
 
 const ACCENT = '#fb923c'
 
-// ── Log form ──────────────────────────────────────────────────────
+// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface SBForm {
   date: string
@@ -54,8 +54,8 @@ function LogSBPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes     || null,
     })
     const xp = XP_RATES.spikeball_game + (isWin ? XP_RATES.spikeball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — 🟠 Spike!`) }
-    else        { playXPGain(); setToast(`+${xp} XP — Keep it up!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP â€” ðŸŸ  Spike!`) }
+    else        { playXPGain(); setToast(`+${xp} XP â€” Keep it up!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), my_score: '', opp_score: '', partner: '', opponents: '', notes: '' })
     setIsWin(true); setOpen(false); onLogged()
@@ -68,7 +68,7 @@ function LogSBPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Game'}
+        {open ? 'âœ• Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -78,9 +78,9 @@ function LogSBPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="My Score"  type="number" placeholder="21" className="flex-1" {...register('my_score')} />
               <Input label="Opp Score" type="number" placeholder="18" className="flex-1" {...register('opp_score')} />
             </div>
-            <Input label="Partner (optional)"   type="text" placeholder="Name…"    {...register('partner')} />
-            <Input label="Opponents (optional)" type="text" placeholder="Names…"   {...register('opponents')} />
-            <Input label="Notes (optional)"     type="text" placeholder="Location…" {...register('notes')} />
+            <Input label="Partner (optional)"   type="text" placeholder="Nameâ€¦"    {...register('partner')} />
+            <Input label="Opponents (optional)" type="text" placeholder="Namesâ€¦"   {...register('opponents')} />
+            <Input label="Notes (optional)"     type="text" placeholder="Locationâ€¦" {...register('notes')} />
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
@@ -92,7 +92,7 @@ function LogSBPanel({ onLogged }: { onLogged: () => void }) {
               </span>
             </div>
 
-            <Button type="submit" fullWidth disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
         </div>
       )}
@@ -101,7 +101,7 @@ function LogSBPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// ── Edit modal ────────────────────────────────────────────────────
+// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function EditSBModal({ game, onClose, onSaved }: { game: SpikeballGame; onClose: () => void; onSaved: () => void }) {
   const [myScore,  setMyScore]  = useState(String(game.my_score  ?? ''))
@@ -124,7 +124,7 @@ function EditSBModal({ game, onClose, onSaved }: { game: SpikeballGame; onClose:
   }
 
   return (
-    <EditModal title={`Edit — ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€” ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -147,7 +147,7 @@ function EditSBModal({ game, onClose, onSaved }: { game: SpikeballGame; onClose:
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────
+// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -188,8 +188,8 @@ export function Spikeball() {
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
             { label: 'Wins',     value: wins },
-            { label: 'Win Rate', value: games.length ? `${winRate}%` : '—' },
-            { label: 'Streak',   value: streak || '—' },
+            { label: 'Win Rate', value: games.length ? `${winRate}%` : 'â€”' },
+            { label: 'Streak',   value: streak || 'â€”' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
@@ -248,7 +248,7 @@ export function Spikeball() {
               <div style={{ textAlign: 'right' }}>
                 {g.my_score != null && g.opp_score != null && (
                   <p style={{ fontSize: 16, fontWeight: 800, color: g.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
-                    {g.my_score}–{g.opp_score}
+                    {g.my_score}â€“{g.opp_score}
                   </p>
                 )}
                 <p style={{ fontSize: 11, fontWeight: 600, color: g.win ? ACCENT : '#f87171' }}>

@@ -92,17 +92,21 @@ async function compressAvatar(file: File): Promise<string> {
 
 
 function ThemeSquare({ theme, active, onSelect }: { theme: Theme; active: boolean; onSelect: () => void }) {
+  const [sweeping, setSweeping] = useState(false)
+  const [sweepKey, setSweepKey] = useState(0)
   return (
     <button
       onClick={onSelect}
       title={theme.name}
       className="relative rounded-lg transition-all"
+      onMouseEnter={() => { setSweeping(true); setSweepKey(k => k + 1) }}
+      onMouseLeave={() => setSweeping(false)}
       style={{
         width: 40, height: 40,
         background: theme.baseBg,
         border: active ? `2.5px solid ${theme.accent}` : '2px solid var(--border)',
         boxShadow: active ? `0 0 12px ${theme.accent}88` : 'none',
-        transform: active ? 'scale(1.12)' : 'scale(1)',
+        transform: active ? 'scale(1.12)' : sweeping ? 'scale(1.06)' : 'scale(1)',
         overflow: 'hidden',
         flexShrink: 0,
       }}
@@ -114,6 +118,8 @@ function ThemeSquare({ theme, active, onSelect }: { theme: Theme; active: boolea
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: 10, height: 10, borderRadius: '50%', background: theme.accent, boxShadow: `0 0 6px ${theme.accent}` }} />
       </div>
+      {/* Hover shimmer sweep */}
+      {sweeping && <div key={sweepKey} className="swatch-sweep" />}
     </button>
   )
 }
@@ -275,8 +281,22 @@ export function Settings() {
   // Reusable toggle pill
   function Toggle({ value, onToggle }: { value: boolean; onToggle: () => void }) {
     return (
-      <button onClick={onToggle} className="relative rounded-full transition-all duration-200 shrink-0" style={{ width: 44, height: 26, background: value ? 'var(--accent)' : 'var(--border)' }}>
-        <div style={{ position: 'absolute', top: 3, left: value ? 21 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left 0.2s ease' }} />
+      <button
+        onClick={onToggle}
+        className="relative rounded-full shrink-0"
+        style={{
+          width: 44, height: 26,
+          background: value ? 'var(--accent)' : 'var(--border)',
+          boxShadow: value ? '0 0 8px var(--accent-dim)' : 'none',
+          transition: 'background 0.2s ease, box-shadow 0.2s ease',
+        }}
+      >
+        <div style={{
+          position: 'absolute', top: 3, left: value ? 21 : 3,
+          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+          transition: 'left 0.2s cubic-bezier(0.34,1.56,0.64,1)',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+        }} />
       </button>
     )
   }

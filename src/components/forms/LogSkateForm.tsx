@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+﻿import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { XP_RATES } from '../../lib/xp'
@@ -36,7 +36,7 @@ export function LogSkateForm() {
     })
 
     const xp = Math.round(miles * XP_RATES.skate_per_mile)
-    setToast(`+${xp} XP — Skate logged!`)
+    setToast(`+${xp} XP â€” Skate logged!`)
     await refreshXP()
     reset({ date: today(), miles: '', duration: '', fastest_mile: '' })
   }
@@ -47,7 +47,7 @@ export function LogSkateForm() {
       <Input label="Miles" type="number" step="0.01" placeholder="5.5" {...register('miles', { required: true })} />
       <Input label="Duration (e.g. 45m)" type="text" placeholder="45m" {...register('duration')} />
       <Input label="Fastest Mile (min/mi)" type="number" step="0.01" placeholder="5.15" {...register('fastest_mile')} />
-      <Button type="submit" fullWidth disabled={isSubmitting}>
+      <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>
         {isSubmitting ? 'Logging...' : 'Log Skate Session'}
       </Button>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 
 interface EmptyStateProps {
@@ -5,11 +6,18 @@ interface EmptyStateProps {
   title:   string
   sub:     string
   action?: { label: string; onClick: () => void }
+  dashed?: boolean
 }
 
-export function EmptyState({ icon, title, sub, action }: EmptyStateProps) {
+export function EmptyState({ icon, title, sub, action, dashed = true }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center text-center py-16 px-6 fade-in">
+    <div
+      className="flex flex-col items-center justify-center text-center py-10 px-6 fade-in"
+      style={dashed ? {
+        border: '1.5px dashed var(--border)',
+        borderRadius: 14,
+      } : undefined}
+    >
       <div
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -49,6 +57,33 @@ export function EmptyState({ icon, title, sub, action }: EmptyStateProps) {
           {action.label}
         </button>
       )}
+    </div>
+  )
+}
+
+const FIRST_USE_KEY_PREFIX = 'youxp-first-use-'
+
+export function FirstUseTip({ formKey, tip }: { formKey: string; tip: string }) {
+  const lsKey = FIRST_USE_KEY_PREFIX + formKey
+  const [visible, setVisible] = useState(() => !localStorage.getItem(lsKey))
+
+  if (!visible) return null
+
+  function dismiss() {
+    localStorage.setItem(lsKey, '1')
+    setVisible(false)
+  }
+
+  return (
+    <div className="flex items-start gap-3 rounded-xl px-3 py-2.5 mb-1 fade-in" style={{
+      background: 'var(--accent-subtle)', border: '1px solid var(--accent-dim)',
+    }}>
+      <span style={{ fontSize: 14, flexShrink: 0 }}>💡</span>
+      <p style={{ fontSize: 11, color: 'var(--accent)', lineHeight: 1.5, flex: 1 }}>{tip}</p>
+      <button
+        onClick={dismiss}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', fontSize: 14, lineHeight: 1, flexShrink: 0, padding: 0, opacity: 0.7 }}
+      >✕</button>
     </div>
   )
 }

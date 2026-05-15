@@ -319,8 +319,7 @@ function BadgeTile({ badge }: { badge: Badge }) {
           ? '1px solid var(--border)'
           : '1px solid var(--border-faint)',
         boxShadow: badge.earned ? '0 4px 16px rgba(0,0,0,0.25)' : 'none',
-        opacity: badge.earned ? 1 : 0.35,
-        filter: badge.earned ? 'none' : 'grayscale(1)',
+        filter: badge.earned ? 'none' : 'grayscale(1) brightness(0.55)',
         transition: 'transform 0.15s ease, box-shadow 0.15s ease',
         transform: hover && badge.earned ? 'translateY(-2px) scale(1.05)' : 'none',
         cursor: 'default',
@@ -445,7 +444,7 @@ function ActivityHeatmap() {
   return (
     <Card className="mb-5">
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
-        <p style={{ color: '#ccc', fontFamily: 'Cinzel, serif', fontSize: 14, fontWeight: 700, letterSpacing: '0.05em' }}>
+        <p style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 700, letterSpacing: '0.05em' }}>
           {year} Activity
         </p>
         {loaded && (
@@ -498,11 +497,11 @@ function ActivityHeatmap() {
       )}
       {/* Legend */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, justifyContent: 'flex-end' }}>
-        <span style={{ fontSize: 9, color: '#555' }}>Less</span>
+        <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>Less</span>
         {['rgba(255,255,255,0.07)','rgba(245,166,35,0.30)','rgba(245,166,35,0.55)','rgba(245,166,35,0.75)','rgba(245,166,35,0.95)'].map((bg, i) => (
           <div key={i} style={{ width: CELL, height: CELL, borderRadius: 2, background: bg }} />
         ))}
-        <span style={{ fontSize: 9, color: '#555' }}>More</span>
+        <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>More</span>
       </div>
     </Card>
   )
@@ -576,6 +575,74 @@ function useLifetimeStats() {
   return s
 }
 
+// ── Level avatar tiers ────────────────────────────────────────
+const AVATAR_TIERS = [
+  { minLevel:  1, emoji: '🌱', title: 'Seedling',     desc: 'Just starting out. Every rep counts.',    aura: '#4ade80' },
+  { minLevel:  6, emoji: '⚔️', title: 'Warrior',      desc: 'You fight for every gain.',               aura: '#94a3b8' },
+  { minLevel: 11, emoji: '🛡️', title: 'Knight',       desc: 'Discipline is your armor.',               aura: '#60a5fa' },
+  { minLevel: 21, emoji: '🔥', title: 'Blazer',       desc: 'Momentum catches fire.',                  aura: '#fb923c' },
+  { minLevel: 31, emoji: '⚡', title: 'Striker',      desc: 'You move with electric purpose.',         aura: '#facc15' },
+  { minLevel: 41, emoji: '🌊', title: 'Tidal',        desc: 'Unstoppable, consistent force.',          aura: '#38bdf8' },
+  { minLevel: 51, emoji: '🦅', title: 'Apex',         desc: 'Above the grind. Soaring.',               aura: '#a78bfa' },
+  { minLevel: 66, emoji: '🌟', title: 'Legend',       desc: 'Your name echoes in the gym.',            aura: '#fbbf24' },
+  { minLevel: 81, emoji: '👑', title: 'Sovereign',    desc: 'You rule your domain.',                   aura: '#f59e0b' },
+  { minLevel: 96, emoji: '💠', title: 'Godlike',      desc: 'Transcendent. Few reach this height.',    aura: '#e879f9' },
+]
+
+function getAvatarTier(level: number) {
+  for (let i = AVATAR_TIERS.length - 1; i >= 0; i--) {
+    if (level >= AVATAR_TIERS[i].minLevel) return { ...AVATAR_TIERS[i], index: i }
+  }
+  return { ...AVATAR_TIERS[0], index: 0 }
+}
+
+function LevelAvatar({ level }: { level: number }) {
+  const tier     = getAvatarTier(level)
+  const nextTier = AVATAR_TIERS[tier.index + 1]
+  const pctToNext = nextTier
+    ? ((level - tier.minLevel) / (nextTier.minLevel - tier.minLevel)) * 100
+    : 100
+
+  return (
+    <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+      <div className="flex items-center gap-4">
+        {/* Avatar orb */}
+        <div style={{
+          position: 'relative', flexShrink: 0,
+          width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            position: 'absolute', inset: 0, borderRadius: '50%',
+            background: `radial-gradient(circle, ${tier.aura}33 0%, transparent 70%)`,
+            boxShadow: `0 0 24px ${tier.aura}55`,
+            animation: 'pulse 3s ease-in-out infinite',
+          }} />
+          <span style={{ fontSize: 36, position: 'relative', zIndex: 1 }}>{tier.emoji}</span>
+        </div>
+
+        {/* Tier info */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="flex items-center gap-2 mb-0.5">
+            <p style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: tier.aura }}>{tier.title}</p>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)', background: 'var(--input-bg)', padding: '1px 6px', borderRadius: 4 }}>Tier {tier.index + 1}</span>
+          </div>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, marginBottom: 6 }}>{tier.desc}</p>
+          {nextTier && (
+            <>
+              <div style={{ height: 3, borderRadius: 2, background: 'var(--input-bg)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${pctToNext}%`, background: tier.aura, borderRadius: 2, transition: 'width 0.8s ease' }} />
+              </div>
+              <p style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 3 }}>
+                Lv {nextTier.minLevel} → {nextTier.emoji} {nextTier.title}
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function Profile() {
   usePageTitle('Profile')
   const { totalXP, level, progress } = useXP()
@@ -647,7 +714,7 @@ export function Profile() {
                 color: 'var(--text-primary)', lineHeight: 1.1, marginBottom: 3 }}>
                 {userName ?? 'Player'}
               </h2>
-              <p style={{ fontFamily: 'Cinzel, serif', fontSize: 11, fontWeight: 700,
+              <p style={{ fontFamily: 'Cinzel, serif', fontSize: 13, fontWeight: 700,
                 color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
                 {title}
               </p>
@@ -672,6 +739,8 @@ export function Profile() {
           </div>
         </div>
 
+        <LevelAvatar level={level} />
+
         {/* Activity Heatmap — hero position */}
         <ActivityHeatmap />
 
@@ -680,8 +749,8 @@ export function Profile() {
           <Card className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-xs uppercase tracking-widest" style={{ color: '#888' }}>Consistency Score</p>
-                <p className="text-xs mt-0.5" style={{ color: '#555' }}>{activeDays} active days in the last 30</p>
+                <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Consistency Score</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{activeDays} active days in the last 30</p>
               </div>
               <span style={{
                 fontSize: 32, fontWeight: 900,
