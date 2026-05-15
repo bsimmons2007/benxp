@@ -109,7 +109,7 @@ export function ChartSkeleton({ height = 150, title }: { height?: number; title?
         </div>
         {/* X-axis skeleton */}
         <div style={{ display: 'flex', gap: 6, marginTop: 8, padding: '0 4px' }}>
-          {[40, 60, 35, 55, 45, 65, 40, 55, 50, 60].map((w, i) => (
+          {[40, 60, 35, 55, 45, 65, 40, 55, 50, 60].map((_w, i) => (
             <Skeleton key={i} height={7} style={{ flex: 1 }} borderRadius={3} />
           ))}
         </div>

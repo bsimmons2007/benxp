@@ -642,7 +642,7 @@ export function Login() {
               {/* Submit button */}
               <button
                 type="submit"
-                loading={isSubmitting} disabled={isSubmitting}
+                disabled={isSubmitting}
                 style={{
                   width: '100%', padding: '13px 0', marginTop: 2, borderRadius: 13, border: 'none',
                   background: 'var(--accent)', color: 'var(--base-bg)',

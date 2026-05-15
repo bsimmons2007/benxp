@@ -1,7 +1,7 @@
 // Interactive SVG body map — front & back views.
 // Clean non-overlapping muscle regions, centered figure, vertical rank dots.
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback } from 'react'
 import type { MuscleScoreResult } from '../lib/muscleScore'
 import { RANKS, MUSCLES } from '../lib/muscleScore'
 

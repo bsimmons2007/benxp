@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -76,7 +76,6 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
   const [holeScores, setHoleScores] = useState<(number | '')[]>(Array(18).fill(''))
   const [savedCourses, setSavedCourses] = useState<string[]>(() => getSavedCourses())
   const [showSuggestions, setShowSuggestions] = useState(false)
-  const courseRef = useRef<HTMLInputElement>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
   const { register, handleSubmit, reset, watch, setValue, formState: { isSubmitting } } = useForm<GolfForm>({
@@ -151,7 +150,6 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
             <div className="flex flex-col gap-1 relative">
               <label className="section-label">Course</label>
               <input
-                ref={courseRef}
                 type="text"
                 placeholder="Papago Golf Course"
                 {...register('course', { required: true })}
