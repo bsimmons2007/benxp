@@ -171,8 +171,8 @@ function Stars({ rating }: { rating: number | null }) {
   return (
     <span className="text-sm">
       {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} style={{ color: i < full ? 'var(--accent)' : half && i === full ? 'var(--accent)' : 'rgba(255,255,255,0.2)' }}>
-          {i < full ? 'â˜…' : half && i === full ? 'â¯¨' : 'â˜†'}
+        <span key={i} style={{ color: i < full ? 'var(--accent)' : half && i === full ? 'var(--accent)' : 'var(--text-dim)', opacity: half && i === full ? 0.5 : 1 }}>
+          ★
         </span>
       ))}
       <span className="ml-1 text-xs" style={{ color: '#888' }}>{rating.toFixed(1)}</span>
@@ -736,7 +736,7 @@ export function Books() {
         <div className="grid grid-cols-3 gap-2 mb-5">
           {[
             { label: 'Read',       value: finished.length },
-            { label: 'Avg Rating', value: avgRating ? avgRating.toFixed(1) + 'â˜…' : '—' },
+            { label: 'Avg Rating', value: avgRating ? avgRating.toFixed(1) + '★' : '—' },
             { label: 'Pages',      value: totalPages.toLocaleString() },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
