@@ -33,7 +33,7 @@ export function useWellnessScore(): WellnessScore {
       const [sleepRes, liftRes, moodRes, waterRes] = await Promise.all([
         supabase.from('sleep_log').select('hours_slept, date').gte('date', weekStart),
         supabase.from('lifting_log').select('date').gte('date', weekStart),
-        supabase.from('mood_log').select('score, date').gte('date', weekStart),
+        supabase.from('mood_log').select('mood, date').gte('date', weekStart),
         supabase.from('water_log').select('oz, date').gte('date', weekStart),
       ])
 
@@ -56,7 +56,7 @@ export function useWellnessScore(): WellnessScore {
 
       // Mood score: avg mood / 10 * 20
       const moodAvg = moodRows.length
-        ? moodRows.reduce((s, r) => s + (r.score ?? 0), 0) / moodRows.length
+        ? moodRows.reduce((s, r) => s + (r.mood ?? 0), 0) / moodRows.length
         : 0
       const moodScore = Math.min(Math.round((moodAvg / 10) * 20), 20)
 
