@@ -74,8 +74,8 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
     })
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.disc_golf_under_par : 0
     const xp = XP_RATES.disc_golf_round + underParBonus
-    if (diff < 0) { playPR(); setToast(`+${xp} XP â€" ${vsParLabel(diff)} ðŸ¥ Under par!`) }
-    else          { playXPGain(); setToast(`+${xp} XP â€" Round logged (${vsParLabel(diff)})`) }
+    if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} ðŸ¥ Under par!`) }
+    else          { playXPGain(); setToast(`+${xp} XP — Round logged (${vsParLabel(diff)})`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), course: '', holes: '18', score: '', par: '54', notes: '' })
     setOpen(false); onLogged()
@@ -133,7 +133,7 @@ function EditDiscGolfModal({ round, onClose, onSaved }: { round: DiscGolfRound; 
   }
 
   return (
-    <EditModal title={`${round.course} â€" ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${round.course} — ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label className="section-label">Score</label>
@@ -179,9 +179,9 @@ export function DiscGolf() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
-            { label: 'Rounds',    value: rounds.length || 'â€"' },
-            { label: 'Best',      value: bestDiff !== null ? vsParLabel(bestDiff) : 'â€"', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
-            { label: 'Under Par', value: underPar || 'â€"', color: '#34d399' },
+            { label: 'Rounds',    value: rounds.length || '—' },
+            { label: 'Best',      value: bestDiff !== null ? vsParLabel(bestDiff) : '—', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
+            { label: 'Under Par', value: underPar || '—', color: '#34d399' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: s.color ?? ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>

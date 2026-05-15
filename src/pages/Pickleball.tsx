@@ -66,8 +66,8 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes     || null,
     })
     const xp = XP_RATES.pickleball_game + (isWin ? XP_RATES.pickleball_win : 0)
-    if (isWin) { playPR(); setToast(`+${xp} XP â€" Dink master!`) }
-    else        { playXPGain(); setToast(`+${xp} XP â€" Keep grinding!`) }
+    if (isWin) { playPR(); setToast(`+${xp} XP — Dink master!`) }
+    else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP()
     refreshActivity()
     reset({ date: today(), game_type: 'Singles', my_score: '', opp_score: '', opponent: '', notes: '' })
@@ -151,7 +151,7 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
   }
 
   return (
-    <EditModal title={`Edit â€" ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit — ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -313,7 +313,7 @@ export function Pickleball() {
               <div style={{ textAlign: 'right' }}>
                 {(game.my_score != null && game.opp_score != null) && (
                   <p style={{ fontSize: 16, fontWeight: 800, color: game.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
-                    {game.my_score}â€"{game.opp_score}
+                    {game.my_score}—{game.opp_score}
                   </p>
                 )}
                 <p style={{ fontSize: 11, color: game.win ? ACCENT : '#f87171', fontWeight: 600 }}>

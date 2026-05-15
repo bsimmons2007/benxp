@@ -46,7 +46,7 @@ const isBlitzMode = (mode: string | null) =>
 
 // Display mode string for blitz (strip prefix, handle legacy)
 const blitzDisplayMode = (mode: string | null) => {
-  if (!mode || mode === 'Blitz') return 'â€"'
+  if (!mode || mode === 'Blitz') return '—'
   return mode.replace('Blitz ', '')
 }
 
@@ -215,7 +215,7 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
   }
 
   return (
-    <EditModal title={`Edit â€" ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit — ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -282,10 +282,10 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (isWin) {
       playPR()
-      setToast(`+${XP_RATES.fortnite_win} XP â€" Victory Royale!${isRanked ? ` (Ranked ${rankName})` : ''}`)
+      setToast(`+${XP_RATES.fortnite_win} XP — Victory Royale!${isRanked ? ` (Ranked ${rankName})` : ''}`)
     } else {
       playXPGain()
-      setToast('Game logged â€" keep grinding!')
+      setToast('Game logged — keep grinding!')
     }
     await refreshXP()
     refreshActivity()
@@ -411,7 +411,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (isWin) {
       playPR()
-      setToast(`+${XP_RATES.fortnite_blitz_win} XP â€" Blitz Victory!`)
+      setToast(`+${XP_RATES.fortnite_blitz_win} XP — Blitz Victory!`)
     } else {
       playXPGain()
       setToast('Blitz game logged!')
@@ -485,8 +485,8 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
     <>
       <StatCards accent={ACCENT_NORMAL} items={[
         { label: 'Wins',       value: wins },
-        { label: 'Best Game',  value: bestKills ? `${bestKills}K` : 'â€"' },
-        { label: 'Avg Kills',  value: games.length ? avgKills : 'â€"' },
+        { label: 'Best Game',  value: bestKills ? `${bestKills}K` : '—' },
+        { label: 'Avg Kills',  value: games.length ? avgKills : '—' },
       ]} />
 
       {rankedWins > 0 && (
@@ -572,14 +572,14 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
       <div className="rounded-xl px-4 py-3 mb-4 flex items-center gap-2" style={{ background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.18)' }}>
         <ZapIcon size={14} color={ACCENT_BLITZ} />
         <p style={{ fontSize: 12, color: ACCENT_BLITZ, opacity: 0.85 }}>
-          Blitz: fast-paced rounds with a shrinking storm. Solos, Duos and Squads only â€" no ranked.
+          Blitz: fast-paced rounds with a shrinking storm. Solos, Duos and Squads only — no ranked.
         </p>
       </div>
 
       <StatCards accent={ACCENT_BLITZ} items={[
         { label: 'Blitz Wins', value: wins },
-        { label: 'Best Game',  value: bestKills ? `${bestKills}K` : 'â€"' },
-        { label: 'Avg Kills',  value: games.length ? avgKills : 'â€"' },
+        { label: 'Best Game',  value: bestKills ? `${bestKills}K` : '—' },
+        { label: 'Avg Kills',  value: games.length ? avgKills : '—' },
       ]} />
 
       <LogBlitzPanel onLogged={onLogged} />

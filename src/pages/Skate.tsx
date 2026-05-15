@@ -46,7 +46,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
       return
     }
     const xp = Math.round(miles * XP_RATES.skate_per_mile)
-    setToast(`+${xp} XP â€" Session logged!`)
+    setToast(`+${xp} XP — Session logged!`)
     await refreshXP()
     refreshActivity()
     reset({ date: today(), miles: '', duration: '', fastest_mile: '' })
@@ -107,7 +107,7 @@ function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose:
   }
 
   return (
-    <EditModal title={`Skate â€" ${formatDate(row.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Skate — ${formatDate(row.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <Input label="Miles" type="number" step="0.01" value={miles} onChange={e => setMiles(e.target.value)} />
         <div className="flex gap-3">
@@ -143,7 +143,7 @@ export function Skate() {
   }, null as number | null)
   const avgMiles = sessions.length > 0 ? totalMiles / sessions.length : 0
 
-  // Chart data â€" chronological for trend lines
+  // Chart data — chronological for trend lines
   const sorted = [...sessions].sort((a, b) => a.date.localeCompare(b.date))
   const milesTrend = sorted.map((s) => ({ date: s.date, miles: s.miles }))
   const fastestTrend = sorted
@@ -160,7 +160,7 @@ export function Skate() {
           {[
             { label: 'Total Miles', value: totalMiles.toFixed(1), unit: 'mi' },
             { label: 'Sessions', value: sessions.length },
-            { label: 'Fastest Mile', value: fastestMile ? fastestMile.toFixed(2) : 'â€"', unit: fastestMile ? 'min' : '' },
+            { label: 'Fastest Mile', value: fastestMile ? fastestMile.toFixed(2) : '—', unit: fastestMile ? 'min' : '' },
           ].map((s) => (
             <div key={s.label} className="rounded-xl p-3" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="section-label">{s.label}</p>

@@ -108,7 +108,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
     const q   = sleepQuality(hrs)
     const xp  = XP_RATES.sleep_log + (hrs >= 7 ? XP_RATES.sleep_quality_bonus : 0)
     if (hrs >= 8.5) playPR(); else playXPGain()
-    setToast(`+${xp} XP â€" ${q.label} sleep!`)
+    setToast(`+${xp} XP — ${q.label} sleep!`)
     addOptimisticActivity({ type: 'sleep', label: `${hrs.toFixed(1)}h sleep`, date: data.date, icon: 'sleep' })
     await refreshXP()
     refreshActivity()
@@ -181,8 +181,8 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
       user_id: user.id, date, hours_slept: napHours, is_nap: true,
     })
     setSaving(false)
-    if (error) { setToast('Failed to save â€" try again'); return }
-    setToast(`Nap logged â€" ${hours}h`)
+    if (error) { setToast('Failed to save — try again'); return }
+    setToast(`Nap logged — ${hours}h`)
     setOpen(false)
     setHours('')
     onLogged()
@@ -237,7 +237,7 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
   }
 
   return (
-    <EditModal title={`Edit â€" ${formatDate(entry.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit — ${formatDate(entry.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <Input label="Bedtime"     type="time"   value={bedtime}  onChange={e => setBedtime(e.target.value)} />
         <Input label="Hours Slept" type="number" step={0.1} value={hours}    onChange={e => setHours(e.target.value)} />
@@ -394,7 +394,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
     }
   })
 
-  // Check actual progress â€" how many recent wake times match or beat the plan?
+  // Check actual progress — how many recent wake times match or beat the plan?
   const recentWakes = logs
     .filter(l => l.wake_time && l.date >= todayStr)
     .map(l => ({ date: l.date, mins: parseTime(l.wake_time!) }))
@@ -608,7 +608,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
             {/* Science note */}
             <p style={{ color: 'var(--text-muted)', fontSize: 10, textAlign: 'center', lineHeight: 1.4 }}>
               Based on chronobiology: shifting {shiftMins} min/day is within the body's natural circadian adaptation rate.
-              Consistency is key â€" try to hit your bedtime every night, including weekends.
+              Consistency is key — try to hit your bedtime every night, including weekends.
             </p>
           </>
         )}
@@ -654,7 +654,7 @@ export function Sleep() {
   const avg  = withHours.length ? withHours.reduce((s, r) => s + (r.hours_slept ?? 0), 0) / withHours.length : 0
   const best = withHours.length ? Math.max(...withHours.map(r => r.hours_slept ?? 0)) : 0
 
-  // Streak â€" fixed: use local date strings, handle today-not-logged case
+  // Streak — fixed: use local date strings, handle today-not-logged case
   const streak = (() => {
     if (!nightLogs.length) return 0
     const dateSet = new Set(nightLogs.map(r => r.date))
@@ -848,7 +848,7 @@ export function Sleep() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <p className="font-bold" style={{ color: q.color, fontSize: 18 }}>{entry.hours_slept ?? 'â€"'}h</p>
+                    <p className="font-bold" style={{ color: q.color, fontSize: 18 }}>{entry.hours_slept ?? '—'}h</p>
                     <p className="text-xs" style={{ color: q.color }}>{q.label}</p>
                   </div>
                   <button

@@ -54,8 +54,8 @@ function LogSBPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes     || null,
     })
     const xp = XP_RATES.spikeball_game + (isWin ? XP_RATES.spikeball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP â€" ðŸŸ  Spike!`) }
-    else        { playXPGain(); setToast(`+${xp} XP â€" Keep it up!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — ðŸŸ  Spike!`) }
+    else        { playXPGain(); setToast(`+${xp} XP — Keep it up!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), my_score: '', opp_score: '', partner: '', opponents: '', notes: '' })
     setIsWin(true); setOpen(false); onLogged()
@@ -124,7 +124,7 @@ function EditSBModal({ game, onClose, onSaved }: { game: SpikeballGame; onClose:
   }
 
   return (
-    <EditModal title={`Edit â€" ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit — ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -188,8 +188,8 @@ export function Spikeball() {
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
             { label: 'Wins',     value: wins },
-            { label: 'Win Rate', value: games.length ? `${winRate}%` : 'â€"' },
-            { label: 'Streak',   value: streak || 'â€"' },
+            { label: 'Win Rate', value: games.length ? `${winRate}%` : '—' },
+            { label: 'Streak',   value: streak || '—' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
@@ -248,7 +248,7 @@ export function Spikeball() {
               <div style={{ textAlign: 'right' }}>
                 {g.my_score != null && g.opp_score != null && (
                   <p style={{ fontSize: 16, fontWeight: 800, color: g.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
-                    {g.my_score}â€"{g.opp_score}
+                    {g.my_score}—{g.opp_score}
                   </p>
                 )}
                 <p style={{ fontSize: 11, fontWeight: 600, color: g.win ? ACCENT : '#f87171' }}>

@@ -218,7 +218,7 @@ function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: ()
           <p style={{ color: 'var(--accent)', fontSize: 13 }}>+{XP_RATES.book_finished} XP on save</p>
         </div>
         <Input label="Date Finished" type="date" value={date} onChange={e => setDate(e.target.value)} />
-        <Input label="Rating (1â€"5, optional)" type="number" step="0.1" min="1" max="5" placeholder="4.5" value={rating} onChange={e => setRating(e.target.value)} />
+        <Input label="Rating (1—5, optional)" type="number" step="0.1" min="1" max="5" placeholder="4.5" value={rating} onChange={e => setRating(e.target.value)} />
       </div>
     </EditModal>
   )
@@ -330,7 +330,7 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
               <input type="date" value={date} onChange={e => setDate(e.target.value)} className={inputCls} style={inputStyle} />
             </div>
             <div className="flex flex-col gap-1">
-              <FieldLabel>Rating (1â€"5, optional)</FieldLabel>
+              <FieldLabel>Rating (1—5, optional)</FieldLabel>
               <input type="number" step="0.1" min="1" max="5" value={rating} onChange={e => setRating(e.target.value)} className={inputCls} style={inputStyle} placeholder="4.5" />
             </div>
           </>
@@ -433,10 +433,10 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
           <div className="mt-3 pt-3 pop-in" style={{ borderTop: '1px solid var(--border-faint)' }}>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {[
-                { label: 'Genre',    value: book.genre ?? 'â€"' },
-                { label: 'Pages',    value: book.pages ?? 'â€"' },
+                { label: 'Genre',    value: book.genre ?? '—' },
+                { label: 'Pages',    value: book.pages ?? '—' },
                 { label: 'Rating',   value: <Stars rating={book.rating} /> },
-                { label: 'Finished', value: book.date_finished ? formatDate(book.date_finished) : 'â€"' },
+                { label: 'Finished', value: book.date_finished ? formatDate(book.date_finished) : '—' },
               ].map(item => (
                 <div key={item.label}>
                   <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#444', fontFamily: 'Cormorant Garamond, serif' }}>{item.label}</p>
@@ -503,7 +503,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
     if (inserted && data.series.trim()) setSeriesForBook(inserted.id, data.series)
 
     if (isFinished) {
-      setToast(`+${XP_RATES.book_finished} XP â€" Book logged!`)
+      setToast(`+${XP_RATES.book_finished} XP — Book logged!`)
       await refreshXP()
       refreshActivity()
     } else {
@@ -566,7 +566,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
             {status === 'finished' && (
               <>
                 <Input label="Date Finished" type="date" {...register('date_finished')} />
-                <Input label="Rating (1â€"5, optional)" type="number" step="0.1" min="1" max="5" placeholder="4.5" {...register('rating')} />
+                <Input label="Rating (1—5, optional)" type="number" step="0.1" min="1" max="5" placeholder="4.5" {...register('rating')} />
               </>
             )}
 
@@ -736,7 +736,7 @@ export function Books() {
         <div className="grid grid-cols-3 gap-2 mb-5">
           {[
             { label: 'Read',       value: finished.length },
-            { label: 'Avg Rating', value: avgRating ? avgRating.toFixed(1) + 'â˜…' : 'â€"' },
+            { label: 'Avg Rating', value: avgRating ? avgRating.toFixed(1) + 'â˜…' : '—' },
             { label: 'Pages',      value: totalPages.toLocaleString() },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>

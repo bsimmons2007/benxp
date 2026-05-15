@@ -54,8 +54,8 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes    || null,
     })
     const xp = XP_RATES.table_tennis_game + (isWin ? XP_RATES.table_tennis_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP â€" ðŸ" Game, set, match!`) }
-    else        { playXPGain(); setToast(`+${xp} XP â€" Keep grinding!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — ðŸ" Game, set, match!`) }
+    else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), game_type: 'Singles', my_score: '', opp_score: '', opponent: '', notes: '' })
     setIsWin(true); setOpen(false); onLogged()
@@ -135,7 +135,7 @@ function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClos
   }
 
   return (
-    <EditModal title={`Edit â€" ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit — ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -285,7 +285,7 @@ export function TableTennis() {
               <div style={{ textAlign: 'right' }}>
                 {g.my_score != null && g.opp_score != null && (
                   <p style={{ fontSize: 16, fontWeight: 800, color: g.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
-                    {g.my_score}â€"{g.opp_score}
+                    {g.my_score}—{g.opp_score}
                   </p>
                 )}
                 <p style={{ fontSize: 11, fontWeight: 600, color: g.win ? ACCENT : '#f87171' }}>

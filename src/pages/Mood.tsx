@@ -119,7 +119,7 @@ export function Mood() {
   const avgEnergy = recent.length ? recent.reduce((s, r) => s + (r.energy ?? 5), 0) / recent.length : null
   const avgStress = recent.length ? recent.reduce((s, r) => s + (r.stress ?? 5), 0) / recent.length : null
 
-  // Chart data â€" oldest first
+  // Chart data — oldest first
   const chartData = [...recent].reverse().map(r => ({
     date:   r.date,
     mood:   r.mood ?? 5,
@@ -136,9 +136,9 @@ export function Mood() {
         {recent.length > 0 && (
           <div className="grid grid-cols-3 gap-2 mb-5">
             {([
-              { label: 'Avg Mood',   value: avgMood?.toFixed(1)   ?? 'â€"', color: 'var(--accent)', icon: <HeartIcon   size={18} color="var(--accent)" /> as ReactNode },
-              { label: 'Avg Energy', value: avgEnergy?.toFixed(1) ?? 'â€"', color: '#4ade80',       icon: <ZapIcon     size={18} color="#4ade80"       /> as ReactNode },
-              { label: 'Avg Stress', value: avgStress?.toFixed(1) ?? 'â€"', color: '#f87171',       icon: <ActivityIcon size={18} color="#f87171"      /> as ReactNode },
+              { label: 'Avg Mood',   value: avgMood?.toFixed(1)   ?? '—', color: 'var(--accent)', icon: <HeartIcon   size={18} color="var(--accent)" /> as ReactNode },
+              { label: 'Avg Energy', value: avgEnergy?.toFixed(1) ?? '—', color: '#4ade80',       icon: <ZapIcon     size={18} color="#4ade80"       /> as ReactNode },
+              { label: 'Avg Stress', value: avgStress?.toFixed(1) ?? '—', color: '#f87171',       icon: <ActivityIcon size={18} color="#f87171"      /> as ReactNode },
             ] as { label: string; value: string; color: string; icon: ReactNode }[]).map(s => (
               <div
                 key={s.label}
@@ -318,7 +318,7 @@ export function Mood() {
 
       {editEntry && (
         <EditModal
-          title={`Edit â€" ${formatDate(editEntry.date)}`}
+          title={`Edit — ${formatDate(editEntry.date)}`}
           onClose={() => setEditEntry(null)}
           onDelete={deleteMoodEntry}
           onSave={saveMoodEdit}

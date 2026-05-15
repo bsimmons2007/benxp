@@ -116,7 +116,7 @@ export function Login() {
   // Pre-fill "password updated" message if redirected from reset flow
   useEffect(() => {
     const params = new URLSearchParams(location.search)
-    if (params.get('reset') === '1') setResetMsg('Password updated â€" sign back in.')
+    if (params.get('reset') === '1') setResetMsg('Password updated — sign back in.')
   }, [location.search])
 
   // Auto-focus email on desktop
@@ -218,7 +218,7 @@ export function Login() {
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--base-bg)' }}>
 
-      {/* â"€â"€ Left hero panel â€" desktop only â"€â"€ */}
+      {/* â"€â"€ Left hero panel — desktop only â"€â"€ */}
       <div
         className="hidden md:flex flex-col justify-between"
         style={{
@@ -230,7 +230,7 @@ export function Login() {
           background: 'linear-gradient(155deg, rgba(22,18,48,0.98) 0%, rgba(8,10,22,1) 60%, rgba(14,10,32,0.97) 100%)',
         }}
       >
-        {/* Diagonal clip â€" gives a slight angled edge on the right side */}
+        {/* Diagonal clip — gives a slight angled edge on the right side */}
         <div style={{
           position: 'absolute', top: 0, right: -1, width: 32, height: '100%',
           background: 'var(--base-bg)',
@@ -250,7 +250,7 @@ export function Login() {
           maskImage: 'radial-gradient(ellipse 90% 90% at 50% 50%, black 40%, transparent 100%)',
         }} />
 
-        {/* XP bar texture â€" subtle horizontal lines */}
+        {/* XP bar texture — subtle horizontal lines */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
           backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(245,166,35,0.025) 28px, rgba(245,166,35,0.025) 29px)',
@@ -380,7 +380,7 @@ export function Login() {
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,166,35,0.13)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,166,35,0.07)')}
           >
-            Join today â€" it's free
+            Join today — it's free
           </button>
         </div>
       </div>
@@ -444,7 +444,7 @@ export function Login() {
 
             <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-              {/* Name â€" animates in for signup */}
+              {/* Name — animates in for signup */}
               <div style={{
                 overflow:   'hidden',
                 maxHeight:  mode === 'signup' ? 72 : 0,
@@ -503,7 +503,7 @@ export function Login() {
                         })
                         if (resetErr) { setError(resetErr.message); return }
                         setError(null)
-                        setResetMsg('Reset link sent â€" check your inbox.')
+                        setResetMsg('Reset link sent — check your inbox.')
                       }}
                       style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', padding: 0, transition: 'color 0.15s' }}
                       onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
@@ -549,7 +549,7 @@ export function Login() {
                   <p style={{ color: '#f59e0b', fontSize: 11, marginTop: 4 }}>âš  Caps Lock is on</p>
                 )}
 
-                {/* Password strength â€" signup only */}
+                {/* Password strength — signup only */}
                 {mode === 'signup' && pw.length > 0 && (
                   <div style={{ marginTop: 8 }}>
                     <div style={{ display: 'flex', gap: 4 }}>
@@ -566,7 +566,7 @@ export function Login() {
                 )}
               </div>
 
-              {/* Confirm password â€" signup only */}
+              {/* Confirm password — signup only */}
               {mode === 'signup' && (
                 <div style={{
                   overflow: 'hidden',
@@ -601,7 +601,7 @@ export function Login() {
                 </div>
               )}
 
-              {/* Remember me â€" login only */}
+              {/* Remember me — login only */}
               {mode === 'login' && (
                 <label style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', userSelect: 'none' }}>
                   <div
@@ -678,7 +678,7 @@ export function Login() {
                   onMouseEnter={e => (e.currentTarget.style.opacity = '0.75')}
                   onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                 >
-                  {mode === 'login' ? 'Start free â€" no card needed' : 'Sign in'}
+                  {mode === 'login' ? 'Start free — no card needed' : 'Sign in'}
                 </button>
               </p>
             </div>

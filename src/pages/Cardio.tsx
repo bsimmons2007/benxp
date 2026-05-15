@@ -130,7 +130,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
       : Math.round(miles * cardioRate(data.activity))
     const { label } = activityMeta(data.activity)
     playXPGain()
-    setToast(`+${xp} XP â€" ${label} logged!`)
+    setToast(`+${xp} XP — ${label} logged!`)
     addOptimisticActivity({ type: 'cardio', label: `${miles.toFixed(2)} mi ${label.toLowerCase()}`, date: data.date, icon: data.activity })
     await refreshXP()
     refreshActivity()
@@ -225,7 +225,7 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
 
   const { label } = activityMeta(session.activity)
   return (
-    <EditModal title={`${label} â€" ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${label} — ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-base font-medium" style={labelStyle}>Miles</label>

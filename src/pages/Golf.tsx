@@ -124,8 +124,8 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
     }
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.golf_under_par : 0
     const xp = XP_RATES.golf_round + underParBonus
-    if (diff < 0) { playPR(); setToast(+{xp} XP — {vsParLabel(diff)} 🌿 Under par!) }
-    else          { playXPGain(); setToast(+{xp} XP — Round logged ({vsParLabel(diff)})) }
+    if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} 🌿 Under par!`) }
+    else          { playXPGain(); setToast(`+${xp} XP — Round logged (${vsParLabel(diff)})`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), course: '', holes: '18', score: '', par: '72', putts: '', fairways_hit: '', fairways_possible: '', notes: '' })
     setHoleScores(Array(18).fill(''))
@@ -265,7 +265,7 @@ function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose:
   }
 
   return (
-    <EditModal title={`${round.course} â€" ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${round.course} — ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -305,7 +305,7 @@ export function Golf() {
   const bestDiff  = rounds.length ? Math.min(...diffs) : null
   const avgDiff   = rounds.length ? Math.round((diffs.reduce((a, b) => a + b, 0) / diffs.length) * 10) / 10 : null
 
-  // Trend chart data â€" most recent 10 rounds reversed to chronological
+  // Trend chart data — most recent 10 rounds reversed to chronological
   const chartData = [...rounds].reverse().slice(-12).map(r => ({
     label: formatDate(r.date).slice(0, 6),
     vsPar: r.score - r.par,
@@ -325,9 +325,9 @@ export function Golf() {
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
-            { label: 'Rounds',   value: rounds.length || 'â€"' },
-            { label: 'Best',     value: bestDiff !== null ? vsParLabel(bestDiff) : 'â€"', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
-            { label: 'Avg',      value: avgDiff  !== null ? vsParLabel(Math.round(avgDiff)) : 'â€"', color: avgDiff !== null ? vsParColor(Math.round(avgDiff)) : undefined },
+            { label: 'Rounds',   value: rounds.length || '—' },
+            { label: 'Best',     value: bestDiff !== null ? vsParLabel(bestDiff) : '—', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
+            { label: 'Avg',      value: avgDiff  !== null ? vsParLabel(Math.round(avgDiff)) : '—', color: avgDiff !== null ? vsParColor(Math.round(avgDiff)) : undefined },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: s.color ?? ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>

@@ -327,7 +327,7 @@ export function Goals() {
   async function complete(goal: Goal) {
     await supabase.from('goals').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', goal.id)
     playGoalComplete()
-    setToast(`+${goal.xp_reward} XP â€" Goal complete!`)
+    setToast(`+${goal.xp_reward} XP — Goal complete!`)
     await refreshXP()
     await load()  // P1-11: must await so goal list reflects completion immediately
   }
@@ -364,7 +364,7 @@ export function Goals() {
         {/* Active goals */}
         {active.length === 0 ? (
           <div style={{ padding: '12px 0' }}>
-            <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet â€" try one of these:</p>
+            <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet — try one of these:</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { label: 'Bench 225 lbs',   metric: 'bench_1rm',         target: 225, unit: 'lbs',   xp: 500 },

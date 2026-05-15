@@ -153,7 +153,7 @@ export function LogWorkoutForm() {
     }
 
     const xpEarned = sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0)
-    setToast(`+${xpEarned} XP${isPR ? ' â€" New PR!' : ''}`)
+    setToast(`+${xpEarned} XP${isPR ? ' — New PR!' : ''}`)
     await refreshXP()
 
     // Keep bodyweight and equipment pre-filled across entries
@@ -255,7 +255,7 @@ export function LogWorkoutForm() {
         />
         {!bwLoggedToday && (
           <p style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
-            Only asked once per day â€" updates your weight graph
+            Only asked once per day — updates your weight graph
           </p>
         )}
       </div>
