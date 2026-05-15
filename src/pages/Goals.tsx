@@ -15,7 +15,7 @@ import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, Tr
 import { localDateStr } from '../lib/utils'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// â”€â”€ Preset metric options â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Preset metric options â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 const GOAL_PRESETS = [
   { key: 'squat_1rm',          label: 'Squat 1RM',       unit: 'lbs',   defaultTarget: 315 },
   { key: 'bench_1rm',          label: 'Bench 1RM',       unit: 'lbs',   defaultTarget: 225 },
@@ -44,7 +44,7 @@ function GoalIcon({ metricKey, size = 18, color = 'var(--text-muted)' }: { metri
   return <TargetIcon size={size} color={color} />
 }
 
-// â”€â”€ Current values hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Current values hook â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 interface MetricValues {
   squat_1rm:          number
   bench_1rm:          number
@@ -106,7 +106,7 @@ function currentFor(key: string, vals: MetricValues | null): number {
   return (vals as unknown as Record<string, number>)[key] ?? 0
 }
 
-// â”€â”€ Add Goal form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Add Goal form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 interface GoalForm { metric_key: MetricKey; target_value: string; title: string; xp_reward: string }
 
 function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
@@ -211,7 +211,7 @@ const METRIC_LINK: Record<string, string> = {
   fn_wins:            '/fortnite',
 }
 
-// â”€â”€ Goal card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Goal card â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
   goal: Goal
   current: number
@@ -308,7 +308,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 export function Goals() {
   usePageTitle('Goals')
   const navigate = useNavigate()
@@ -327,7 +327,7 @@ export function Goals() {
   async function complete(goal: Goal) {
     await supabase.from('goals').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', goal.id)
     playGoalComplete()
-    setToast(`+${goal.xp_reward} XP â€” Goal complete!`)
+    setToast(`+${goal.xp_reward} XP â€" Goal complete!`)
     await refreshXP()
     await load()  // P1-11: must await so goal list reflects completion immediately
   }
@@ -364,7 +364,7 @@ export function Goals() {
         {/* Active goals */}
         {active.length === 0 ? (
           <div style={{ padding: '12px 0' }}>
-            <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet â€” try one of these:</p>
+            <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet â€" try one of these:</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { label: 'Bench 225 lbs',   metric: 'bench_1rm',         target: 225, unit: 'lbs',   xp: 500 },

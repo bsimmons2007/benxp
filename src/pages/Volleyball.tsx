@@ -19,7 +19,7 @@ import type { VolleyballSession } from '../types'
 
 const ACCENT = '#f472b6'
 
-// â”€â”€ Indoor form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Indoor form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface IndoorForm {
   date: string
@@ -63,8 +63,8 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes     || null,
     })
     const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP â€” ðŸ Spike!`) }
-    else        { playXPGain(); setToast(`+${xp} XP â€” Keep grinding!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP â€" ðŸ Spike!`) }
+    else        { playXPGain(); setToast(`+${xp} XP â€" Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), sets_won: '', sets_lost: '', aces: '', kills: '', blocks: '', digs: '', assists: '', opponent: '', notes: '' })
     setIsWin(true); setOpen(false); onLogged()
@@ -116,7 +116,7 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Sand form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Sand form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface SandForm {
   date: string
@@ -152,8 +152,8 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes     || null,
     })
     const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP â€” ðŸ–ï¸ Beach winner!`) }
-    else        { playXPGain(); setToast(`+${xp} XP â€” Keep grinding!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP â€" ðŸ–ï¸ Beach winner!`) }
+    else        { playXPGain(); setToast(`+${xp} XP â€" Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), my_score: '', opp_score: '', partner: '', opponent: '', notes: '' })
     setIsWin(true); setOpen(false); onLogged()
@@ -199,7 +199,7 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function EditVBModal({ session, onClose, onSaved }: { session: VolleyballSession; onClose: () => void; onSaved: () => void }) {
   const [win,     setWin]     = useState(session.win)
@@ -228,7 +228,7 @@ function EditVBModal({ session, onClose, onSaved }: { session: VolleyballSession
   }
 
   return (
-    <EditModal title={`Edit â€” ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€" ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         {session.format === 'Indoor' ? (
           <div className="flex gap-3">
@@ -264,7 +264,7 @@ function EditVBModal({ session, onClose, onSaved }: { session: VolleyballSession
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -327,8 +327,8 @@ export function Volleyball() {
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
             { label: 'Wins',     value: wins },
-            { label: 'Win Rate', value: games.length ? `${winRate}%` : 'â€”' },
-            { label: 'Streak',   value: streak || 'â€”' },
+            { label: 'Win Rate', value: games.length ? `${winRate}%` : 'â€"' },
+            { label: 'Streak',   value: streak || 'â€"' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
@@ -385,7 +385,7 @@ export function Volleyball() {
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>{formatDate(g.date)}</p>
                 <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>
                   {g.format === 'Indoor'
-                    ? (g.sets_won != null && g.sets_lost != null ? `${g.sets_won}â€“${g.sets_lost} sets` : 'Indoor')
+                    ? (g.sets_won != null && g.sets_lost != null ? `${g.sets_won}â€"${g.sets_lost} sets` : 'Indoor')
                     : (g.partner ? `w/ ${g.partner}` : 'Sand')}
                 </p>
               </div>
@@ -394,7 +394,7 @@ export function Volleyball() {
               <div style={{ textAlign: 'right' }}>
                 {g.format === 'Sand' && g.my_score != null && g.opp_score != null && (
                   <p style={{ fontSize: 16, fontWeight: 800, color: g.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
-                    {g.my_score}â€“{g.opp_score}
+                    {g.my_score}â€"{g.opp_score}
                   </p>
                 )}
                 <p style={{ fontSize: 11, fontWeight: 600, color: g.win ? ACCENT : '#f87171' }}>

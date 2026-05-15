@@ -19,7 +19,7 @@ import type { HikingSession } from '../types'
 
 const ACCENT = '#84cc16'
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const DIFFICULTIES = ['Easy', 'Moderate', 'Hard', 'Expert'] as const
 function diffColor(d: string | null): string {
@@ -36,7 +36,7 @@ function fmtDuration(mins: number | null): string {
   return h > 0 ? `${h}h ${m > 0 ? `${m}m` : ''}`.trim() : `${m}m`
 }
 
-// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface HikeForm {
   date: string
@@ -76,7 +76,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
     const elevXP  = Math.floor((elevFt ?? 0) / 500) * XP_RATES.hiking_per_500ft
     const xp = Math.round(milesXP + elevXP)
     playXPGain()
-    setToast(`+${xp} XP â€” ${miles} mi${elevFt ? ` Â· ${elevFt.toLocaleString()} ft gain` : ''}`)
+    setToast(`+${xp} XP â€" ${miles} mi${elevFt ? ` Â· ${elevFt.toLocaleString()} ft gain` : ''}`)
     await refreshXP(); refreshActivity()
     reset({ date: today(), trail: '', distance_miles: '', elevation_gain_ft: '', duration_mins: '', difficulty: 'Moderate', notes: '' })
     setOpen(false); onLogged()
@@ -95,7 +95,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
-            <Input label="Trail" type="text" placeholder="Camelback Mountain â€” Echo Canyon" {...register('trail', { required: true })} />
+            <Input label="Trail" type="text" placeholder="Camelback Mountain â€" Echo Canyon" {...register('trail', { required: true })} />
 
             <div className="flex gap-3">
               <Input label="Distance (mi)" type="number" step="0.1" placeholder="3.2" className="flex-1" {...register('distance_miles', { required: true })} />
@@ -122,7 +122,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function EditHikingModal({ session, onClose, onSaved }: { session: HikingSession; onClose: () => void; onSaved: () => void }) {
   const [distance,   setDistance]   = useState(String(session.distance_miles))
@@ -145,7 +145,7 @@ function EditHikingModal({ session, onClose, onSaved }: { session: HikingSession
   }
 
   return (
-    <EditModal title={`${session.trail} â€” ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${session.trail} â€" ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -166,7 +166,7 @@ function EditHikingModal({ session, onClose, onSaved }: { session: HikingSession
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -206,9 +206,9 @@ export function Hiking() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
-            { label: 'Hikes',    value: sessions.length || 'â€”' },
-            { label: 'Total mi', value: totalMiles > 0 ? totalMiles.toFixed(1) : 'â€”' },
-            { label: 'Total ft', value: totalElev > 0 ? `${(totalElev / 1000).toFixed(1)}k` : 'â€”' },
+            { label: 'Hikes',    value: sessions.length || 'â€"' },
+            { label: 'Total mi', value: totalMiles > 0 ? totalMiles.toFixed(1) : 'â€"' },
+            { label: 'Total ft', value: totalElev > 0 ? `${(totalElev / 1000).toFixed(1)}k` : 'â€"' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>

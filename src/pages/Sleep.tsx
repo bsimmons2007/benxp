@@ -57,7 +57,7 @@ function nDaysAgo(n: number): string {
   return localDateStr(d)
 }
 
-// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface SleepForm { date: string; bedtime: string; hours_slept: string; wake_time: string }
 
@@ -108,7 +108,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
     const q   = sleepQuality(hrs)
     const xp  = XP_RATES.sleep_log + (hrs >= 7 ? XP_RATES.sleep_quality_bonus : 0)
     if (hrs >= 8.5) playPR(); else playXPGain()
-    setToast(`+${xp} XP â€” ${q.label} sleep!`)
+    setToast(`+${xp} XP â€" ${q.label} sleep!`)
     addOptimisticActivity({ type: 'sleep', label: `${hrs.toFixed(1)}h sleep`, date: data.date, icon: 'sleep' })
     await refreshXP()
     refreshActivity()
@@ -161,7 +161,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Nap log panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Nap log panel â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function LogNapPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
@@ -181,8 +181,8 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
       user_id: user.id, date, hours_slept: napHours, is_nap: true,
     })
     setSaving(false)
-    if (error) { setToast('Failed to save â€” try again'); return }
-    setToast(`Nap logged â€” ${hours}h`)
+    if (error) { setToast('Failed to save â€" try again'); return }
+    setToast(`Nap logged â€" ${hours}h`)
     setOpen(false)
     setHours('')
     onLogged()
@@ -211,7 +211,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose: () => void; onSaved: () => void }) {
   const [hours,    setHours]    = useState(String(entry.hours_slept ?? ''))
@@ -237,7 +237,7 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
   }
 
   return (
-    <EditModal title={`Edit â€” ${formatDate(entry.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€" ${formatDate(entry.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <Input label="Bedtime"     type="time"   value={bedtime}  onChange={e => setBedtime(e.target.value)} />
         <Input label="Hours Slept" type="number" step={0.1} value={hours}    onChange={e => setHours(e.target.value)} />
@@ -247,7 +247,7 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
   )
 }
 
-// â”€â”€ Sleep debt card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Sleep debt card â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   const nights = logs.filter(r => !r.is_nap)
@@ -328,7 +328,7 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   )
 }
 
-// â”€â”€ Wake Time Trainer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Wake Time Trainer â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 /** Parse "HH:MM" â†’ total minutes since midnight */
 function parseTime(t: string): number {
@@ -394,7 +394,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
     }
   })
 
-  // Check actual progress â€” how many recent wake times match or beat the plan?
+  // Check actual progress â€" how many recent wake times match or beat the plan?
   const recentWakes = logs
     .filter(l => l.wake_time && l.date >= todayStr)
     .map(l => ({ date: l.date, mins: parseTime(l.wake_time!) }))
@@ -589,7 +589,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                         </p>
                         {actualWake?.wake_time && (
                           <p style={{ color: onTrack ? '#2ECC71' : '#E94560', fontSize: 10, marginTop: 1 }}>
-                            Actual wake: {fmtTime(parseTime(actualWake.wake_time))} {onTrack ? 'âœ“' : 'âœ—'}
+                            Actual wake: {fmtTime(parseTime(actualWake.wake_time))} {onTrack ? 'âœ"' : 'âœ—'}
                           </p>
                         )}
                       </div>
@@ -608,7 +608,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
             {/* Science note */}
             <p style={{ color: 'var(--text-muted)', fontSize: 10, textAlign: 'center', lineHeight: 1.4 }}>
               Based on chronobiology: shifting {shiftMins} min/day is within the body's natural circadian adaptation rate.
-              Consistency is key â€” try to hit your bedtime every night, including weekends.
+              Consistency is key â€" try to hit your bedtime every night, including weekends.
             </p>
           </>
         )}
@@ -617,7 +617,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const ttStyle = {
   background: 'rgba(10,10,22,0.97)',
@@ -654,7 +654,7 @@ export function Sleep() {
   const avg  = withHours.length ? withHours.reduce((s, r) => s + (r.hours_slept ?? 0), 0) / withHours.length : 0
   const best = withHours.length ? Math.max(...withHours.map(r => r.hours_slept ?? 0)) : 0
 
-  // Streak â€” fixed: use local date strings, handle today-not-logged case
+  // Streak â€" fixed: use local date strings, handle today-not-logged case
   const streak = (() => {
     if (!nightLogs.length) return 0
     const dateSet = new Set(nightLogs.map(r => r.date))
@@ -716,7 +716,7 @@ export function Sleep() {
         )}
 
         {/* Stats row */}
-        <div className=”grid grid-cols-4 gap-2 mb-5”>
+        <div className="grid grid-cols-4 gap-2 mb-5">
           {[
             { label: 'Avg Hours',   value: avg    ? avg.toFixed(1)  : '—' },
             { label: 'Best Night',  value: best   ? best.toFixed(1) : '—' },
@@ -790,8 +790,8 @@ export function Sleep() {
               </AreaChart>
             </ResponsiveContainer>
             <div className="flex gap-4 mt-1">
-              <span className="text-xs" style={{ color: '#27AE60' }}>â”€â”€ 8h goal</span>
-              <span className="text-xs" style={{ color: 'var(--accent)' }}>â”€â”€ 7h min</span>
+              <span className="text-xs" style={{ color: '#27AE60' }}>â"€â"€ 8h goal</span>
+              <span className="text-xs" style={{ color: 'var(--accent)' }}>â"€â"€ 7h min</span>
             </div>
           </div>
         )}
@@ -848,7 +848,7 @@ export function Sleep() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <p className="font-bold" style={{ color: q.color, fontSize: 18 }}>{entry.hours_slept ?? 'â€”'}h</p>
+                    <p className="font-bold" style={{ color: q.color, fontSize: 18 }}>{entry.hours_slept ?? 'â€"'}h</p>
                     <p className="text-xs" style={{ color: q.color }}>{q.label}</p>
                   </div>
                   <button

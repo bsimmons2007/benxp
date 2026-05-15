@@ -36,7 +36,7 @@ export function LogSkateForm() {
     })
 
     const xp = Math.round(miles * XP_RATES.skate_per_mile)
-    setToast(`+${xp} XP â€” Skate logged!`)
+    setToast(`+${xp} XP â€" Skate logged!`)
     await refreshXP()
     reset({ date: today(), miles: '', duration: '', fastest_mile: '' })
   }

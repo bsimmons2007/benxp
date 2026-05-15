@@ -19,7 +19,7 @@ import type { DiscGolfRound } from '../types'
 
 const ACCENT = '#f59e0b'
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function vsParLabel(diff: number): string {
   if (diff === 0) return 'E'
@@ -32,7 +32,7 @@ function vsParColor(diff: number): string {
 }
 function defaultPar(holes: number) { return holes === 9 ? 27 : 54 }
 
-// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface DgForm {
   date: string
@@ -74,8 +74,8 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
     })
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.disc_golf_under_par : 0
     const xp = XP_RATES.disc_golf_round + underParBonus
-    if (diff < 0) { playPR(); setToast(`+${xp} XP â€” ${vsParLabel(diff)} ðŸ¥ Under par!`) }
-    else          { playXPGain(); setToast(`+${xp} XP â€” Round logged (${vsParLabel(diff)})`) }
+    if (diff < 0) { playPR(); setToast(`+${xp} XP â€" ${vsParLabel(diff)} ðŸ¥ Under par!`) }
+    else          { playXPGain(); setToast(`+${xp} XP â€" Round logged (${vsParLabel(diff)})`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), course: '', holes: '18', score: '', par: '54', notes: '' })
     setOpen(false); onLogged()
@@ -116,7 +116,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function EditDiscGolfModal({ round, onClose, onSaved }: { round: DiscGolfRound; onClose: () => void; onSaved: () => void }) {
   const [score, setScore] = useState(String(round.score))
@@ -133,7 +133,7 @@ function EditDiscGolfModal({ round, onClose, onSaved }: { round: DiscGolfRound; 
   }
 
   return (
-    <EditModal title={`${round.course} â€” ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${round.course} â€" ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label className="section-label">Score</label>
@@ -144,7 +144,7 @@ function EditDiscGolfModal({ round, onClose, onSaved }: { round: DiscGolfRound; 
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -179,9 +179,9 @@ export function DiscGolf() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
-            { label: 'Rounds',    value: rounds.length || 'â€”' },
-            { label: 'Best',      value: bestDiff !== null ? vsParLabel(bestDiff) : 'â€”', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
-            { label: 'Under Par', value: underPar || 'â€”', color: '#34d399' },
+            { label: 'Rounds',    value: rounds.length || 'â€"' },
+            { label: 'Best',      value: bestDiff !== null ? vsParLabel(bestDiff) : 'â€"', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
+            { label: 'Under Par', value: underPar || 'â€"', color: '#34d399' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: s.color ?? ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>

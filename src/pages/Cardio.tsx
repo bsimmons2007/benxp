@@ -44,7 +44,7 @@ function activityMeta(key: string) {
   return ACTIVITIES.find(a => a.key === key) ?? { key: 'run', label: 'Run' }
 }
 
-// â”€â”€ Unified session type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Unified session type â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 interface Session {
   id: string
   date: string
@@ -70,7 +70,7 @@ function sessionXP(s: Session) {
     : Math.round(s.distance * cardioRate(s.activity))
 }
 
-// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 interface CardioForm {
   date: string
   activity: ActivityKey
@@ -130,7 +130,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
       : Math.round(miles * cardioRate(data.activity))
     const { label } = activityMeta(data.activity)
     playXPGain()
-    setToast(`+${xp} XP â€” ${label} logged!`)
+    setToast(`+${xp} XP â€" ${label} logged!`)
     addOptimisticActivity({ type: 'cardio', label: `${miles.toFixed(2)} mi ${label.toLowerCase()}`, date: data.date, icon: data.activity })
     await refreshXP()
     refreshActivity()
@@ -188,7 +188,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 function EditSessionModal({ session, onClose, onSaved }: { session: Session; onClose: () => void; onSaved: () => void }) {
   const [miles, setMiles]   = useState(String(session.distance))
   const [mins, setMins]     = useState(String(session.duration_mins ?? ''))
@@ -225,7 +225,7 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
 
   const { label } = activityMeta(session.activity)
   return (
-    <EditModal title={`${label} â€” ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${label} â€" ${formatDate(session.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-base font-medium" style={labelStyle}>Miles</label>
@@ -252,7 +252,7 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 export function Cardio() {
   usePageTitle('Cardio')
   const streak = useStreak()

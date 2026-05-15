@@ -33,7 +33,7 @@ export function LogSleepForm() {
 
     const hrs = parseFloat(data.hours_slept)
     const quality = hrs >= 8 ? 'Great sleep!' : hrs >= 7 ? 'Good sleep' : 'Could be better'
-    setToast(`Sleep logged â€” ${quality}`)
+    setToast(`Sleep logged â€" ${quality}`)
     reset({ date: today(), bedtime: '', hours_slept: '', wake_time: '' })
   }
 

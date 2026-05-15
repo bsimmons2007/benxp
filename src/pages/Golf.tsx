@@ -40,7 +40,7 @@ function saveScorecardForRound(id: string, holes: number[]) {
   localStorage.setItem(SCORECARDS_KEY, JSON.stringify(m))
 }
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function vsParLabel(diff: number): string {
   if (diff === 0) return 'E'
@@ -55,7 +55,7 @@ function defaultPar(holes: number) {
   return holes === 9 ? 36 : 72
 }
 
-// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface GolfForm {
   date: string
@@ -244,7 +244,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose: () => void; onSaved: () => void }) {
   const [score, setScore] = useState(String(round.score))
@@ -265,7 +265,7 @@ function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose:
   }
 
   return (
-    <EditModal title={`${round.course} â€” ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${round.course} â€" ${formatDate(round.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -282,7 +282,7 @@ function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose:
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -305,7 +305,7 @@ export function Golf() {
   const bestDiff  = rounds.length ? Math.min(...diffs) : null
   const avgDiff   = rounds.length ? Math.round((diffs.reduce((a, b) => a + b, 0) / diffs.length) * 10) / 10 : null
 
-  // Trend chart data â€” most recent 10 rounds reversed to chronological
+  // Trend chart data â€" most recent 10 rounds reversed to chronological
   const chartData = [...rounds].reverse().slice(-12).map(r => ({
     label: formatDate(r.date).slice(0, 6),
     vsPar: r.score - r.par,
@@ -325,9 +325,9 @@ export function Golf() {
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
-            { label: 'Rounds',   value: rounds.length || 'â€”' },
-            { label: 'Best',     value: bestDiff !== null ? vsParLabel(bestDiff) : 'â€”', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
-            { label: 'Avg',      value: avgDiff  !== null ? vsParLabel(Math.round(avgDiff)) : 'â€”', color: avgDiff !== null ? vsParColor(Math.round(avgDiff)) : undefined },
+            { label: 'Rounds',   value: rounds.length || 'â€"' },
+            { label: 'Best',     value: bestDiff !== null ? vsParLabel(bestDiff) : 'â€"', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
+            { label: 'Avg',      value: avgDiff  !== null ? vsParLabel(Math.round(avgDiff)) : 'â€"', color: avgDiff !== null ? vsParColor(Math.round(avgDiff)) : undefined },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: s.color ?? ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>

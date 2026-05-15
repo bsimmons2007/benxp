@@ -19,7 +19,7 @@ import type { TableTennisGame } from '../types'
 
 const ACCENT = '#38bdf8'
 
-// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface TTForm {
   date: string
@@ -54,8 +54,8 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes    || null,
     })
     const xp = XP_RATES.table_tennis_game + (isWin ? XP_RATES.table_tennis_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP â€” ðŸ“ Game, set, match!`) }
-    else        { playXPGain(); setToast(`+${xp} XP â€” Keep grinding!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP â€" ðŸ" Game, set, match!`) }
+    else        { playXPGain(); setToast(`+${xp} XP â€" Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), game_type: 'Singles', my_score: '', opp_score: '', opponent: '', notes: '' })
     setIsWin(true); setOpen(false); onLogged()
@@ -112,7 +112,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClose: () => void; onSaved: () => void }) {
   const [myScore,  setMyScore]  = useState(String(game.my_score  ?? ''))
@@ -135,7 +135,7 @@ function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClos
   }
 
   return (
-    <EditModal title={`Edit â€” ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€" ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
@@ -158,7 +158,7 @@ function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClos
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -201,12 +201,12 @@ export function TableTennis() {
 
         {/* Format filter */}
         {hasBothFormats && (
-          <div className=”flex gap-2 mb-3”>
+          <div className="flex gap-2 mb-3">
             {(['All', 'Singles', 'Doubles'] as const).map(f => (
               <button
                 key={f}
                 onClick={() => setFormatFilter(f)}
-                className=”px-3 py-1.5 rounded-full text-xs font-semibold”
+                className="px-3 py-1.5 rounded-full text-xs font-semibold"
                 style={{
                   background: formatFilter === f ? ACCENT : 'var(--input-bg)',
                   color: formatFilter === f ? '#0d0d1a' : 'var(--text-muted)',
@@ -219,7 +219,7 @@ export function TableTennis() {
           </div>
         )}
 
-        <div className=”grid grid-cols-3 gap-2 mb-3”>
+        <div className="grid grid-cols-3 gap-2 mb-3">
           {[
             { label: 'Wins',     value: wins },
             { label: 'Win Rate', value: filteredGames.length ? `${winRate}%` : '—' },
@@ -285,7 +285,7 @@ export function TableTennis() {
               <div style={{ textAlign: 'right' }}>
                 {g.my_score != null && g.opp_score != null && (
                   <p style={{ fontSize: 16, fontWeight: 800, color: g.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
-                    {g.my_score}â€“{g.opp_score}
+                    {g.my_score}â€"{g.opp_score}
                   </p>
                 )}
                 <p style={{ fontSize: 11, fontWeight: 600, color: g.win ? ACCENT : '#f87171' }}>

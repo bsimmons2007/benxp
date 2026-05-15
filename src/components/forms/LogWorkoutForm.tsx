@@ -54,7 +54,7 @@ export function LogWorkoutForm() {
   const isBodyweight = BODYWEIGHT_LIFTS.includes(lift)
   const showGrip = GRIP_LIFTS.includes(lift)
 
-  // â”€â”€ Load today's bodyweight on mount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ Load today's bodyweight on mount â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   useEffect(() => {
     async function loadBW() {
       const { data: { user } } = await supabase.auth.getUser()
@@ -135,7 +135,7 @@ export function LogWorkoutForm() {
     }
     saveVariantsForLift(inserted.id, data.equipment, data.grip)
 
-    // â”€â”€ Save bodyweight to bodyweight_log (only once per day) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â"€â"€ Save bodyweight to bodyweight_log (only once per day) â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
     if (data.bodyweight && parseFloat(data.bodyweight) > 0 && !bwLoggedToday) {
       const bwEntry = parseFloat(data.bodyweight)
       await supabase.from('bodyweight_log').insert({
@@ -153,7 +153,7 @@ export function LogWorkoutForm() {
     }
 
     const xpEarned = sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0)
-    setToast(`+${xpEarned} XP${isPR ? ' â€” New PR!' : ''}`)
+    setToast(`+${xpEarned} XP${isPR ? ' â€" New PR!' : ''}`)
     await refreshXP()
 
     // Keep bodyweight and equipment pre-filled across entries
@@ -236,7 +236,7 @@ export function LogWorkoutForm() {
         <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>
           Bodyweight (lbs)
           {bwLoggedToday && (
-            <span style={{ marginLeft: 8, fontSize: 10, color: '#4caf50', fontWeight: 700 }}>âœ“ logged today</span>
+            <span style={{ marginLeft: 8, fontSize: 10, color: '#4caf50', fontWeight: 700 }}>âœ" logged today</span>
           )}
         </label>
         <input
@@ -255,7 +255,7 @@ export function LogWorkoutForm() {
         />
         {!bwLoggedToday && (
           <p style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
-            Only asked once per day â€” updates your weight graph
+            Only asked once per day â€" updates your weight graph
           </p>
         )}
       </div>

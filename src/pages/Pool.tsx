@@ -20,7 +20,7 @@ import type { PoolGame } from '../types'
 const ACCENT = '#c084fc'
 const GAME_TYPES = ['8-Ball', '9-Ball', '10-Ball', 'Straight Pool', 'One Pocket', 'Bank Pool']
 
-// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface PoolForm {
   date: string
@@ -57,8 +57,8 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
     const xp = XP_RATES.pool_game
       + (isWin       ? XP_RATES.pool_win           : 0)
       + (breakAndRun ? XP_RATES.pool_break_and_run : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP â€” ðŸŽ± Rack 'em!`) }
-    else        { playXPGain(); setToast(`+${xp} XP â€” Keep shooting!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP â€" ðŸŽ± Rack 'em!`) }
+    else        { playXPGain(); setToast(`+${xp} XP â€" Keep shooting!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), game_type: '8-Ball', opponent: '', run_count: '', notes: '' })
     setIsWin(true); setBreakAndRun(false); setOpen(false); onLogged()
@@ -119,7 +119,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function EditPoolModal({ game, onClose, onSaved }: { game: PoolGame; onClose: () => void; onSaved: () => void }) {
   const [win,         setWin]         = useState(game.win)
@@ -141,7 +141,7 @@ function EditPoolModal({ game, onClose, onSaved }: { game: PoolGame; onClose: ()
   }
 
   return (
-    <EditModal title={`Edit â€” ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Edit â€" ${formatDate(game.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label className="section-label">Run Count</label>
@@ -164,7 +164,7 @@ function EditPoolModal({ game, onClose, onSaved }: { game: PoolGame; onClose: ()
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -207,9 +207,9 @@ export function Pool() {
         <div className="grid grid-cols-2 gap-2 mb-3">
           {[
             { label: 'Wins',         value: wins },
-            { label: 'Win Rate',     value: games.length ? `${winRate}%` : 'â€”' },
-            { label: 'Win Streak',   value: streak || 'â€”' },
-            { label: 'Break & Runs', value: breakAndRuns || 'â€”' },
+            { label: 'Win Rate',     value: games.length ? `${winRate}%` : 'â€"' },
+            { label: 'Win Streak',   value: streak || 'â€"' },
+            { label: 'Break & Runs', value: breakAndRuns || 'â€"' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>

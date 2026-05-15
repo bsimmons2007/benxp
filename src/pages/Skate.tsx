@@ -16,7 +16,7 @@ import type { SkateSession } from '../types'
 import { ZapIcon, EditIcon, SkateIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface SkateForm { date: string; miles: string; duration: string; fastest_mile: string }
 
@@ -46,7 +46,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
       return
     }
     const xp = Math.round(miles * XP_RATES.skate_per_mile)
-    setToast(`+${xp} XP â€” Session logged!`)
+    setToast(`+${xp} XP â€" Session logged!`)
     await refreshXP()
     refreshActivity()
     reset({ date: today(), miles: '', duration: '', fastest_mile: '' })
@@ -83,7 +83,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose: () => void; onSaved: () => void }) {
   const [miles, setMiles] = useState(String(row.miles ?? ''))
@@ -107,7 +107,7 @@ function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose:
   }
 
   return (
-    <EditModal title={`Skate â€” ${formatDate(row.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`Skate â€" ${formatDate(row.date)}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <Input label="Miles" type="number" step="0.01" value={miles} onChange={e => setMiles(e.target.value)} />
         <div className="flex gap-3">
@@ -119,7 +119,7 @@ function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose:
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 export function Skate() {
   usePageTitle('Skate')
@@ -143,7 +143,7 @@ export function Skate() {
   }, null as number | null)
   const avgMiles = sessions.length > 0 ? totalMiles / sessions.length : 0
 
-  // Chart data â€” chronological for trend lines
+  // Chart data â€" chronological for trend lines
   const sorted = [...sessions].sort((a, b) => a.date.localeCompare(b.date))
   const milesTrend = sorted.map((s) => ({ date: s.date, miles: s.miles }))
   const fastestTrend = sorted
@@ -160,7 +160,7 @@ export function Skate() {
           {[
             { label: 'Total Miles', value: totalMiles.toFixed(1), unit: 'mi' },
             { label: 'Sessions', value: sessions.length },
-            { label: 'Fastest Mile', value: fastestMile ? fastestMile.toFixed(2) : 'â€”', unit: fastestMile ? 'min' : '' },
+            { label: 'Fastest Mile', value: fastestMile ? fastestMile.toFixed(2) : 'â€"', unit: fastestMile ? 'min' : '' },
           ].map((s) => (
             <div key={s.label} className="rounded-xl p-3" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="section-label">{s.label}</p>
@@ -210,7 +210,7 @@ export function Skate() {
                 <Area type="monotone" dataKey="miles" stroke="var(--accent)" strokeWidth={2.5} fill="url(#skate-miles-grad)" dot={{ fill: 'var(--accent)', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: 'var(--accent)', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
-            <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>â”€â”€ avg</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>â"€â"€ avg</p>
           </div>
         )}
 
@@ -242,7 +242,7 @@ export function Skate() {
                 <Area type="monotone" dataKey="fastest_mile" stroke="#2ECC71" strokeWidth={2.5} fill="url(#skate-speed-grad)" dot={{ fill: '#2ECC71', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#2ECC71', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
-            {fastestMile && <p className="text-xs mt-1" style={{ color: '#2ECC71' }}>â”€â”€ PR {fastestMile.toFixed(2)} min/mi</p>}
+            {fastestMile && <p className="text-xs mt-1" style={{ color: '#2ECC71' }}>â"€â"€ PR {fastestMile.toFixed(2)} min/mi</p>}
           </div>
         )}
 

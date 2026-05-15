@@ -33,7 +33,7 @@ function resultLabel(r: string) {
   return 'Loss'
 }
 
-// â”€â”€ Log form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface ChessForm {
   date: string
@@ -74,9 +74,9 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
     const xp = XP_RATES.chess_game
       + (data.result === 'win'  ? XP_RATES.chess_win  : 0)
       + (data.result === 'draw' ? XP_RATES.chess_draw : 0)
-    if (data.result === 'win')  { playPR();     setToast(`+${xp} XP â€” â™Ÿï¸ Checkmate!`) }
-    else if (data.result === 'draw') { playXPGain(); setToast(`+${xp} XP â€” Draw logged`) }
-    else                        { playXPGain(); setToast(`+${xp} XP â€” Game logged`) }
+    if (data.result === 'win')  { playPR();     setToast(`+${xp} XP â€" â™Ÿï¸ Checkmate!`) }
+    else if (data.result === 'draw') { playXPGain(); setToast(`+${xp} XP â€" Draw logged`) }
+    else                        { playXPGain(); setToast(`+${xp} XP â€" Game logged`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), result: 'win', rating_after: '', time_control: 'Blitz', color: 'White', opponent: '', opening: '', notes: '' })
     setOpen(false); onLogged()
@@ -149,7 +149,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â”€â”€ Edit modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function EditChessModal({ game, onClose, onSaved }: { game: ChessGame; onClose: () => void; onSaved: () => void }) {
   const [rating, setRating] = useState(String(game.rating_after ?? ''))
@@ -170,7 +170,7 @@ function EditChessModal({ game, onClose, onSaved }: { game: ChessGame; onClose: 
   }
 
   return (
-    <EditModal title={`${formatDate(game.date)} â€” ${game.time_control}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
+    <EditModal title={`${formatDate(game.date)} â€" ${game.time_control}`} onClose={onClose} onDelete={del} onSave={save} saving={saving}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-2">
           {RESULTS.map(r => (
@@ -196,7 +196,7 @@ function EditChessModal({ game, onClose, onSaved }: { game: ChessGame; onClose: 
   )
 }
 
-// â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -220,7 +220,7 @@ export function Chess() {
   const losses   = filtered.filter(g => g.result === 'loss').length
   const winRate  = filtered.length ? Math.round((wins / filtered.length) * 100) : 0
 
-  // Rating trend â€” only games that have rating_after, chronological
+  // Rating trend â€" only games that have rating_after, chronological
   const ratingData = [...games]
     .filter(g => g.rating_after != null)
     .reverse()
@@ -265,7 +265,7 @@ export function Chess() {
             { label: 'Wins',     value: wins,    color: '#34d399' },
             { label: 'Draws',    value: draws,   color: '#f59e0b' },
             { label: 'Losses',   value: losses,  color: '#f87171' },
-            { label: 'Win %',    value: filtered.length ? `${winRate}%` : 'â€”', color: ACCENT },
+            { label: 'Win %',    value: filtered.length ? `${winRate}%` : 'â€"', color: ACCENT },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-2 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-lg font-bold" style={{ color: s.color, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
@@ -279,7 +279,7 @@ export function Chess() {
           <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.2)' }}>
             <span style={{ fontSize: 13, color: '#888' }}>{games.length} games</span>
             {streak > 1 && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#34d399' }}>ðŸ”¥ {streak} win streak</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#34d399' }}>ðŸ"¥ {streak} win streak</span>
             )}
           </div>
         )}
