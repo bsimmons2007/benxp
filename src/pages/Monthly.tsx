@@ -61,6 +61,7 @@ export function Monthly() {
   }
 
   useEffect(() => {
+    let cancelled = false
     async function load() {
       setLoading(true)
       const { start, end } = monthRange(year, month)
@@ -136,10 +137,13 @@ export function Monthly() {
       }
       booksRead.forEach(b => topMoments.push({ icon: <BookIcon size={16} color="var(--text-secondary)" />, text: `Finished "${b.title}"` }))
 
-      setData({ xpEarned, highlights, topMoments, workoutDays, newPRs, wins, totalKills, milesSkated, booksRead, sleepNights: sleepRows.length, avgSleep })
-      setLoading(false)
+      if (!cancelled) {
+        setData({ xpEarned, highlights, topMoments, workoutDays, newPRs, wins, totalKills, milesSkated, booksRead, sleepNights: sleepRows.length, avgSleep })
+        setLoading(false)
+      }
     }
     load()
+    return () => { cancelled = true }
   }, [year, month])
 
   const animatedXP = useCountUp(data?.xpEarned ?? 0, 1000)

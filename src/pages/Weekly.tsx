@@ -64,6 +64,7 @@ export function Weekly() {
     : `${formatDateShort(monday)} – ${formatDateShort(sunday)}`
 
   useEffect(() => {
+    let cancelled = false
     async function load() {
       setLoading(true)
       const [lifting, prs, skate, books, games, sleep] = await Promise.all([
@@ -128,18 +129,21 @@ export function Weekly() {
         streak = Math.max(streak, cur)
       }
 
-      setData({
-        xpEarned, workoutDays, totalSets, newPRs: prRows.length,
-        bestLift: bestLiftRow ? { lift: bestLiftRow.lift, weight: bestLiftRow.weight, reps: bestLiftRow.reps } : null,
-        milesSkated: totalMiles, skateSessions: skateRows.length,
-        wins, kills,
-        booksFinished: bookRows.map((r: { title: string }) => ({ title: r.title })),
-        sleepNights: sleepRows.length, avgSleep, goodSleepNights: goodNights,
-        streak, activeDays: activeSorted,
-      })
-      setLoading(false)
+      if (!cancelled) {
+        setData({
+          xpEarned, workoutDays, totalSets, newPRs: prRows.length,
+          bestLift: bestLiftRow ? { lift: bestLiftRow.lift, weight: bestLiftRow.weight, reps: bestLiftRow.reps } : null,
+          milesSkated: totalMiles, skateSessions: skateRows.length,
+          wins, kills,
+          booksFinished: bookRows.map((r: { title: string }) => ({ title: r.title })),
+          sleepNights: sleepRows.length, avgSleep, goodSleepNights: goodNights,
+          streak, activeDays: activeSorted,
+        })
+        setLoading(false)
+      }
     }
     load()
+    return () => { cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monday, sunday])
 
