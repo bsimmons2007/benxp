@@ -138,7 +138,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Rating after game (optional)" type="number" placeholder="1240" {...register('rating_after')} />
             <Input label="Opponent (optional)" type="text" placeholder="GrandmasterFox" {...register('opponent')} />
             <Input label="Opening (optional)" type="text" placeholder="Sicilian Defense" {...register('opening')} />
-            <Input label="Notes (optional)" type="text" placeholder="Blundered the queen on move 22â€¦" {...register('notes')} />
+            <Input label="Notes (optional)" type="text" placeholder="Blundered the queen on move 22…" {...register('notes')} />
 
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>

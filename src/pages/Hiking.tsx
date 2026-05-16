@@ -112,7 +112,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
               </div>
             </div>
 
-            <Input label="Notes (optional)" type="text" placeholder="Sunrise hike, packed lunchâ€¦" {...register('notes')} />
+            <Input label="Notes (optional)" type="text" placeholder="Sunrise hike, packed lunch…" {...register('notes')} />
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Hike'}</Button>
           </form>
         </div>

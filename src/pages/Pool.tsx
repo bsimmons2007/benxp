@@ -85,9 +85,9 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
               </select>
             </div>
 
-            <Input label="Opponent (optional)" type="text" placeholder="Nameâ€¦"    {...register('opponent')} />
+            <Input label="Opponent (optional)" type="text" placeholder="Name…"    {...register('opponent')} />
             <Input label="Run Count (optional)" type="number" placeholder="e.g. 5" {...register('run_count')} />
-            <Input label="Notes (optional)"    type="text" placeholder="Location, tableâ€¦" {...register('notes')} />
+            <Input label="Notes (optional)"    type="text" placeholder="Location, table…" {...register('notes')} />
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>

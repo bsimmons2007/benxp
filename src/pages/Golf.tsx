@@ -232,7 +232,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="FWY Tot" type="number" placeholder="14" className="flex-1" {...register('fairways_possible')} />
             </div>
 
-            <Input label="Notes (optional)" type="text" placeholder="Windy, back nine was toughâ€¦" {...register('notes')} />
+            <Input label="Notes (optional)" type="text" placeholder="Windy, back nine was tough…" {...register('notes')} />
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Round'}</Button>
           </form>
         </div>

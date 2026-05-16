@@ -258,7 +258,7 @@ export function Mood() {
               </div>
             ))}
 
-            <Input label="Activities" type="text" placeholder="Gym, reading, skatingâ€¦" {...register('activities')} />
+            <Input label="Activities" type="text" placeholder="Gym, reading, skating…" {...register('activities')} />
             <div className="flex flex-col gap-1">
               <label style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif', fontSize: 15, fontWeight: 500 }}>
                 Notes
@@ -272,7 +272,7 @@ export function Mood() {
               />
             </div>
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>
-              {isSubmitting ? 'Loggingâ€¦' : 'Log Check-in'}
+              {isSubmitting ? 'Logging…' : 'Log Check-in'}
             </Button>
           </form>
         </Card>
@@ -346,7 +346,7 @@ export function Mood() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={{ fontSize: 13, color: '#aaa' }}>Activities</label>
               <input value={editVals.activities} onChange={e => setEditVals(v => ({ ...v, activities: e.target.value }))}
-                placeholder="Gym, readingâ€¦"
+                placeholder="Gym, reading…"
                 style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>

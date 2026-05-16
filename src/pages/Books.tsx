@@ -558,7 +558,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
               </select>
             </div>
             {genre === 'Other' && (
-              <Input label="Custom genre" type="text" placeholder="e.g. Horror, Westernâ€¦" {...register('customGenre')} />
+              <Input label="Custom genre" type="text" placeholder="e.g. Horror, Western…" {...register('customGenre')} />
             )}
 
             <Input label="Pages (optional)" type="number" placeholder="350" {...register('pages')} />
@@ -571,7 +571,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
             )}
 
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>
-              {isSubmitting ? 'Savingâ€¦' : status === 'reading' ? 'Start Reading' : 'Log Finished Book'}
+              {isSubmitting ? 'Saving…' : status === 'reading' ? 'Start Reading' : 'Log Finished Book'}
             </Button>
           </form>
         </div>

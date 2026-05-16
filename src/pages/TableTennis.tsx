@@ -89,7 +89,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
             </div>
 
             <Input label="Opponent (optional)" type="text" placeholder="John" {...register('opponent')} />
-            <Input label="Notes (optional)"    type="text" placeholder="Best-of-5 matchâ€¦" {...register('notes')} />
+            <Input label="Notes (optional)"    type="text" placeholder="Best-of-5 match…" {...register('notes')} />
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>

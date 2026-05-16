@@ -94,8 +94,8 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="Digs"    type="number" placeholder="0" {...register('digs')} />
               <Input label="Assists" type="number" placeholder="0" {...register('assists')} />
             </div>
-            <Input label="Opponent (optional)" type="text" placeholder="Team nameâ€¦" {...register('opponent')} />
-            <Input label="Notes (optional)"    type="text" placeholder="Gym, tournamentâ€¦" {...register('notes')} />
+            <Input label="Opponent (optional)" type="text" placeholder="Team name…" {...register('opponent')} />
+            <Input label="Notes (optional)"    type="text" placeholder="Gym, tournament…" {...register('notes')} />
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
@@ -176,9 +176,9 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="My Score"  type="number" placeholder="21" className="flex-1" {...register('my_score')} />
               <Input label="Opp Score" type="number" placeholder="18" className="flex-1" {...register('opp_score')} />
             </div>
-            <Input label="Partner (optional)"  type="text" placeholder="Nameâ€¦"   {...register('partner')} />
-            <Input label="Opponent (optional)" type="text" placeholder="Teamâ€¦"   {...register('opponent')} />
-            <Input label="Notes (optional)"    type="text" placeholder="Location, tournamentâ€¦" {...register('notes')} />
+            <Input label="Partner (optional)"  type="text" placeholder="Name…"   {...register('partner')} />
+            <Input label="Opponent (optional)" type="text" placeholder="Team…"   {...register('opponent')} />
+            <Input label="Notes (optional)"    type="text" placeholder="Location, tournament…" {...register('notes')} />
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>

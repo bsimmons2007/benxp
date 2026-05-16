@@ -174,12 +174,12 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="Fastest Mile (min/mi)" type="number" step="0.01" placeholder="5.15" {...register('fastest_mile')} />
             )}
             {activity === 'run' && (
-              <Input label="Mile Splits (optional)" type="text" placeholder="8:30, 8:15, 8:45â€¦" {...register('splits')} />
+              <Input label="Mile Splits (optional)" type="text" placeholder="8:30, 8:15, 8:45…" {...register('splits')} />
             )}
             {!isSkate && (
-              <Input label="Notes (optional)" type="text" placeholder="Morning runâ€¦" {...register('notes')} />
+              <Input label="Notes (optional)" type="text" placeholder="Morning run…" {...register('notes')} />
             )}
-            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Loggingâ€¦' : 'Log Session'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging…' : 'Log Session'}</Button>
           </form>
         </div>
       )}

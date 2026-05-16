@@ -106,7 +106,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="Par" type="number" placeholder="54" className="flex-1" {...register('par')} />
               <Input label="Score" type="number" placeholder="56" className="flex-1" {...register('score', { required: true })} />
             </div>
-            <Input label="Notes (optional)" type="text" placeholder="Wooded course, great weatherâ€¦" {...register('notes')} />
+            <Input label="Notes (optional)" type="text" placeholder="Wooded course, great weather…" {...register('notes')} />
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Round'}</Button>
           </form>
         </div>

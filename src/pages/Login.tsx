@@ -483,7 +483,7 @@ export function Login() {
                     <span style={{
                       position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
                       color: '#22c55e', fontSize: 16, lineHeight: 1,
-                    }}>âœ"</span>
+                    }}>✓</span>
                   )}
                 </div>
               </div>
@@ -517,7 +517,7 @@ export function Login() {
                   <input
                     type={showPass ? 'text' : 'password'}
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                    placeholder="••••••••"
                     {...passwordReg}
                     ref={e => { passwordReg.ref(e); (passwordRef as React.MutableRefObject<HTMLInputElement | null>).current = e }}
                     style={{ ...INPUT_BASE, paddingRight: 46 }}
@@ -546,7 +546,7 @@ export function Login() {
 
                 {/* Caps Lock warning */}
                 {capsLock && (
-                  <p style={{ color: '#f59e0b', fontSize: 11, marginTop: 4 }}>âš  Caps Lock is on</p>
+                  <p style={{ color: '#f59e0b', fontSize: 11, marginTop: 4 }}>⚠ Caps Lock is on</p>
                 )}
 
                 {/* Password strength — signup only */}
@@ -579,7 +579,7 @@ export function Login() {
                     <input
                       type={showConfirm ? 'text' : 'password'}
                       autoComplete="new-password"
-                      placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                      placeholder="••••••••"
                       {...register('confirm', { required: mode === 'signup' })}
                       style={{ ...INPUT_BASE, paddingRight: 46 }}
                       onFocus={inputFocus}
@@ -657,7 +657,7 @@ export function Login() {
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px var(--accent-dim)' }}
               >
                 {isSubmitting
-                  ? <><SpinnerIcon /> Loadingâ€¦</>
+                  ? <><SpinnerIcon /> Loading…</>
                   : mode === 'login' ? 'Sign In' : 'Create Account'
                 }
               </button>

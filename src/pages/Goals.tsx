@@ -191,7 +191,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
               />
             </div>
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>
-              {isSubmitting ? 'Savingâ€¦' : 'Add Goal'}
+              {isSubmitting ? 'Saving…' : 'Add Goal'}
             </Button>
           </form>
         </div>

@@ -78,9 +78,9 @@ function LogSBPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="My Score"  type="number" placeholder="21" className="flex-1" {...register('my_score')} />
               <Input label="Opp Score" type="number" placeholder="18" className="flex-1" {...register('opp_score')} />
             </div>
-            <Input label="Partner (optional)"   type="text" placeholder="Nameâ€¦"    {...register('partner')} />
-            <Input label="Opponents (optional)" type="text" placeholder="Namesâ€¦"   {...register('opponents')} />
-            <Input label="Notes (optional)"     type="text" placeholder="Locationâ€¦" {...register('notes')} />
+            <Input label="Partner (optional)"   type="text" placeholder="Name…"    {...register('partner')} />
+            <Input label="Opponents (optional)" type="text" placeholder="Names…"   {...register('opponents')} />
+            <Input label="Notes (optional)"     type="text" placeholder="Location…" {...register('notes')} />
 
             {/* Win toggle */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>

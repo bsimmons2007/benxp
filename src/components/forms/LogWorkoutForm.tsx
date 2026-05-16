@@ -236,7 +236,7 @@ export function LogWorkoutForm() {
         <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>
           Bodyweight (lbs)
           {bwLoggedToday && (
-            <span style={{ marginLeft: 8, fontSize: 10, color: '#4caf50', fontWeight: 700 }}>âœ" logged today</span>
+            <span style={{ marginLeft: 8, fontSize: 10, color: '#4caf50', fontWeight: 700 }}>✓ logged today</span>
           )}
         </label>
         <input
