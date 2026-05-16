@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState, lazy, Suspense } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, lazy, Suspense } from 'react'
 import type { ReactNode } from 'react'
 import { BottomNav } from './components/layout/BottomNav'
 import { SideNav } from './components/layout/SideNav'
@@ -51,13 +51,13 @@ import { checkDailyReminder } from './lib/notifications'
 import { useAuth } from './hooks/useAuth'
 import { useStore } from './store/useStore'
 
+// Auth state is resolved once at the App root and shared via context so that
+// navigating between routes doesn't create a new getSession() call each time.
+const AuthContext = createContext<ReturnType<typeof useAuth>>(null as never)
+
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { session, loading, error } = useAuth()
-  if (loading) {
-    return (
-      <div style={{ background: 'var(--base-bg)', minHeight: '100dvh' }} />
-    )
-  }
+  const { session, loading, error } = useContext(AuthContext)
+  if (loading) return <div style={{ background: 'var(--base-bg)', minHeight: '100dvh' }} />
   if (error || !session) return <Navigate to="/login" replace />
   return <>{children}</>
 }
@@ -240,7 +240,7 @@ function TopLoadBar() {
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, height: 2,
-      zIndex: 9998, pointerEvents: 'none',
+      zIndex: 9998, pointerEvents: 'none', overflow: 'hidden',
       opacity: loading ? 1 : 0,
       transition: 'opacity 0.4s ease',
     }}>
@@ -351,6 +351,8 @@ function AppInner() {
 }
 
 export default function App() {
+  const auth = useAuth()
+
   useEffect(() => {
     applyTimeOrSavedTheme()
     setupOfflineQueue()
@@ -378,8 +380,10 @@ export default function App() {
   }, [])
 
   return (
-    <BrowserRouter>
-      <AppInner />
-    </BrowserRouter>
+    <AuthContext.Provider value={auth}>
+      <BrowserRouter>
+        <AppInner />
+      </BrowserRouter>
+    </AuthContext.Provider>
   )
 }

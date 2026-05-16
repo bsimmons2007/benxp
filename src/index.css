@@ -358,10 +358,9 @@ button:not(:disabled):active { transform: scale(0.97); }
 /* ── Top load bar ── */
 @keyframes topLoadBar {
   0%   { transform: translateX(-100%); }
-  50%  { transform: translateX(-20%); }
-  100% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
 }
-.top-load-bar { animation: topLoadBar 1.4s cubic-bezier(0.4,0,0.2,1) infinite; }
+.top-load-bar { animation: topLoadBar 1.2s linear infinite; }
 
 /* ── Chart today-dot pulse ── */
 @keyframes chartDotPulse {
