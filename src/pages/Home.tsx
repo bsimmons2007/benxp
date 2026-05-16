@@ -98,6 +98,7 @@ function useTrends(): TrendResult {
   useEffect(() => {
     if (trendsCache && Date.now() - trendsCache.ts < TRENDS_TTL) return
 
+    let cancelled = false
     async function load() {
       const now            = new Date()
       const thisMonthStart = localDateStr(new Date(now.getFullYear(), now.getMonth(), 1))
@@ -154,9 +155,10 @@ function useTrends(): TrendResult {
       }
 
       trendsCache = { data: result, ts: Date.now() }
-      setTrends(result)
+      if (!cancelled) setTrends(result)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   return trends
@@ -659,9 +661,7 @@ export function Home() {
               {streak.current > 0 && <>{streak.current} Streak · </>}
               {stats.booksThisYear} Books · {stats.winCount} Wins
               {userName && <> · {userName}XP</>}
-              {fmtAgo(lastUpdated) && (
-                <span style={{ marginLeft: 6, opacity: 0.6 }}>· {fmtAgo(lastUpdated)}</span>
-              )}
+              {(() => { const t = fmtAgo(lastUpdated); return t ? <span style={{ marginLeft: 6, opacity: 0.6 }}>· {t}</span> : null })()}
             </p>
           </div>
         </div>

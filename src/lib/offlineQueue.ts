@@ -41,7 +41,10 @@ export async function flushQueue(): Promise<void> {
   writeQueue(failed)
 }
 
+let _setupDone = false
 export function setupOfflineQueue() {
+  if (_setupDone) return
+  _setupDone = true
   window.addEventListener('online', () => {
     flushQueue().catch(console.error)
   })

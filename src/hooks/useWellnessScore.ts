@@ -22,6 +22,7 @@ export function useWellnessScore(): WellnessScore {
   useEffect(() => {
     if (cache && Date.now() - cache.ts < TTL) { setScore(cache.data); return }
 
+    let cancelled = false
     async function load() {
       const now   = new Date()
       const dow   = now.getDay()
@@ -74,9 +75,10 @@ export function useWellnessScore(): WellnessScore {
         loading: false, hasSomeData,
       }
       cache = { data: result, ts: Date.now() }
-      setScore(result)
+      if (!cancelled) setScore(result)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   return score
