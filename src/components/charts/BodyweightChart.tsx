@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { formatDate, formatDateTooltip } from '../../lib/utils'
+import { formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
 
 const BW_GOAL_KEY = 'youxp-bw-goal'
 
@@ -19,7 +19,7 @@ const TT_STYLE = {
   boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
 
-const todayStr = new Date().toISOString().slice(0, 10)
+const todayStr = localDateStr(new Date())
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomDot(props: any) {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { formatDate, formatDateTooltip } from '../../lib/utils'
+import { formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
 
 interface DataPoint {
   date:    string
@@ -15,7 +15,7 @@ interface ComparePoint {
   prior:    number | null
 }
 
-const todayStr = new Date().toISOString().slice(0, 10)
+const todayStr = localDateStr(new Date())
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomDot(props: any) {
@@ -47,8 +47,8 @@ function buildCompareData(data: DataPoint[], dataKey: 'est_1rm' | 'reps'): Compa
   const cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 30)
   const cutoffPrior = new Date(now); cutoffPrior.setDate(cutoffPrior.getDate() - 60)
 
-  const currentRows = data.filter(d => d.date >= cutoff.toISOString().slice(0, 10))
-  const priorRows   = data.filter(d => d.date >= cutoffPrior.toISOString().slice(0, 10) && d.date < cutoff.toISOString().slice(0, 10))
+  const currentRows = data.filter(d => d.date >= localDateStr(cutoff))
+  const priorRows   = data.filter(d => d.date >= localDateStr(cutoffPrior) && d.date < localDateStr(cutoff))
 
   const days = 30
   const points: ComparePoint[] = Array.from({ length: days }, (_, i) => ({ day: i + 1, current: null, prior: null }))
@@ -113,7 +113,7 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
 
   const hasPriorData = data.some(d => {
     const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30)
-    return d.date < cutoff.toISOString().slice(0, 10)
+    return d.date < localDateStr(cutoff)
   })
 
   if (compare && hasPriorData) {
