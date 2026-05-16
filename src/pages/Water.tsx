@@ -204,7 +204,8 @@ export function Water() {
   async function addWater(oz: number) {
     if (!userId || oz <= 0) return
     const wasGoalMet = totalOz >= goalOz
-    await supabase.from('water_log').insert({ user_id: userId, date: todayStr, oz })
+    const { error } = await supabase.from('water_log').insert({ user_id: userId, date: todayStr, oz })
+    if (error) { setToast('Failed to log — try again'); return }
     const newTotal = totalOz + oz
     const goalJustMet = !wasGoalMet && newTotal >= goalOz
     if (goalJustMet) {
@@ -217,17 +218,16 @@ export function Water() {
   }
 
   async function deleteEntry(id: string) {
-    await supabase.from('water_log').delete().eq('id', id)
-    load()
+    const { error } = await supabase.from('water_log').delete().eq('id', id)
+    if (!error) load()
   }
 
   async function saveEdit() {
     if (!editEntry) return
     setSaving(true)
-    await supabase.from('water_log').update({ oz: parseFloat(editOz) || editEntry.oz }).eq('id', editEntry.id)
+    const { error } = await supabase.from('water_log').update({ oz: parseFloat(editOz) || editEntry.oz }).eq('id', editEntry.id)
     setSaving(false)
-    setEditEntry(null)
-    load()
+    if (!error) { setEditEntry(null); load() }
   }
 
   function formatTime(iso: string) {

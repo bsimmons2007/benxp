@@ -491,7 +491,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
 
     const isFinished = data.status === 'finished'
 
-    const { data: inserted } = await supabase.from('books').insert({
+    const { data: inserted, error } = await supabase.from('books').insert({
       user_id:       user.id,
       title:         data.title,
       author:        data.author || null,
@@ -500,6 +500,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
       date_finished: isFinished ? data.date_finished : null,
       rating:        isFinished && data.rating ? parseFloat(data.rating) : null,
     }).select('id').single()
+    if (error) { setToast('Failed to save — try again'); return }
     if (inserted && data.series.trim()) setSeriesForBook(inserted.id, data.series)
 
     if (isFinished) {
@@ -601,8 +602,8 @@ function ToReadSection() {
   const onSubmit = async (data: ToReadForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('to_read').insert({ user_id: user.id, title: data.title, author: data.author || null, genre: data.genre || null, priority: data.priority })
-    reset(); setShowForm(false); load()
+    const { error: toReadErr } = await supabase.from('to_read').insert({ user_id: user.id, title: data.title, author: data.author || null, genre: data.genre || null, priority: data.priority })
+    if (!toReadErr) { reset(); setShowForm(false); load() }
   }
 
   async function remove(id: string) {

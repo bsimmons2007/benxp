@@ -62,7 +62,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
     if (!user) return
     const miles  = parseFloat(data.distance_miles) || 0
     const elevFt = data.elevation_gain_ft ? parseInt(data.elevation_gain_ft) : null
-    await supabase.from('hiking_sessions').insert({
+    const { error } = await supabase.from('hiking_sessions').insert({
       user_id:           user.id,
       date:              data.date,
       trail:             data.trail,
@@ -72,6 +72,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
       difficulty:        data.difficulty || null,
       notes:             data.notes || null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     const milesXP = miles * XP_RATES.hiking_per_mile
     const elevXP  = Math.floor((elevFt ?? 0) / 500) * XP_RATES.hiking_per_500ft
     const xp = Math.round(milesXP + elevXP)
@@ -132,16 +133,17 @@ function EditHikingModal({ session, onClose, onSaved }: { session: HikingSession
 
   async function save() {
     setSaving(true)
-    await supabase.from('hiking_sessions').update({
+    const { error } = await supabase.from('hiking_sessions').update({
       distance_miles:    parseFloat(distance) || session.distance_miles,
       elevation_gain_ft: elevation ? parseInt(elevation) : null,
       duration_mins:     duration  ? parseInt(duration)  : null,
     }).eq('id', session.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
   async function del() {
-    await supabase.from('hiking_sessions').delete().eq('id', session.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('hiking_sessions').delete().eq('id', session.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

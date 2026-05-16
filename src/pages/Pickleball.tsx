@@ -55,7 +55,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: PbForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('pickleball_games').insert({
+    const { error } = await supabase.from('pickleball_games').insert({
       user_id:   user.id,
       date:      data.date,
       win:       isWin,
@@ -65,6 +65,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
       opponent:  data.opponent  || null,
       notes:     data.notes     || null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.pickleball_game + (isWin ? XP_RATES.pickleball_win : 0)
     if (isWin) { playPR(); setToast(`+${xp} XP — Dink master!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
@@ -138,16 +139,17 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
 
   async function save() {
     setSaving(true)
-    await supabase.from('pickleball_games').update({
+    const { error } = await supabase.from('pickleball_games').update({
       my_score:  myScore  ? parseInt(myScore)  : null,
       opp_score: oppScore ? parseInt(oppScore) : null,
       win,
     }).eq('id', game.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
   async function del() {
-    await supabase.from('pickleball_games').delete().eq('id', game.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('pickleball_games').delete().eq('id', game.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

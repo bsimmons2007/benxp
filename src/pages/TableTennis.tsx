@@ -43,7 +43,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: TTForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('table_tennis_games').insert({
+    const { error } = await supabase.from('table_tennis_games').insert({
       user_id:   user.id,
       date:      data.date,
       win:       isWin,
@@ -53,6 +53,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
       opponent:  data.opponent || null,
       notes:     data.notes    || null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.table_tennis_game + (isWin ? XP_RATES.table_tennis_win : 0)
     if (isWin) { playPR();     setToast(`+${xp} XP — ðŸ" Game, set, match!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
@@ -122,16 +123,17 @@ function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClos
 
   async function save() {
     setSaving(true)
-    await supabase.from('table_tennis_games').update({
+    const { error } = await supabase.from('table_tennis_games').update({
       my_score:  myScore  ? parseInt(myScore)  : null,
       opp_score: oppScore ? parseInt(oppScore) : null,
       win,
     }).eq('id', game.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
   async function del() {
-    await supabase.from('table_tennis_games').delete().eq('id', game.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('table_tennis_games').delete().eq('id', game.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

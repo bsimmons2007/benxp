@@ -47,7 +47,7 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: IndoorForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('volleyball_sessions').insert({
+    const { error } = await supabase.from('volleyball_sessions').insert({
       user_id:   user.id,
       date:      data.date,
       format:    'Indoor',
@@ -62,6 +62,7 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
       opponent:  data.opponent  || null,
       notes:     data.notes     || null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
     if (isWin) { playPR();     setToast(`+${xp} XP — ðŸ Spike!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
@@ -140,7 +141,7 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: SandForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('volleyball_sessions').insert({
+    const { error } = await supabase.from('volleyball_sessions').insert({
       user_id:   user.id,
       date:      data.date,
       format:    'Sand',
@@ -151,6 +152,7 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
       opponent:  data.opponent  || null,
       notes:     data.notes     || null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
     if (isWin) { playPR();     setToast(`+${xp} XP — ðŸ–ï¸ Beach winner!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
@@ -219,12 +221,13 @@ function EditVBModal({ session, onClose, onSaved }: { session: VolleyballSession
       patch.my_score  = myScore  ? parseInt(myScore)  : null
       patch.opp_score = oppScore ? parseInt(oppScore) : null
     }
-    await supabase.from('volleyball_sessions').update(patch).eq('id', session.id)
-    setSaving(false); onSaved(); onClose()
+    const { error } = await supabase.from('volleyball_sessions').update(patch).eq('id', session.id)
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
   async function del() {
-    await supabase.from('volleyball_sessions').delete().eq('id', session.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('volleyball_sessions').delete().eq('id', session.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

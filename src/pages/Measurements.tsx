@@ -177,7 +177,8 @@ export function Measurements() {
     }
     if (form.notes.trim()) payload['notes'] = form.notes.trim()
 
-    await supabase.from('body_measurements').insert(payload)
+    const { error } = await supabase.from('body_measurements').insert(payload)
+    if (error) { setToast('Failed to save — try again'); setSaving(false); return }
     reset({ date: today() })
     setShowForm(false)
     setToast(`+${XP_RATES.measurement_log} XP — Measurements saved!`)

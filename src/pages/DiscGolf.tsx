@@ -63,7 +63,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
     const score = parseInt(data.score)
     const par   = parseInt(data.par) || defaultPar(parseInt(data.holes) || 18)
     const diff  = score - par
-    await supabase.from('disc_golf_rounds').insert({
+    const { error } = await supabase.from('disc_golf_rounds').insert({
       user_id: user.id,
       date:    data.date,
       course:  data.course,
@@ -72,6 +72,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
       par,
       notes:   data.notes || null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.disc_golf_under_par : 0
     const xp = XP_RATES.disc_golf_round + underParBonus
     if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} ðŸ¥ Under par!`) }
@@ -124,12 +125,13 @@ function EditDiscGolfModal({ round, onClose, onSaved }: { round: DiscGolfRound; 
 
   async function save() {
     setSaving(true)
-    await supabase.from('disc_golf_rounds').update({ score: parseInt(score) || round.score }).eq('id', round.id)
-    setSaving(false); onSaved(); onClose()
+    const { error } = await supabase.from('disc_golf_rounds').update({ score: parseInt(score) || round.score }).eq('id', round.id)
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
   async function del() {
-    await supabase.from('disc_golf_rounds').delete().eq('id', round.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('disc_golf_rounds').delete().eq('id', round.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

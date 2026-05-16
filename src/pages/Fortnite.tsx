@@ -268,7 +268,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: NormalForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('fortnite_games').insert({
+    const { error } = await supabase.from('fortnite_games').insert({
       user_id:   user.id,
       date:      data.date,
       mode:      data.mode,
@@ -280,6 +280,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
       is_ranked: isRanked,
       rank_name: isRanked ? rankName : null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     if (isWin) {
       playPR()
       setToast(`+${XP_RATES.fortnite_win} XP — Victory Royale!${isRanked ? ` (Ranked ${rankName})` : ''}`)
@@ -398,7 +399,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: BlitzForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('fortnite_games').insert({
+    const { error } = await supabase.from('fortnite_games').insert({
       user_id:   user.id,
       date:      data.date,
       mode:      `Blitz ${data.blitzMode}`,   // e.g. "Blitz Solos"
@@ -409,6 +410,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
       is_ranked: false,
       rank_name: null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     if (isWin) {
       playPR()
       setToast(`+${XP_RATES.fortnite_blitz_win} XP — Blitz Victory!`)

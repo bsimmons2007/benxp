@@ -175,10 +175,9 @@ export function Settings() {
   async function saveName() {
     if (!nameInput.trim()) return
     setNameSaving(true)
-    await supabase.auth.updateUser({ data: { name: nameInput.trim() } })
+    const { error } = await supabase.auth.updateUser({ data: { name: nameInput.trim() } })
     setNameSaving(false)
-    setEditingName(false)
-    refreshUser()
+    if (!error) { setEditingName(false); refreshUser() }
   }
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {

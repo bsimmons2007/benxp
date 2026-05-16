@@ -44,7 +44,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: PoolForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('pool_games').insert({
+    const { error } = await supabase.from('pool_games').insert({
       user_id:       user.id,
       date:          data.date,
       win:           isWin,
@@ -54,6 +54,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
       break_and_run: breakAndRun,
       notes:         data.notes      || null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.pool_game
       + (isWin       ? XP_RATES.pool_win           : 0)
       + (breakAndRun ? XP_RATES.pool_break_and_run : 0)
@@ -129,15 +130,16 @@ function EditPoolModal({ game, onClose, onSaved }: { game: PoolGame; onClose: ()
 
   async function save() {
     setSaving(true)
-    await supabase.from('pool_games').update({
+    const { error } = await supabase.from('pool_games').update({
       win, break_and_run: breakAndRun,
       run_count: runCount ? parseInt(runCount) : null,
     }).eq('id', game.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
   async function del() {
-    await supabase.from('pool_games').delete().eq('id', game.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('pool_games').delete().eq('id', game.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

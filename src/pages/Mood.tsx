@@ -77,7 +77,7 @@ export function Mood() {
   async function saveMoodEdit() {
     if (!editEntry) return
     setSaving(true)
-    await supabase.from('mood_log').update({
+    const { error } = await supabase.from('mood_log').update({
       mood:       parseInt(editVals.mood),
       energy:     parseInt(editVals.energy),
       stress:     parseInt(editVals.stress),
@@ -85,21 +85,19 @@ export function Mood() {
       notes:      editVals.notes || null,
     }).eq('id', editEntry.id)
     setSaving(false)
-    setEditEntry(null)
-    loadRecent()
+    if (!error) { setEditEntry(null); loadRecent() }
   }
 
   async function deleteMoodEntry() {
     if (!editEntry) return
-    await supabase.from('mood_log').delete().eq('id', editEntry.id)
-    setEditEntry(null)
-    loadRecent()
+    const { error } = await supabase.from('mood_log').delete().eq('id', editEntry.id)
+    if (!error) { setEditEntry(null); loadRecent() }
   }
 
   const onSubmit = async (data: MoodForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('mood_log').insert({
+    const { error } = await supabase.from('mood_log').insert({
       user_id: user.id,
       date: data.date,
       mood: parseInt(data.mood),
@@ -108,6 +106,7 @@ export function Mood() {
       activities: data.activities || null,
       notes: data.notes || null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     playXPGain()
     setToast(`+${XP_RATES.mood_log} XP Â· Check-in logged ${moodLabel(parseInt(data.mood))}`)
     refreshXP()

@@ -60,7 +60,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: ChessForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('chess_games').insert({
+    const { error } = await supabase.from('chess_games').insert({
       user_id:      user.id,
       date:         data.date,
       result:       data.result,
@@ -71,6 +71,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
       opening:      data.opening  || null,
       notes:        data.notes    || null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.chess_game
       + (data.result === 'win'  ? XP_RATES.chess_win  : 0)
       + (data.result === 'draw' ? XP_RATES.chess_draw : 0)
@@ -158,15 +159,16 @@ function EditChessModal({ game, onClose, onSaved }: { game: ChessGame; onClose: 
 
   async function save() {
     setSaving(true)
-    await supabase.from('chess_games').update({
+    const { error } = await supabase.from('chess_games').update({
       result,
       rating_after: rating ? parseInt(rating) : null,
     }).eq('id', game.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
   async function del() {
-    await supabase.from('chess_games').delete().eq('id', game.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('chess_games').delete().eq('id', game.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

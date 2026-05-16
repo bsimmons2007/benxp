@@ -103,7 +103,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
     const score = parseInt(data.score)
     const par   = parseInt(data.par) || defaultPar(parseInt(data.holes) || 18)
     const diff  = score - par
-    const { data: inserted } = await supabase.from('golf_rounds').insert({
+    const { data: inserted, error } = await supabase.from('golf_rounds').insert({
       user_id:           user.id,
       date:              data.date,
       course:            data.course,
@@ -115,6 +115,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
       fairways_possible: data.fairways_possible ? parseInt(data.fairways_possible) : null,
       notes:             data.notes             || null,
     }).select('id').single()
+    if (error) { setToast('Failed to save — try again'); return }
     saveCourse(data.course)
     setSavedCourses(getSavedCourses())
     if (inserted && showScorecard) {
@@ -251,15 +252,16 @@ function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose:
 
   async function save() {
     setSaving(true)
-    await supabase.from('golf_rounds').update({
+    const { error } = await supabase.from('golf_rounds').update({
       score: parseInt(score) || round.score,
       putts: putts ? parseInt(putts) : null,
     }).eq('id', round.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
   async function del() {
-    await supabase.from('golf_rounds').delete().eq('id', round.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('golf_rounds').delete().eq('id', round.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (
