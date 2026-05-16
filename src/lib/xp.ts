@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { localDateStr } from './utils'
 
 // ── Level Titles ── every 5 levels, themed progression arc
 const LEVEL_TITLES: [number, string][] = [
@@ -305,7 +306,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
 
   // Mood: avg last 30 days
   const thirtyAgo = new Date(); thirtyAgo.setDate(thirtyAgo.getDate() - 30)
-  const thirtyAgoStr = thirtyAgo.toISOString().slice(0, 10)
+  const thirtyAgoStr = localDateStr(thirtyAgo)
   const recentMoods = (moodLogs.data ?? []).filter(
     (r: { rating: number; date: string }) => r.date >= thirtyAgoStr && r.rating != null
   ) as { rating: number; date: string }[]
@@ -314,7 +315,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     : null
 
   // Water: today's total oz
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = localDateStr(new Date())
   const waterOzToday = (waterLog.data ?? [])
     .filter((r: { date: string; oz: number }) => r.date === todayStr)
     .reduce((s: number, r: { oz: number }) => s + Number(r.oz), 0)
@@ -361,12 +362,6 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
   }
 
   return { totalXP, stats }
-}
-
-// Still used for lightweight XP-only refresh after logging
-export async function calculateTotalXP(supabase: SupabaseClient): Promise<number> {
-  const { totalXP } = await fetchXPAndStats(supabase)
-  return totalXP
 }
 
 // ── Strength milestones ────────────────────────────────────────

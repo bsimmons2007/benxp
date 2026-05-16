@@ -74,7 +74,7 @@ function triggerDownload(filename: string, content: string) {
 }
 
 async function compressAvatar(file: File): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas')
     canvas.width = 96; canvas.height = 96
     const ctx = canvas.getContext('2d')!
@@ -83,8 +83,12 @@ async function compressAvatar(file: File): Promise<string> {
     img.onload = () => {
       const size = Math.min(img.width, img.height)
       ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 96, 96)
-      URL.revokeObjectURL(objectUrl)  // prevent Blob URL leak (P2-9)
+      URL.revokeObjectURL(objectUrl)
       resolve(canvas.toDataURL('image/jpeg', 0.82))
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl)
+      reject(new Error('Failed to load image'))
     }
     img.src = objectUrl
   })
@@ -181,11 +185,16 @@ export function Settings() {
     const file = e.target.files?.[0]
     if (!file) return
     setAvatarLoading(true)
-    const base64 = await compressAvatar(file)
-    await supabase.auth.updateUser({ data: { avatar_url: base64 } })
-    setAvatarUrl(base64)
-    refreshUser()
-    setAvatarLoading(false)
+    try {
+      const base64 = await compressAvatar(file)
+      await supabase.auth.updateUser({ data: { avatar_url: base64 } })
+      setAvatarUrl(base64)
+      refreshUser()
+    } catch (err) {
+      console.error('Avatar upload failed:', err)
+    } finally {
+      setAvatarLoading(false)
+    }
   }
 
   async function handleExportCSV() {

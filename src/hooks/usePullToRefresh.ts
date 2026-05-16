@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const THRESHOLD = 64   // px pull needed to trigger refresh
 const MAX_PULL  = 88   // px maximum visual pull distance
@@ -6,13 +6,11 @@ const MAX_PULL  = 88   // px maximum visual pull distance
 export function usePullToRefresh(onRefresh: () => Promise<void> | void) {
   const [refreshing,   setRefreshing]   = useState(false)
   const [pullDistance, setPullDistance] = useState(0)
-  const startY       = useRef<number | null>(null)
-  const pulling      = useRef(false)
-  // Mirror pullDistance into a ref so onTouchEnd always reads the current
-  // value without a stale closure (avoids re-registering listeners on every move)
-  const pullDistRef  = useRef(0)
-
-  const refresh = useCallback(onRefresh, [onRefresh])  // stable ref
+  const startY      = useRef<number | null>(null)
+  const pulling     = useRef(false)
+  const pullDistRef = useRef(0)
+  const refreshRef  = useRef(onRefresh)
+  refreshRef.current = onRefresh
 
   useEffect(() => {
     function onTouchStart(e: TouchEvent) {
@@ -41,7 +39,7 @@ export function usePullToRefresh(onRefresh: () => Promise<void> | void) {
       if (dist >= THRESHOLD && !refreshing) {
         setRefreshing(true)
         try {
-          await refresh()
+          await refreshRef.current()
         } finally {
           setRefreshing(false)
         }
@@ -56,7 +54,7 @@ export function usePullToRefresh(onRefresh: () => Promise<void> | void) {
       document.removeEventListener('touchmove',  onTouchMove)
       document.removeEventListener('touchend',   onTouchEnd)
     }
-  }, [refreshing, refresh])  // pullDistance removed — read via ref instead
+  }, [refreshing])
 
   return { refreshing, pullDistance, threshold: THRESHOLD }
 }

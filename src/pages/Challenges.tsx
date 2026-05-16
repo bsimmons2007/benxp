@@ -43,7 +43,11 @@ function ChallengeCard({
 
   useEffect(() => {
     if (!poolKey || !targetValue) return
-    getAutoProgress(supabase, poolKey, targetValue).then(setProgress)
+    let cancelled = false
+    getAutoProgress(supabase, poolKey, targetValue).then(result => {
+      if (!cancelled) setProgress(result)
+    })
+    return () => { cancelled = true }
   }, [poolKey, targetValue])
 
   const pct = progress ? Math.min((progress.current / progress.target) * 100, 100) : null
