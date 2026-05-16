@@ -201,26 +201,30 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
 
   async function save() {
     setSaving(true)
+    let error: { message: string } | null = null
     if (session.source === 'skate') {
-      await supabase.from('skate_sessions').update({
+      const { error: e } = await supabase.from('skate_sessions').update({
         miles: parseFloat(miles),
         duration: mins ? `${mins}m` : null,
         fastest_mile: fastest ? parseFloat(fastest) : null,
       }).eq('id', session.id)
+      error = e
     } else {
-      await supabase.from('cardio_sessions').update({
+      const { error: e } = await supabase.from('cardio_sessions').update({
         distance_miles: parseFloat(miles),
         duration_mins: mins ? parseInt(mins) : null,
         notes: notes || null,
       }).eq('id', session.id)
+      error = e
     }
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
 
   async function del() {
     const table = session.source === 'skate' ? 'skate_sessions' : 'cardio_sessions'
-    await supabase.from(table).delete().eq('id', session.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from(table).delete().eq('id', session.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   const { label } = activityMeta(session.activity)

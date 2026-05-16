@@ -230,7 +230,7 @@ function EditBbModal({ session, onClose, onSaved }: { session: BasketballSession
 
   async function save() {
     setSaving(true)
-    await supabase.from('basketball_sessions').update({
+    const { error } = await supabase.from('basketball_sessions').update({
       date: vals.date,
       fg_made: int(vals.fg_made), fg_attempted: int(vals.fg_attempted),
       three_made: int(vals.three_made), three_attempted: int(vals.three_attempted),
@@ -241,14 +241,12 @@ function EditBbModal({ session, onClose, onSaved }: { session: BasketballSession
       notes: vals.notes || null,
     }).eq('id', session.id)
     setSaving(false)
-    onSaved()
-    onClose()
+    if (!error) { onSaved(); onClose() }
   }
 
   async function del() {
-    await supabase.from('basketball_sessions').delete().eq('id', session.id)
-    onSaved()
-    onClose()
+    const { error } = await supabase.from('basketball_sessions').delete().eq('id', session.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   const field = (label: string, key: keyof typeof vals) => (

@@ -859,17 +859,18 @@ function EditLiftModal({ row, onClose, onSaved }: { row: LiftingLog; onClose: ()
 
   async function save() {
     setSaving(true)
-    await supabase.from('lifting_log').update({
+    const { error } = await supabase.from('lifting_log').update({
       weight: weight ? parseFloat(weight) : null,
       sets: sets ? parseInt(sets) : null,
       reps: reps ? parseInt(reps) : null,
     }).eq('id', row.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
 
   async function del() {
-    await supabase.from('lifting_log').delete().eq('id', row.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('lifting_log').delete().eq('id', row.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

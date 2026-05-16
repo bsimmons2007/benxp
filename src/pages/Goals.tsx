@@ -111,6 +111,7 @@ interface GoalForm { metric_key: MetricKey; target_value: string; title: string;
 
 function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
   const [open, setOpen] = useState(false)
+  const [addError, setAddError] = useState(false)
   const { register, handleSubmit, watch, setValue, reset, formState: { isSubmitting } } = useForm<GoalForm>({
     defaultValues: { metric_key: 'squat_1rm', target_value: '315', title: '', xp_reward: '500' },
   })
@@ -129,7 +130,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const p = presetFor(data.metric_key)
-    await supabase.from('goals').insert({
+    const { error } = await supabase.from('goals').insert({
       user_id: user.id,
       title: data.title || `${p.label} goal`,
       metric_key: data.metric_key,
@@ -137,6 +138,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
       target_unit: p.unit,
       xp_reward: parseInt(data.xp_reward) || 500,
     })
+    if (error) { setAddError(true); return }
     reset()
     setOpen(false)
     onAdded()
@@ -325,7 +327,8 @@ export function Goals() {
   useEffect(() => { load() }, [])
 
   async function complete(goal: Goal) {
-    await supabase.from('goals').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', goal.id)
+    const { error } = await supabase.from('goals').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', goal.id)
+    if (error) return
     playGoalComplete()
     setToast(`+${goal.xp_reward} XP — Goal complete!`)
     await refreshXP()
@@ -333,8 +336,8 @@ export function Goals() {
   }
 
   async function deleteGoal(id: string) {
-    await supabase.from('goals').delete().eq('id', id)
-    await load()
+    const { error } = await supabase.from('goals').delete().eq('id', id)
+    if (!error) await load()
   }
 
   const active    = goals.filter(g => g.status === 'active')
@@ -378,13 +381,13 @@ export function Goals() {
                   onClick={async () => {
                     const { data: { user } } = await supabase.auth.getUser()
                     if (!user) return
-                    await supabase.from('goals').insert({
+                    const { error } = await supabase.from('goals').insert({
                       user_id: user.id, title: t.label,
                       metric_key: t.metric, target_value: t.target,
                       target_unit: t.unit, xp_reward: t.xp,        // P1-10: required fields
                       status: 'active',
                     })
-                    await load()  // P1-11: await so list refreshes immediately
+                    if (!error) await load()  // P1-11: await so list refreshes immediately
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,

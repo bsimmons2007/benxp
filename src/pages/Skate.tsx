@@ -93,17 +93,18 @@ function EditSkateModal({ row, onClose, onSaved }: { row: SkateSession; onClose:
 
   async function save() {
     setSaving(true)
-    await supabase.from('skate_sessions').update({
+    const { error } = await supabase.from('skate_sessions').update({
       miles: miles ? parseFloat(miles) : null,
       duration: duration || null,
       fastest_mile: fastest ? parseFloat(fastest) : null,
     }).eq('id', row.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
 
   async function del() {
-    await supabase.from('skate_sessions').delete().eq('id', row.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('skate_sessions').delete().eq('id', row.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

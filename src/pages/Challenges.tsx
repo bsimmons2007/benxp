@@ -162,9 +162,10 @@ export function Challenges() {
   useEffect(() => { syncAndLoad() }, [])
 
   async function handleComplete(id: string) {
-    await supabase.from('challenges')
+    const { error } = await supabase.from('challenges')
       .update({ status: 'completed', completed_at: new Date().toISOString() })
       .eq('id', id)
+    if (error) return
     playGoalComplete()
     await syncAndLoad()
     await refreshXP()

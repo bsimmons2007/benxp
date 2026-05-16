@@ -138,12 +138,12 @@ export function LogWorkoutForm() {
     // â"€â"€ Save bodyweight to bodyweight_log (only once per day) â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
     if (data.bodyweight && parseFloat(data.bodyweight) > 0 && !bwLoggedToday) {
       const bwEntry = parseFloat(data.bodyweight)
-      await supabase.from('bodyweight_log').insert({
+      const { error: bwErr } = await supabase.from('bodyweight_log').insert({
         user_id: userId ?? user.id,
         date: data.date,
         weight_lbs: bwEntry,
       })
-      setBwLoggedToday(true)
+      if (!bwErr) setBwLoggedToday(true)
     }
 
     const isPR = await checkForPR(supabase, data.lift, est1rm, data.date, inserted.id, user.id)

@@ -46,7 +46,7 @@ export function LogBookForm() {
       }
     }
 
-    await supabase.from('books').insert({
+    const { error } = await supabase.from('books').insert({
       user_id: user.id,
       date_finished: data.date_finished,
       title: data.title,
@@ -55,6 +55,7 @@ export function LogBookForm() {
       pages: data.pages ? parseInt(data.pages) : null,
       rating: data.rating ? parseFloat(data.rating) : null,
     })
+    if (error) { setToast('Failed to save — try again'); return }
 
     setToast(`+${XP_RATES.book_finished} XP — Book finished!`)
     await refreshXP()

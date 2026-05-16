@@ -223,17 +223,18 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
     const parsedHours = hours !== '' ? parseFloat(hours) : null
     if (parsedHours !== null && !isFinite(parsedHours)) return
     setSaving(true)
-    await supabase.from('sleep_log').update({
+    const { error } = await supabase.from('sleep_log').update({
       hours_slept: parsedHours,
       bedtime: bedtime || null,
       wake_time: wakeTime || null,
     }).eq('id', entry.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
 
   async function del() {
-    await supabase.from('sleep_log').delete().eq('id', entry.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('sleep_log').delete().eq('id', entry.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (

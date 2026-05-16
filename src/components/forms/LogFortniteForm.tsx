@@ -30,7 +30,7 @@ export function LogFortniteForm() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    await supabase.from('fortnite_games').insert({
+    const { error } = await supabase.from('fortnite_games').insert({
       user_id: user.id,
       date: data.date,
       mode: data.mode,
@@ -40,6 +40,7 @@ export function LogFortniteForm() {
       accuracy: data.accuracy ? parseFloat(data.accuracy) : null,
       win: data.win,
     })
+    if (error) { setToast('Failed to save — try again'); return }
 
     const xp = data.win ? XP_RATES.fortnite_win : 0
     setToast(data.win ? `+${xp} XP — Victory Royale!` : 'Game logged!')

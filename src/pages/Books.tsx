@@ -199,14 +199,15 @@ function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: ()
 
   async function save() {
     setSaving(true)
-    await supabase.from('books').update({
+    const { error } = await supabase.from('books').update({
       date_finished: date,
       rating: rating ? parseFloat(rating) : null,
     }).eq('id', book.id)
+    setSaving(false)
+    if (error) return
     playGoalComplete()
     await refreshXP()
     refreshActivity()
-    setSaving(false)
     onSaved()
     onClose()
   }
@@ -247,7 +248,7 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
   async function save() {
     if (!title.trim()) return
     setSaving(true)
-    await supabase.from('books').update({
+    const { error } = await supabase.from('books').update({
       title:         title.trim(),
       author:        author.trim() || null,
       genre:         genre || null,
@@ -255,13 +256,13 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
       rating:        rating ? parseFloat(rating) : null,
       date_finished: finished && date ? date : null,
     }).eq('id', book.id)
-    setSeriesForBook(book.id, series)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { setSeriesForBook(book.id, series); onSaved(); onClose() }
   }
 
   async function del() {
-    await supabase.from('books').delete().eq('id', book.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('books').delete().eq('id', book.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (
@@ -607,8 +608,8 @@ function ToReadSection() {
   }
 
   async function remove(id: string) {
-    await supabase.from('to_read').delete().eq('id', id)
-    load()
+    const { error } = await supabase.from('to_read').delete().eq('id', id)
+    if (!error) load()
   }
 
   return (

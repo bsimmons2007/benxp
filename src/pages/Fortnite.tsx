@@ -201,17 +201,18 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
 
   async function save() {
     setSaving(true)
-    await supabase.from('fortnite_games').update({
+    const { error } = await supabase.from('fortnite_games').update({
       kills: parseInt(kills) || 0,
       placement: placement ? parseInt(placement) : null,
       accuracy: accuracy ? parseFloat(accuracy) : null,
       win,
     }).eq('id', game.id)
-    setSaving(false); onSaved(); onClose()
+    setSaving(false)
+    if (!error) { onSaved(); onClose() }
   }
   async function del() {
-    await supabase.from('fortnite_games').delete().eq('id', game.id)
-    onSaved(); onClose()
+    const { error } = await supabase.from('fortnite_games').delete().eq('id', game.id)
+    if (!error) { onSaved(); onClose() }
   }
 
   return (
