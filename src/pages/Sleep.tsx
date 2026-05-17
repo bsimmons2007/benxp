@@ -57,7 +57,7 @@ function nDaysAgo(n: number): string {
   return localDateStr(d)
 }
 
-// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log form ──────────────────────────────────────────────────────────────────
 
 interface SleepForm { date: string; bedtime: string; hours_slept: string; wake_time: string }
 
@@ -161,7 +161,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Nap log panel â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Nap log panel ─────────────────────────────────────────────────────────────
 
 function LogNapPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
@@ -211,7 +211,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────────────────────
 
 function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose: () => void; onSaved: () => void }) {
   const [hours,    setHours]    = useState(String(entry.hours_slept ?? ''))
@@ -248,7 +248,7 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
   )
 }
 
-// â"€â"€ Sleep debt card â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Sleep debt card ───────────────────────────────────────────────────────────
 
 function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   const nights = logs.filter(r => !r.is_nap)
@@ -329,15 +329,15 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   )
 }
 
-// â"€â"€ Wake Time Trainer â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Wake Time Trainer ────────────────────────────────────────────────────────
 
-/** Parse "HH:MM" â†’ total minutes since midnight */
+/** Parse "HH:MM" → total minutes since midnight */
 function parseTime(t: string): number {
   const [h, m] = t.split(':').map(Number)
   return (h || 0) * 60 + (m || 0)
 }
 
-/** Format minutes-since-midnight â†’ "h:mm AM/PM" */
+/** Format minutes-since-midnight → "h:mm AM/PM" */
 function fmtTime(mins: number): string {
   const wrapped = ((mins % 1440) + 1440) % 1440          // handle < 0 or > 1440
   const h = Math.floor(wrapped / 60)
@@ -400,7 +400,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
     .filter(l => l.wake_time && l.date >= todayStr)
     .map(l => ({ date: l.date, mins: parseTime(l.wake_time!) }))
 
-  // Days already on-track: wake time â‰¤ scheduled target for that day
+  // Days already on-track: wake time ≤ scheduled target for that day
   const daysOnTrack = recentWakes.filter(w => {
     const dayNum = Math.round((new Date(w.date + 'T12:00:00').getTime() - new Date(todayStr + 'T12:00:00').getTime()) / 86400000)
     const planned = currentWakeMins - dayNum * shiftMins
@@ -428,7 +428,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                 : 'Plan a gradual wake time shift with a day-by-day schedule'}
             </p>
           </div>
-          <span style={{ color: 'var(--accent)', fontSize: 18 }}>â€º</span>
+          <span style={{ color: 'var(--accent)', fontSize: 18 }}>›</span>
         </div>
       </button>
     )
@@ -452,7 +452,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
             </p>
             <p style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-serif)' }}>{fmtTime(currentWakeMins)}</p>
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: 22, fontWeight: 300 }}>â†’</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 22, fontWeight: 300 }}>→</div>
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.3)' }}>
             <p style={{ color: 'var(--accent)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Goal</p>
             <p style={{ color: 'var(--accent)', fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif' }}>{fmtTime(targetWakeMins)}</p>
@@ -618,7 +618,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 const ttStyle = {
   background: 'var(--card-bg)',
@@ -791,8 +791,8 @@ export function Sleep() {
               </AreaChart>
             </ResponsiveContainer>
             <div className="flex gap-4 mt-1">
-              <span className="text-xs" style={{ color: '#27AE60' }}>â"€â"€ 8h goal</span>
-              <span className="text-xs" style={{ color: 'var(--accent)' }}>â"€â"€ 7h min</span>
+              <span className="text-xs" style={{ color: '#27AE60' }}>── 8h goal</span>
+              <span className="text-xs" style={{ color: 'var(--accent)' }}>── 7h min</span>
             </div>
           </div>
         )}
