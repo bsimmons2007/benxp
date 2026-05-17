@@ -34,7 +34,7 @@ function CustomDot(props: any) {
 }
 
 const TT_STYLE = {
-  background: 'rgba(10,10,22,0.97)',
+  background: 'var(--card-bg)',
   border: '1px solid var(--border)',
   borderRadius: 8,
   color: 'var(--text-primary)',

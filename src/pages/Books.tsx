@@ -524,7 +524,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Add Book'}
+        {open ? '✕ Cancel' : '+ Add Book'}
       </button>
 
       {open && (
@@ -543,7 +543,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
                     color: status === s ? 'var(--base-bg)' : '#888',
                     transition: 'all 0.15s ease',
                   }}>
-                    {s === 'reading' ? 'Currently Reading' : 'âœ" Finished'}
+                    {s === 'reading' ? 'Currently Reading' : '✓ Finished'}
                   </div>
                 </label>
               ))}
@@ -555,7 +555,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
 
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Genre</label>
-              <select {...register('genre')} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}>
+              <select {...register('genre')} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 {allGenres.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
@@ -621,7 +621,7 @@ function ToReadSection() {
           className="text-sm px-3 py-1.5 rounded-lg font-medium"
           style={{ background: showForm ? 'var(--accent)' : 'var(--input-bg)', color: showForm ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)' }}
         >
-          {showForm ? 'âœ•' : '+ Add'}
+          {showForm ? '✕' : '+ Add'}
         </button>
       </div>
 
@@ -633,7 +633,7 @@ function ToReadSection() {
             <Input label="Genre" type="text" className="flex-1" {...register('genre')} />
             <div className="flex flex-col gap-1 flex-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Priority</label>
-              <select {...register('priority')} className="px-3 py-3 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}>
+              <select {...register('priority')} className="px-3 py-3 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 <option>High</option><option>Medium</option><option>Low</option>
               </select>
             </div>
@@ -656,7 +656,7 @@ function ToReadSection() {
               {b.priority && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: PRIORITY_COLORS[b.priority], color: 'var(--text-primary)' }}>{b.priority}</span>
               )}
-              <button onClick={() => remove(b.id)} style={{ color: '#444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>âœ•</button>
+              <button onClick={() => remove(b.id)} style={{ color: '#444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
           </div>
         ))}

@@ -237,7 +237,7 @@ export function computeMuscleScores(
 
     for (const row of rows) {
       sessionDates.add(row.date)
-      const rowDate = new Date(row.date)
+      const rowDate = new Date(row.date + 'T12:00:00')
       if (rowDate > lastDate) lastDate = rowDate
 
       let load = row.est_1rm

@@ -57,7 +57,7 @@ export function LogFortniteForm() {
         <select
           {...register('mode')}
           className="px-3 py-2 rounded-lg text-white outline-none"
-          style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}
+          style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
         >
           <option>Solos</option>
           <option>Duos</option>

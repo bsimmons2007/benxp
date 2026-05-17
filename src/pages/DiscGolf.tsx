@@ -75,7 +75,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
     if (error) { setToast('Failed to save — try again'); return }
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.disc_golf_under_par : 0
     const xp = XP_RATES.disc_golf_round + underParBonus
-    if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} ðŸ¥ Under par!`) }
+    if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} 🥏 Under par!`) }
     else          { playXPGain(); setToast(`+${xp} XP — Round logged (${vsParLabel(diff)})`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), course: '', holes: '18', score: '', par: '54', notes: '' })
@@ -89,7 +89,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Round'}
+        {open ? '✕ Cancel' : '+ Log Round'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -148,7 +148,7 @@ function EditDiscGolfModal({ round, onClose, onSaved }: { round: DiscGolfRound; 
 
 // â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function DiscGolf() {
   usePageTitle('Disc Golf')
@@ -243,7 +243,7 @@ export function DiscGolf() {
                 </div>
                 <div>
                   <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>{r.course}</p>
-                  <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{formatDate(r.date)} Â· {r.holes}H</p>
+                  <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{formatDate(r.date)} · {r.holes}H</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">

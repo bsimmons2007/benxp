@@ -30,7 +30,7 @@ interface MoodForm {
 
 
 const TT_STYLE = {
-  background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)',
+  background: 'var(--card-bg)', border: '1px solid var(--border)',
   borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
 
@@ -108,7 +108,7 @@ export function Mood() {
     })
     if (error) { setToast('Failed to save — try again'); return }
     playXPGain()
-    setToast(`+${XP_RATES.mood_log} XP Â· Check-in logged ${moodLabel(parseInt(data.mood))}`)
+    setToast(`+${XP_RATES.mood_log} XP · Check-in logged ${moodLabel(parseInt(data.mood))}`)
     refreshXP()
     reset({ date: today(), mood: '7', energy: '7', stress: '5', activities: '', notes: '' })
     loadRecent()

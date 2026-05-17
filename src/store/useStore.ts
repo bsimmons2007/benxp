@@ -211,7 +211,7 @@ export const useStore = create<AppState>((set, get) => ({
       const now = Date.now()
 
       const level    = calculateLevel(totalXP)
-      const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10)
+      const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10) || 1
 
       set({
         totalXP,
@@ -239,7 +239,7 @@ export const useStore = create<AppState>((set, get) => ({
       const { totalXP, stats } = await fetchXPAndStats(supabase)
       setCachedXPData({ totalXP, stats })
       const level    = calculateLevel(totalXP)
-      const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10)
+      const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10) || 1
       set({
         totalXP,
         level,

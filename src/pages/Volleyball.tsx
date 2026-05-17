@@ -64,7 +64,7 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — ðŸ Spike!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — 🏐 Spike!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), sets_won: '', sets_lost: '', aces: '', kills: '', blocks: '', digs: '', assists: '', opponent: '', notes: '' })
@@ -78,7 +78,7 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Game'}
+        {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -154,7 +154,7 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — ðŸ–ï¸ Beach winner!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — 🏐 Beach winner!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), my_score: '', opp_score: '', partner: '', opponent: '', notes: '' })
@@ -168,7 +168,7 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Game'}
+        {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -269,7 +269,7 @@ function EditVBModal({ session, onClose, onSaved }: { session: VolleyballSession
 
 // â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function Volleyball() {
   usePageTitle('Volleyball')
@@ -321,7 +321,7 @@ export function Volleyball() {
                 cursor: 'pointer', transition: 'all 0.15s',
               }}
             >
-              {t === 'Indoor' ? 'ðŸ Indoor' : 'ðŸ–ï¸ Sand'}
+              {t === 'Indoor' ? '🏐 Indoor' : '🏐 Sand'}
             </button>
           ))}
         </div>

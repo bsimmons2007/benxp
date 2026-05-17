@@ -75,7 +75,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
     const xp = XP_RATES.chess_game
       + (data.result === 'win'  ? XP_RATES.chess_win  : 0)
       + (data.result === 'draw' ? XP_RATES.chess_draw : 0)
-    if (data.result === 'win')  { playPR();     setToast(`+${xp} XP — â™Ÿï¸ Checkmate!`) }
+    if (data.result === 'win')  { playPR();     setToast(`+${xp} XP — ♟️ Checkmate!`) }
     else if (data.result === 'draw') { playXPGain(); setToast(`+${xp} XP — Draw logged`) }
     else                        { playXPGain(); setToast(`+${xp} XP — Game logged`) }
     await refreshXP(); refreshActivity()
@@ -90,7 +90,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Game'}
+        {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -200,7 +200,7 @@ function EditChessModal({ game, onClose, onSaved }: { game: ChessGame; onClose: 
 
 // â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function Chess() {
   usePageTitle('Chess')
@@ -281,7 +281,7 @@ export function Chess() {
           <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.2)' }}>
             <span style={{ fontSize: 13, color: '#888' }}>{games.length} games</span>
             {streak > 1 && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#34d399' }}>ðŸ"¥ {streak} win streak</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#34d399' }}>🏆 {streak} win streak</span>
             )}
           </div>
         )}

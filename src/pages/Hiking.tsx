@@ -77,7 +77,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
     const elevXP  = Math.floor((elevFt ?? 0) / 500) * XP_RATES.hiking_per_500ft
     const xp = Math.round(milesXP + elevXP)
     playXPGain()
-    setToast(`+${xp} XP — ${miles} mi${elevFt ? ` Â· ${elevFt.toLocaleString()} ft gain` : ''}`)
+    setToast(`+${xp} XP — ${miles} mi${elevFt ? ` · ${elevFt.toLocaleString()} ft gain` : ''}`)
     await refreshXP(); refreshActivity()
     reset({ date: today(), trail: '', distance_miles: '', elevation_gain_ft: '', duration_mins: '', difficulty: 'Moderate', notes: '' })
     setOpen(false); onLogged()
@@ -90,7 +90,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Hike'}
+        {open ? '✕ Cancel' : '+ Log Hike'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -170,7 +170,7 @@ function EditHikingModal({ session, onClose, onSaved }: { session: HikingSession
 
 // â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function Hiking() {
   usePageTitle('Hiking')
