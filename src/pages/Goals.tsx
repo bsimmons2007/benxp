@@ -111,7 +111,6 @@ interface GoalForm { metric_key: MetricKey; target_value: string; title: string;
 
 function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
   const [open, setOpen] = useState(false)
-  const [addError, setAddError] = useState(false)
   const { register, handleSubmit, watch, setValue, reset, formState: { isSubmitting } } = useForm<GoalForm>({
     defaultValues: { metric_key: 'squat_1rm', target_value: '315', title: '', xp_reward: '500' },
   })
@@ -138,7 +137,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
       target_unit: p.unit,
       xp_reward: parseInt(data.xp_reward) || 500,
     })
-    if (error) { setAddError(true); return }
+    if (error) return
     reset()
     setOpen(false)
     onAdded()
