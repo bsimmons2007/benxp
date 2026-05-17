@@ -256,7 +256,7 @@ export function Chess() {
               <p style={{ fontSize: 12, color: '#666', marginTop: 4 }}>Peak {peakRating.toLocaleString()}</p>
             )}
             {peakRating && peakRating === currentRating && (
-              <p style={{ fontSize: 12, color: '#f59e0b', marginTop: 4 }}>â­ Personal best</p>
+              <p style={{ fontSize: 12, color: '#f59e0b', marginTop: 4 }}>⭐ Personal best</p>
             )}
           </div>
         )}
