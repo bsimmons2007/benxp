@@ -19,7 +19,7 @@ import type { DiscGolfRound } from '../types'
 
 const ACCENT = '#f59e0b'
 
-// â"€â"€ Helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Helpers ───────────────────────────────────────────────────────
 
 function vsParLabel(diff: number): string {
   if (diff === 0) return 'E'
@@ -32,7 +32,7 @@ function vsParColor(diff: number): string {
 }
 function defaultPar(holes: number) { return holes === 9 ? 27 : 54 }
 
-// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log form ──────────────────────────────────────────────────────
 
 interface DgForm {
   date: string
@@ -117,7 +117,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────────
 
 function EditDiscGolfModal({ round, onClose, onSaved }: { round: DiscGolfRound; onClose: () => void; onSaved: () => void }) {
   const [score, setScore] = useState(String(round.score))
@@ -146,7 +146,7 @@ function EditDiscGolfModal({ round, onClose, onSaved }: { round: DiscGolfRound; 
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────────
 
 const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 

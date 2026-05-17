@@ -19,7 +19,7 @@ import type { TableTennisGame } from '../types'
 
 const ACCENT = '#38bdf8'
 
-// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log form ──────────────────────────────────────────────────────
 
 interface TTForm {
   date: string
@@ -113,7 +113,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────────
 
 function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClose: () => void; onSaved: () => void }) {
   const [myScore,  setMyScore]  = useState(String(game.my_score  ?? ''))
@@ -160,7 +160,7 @@ function EditTTModal({ game, onClose, onSaved }: { game: TableTennisGame; onClos
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────────
 
 const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 

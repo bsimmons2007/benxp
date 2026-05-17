@@ -40,22 +40,22 @@ function saveScorecardForRound(id: string, holes: number[]) {
   localStorage.setItem(SCORECARDS_KEY, JSON.stringify(m))
 }
 
-// â"€â"€ Helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Helpers ───────────────────────────────────────────────────────
 
 function vsParLabel(diff: number): string {
   if (diff === 0) return 'E'
   return diff > 0 ? `+${diff}` : String(diff)
 }
 function vsParColor(diff: number): string {
-  if (diff < 0) return '#34d399'   // under par â†’ green
-  if (diff === 0) return '#f5a623' // even â†’ gold
-  return '#f87171'                  // over par â†’ red
+  if (diff < 0) return '#34d399'   // under par → green
+  if (diff === 0) return '#f5a623' // even → gold
+  return '#f87171'                  // over par → red
 }
 function defaultPar(holes: number) {
   return holes === 9 ? 36 : 72
 }
 
-// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log form ──────────────────────────────────────────────────────
 
 interface GolfForm {
   date: string
@@ -243,7 +243,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────────
 
 function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose: () => void; onSaved: () => void }) {
   const [score, setScore] = useState(String(round.score))
@@ -282,7 +282,7 @@ function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose:
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────────
 
 const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 

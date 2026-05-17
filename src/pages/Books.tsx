@@ -17,14 +17,14 @@ import type { Book, ToRead } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { FirstUseTip } from '../components/ui/EmptyState'
 
-// â"€â"€ Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Types ────────────────────────────────────────────────────
 type SortKey = 'date_desc' | 'date_asc' | 'title_asc' | 'title_desc' | 'rating_desc' | 'rating_asc' | 'pages_desc' | 'pages_asc'
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'date_desc',   label: 'Newest first' },
   { key: 'date_asc',    label: 'Oldest first' },
-  { key: 'title_asc',   label: 'A â†’ Z' },
-  { key: 'title_desc',  label: 'Z â†’ A' },
+  { key: 'title_asc',   label: 'A → Z' },
+  { key: 'title_desc',  label: 'Z → A' },
   { key: 'rating_desc', label: 'Highest rated' },
   { key: 'rating_asc',  label: 'Lowest rated' },
   { key: 'pages_desc',  label: 'Most pages' },
@@ -163,7 +163,7 @@ const GENRE_COLORS: Record<string, string> = {
   'Essays': '#5C6BC0', 'Other': '#555',
 }
 
-// â"€â"€ Star rating â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Star rating ──────────────────────────────────────────────
 function Stars({ rating }: { rating: number | null }) {
   if (!rating) return null
   const full = Math.floor(rating)
@@ -189,7 +189,7 @@ function GenreChip({ genre }: { genre: string | null }) {
   )
 }
 
-// â"€â"€ Mark Finished modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Mark Finished modal ──────────────────────────────────────
 function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: () => void; onSaved: () => void }) {
   const [date,   setDate]   = useState(today())
   const [rating, setRating] = useState('')
@@ -225,7 +225,7 @@ function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: ()
   )
 }
 
-// â"€â"€ Edit book modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit book modal ──────────────────────────────────────────
 const inputCls = "px-3 py-3 rounded-lg text-white outline-none text-base w-full"
 const inputStyle = { background: 'var(--input-bg)', border: '1px solid var(--border)' }
 const labelStyle = { color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }
@@ -342,7 +342,7 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
   )
 }
 
-// â"€â"€ Currently Reading card â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Currently Reading card ───────────────────────────────────
 function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () => void }) {
   const [finishing, setFinishing] = useState(false)
   const [editing,   setEditing]   = useState(false)
@@ -394,7 +394,7 @@ function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () =
   )
 }
 
-// â"€â"€ Finished book card â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Finished book card ───────────────────────────────────────
 function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
   const [expanded, setExpanded] = useState(false)
   const [editing,  setEditing]  = useState(false)
@@ -453,7 +453,7 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
   )
 }
 
-// â"€â"€ Log Book form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log Book form ────────────────────────────────────────────
 interface BookForm {
   title: string; author: string; genre: string; customGenre: string
   pages: string; date_finished: string; rating: string
@@ -583,7 +583,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ To-Read section â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── To-Read section ──────────────────────────────────────────
 interface ToReadForm { title: string; author: string; genre: string; priority: 'High' | 'Medium' | 'Low' }
 const PRIORITY_COLORS = { High: '#E94560', Medium: '#F5A623', Low: '#27AE60' }
 
@@ -666,7 +666,7 @@ function ToReadSection() {
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ────────────────────────────────────────────────
 export function Books() {
   usePageTitle('Books')
   const [allBooks, setAllBooks] = useState<Book[]>([])

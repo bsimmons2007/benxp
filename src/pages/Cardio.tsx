@@ -44,7 +44,7 @@ function activityMeta(key: string) {
   return ACTIVITIES.find(a => a.key === key) ?? { key: 'run', label: 'Run' }
 }
 
-// â"€â"€ Unified session type â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Unified session type ──────────────────────────────────────
 interface Session {
   id: string
   date: string
@@ -70,7 +70,7 @@ function sessionXP(s: Session) {
     : Math.round(s.distance * cardioRate(s.activity))
 }
 
-// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log form ─────────────────────────────────────────────────
 interface CardioForm {
   date: string
   activity: ActivityKey
@@ -188,7 +188,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────
 function EditSessionModal({ session, onClose, onSaved }: { session: Session; onClose: () => void; onSaved: () => void }) {
   const [miles, setMiles]   = useState(String(session.distance))
   const [mins, setMins]     = useState(String(session.duration_mins ?? ''))
@@ -256,7 +256,7 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────
 export function Cardio() {
   usePageTitle('Cardio')
   const streak = useStreak()

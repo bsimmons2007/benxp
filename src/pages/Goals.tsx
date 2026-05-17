@@ -15,7 +15,7 @@ import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, Tr
 import { localDateStr } from '../lib/utils'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// â"€â"€ Preset metric options â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Preset metric options ────────────────────────────────────
 const GOAL_PRESETS = [
   { key: 'squat_1rm',          label: 'Squat 1RM',       unit: 'lbs',   defaultTarget: 315 },
   { key: 'bench_1rm',          label: 'Bench 1RM',       unit: 'lbs',   defaultTarget: 225 },
@@ -44,7 +44,7 @@ function GoalIcon({ metricKey, size = 18, color = 'var(--text-muted)' }: { metri
   return <TargetIcon size={size} color={color} />
 }
 
-// â"€â"€ Current values hook â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Current values hook ──────────────────────────────────────
 interface MetricValues {
   squat_1rm:          number
   bench_1rm:          number
@@ -106,7 +106,7 @@ function currentFor(key: string, vals: MetricValues | null): number {
   return (vals as unknown as Record<string, number>)[key] ?? 0
 }
 
-// â"€â"€ Add Goal form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Add Goal form ────────────────────────────────────────────
 interface GoalForm { metric_key: MetricKey; target_value: string; title: string; xp_reward: string }
 
 function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
@@ -212,7 +212,7 @@ const METRIC_LINK: Record<string, string> = {
   fn_wins:            '/fortnite',
 }
 
-// â"€â"€ Goal card â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Goal card ────────────────────────────────────────────────
 function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
   goal: Goal
   current: number
@@ -276,7 +276,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
                 style={{ background: 'var(--input-bg)', color: 'var(--accent)', border: '1px solid var(--border)', flexShrink: 0 }}
                 title="View history for this metric"
               >
-                History â†—
+                History ↗
               </button>
             )}
             <button
@@ -309,7 +309,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ────────────────────────────────────────────────
 export function Goals() {
   usePageTitle('Goals')
   const navigate = useNavigate()

@@ -219,8 +219,8 @@ export function Mood() {
               </AreaChart>
             </ResponsiveContainer>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 6 }}>
-              <span style={{ fontSize: 10, color: 'var(--accent)' }}>â"€â"€ Mood</span>
-              <span style={{ fontSize: 10, color: '#4ade80' }}>â"€â"€ Energy</span>
+              <span style={{ fontSize: 10, color: 'var(--accent)' }}>── Mood</span>
+              <span style={{ fontSize: 10, color: '#4ade80' }}>── Energy</span>
             </div>
           </Card>
         )}

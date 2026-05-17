@@ -20,7 +20,7 @@ import type { FortniteGame } from '../types'
 import { TrophyIcon, StarIcon, EditIcon, ZapIcon, GamepadIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// â"€â"€ Shared constants â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Shared constants ───────────────────────────────────────────────
 
 const FN_RANKS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Elite', 'Champion', 'Unreal'] as const
 type FnRank = typeof FN_RANKS[number]
@@ -50,7 +50,7 @@ const blitzDisplayMode = (mode: string | null) => {
   return mode.replace('Blitz ', '')
 }
 
-// â"€â"€ Chart helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Chart helpers ──────────────────────────────────────────────────
 
 function buildMonthlyWins(games: FortniteGame[]) {
   const map: Record<string, number> = {}
@@ -73,7 +73,7 @@ function buildCumulativeWins(games: FortniteGame[]) {
     .map(g => ({ date: g.date, wins: ++count }))
 }
 
-// â"€â"€ Stat mini-cards â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Stat mini-cards ────────────────────────────────────────────────
 
 function StatCards({ items, accent }: { items: { label: string; value: string | number }[]; accent: string }) {
   return (
@@ -88,7 +88,7 @@ function StatCards({ items, accent }: { items: { label: string; value: string | 
   )
 }
 
-// â"€â"€ Charts block â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Charts block ───────────────────────────────────────────────────
 
 function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: string; gradId: string }) {
   const sorted = [...games].sort((a, b) => a.date.localeCompare(b.date))
@@ -162,7 +162,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <Area type="monotone" dataKey="kills" stroke="#7B2FBE" strokeWidth={2.5} fill={`url(#${gradId}-kills)`} dot={{ fill: '#7B2FBE', r: 3, fillOpacity: 0.7 }} activeDot={{ r: 5, fill: '#7B2FBE', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
-          <p className="text-xs mt-1" style={{ color: accent }}>â"€â"€ avg {avgKills}K</p>
+          <p className="text-xs mt-1" style={{ color: accent }}>── avg {avgKills}K</p>
         </div>
       )}
 
@@ -190,7 +190,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
   )
 }
 
-// â"€â"€ Edit modal (shared) â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal (shared) ────────────────────────────────────────────
 
 function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onClose: () => void; onSaved: () => void }) {
   const [kills, setKills]       = useState(String(game.kills))
@@ -243,7 +243,7 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
   )
 }
 
-// â"€â"€ Normal log panel â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Normal log panel ───────────────────────────────────────────────
 
 interface NormalForm {
   date: string
@@ -377,7 +377,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Blitz log panel â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Blitz log panel ────────────────────────────────────────────────
 
 interface BlitzForm {
   date: string
@@ -476,7 +476,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Normal tab â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Normal tab ─────────────────────────────────────────────────────
 
 function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged: () => void; onEdit: (g: FortniteGame) => void }) {
   const wins      = games.filter(g => g.win).length
@@ -563,7 +563,7 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
   )
 }
 
-// â"€â"€ Blitz tab â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Blitz tab ──────────────────────────────────────────────────────
 
 function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged: () => void; onEdit: (g: FortniteGame) => void }) {
   const wins      = games.filter(g => g.win).length
@@ -633,7 +633,7 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ──────────────────────────────────────────────────────
 
 export function Fortnite() {
   usePageTitle('Fortnite')

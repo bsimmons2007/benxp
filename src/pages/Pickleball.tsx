@@ -31,7 +31,7 @@ interface PickleballGame {
   notes: string | null
 }
 
-// â"€â"€ Log panel â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log panel ─────────────────────────────────────────────────────
 
 interface PbForm {
   date: string
@@ -129,7 +129,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────────
 
 function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame; onClose: () => void; onSaved: () => void }) {
   const [myScore,  setMyScore]  = useState(String(game.my_score  ?? ''))
@@ -176,7 +176,7 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────────
 
 const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
@@ -299,7 +299,7 @@ export function Pickleball() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 16,
               }}>
-                {game.win ? <TrophyIcon size={16} color='#22c55e' /> : <span style={{ color: '#555', fontSize: 14 }}>â—‹</span>}
+                {game.win ? <TrophyIcon size={16} color='#22c55e' /> : <span style={{ color: '#555', fontSize: 14 }}>○</span>}
               </div>
               <div>
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>
