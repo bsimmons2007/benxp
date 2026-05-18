@@ -14,7 +14,7 @@ export function PageWrapper({ children, noPadding = false }: PageWrapperProps) {
       className="page-main"
       style={{
         paddingTop:    'calc(72px + env(safe-area-inset-top))',
-        paddingBottom: 'calc(110px + env(safe-area-inset-bottom))',
+        paddingBottom: 'calc(80px + env(safe-area-inset-bottom))',
         paddingLeft:   noPadding ? 0 : 20,
         paddingRight:  noPadding ? 0 : 20,
         minHeight:     '100dvh',
