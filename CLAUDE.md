@@ -285,9 +285,45 @@ Always end every response with either `(Merged y)` or `(Merged n)` indicating wh
 
 ---
 
+## Mojibake — history & detection
+Files were corrupted by UTF-8 bytes being re-encoded through Windows-1252, then sometimes further collapsed by editors. All instances fixed as of May 2026 session. If new files appear garbled, run this scanner:
+
+```python
+# Quick scan — run from repo root
+import os
+PATTERNS = {
+    b'\xc3\xa2"\xe2\x82\xac':             '─ U+2500',
+    b'\xc3\xa2\xe2\x80\xa0\xe2\x80\x99':  '→ U+2192',
+    b'\xc3\xa2\xe2\x80\xa0\xe2\x80\x94':  '↗ U+2197',
+    b'\xc3\xa2\xe2\x80\xa0\xe2\x80\x98':  '↑ U+2191',
+    b'\xc3\xa2\xe2\x80\x94\xe2\x80\xb9':  '○ U+25CB',
+    b'\xc3\x82\xc2\xb7':                  '· U+00B7',
+    b'\xc3\xa2\xc5\x93\xe2\x80\xa2':      '✕ U+2715',
+    b'\xc3\xa2\xc2\xad\xc2\x90':          '⭐ U+2B50',
+}
+for dirpath, _, files in os.walk('src'):
+    for f in files:
+        if not f.endswith(('.tsx','.ts','.css')): continue
+        c = open(os.path.join(dirpath,f),'rb').read()
+        hits = [(lbl,c.count(p)) for p,lbl in PATTERNS.items() if c.count(p)]
+        # also flag any \xc3\xa2 or \xc3\x82 not in known patterns
+        if hits: print(f, hits)
+```
+Fix with binary replacement (`content.replace(bad_bytes, good_bytes)`) — text editors cannot reliably match these sequences.
+
+---
+
 ## Recent work (May 2026)
 - **Site-wide light mode fix** — all hardcoded `rgba(255,255,255,x)` and `color:#fff` replaced with CSS variables across 38 files
 - **Tutorial overhaul** — richer step content, tip callouts, pulse rings, caret arrows, card animations, keyboard nav, scroll lock
 - **Bug fixes** — `More.tsx` `<a href>` → `<Link>`, `EmptyState` colors, `PageWrapper` key moved to inner div, `Toast`/`MilestoneOverlay` drain bar reset fix, `LevelUpOverlay` exit animation
 - **UI polish** — `card-hover:active` tap feedback, `navDotEnter` animation, `prefers-reduced-motion` support, stat picker Cancel button, Dev Tools hidden in prod
 - **Dev PIN** hardcoded to `1337`
+- **Mojibake sweep** — 3,776+ corrupted characters binary-patched across 17 pages (Sleep, Books, Cardio, Chess, DiscGolf, Fortnite, Goals, Golf, Hiking, Login, Mood, Pickleball, Pool, Skate, Spikeball, TableTennis, Volleyball). Scanner confirmed fully clean.
+- **Epley formula cap** — `LogWorkoutForm.tsx`: capped at 12 reps (`Math.min(reps, 12)`) to prevent false PRs on high-rep sets
+- **UTC date fix** — `muscleScore.ts`: `new Date(row.date + 'T12:00:00')` prevents off-by-one daysAgo in US timezones
+- **parseInt NaN guard** — `useStore.ts`: two `parseInt(…) || 1` fallbacks for localStorage level key
+- **Dead code removal** — `Goals.tsx`: removed `addError` useState that was set but never read (fixed TS6133 build error)
+- **Stray emoji** — `Water.tsx`: removed accidental `✏️` from goal tile label
+- **`useMemo` for activityDates** — `Home.tsx:526`: Set now only rebuilt when `activity` changes
+- **Books genre donut chart** — replaced horizontal bar chart with Recharts `PieChart` (donut style); book count centered in hole; legend shows genre + %; tooltip on tap; all colors via CSS variables
