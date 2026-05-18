@@ -92,7 +92,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
 
             {/* Game type */}
             <div className="flex flex-col gap-1">
-              <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Game Type</label>
+              <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Game Type</label>
               <select {...register('game_type')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
                 <option>Singles</option>
                 <option>Doubles</option>
@@ -113,7 +113,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
-              <span className="font-semibold" style={{ color: isWin ? ACCENT : '#888', fontFamily: 'Cinzel, serif', fontSize: 13 }}>
+              <span className="font-semibold" style={{ color: isWin ? ACCENT : '#888', fontSize: 13 }}>
                 {isWin
                   ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TrophyIcon size={14} color={ACCENT} /> Win</span>
                   : 'Loss'}
@@ -157,11 +157,11 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>My Score</label>
+            <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>My Score</label>
             <input type="number" value={myScore} onChange={e => setMyScore(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }} />
           </div>
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Opp Score</label>
+            <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Opp Score</label>
             <input type="number" value={oppScore} onChange={e => setOppScore(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }} />
           </div>
         </div>
@@ -248,8 +248,8 @@ export function Pickleball() {
             { label: 'Streak',   value: streak || '—' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
-              <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
+              <p className="text-xl font-bold" style={{ color: ACCENT }}>{s.value}</p>
+              <p className="text-xs mt-0.5" style={{ color: '#888' }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -268,7 +268,7 @@ export function Pickleball() {
         {/* Monthly chart */}
         {monthData.length >= 2 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Monthly Record</p>
+            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Monthly Record</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={monthData} barGap={4}>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -314,7 +314,7 @@ export function Pickleball() {
             <div className="flex items-center gap-3">
               <div style={{ textAlign: 'right' }}>
                 {(game.my_score != null && game.opp_score != null) && (
-                  <p style={{ fontSize: 16, fontWeight: 800, color: game.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: game.win ? ACCENT : '#f87171' }}>
                     {game.my_score}—{game.opp_score}
                   </p>
                 )}

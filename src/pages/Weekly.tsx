@@ -180,7 +180,7 @@ export function Weekly() {
             {/* XP Earned hero */}
             <Card className="mb-4 text-center" goldBorder>
               <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#888' }}>XP This Week</p>
-              <p className="text-5xl font-bold xp-number" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
+              <p className="text-5xl font-bold xp-number" style={{ color: 'var(--accent)' }}>
                 +{data.xpEarned.toLocaleString()}
               </p>
               {data.xpEarned === 0 && (
@@ -310,7 +310,7 @@ export function Weekly() {
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs uppercase tracking-widest" style={{ color: '#888' }}>Weekly Score</p>
                     <div className="flex items-center gap-2">
-                      <span style={{ fontSize: 28, fontWeight: 900, color: gradeColor, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{grade}</span>
+                      <span style={{ fontSize: 28, fontWeight: 900, color: gradeColor, lineHeight: 1 }}>{grade}</span>
                       <span style={{ color: '#888', fontSize: 12 }}>{score}/100</span>
                     </div>
                   </div>

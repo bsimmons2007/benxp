@@ -249,7 +249,7 @@ export function Chess() {
             border: '1px solid rgba(167,139,250,0.25)',
           }}>
             <p className="section-label mb-1">Current Rating</p>
-            <p style={{ fontSize: 52, fontWeight: 900, color: ACCENT, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>
+            <p style={{ fontSize: 52, fontWeight: 900, color: ACCENT, lineHeight: 1 }}>
               {currentRating.toLocaleString()}
             </p>
             {peakRating && peakRating > currentRating && (
@@ -270,7 +270,7 @@ export function Chess() {
             { label: 'Win %',    value: filtered.length ? `${winRate}%` : '—', color: ACCENT },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-2 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-lg font-bold" style={{ color: s.color, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
+              <p className="text-lg font-bold" style={{ color: s.color }}>{s.value}</p>
               <p className="section-label" style={{ fontSize: 9 }}>{s.label}</p>
             </div>
           ))}
@@ -310,7 +310,7 @@ export function Chess() {
         {/* Rating trend */}
         {ratingData.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Rating Trend</p>
+            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Rating Trend</p>
             <ResponsiveContainer width="100%" height={150}>
               <LineChart data={ratingData}>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />

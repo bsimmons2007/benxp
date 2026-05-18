@@ -86,8 +86,6 @@ export function SideNav() {
           inset:         0,
           zIndex:        48,
           background:    'rgba(0,0,0,0.55)',
-          backdropFilter: 'blur(2px)',
-          WebkitBackdropFilter: 'blur(2px)',
           opacity:       isOpen ? 1 : 0,
           pointerEvents: isOpen ? 'auto' : 'none',
           transition:    'opacity 0.25s ease',
@@ -107,8 +105,6 @@ export function SideNav() {
           display:              'flex',
           flexDirection:        'column',
           background:           'var(--nav-bg)',
-          backdropFilter:       'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
           borderRight:          '1px solid var(--border)',
           transform:            isOpen ? 'translateX(0)' : 'translateX(-100%)',
           transition:           'transform 0.26s cubic-bezier(0.22,1,0.36,1)',
@@ -127,7 +123,7 @@ export function SideNav() {
             borderBottom: '1px solid var(--border-faint)',
           }}
         >
-          <p style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 20, fontWeight: 700, lineHeight: 1, margin: 0 }}>
+          <p style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 700, lineHeight: 1, margin: 0 }}>
             {userName ? `${userName}XP` : 'YouXP'}
           </p>
           <p style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 4, marginBottom: 6, letterSpacing: '0.04em' }}>

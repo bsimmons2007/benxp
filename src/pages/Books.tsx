@@ -16,6 +16,7 @@ import { playGoalComplete } from '../lib/sounds'
 import type { Book, ToRead } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { FirstUseTip } from '../components/ui/EmptyState'
+import { PieChart, Pie, Cell, Tooltip } from 'recharts'
 
 // ── Types ────────────────────────────────────────────────────
 type SortKey = 'date_desc' | 'date_asc' | 'title_asc' | 'title_desc' | 'rating_desc' | 'rating_asc' | 'pages_desc' | 'pages_asc'
@@ -228,7 +229,7 @@ function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: ()
 // ── Edit book modal ──────────────────────────────────────────
 const inputCls = "px-3 py-3 rounded-lg text-white outline-none text-base w-full"
 const inputStyle = { background: 'var(--input-bg)', border: '1px solid var(--border)' }
-const labelStyle = { color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }
+const labelStyle = { color: 'var(--text-secondary)' }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return <label className="text-base font-medium" style={labelStyle}>{children}</label>
@@ -351,7 +352,6 @@ function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () =
     <>
       <div className="rounded-xl p-4 mb-3 card-animate" style={{
         background: 'rgba(16,24,52,0.7)',
-        backdropFilter: 'blur(12px)',
         border: '1px solid rgba(245,166,35,0.25)',
         boxShadow: '0 0 20px rgba(245,166,35,0.08)',
       }}>
@@ -359,8 +359,8 @@ function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () =
           {/* Reading indicator */}
           <div style={{ width: 4, borderRadius: 2, alignSelf: 'stretch', background: 'var(--accent)', flexShrink: 0 }} />
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-white leading-tight" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>{book.title}</p>
-            {book.author && <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>{book.author}</p>}
+            <p className="font-bold text-white leading-tight" style={{ fontSize: 15 }}>{book.title}</p>
+            {book.author && <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>{book.author}</p>}
             <div className="flex items-center gap-2 mt-2">
               <GenreChip genre={book.genre} />
               {book.pages && <span style={{ color: '#444', fontSize: 11 }}>{book.pages} pp</span>}
@@ -404,7 +404,6 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
         className="rounded-xl p-4 mb-3 card-animate cursor-pointer"
         style={{
           background: 'var(--card-bg)',
-          backdropFilter: 'blur(12px)',
           border: `1px solid ${expanded ? 'var(--accent)' : 'var(--border)'}`,
           boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
           transition: 'border-color 0.2s',
@@ -414,8 +413,8 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
         <div className="flex items-start justify-between gap-3">
           <div className="w-1 rounded-full flex-shrink-0 self-stretch" style={{ background: GENRE_COLORS[book.genre ?? ''] ?? '#555', minHeight: 40 }} />
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-white leading-tight" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>{book.title}</p>
-            {book.author && <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>{book.author}</p>}
+            <p className="font-bold text-white leading-tight" style={{ fontSize: 15 }}>{book.title}</p>
+            {book.author && <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>{book.author}</p>}
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <GenreChip genre={book.genre} />
               <Stars rating={book.rating} />
@@ -440,7 +439,7 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
                 { label: 'Finished', value: book.date_finished ? formatDate(book.date_finished) : '—' },
               ].map(item => (
                 <div key={item.label}>
-                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#444', fontFamily: 'Cormorant Garamond, serif' }}>{item.label}</p>
+                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#444' }}>{item.label}</p>
                   <p className="text-white">{item.value}</p>
                 </div>
               ))}
@@ -554,7 +553,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Series (optional)" type="text" placeholder="e.g. The Stormlight Archive" {...register('series')} />
 
             <div className="flex flex-col gap-1">
-              <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Genre</label>
+              <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Genre</label>
               <select {...register('genre')} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 {allGenres.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
@@ -632,7 +631,7 @@ function ToReadSection() {
           <div className="flex gap-2">
             <Input label="Genre" type="text" className="flex-1" {...register('genre')} />
             <div className="flex flex-col gap-1 flex-1">
-              <label className="text-base font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Priority</label>
+              <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Priority</label>
               <select {...register('priority')} className="px-3 py-3 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 <option>High</option><option>Medium</option><option>Low</option>
               </select>
@@ -727,7 +726,11 @@ export function Books() {
   const genreBreakdown = Object.entries(genreCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8)
-  const maxGenreCount = genreBreakdown[0]?.[1] ?? 1
+  const pieData = genreBreakdown.map(([genre, count]) => ({
+    name: genre,
+    value: count,
+    color: GENRE_COLORS[genre] ?? '#555',
+  }))
 
   return (
     <>
@@ -742,8 +745,8 @@ export function Books() {
             { label: 'Pages',      value: totalPages.toLocaleString() },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{s.value}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
+              <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{s.value}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -751,21 +754,49 @@ export function Books() {
         {/* Genre breakdown */}
         {genreBreakdown.length > 1 && (
           <div className="rounded-xl p-4 mb-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold mb-4" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Genre Breakdown</p>
-            <div className="flex flex-col gap-2.5">
-              {genreBreakdown.map(([genre, count]) => {
-                const color = GENRE_COLORS[genre] ?? '#555'
-                const pct = (count / maxGenreCount) * 100
-                return (
-                  <div key={genre} className="flex items-center gap-3">
-                    <p className="shrink-0 text-right" style={{ color: 'var(--text-secondary)', width: 100, fontFamily: 'Cormorant Garamond, serif', fontSize: 12 }}>{genre}</p>
-                    <div className="flex-1 rounded-full overflow-hidden" style={{ height: 8, background: 'var(--input-bg)' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 4, transition: 'width 0.6s ease' }} />
+            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Genre Breakdown</p>
+            <div className="flex items-center gap-4">
+
+              {/* Donut chart with centered count */}
+              <div className="relative flex-shrink-0" style={{ width: 140, height: 140 }}>
+                <PieChart width={140} height={140} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={46}
+                    outerRadius={66}
+                    paddingAngle={2}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {pieData.map((entry, i) => (
+                      <Cell key={i} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 11, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}
+                    formatter={(value: number, name: string) => [`${value} book${value !== 1 ? 's' : ''} · ${Math.round(value / finished.length * 100)}%`, name]}
+                  />
+                </PieChart>
+                <div className="pointer-events-none" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+                  <p className="font-bold" style={{ color: 'var(--text-primary)', fontSize: 22, lineHeight: 1 }}>{finished.length}</p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>books</p>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+                {pieData.map(({ name, color, value }) => (
+                  <div key={name} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <div className="rounded-full flex-shrink-0" style={{ width: 8, height: 8, background: color }} />
+                      <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>{name}</p>
                     </div>
-                    <p className="shrink-0 text-xs font-bold" style={{ color, width: 16, textAlign: 'right' }}>{count}</p>
+                    <p className="shrink-0 text-xs font-bold" style={{ color }}>{Math.round(value / finished.length * 100)}%</p>
                   </div>
-                )
-              })}
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -848,7 +879,7 @@ export function Books() {
                   <div key={seriesName} className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
                       <div style={{ width: 3, height: 14, borderRadius: 2, background: 'var(--accent)', flexShrink: 0 }} />
-                      <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{seriesName}</p>
+                      <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--accent)' }}>{seriesName}</p>
                       <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{books.length} book{books.length !== 1 ? 's' : ''}</span>
                     </div>
                     {books.map(book => <BookCard key={book.id} book={book} onEdited={load} />)}
@@ -858,7 +889,7 @@ export function Books() {
                   <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
                       <div style={{ width: 3, height: 14, borderRadius: 2, background: 'var(--border)', flexShrink: 0 }} />
-                      <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)', fontFamily: 'Cinzel, serif' }}>Standalone</p>
+                      <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Standalone</p>
                       <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{noSeries.length}</span>
                     </div>
                     {noSeries.map(book => <BookCard key={book.id} book={book} onEdited={load} />)}

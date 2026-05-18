@@ -188,15 +188,13 @@ export function XPHistory() {
           className="rounded-xl mb-5 px-4 py-3 flex items-center justify-between"
           style={{
             background: 'var(--card-bg)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
             border: '1px solid var(--border)',
             boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
           }}
         >
           <div>
             <p className="section-label">All-time XP</p>
-            <p className="font-bold text-2xl" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
+            <p className="font-bold text-2xl" style={{ color: 'var(--accent)' }}>
               {xpLoading ? '—' : totalXP.toLocaleString()}
             </p>
           </div>
@@ -237,8 +235,6 @@ export function XPHistory() {
                     className="flex items-center gap-3 rounded-xl px-3 py-2.5 mb-1"
                     style={{
                       background: 'var(--card-bg)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
                       border: '1px solid var(--border-faint)',
                     }}
                   >

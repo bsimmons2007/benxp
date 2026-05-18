@@ -186,7 +186,7 @@ export function DiscGolf() {
             { label: 'Under Par', value: underPar || '—', color: '#34d399' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: s.color ?? ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
+              <p className="text-xl font-bold" style={{ color: s.color ?? ACCENT }}>{s.value}</p>
               <p className="text-xs mt-0.5 section-label">{s.label}</p>
             </div>
           ))}
@@ -208,7 +208,7 @@ export function DiscGolf() {
         {/* Score vs Par chart */}
         {chartData.length >= 2 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Score vs Par</p>
+            <p className="font-bold text-white mb-1" style={{ fontSize: 15 }}>Score vs Par</p>
             <p className="section-label mb-3">Green = under par</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={chartData} barSize={22}>
@@ -248,7 +248,7 @@ export function DiscGolf() {
               </div>
               <div className="flex items-center gap-3">
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: 18, fontWeight: 800, color: vsParColor(diff), fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{vsParLabel(diff)}</p>
+                  <p style={{ fontSize: 18, fontWeight: 800, color: vsParColor(diff), lineHeight: 1 }}>{vsParLabel(diff)}</p>
                   <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{r.score} / {r.par}</p>
                 </div>
                 <button onClick={() => setEditing(r)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>

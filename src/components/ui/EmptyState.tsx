@@ -30,7 +30,7 @@ export function EmptyState({ icon, title, sub, action, dashed = true }: EmptySta
 
       <p
         className="font-bold mb-2"
-        style={{ color: 'var(--text-secondary)', fontFamily: 'Cinzel, serif', fontSize: 15, letterSpacing: '0.04em' }}
+        style={{ color: 'var(--text-secondary)', fontSize: 15, letterSpacing: '0.04em' }}
       >
         {title}
       </p>
@@ -50,7 +50,6 @@ export function EmptyState({ icon, title, sub, action, dashed = true }: EmptySta
             background: 'var(--accent)',
             color: 'var(--base-bg)',
             boxShadow: '0 0 20px var(--accent-dim)',
-            fontFamily: 'Cinzel, serif',
             letterSpacing: '0.03em',
           }}
         >

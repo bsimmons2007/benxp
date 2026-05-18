@@ -184,7 +184,7 @@ export function Skate() {
         )}
         {milesTrend.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Miles per Session</p>
+            <p className="font-bold text-white mb-1" style={{ fontSize: 15 }}>Miles per Session</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>
               Avg {avgMiles.toFixed(1)} mi/session
             </p>
@@ -218,7 +218,7 @@ export function Skate() {
         {/* Fastest mile trend */}
         {fastestTrend.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Fastest Mile Trend</p>
+            <p className="font-bold text-white mb-1" style={{ fontSize: 15 }}>Fastest Mile Trend</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>Lower is faster</p>
             <ResponsiveContainer width="100%" height={150}>
               <AreaChart data={fastestTrend} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -258,7 +258,7 @@ export function Skate() {
         {/* Session history */}
         {sessions.length > 0 && (
           <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="px-4 pt-4 pb-2 font-bold text-white" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Sessions</p>
+            <p className="px-4 pt-4 pb-2 font-bold text-white" style={{ fontSize: 15 }}>Sessions</p>
             {sessions.map((s) => (
               <div key={s.id} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
                 <div>

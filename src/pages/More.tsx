@@ -40,8 +40,6 @@ export function More() {
                   display: 'flex', alignItems: 'center', gap: 14,
                   padding: '14px 16px', borderRadius: 14,
                   background: 'var(--card-bg)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
                   border: '1px solid var(--border)',
                 }}
               >

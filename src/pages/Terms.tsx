@@ -11,7 +11,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div className="mb-6">
       <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase', fontFamily: 'Cinzel, serif', marginBottom: 8 }}>
+        textTransform: 'uppercase', marginBottom: 8 }}>
         {title}
       </p>
       <div style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.7 }}>
@@ -38,7 +38,7 @@ export function Terms() {
           ← Back
         </button>
 
-        <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: 26, fontWeight: 900,
+        <h1 style={{ fontSize: 26, fontWeight: 900,
           color: 'var(--text-primary)', marginBottom: 4 }}>
           Terms of Service
         </h1>

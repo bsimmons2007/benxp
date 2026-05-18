@@ -35,7 +35,8 @@ export function darkenForLight(hex: string): string {
 }
 
 export function isLightMode(): boolean {
-  return localStorage.getItem('youxp-light-mode') === 'true'
+  const saved = localStorage.getItem('youxp-light-mode')
+  return saved === null ? true : saved === 'true'  // default: light mode for new users
 }
 
 export function setLightMode(on: boolean) {
@@ -808,44 +809,59 @@ export function applyTheme(theme: Theme, light = isLightMode()) {
 
   if (light) {
     const la = theme.lightAccent ?? darkenForLight(theme.accent)
+    // Accent
     r.style.setProperty('--accent',        la)
-    r.style.setProperty('--accent-dim',    hexToRgba(la, 0.15))
+    r.style.setProperty('--accent-dim',    hexToRgba(la, 0.14))
     r.style.setProperty('--accent-subtle', hexToRgba(la, 0.08))
-    r.style.setProperty('--accent-tint',   hexToRgba(la, 0.04))
-    r.style.setProperty('--border-strong', 'rgba(0,0,0,0.18)')
-    r.style.setProperty('--orb1',          'transparent')
-    r.style.setProperty('--orb2',          'transparent')
-    r.style.setProperty('--orb3',          'transparent')
-    r.style.setProperty('--card-bg',       '#ffffff')
-    r.style.setProperty('--nav-bg',        'rgba(255,255,255,0.92)')
-    r.style.setProperty('--base-bg',       '#f2f2f4')
-    r.style.setProperty('--bg-mid',        '#eaeaec')
-    r.style.setProperty('--bg-deep',       '#e2e2e5')
-    r.style.setProperty('--input-bg',      'rgba(0,0,0,0.04)')
-    r.style.setProperty('--card-shadow',   '0 1px 2px rgba(0,0,0,0.06), 0 3px 12px rgba(0,0,0,0.08)')
-    r.setAttribute('data-mode', 'light')
+    r.style.setProperty('--accent-tint',   hexToRgba(la, 0.05))
+    // Surfaces (new tokens)
+    r.style.setProperty('--surface-0', '#f5f5f7')
+    r.style.setProperty('--surface-1', '#ffffff')
+    r.style.setProperty('--surface-2', '#f0f0f5')
+    r.style.setProperty('--surface-3', '#ffffff')
+    // Legacy aliases (still used by many components)
+    r.style.setProperty('--card-bg',     '#ffffff')
+    r.style.setProperty('--nav-bg',      '#ffffff')
+    r.style.setProperty('--base-bg',     '#f5f5f7')
+    r.style.setProperty('--bg-mid',      '#f0f0f5')
+    r.style.setProperty('--bg-deep',     '#eaeaed')
+    r.style.setProperty('--input-bg',    '#f0f0f5')
+    r.style.setProperty('--card-shadow', '0 1px 3px rgba(0,0,0,0.07), 0 2px 8px rgba(0,0,0,0.06)')
+    r.style.setProperty('--orb1', 'transparent')
+    r.style.setProperty('--orb2', 'transparent')
+    r.style.setProperty('--orb3', 'transparent')
+    r.removeAttribute('data-mode')   // no attribute = light (CSS :root defaults)
   } else {
-    r.style.setProperty('--accent',        theme.accent)
-    r.style.setProperty('--accent-dim',   theme.accentDim)
-    r.style.setProperty('--accent-subtle', hexToRgba(theme.accent, 0.08))
-    r.style.setProperty('--accent-tint',   hexToRgba(theme.accent, 0.04))
-    r.style.setProperty('--border-strong', 'rgba(255,255,255,0.18)')
-    r.style.setProperty('--orb1',        theme.orb1)
-    r.style.setProperty('--orb2',        theme.orb2)
-    r.style.setProperty('--orb3',        theme.orb3)
+    const accent = theme.accent
+    // Accent
+    r.style.setProperty('--accent',        accent)
+    r.style.setProperty('--accent-dim',    theme.accentDim)
+    r.style.setProperty('--accent-subtle', hexToRgba(accent, 0.08))
+    r.style.setProperty('--accent-tint',   hexToRgba(accent, 0.04))
+    // Surfaces — tinted with theme's base bg
+    r.style.setProperty('--surface-0', theme.baseBg)
+    r.style.setProperty('--surface-1', theme.cardBg.startsWith('rgba') ? theme.cardBg : theme.cardBg)
+    r.style.setProperty('--surface-2', theme.bgMid)
+    r.style.setProperty('--surface-3', theme.bgDeep)
+    // Legacy aliases
     r.style.setProperty('--card-bg',     theme.cardBg)
     r.style.setProperty('--nav-bg',      theme.navBg)
     r.style.setProperty('--base-bg',     theme.baseBg)
     r.style.setProperty('--bg-mid',      theme.bgMid)
     r.style.setProperty('--bg-deep',     theme.bgDeep)
-    r.style.setProperty('--card-shadow', '0 2px 12px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05)')
-    r.removeAttribute('data-mode')
+    r.style.setProperty('--input-bg',    'rgba(255,255,255,0.04)')
+    r.style.setProperty('--card-shadow', '0 2px 8px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04)')
+    r.style.setProperty('--orb1', 'transparent')
+    r.style.setProperty('--orb2', 'transparent')
+    r.style.setProperty('--orb3', 'transparent')
+    r.setAttribute('data-mode', 'dark')
   }
 }
 
 export function loadTheme(): Theme {
   const saved = localStorage.getItem('youxp-theme')
-  return THEMES.find((t) => t.id === saved) ?? THEMES.find((t) => t.id === 'midnight') ?? THEMES[0]
+  // Default theme: cobalt (deep blue) looks great in both light and dark
+  return THEMES.find((t) => t.id === saved) ?? THEMES.find((t) => t.id === 'cobalt') ?? THEMES[0]
 }
 
 // ── Time-of-day auto theme ─────────────────────────────────────

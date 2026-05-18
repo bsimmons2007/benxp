@@ -213,7 +213,7 @@ export function Hiking() {
             { label: 'Total ft', value: totalElev > 0 ? `${(totalElev / 1000).toFixed(1)}k` : '—' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
+              <p className="text-xl font-bold" style={{ color: ACCENT }}>{s.value}</p>
               <p className="text-xs mt-0.5 section-label">{s.label}</p>
             </div>
           ))}
@@ -235,7 +235,7 @@ export function Hiking() {
         {/* Monthly miles chart */}
         {chartData.length >= 2 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Miles / Month</p>
+            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Miles / Month</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={chartData} barSize={24}>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -272,7 +272,7 @@ export function Hiking() {
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 17, fontWeight: 800, color: ACCENT, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>
+                <p style={{ fontSize: 17, fontWeight: 800, color: ACCENT, lineHeight: 1 }}>
                   {Number(h.distance_miles).toFixed(1)}
                   <span style={{ fontSize: 11, fontWeight: 400, color: '#555', marginLeft: 2 }}>mi</span>
                 </p>

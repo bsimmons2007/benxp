@@ -209,8 +209,7 @@ function WeekDotStrip({ activityDates, streak }: {
       {/* Streak info */}
       {!streak.loading && (
         <div style={{ textAlign: 'right', paddingLeft: 10 }}>
-          <p style={{
-            fontFamily: 'Cinzel, serif', fontSize: 22, fontWeight: 700,
+          <p style={{ fontSize: 22, fontWeight: 700,
             color: streak.current > 0 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1,
           }}>
             {streak.current}
@@ -267,7 +266,7 @@ function StatsPickerModal({ picks, onChange, onClose }: {
           margin: '0 auto 18px' }} />
 
         <div className="flex items-center justify-between" style={{ marginBottom: 18 }}>
-          <p style={{ fontFamily: 'Cinzel, serif', fontSize: 14, fontWeight: 700,
+          <p style={{ fontSize: 14, fontWeight: 700,
             color: 'var(--text-primary)' }}>
             Customize Stats
           </p>
@@ -314,8 +313,7 @@ function StatsPickerModal({ picks, onChange, onClose }: {
             flex: 2, padding: '13px',
             background: 'var(--accent)', color: '#0d0d1a',
             border: 'none', borderRadius: 12,
-            fontWeight: 700, fontSize: 14, cursor: 'pointer',
-            fontFamily: 'Cinzel, serif', letterSpacing: '0.04em',
+            fontWeight: 700, fontSize: 14, cursor: 'pointer', letterSpacing: '0.04em',
           }}>
             Save
           </button>
@@ -431,7 +429,7 @@ function WellnessWidget() {
   return (
     <div className="mb-5 rounded-xl p-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
       <div className="flex items-center justify-between mb-3">
-        <p style={{ fontFamily: 'Cinzel, serif', fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
           Weekly Wellness
         </p>
         <div className="flex items-baseline gap-1">
@@ -628,7 +626,7 @@ export function Home() {
                 style={{ filter: 'drop-shadow(0 0 5px var(--accent))', transition: 'stroke-dasharray 1s ease' }}
               />
               <text x="50" y="46" textAnchor="middle" dominantBaseline="middle"
-                fill="var(--accent)" fontFamily="Cinzel, serif" fontSize="26" fontWeight="700">
+                fill="var(--accent)" fontFamily="Inter Variable, Inter, system-ui, sans-serif" fontSize="26" fontWeight="700">
                 {displayLevel}
               </text>
               <text x="50" y="63" textAnchor="middle" dominantBaseline="middle"
@@ -641,7 +639,7 @@ export function Home() {
 
           {/* Stacked info */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontFamily: 'Cinzel, serif', fontSize: 13, fontWeight: 700,
+            <p style={{ fontSize: 13, fontWeight: 700,
               color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase',
               marginBottom: 2 }}>
               {title}

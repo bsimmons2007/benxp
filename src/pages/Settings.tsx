@@ -313,10 +313,10 @@ export function Settings() {
     <>
       <header
         className="fixed top-0 left-0 right-0 flex items-center px-4 py-3 z-40"
-        style={{ background: 'var(--nav-bg)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--border-faint)' }}
+        style={{ background: 'var(--nav-bg)', borderBottom: '1px solid var(--border-faint)' }}
       >
         <button onClick={() => navigate(-1)} className="mr-3 text-xl" style={{ color: 'var(--accent)' }}>←</button>
-        <span className="text-2xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Settings</span>
+        <span className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>Settings</span>
       </header>
 
       <PageWrapper>
@@ -329,7 +329,7 @@ export function Settings() {
               <button
                 onClick={() => avatarInputRef.current?.click()}
                 className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center text-2xl font-bold relative"
-                style={{ background: avatarUrl ? 'transparent' : 'var(--accent)', color: 'var(--base-bg)', fontFamily: 'Cinzel, serif' }}
+                style={{ background: avatarUrl ? 'transparent' : 'var(--accent)', color: 'var(--base-bg)' }}
               >
                 {avatarUrl
                   ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
@@ -364,11 +364,11 @@ export function Settings() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <p className="text-white font-bold text-xl truncate" style={{ fontFamily: 'Cinzel, serif' }}>{userName || '—'}</p>
+                  <p className="text-white font-bold text-xl truncate" style={{ }}>{userName || '—'}</p>
                   <button onClick={() => { setNameInput(userName); setEditingName(true) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: 6, background: 'var(--input-bg)', border: 'none', cursor: 'pointer', flexShrink: 0 }}><EditIcon size={12} color="var(--text-muted)" /></button>
                 </div>
               )}
-              <p className="mt-0.5" style={{ color: 'var(--accent)', fontSize: 13, fontFamily: 'Cinzel, serif' }}>
+              <p className="mt-0.5" style={{ color: 'var(--accent)', fontSize: 13 }}>
                 Level {displayLevel}
               </p>
               <p style={{ color: '#444', fontSize: 12 }}>{totalXP.toLocaleString()} XP total</p>
@@ -459,8 +459,7 @@ export function Settings() {
                     style={{
                       background: levelStyle === style ? 'var(--accent)' : 'var(--input-bg)',
                       color: levelStyle === style ? 'var(--base-bg)' : 'var(--text-muted)',
-                      border: `1px solid ${levelStyle === style ? 'var(--accent)' : 'var(--border)'}`,
-                      fontFamily: 'Cinzel, serif', fontSize: 20,
+                      border: `1px solid ${levelStyle === style ? 'var(--accent)' : 'var(--border)'}`, fontSize: 20,
                     }}
                   >
                     {style === 'number' ? level : toRoman(level)}
@@ -828,7 +827,7 @@ export function Settings() {
         </div>
 
         {/* ── Sign out ──────────────────────────────────────────────── */}
-        <button onClick={logout} className="w-full py-3.5 rounded-xl font-semibold mt-2" style={{ background: 'rgba(233,69,96,0.12)', color: '#E94560', border: '1px solid rgba(233,69,96,0.25)', fontFamily: 'Cinzel, serif' }}>
+        <button onClick={logout} className="w-full py-3.5 rounded-xl font-semibold mt-2" style={{ background: 'rgba(233,69,96,0.12)', color: '#E94560', border: '1px solid rgba(233,69,96,0.25)' }}>
           Sign Out
         </button>
 

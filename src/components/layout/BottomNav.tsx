@@ -30,8 +30,6 @@ export function BottomNav() {
       className="fixed bottom-0 left-0 right-0 flex justify-around items-start z-40 md:hidden"
       style={{
         background:           'var(--nav-bg)',
-        backdropFilter:       'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
         borderTop:            '1px solid var(--border-faint)',
         height:               'calc(56px + env(safe-area-inset-bottom))',
         paddingTop:           8,

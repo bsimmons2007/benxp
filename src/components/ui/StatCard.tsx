@@ -26,7 +26,7 @@ function AnimatedValue({ value, unit }: { value: string | number; unit?: string 
 export function StatCard({ label, value, unit, highlight, animate = false }: StatCardProps) {
   return (
     <Card className={`card-animate ${highlight ? 'pr-badge' : ''} !p-3`}>
-      <p className="font-medium mb-0.5 truncate" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif', fontSize: 11 }}>
+      <p className="font-medium mb-0.5 truncate" style={{ color: '#AAAAAA', fontSize: 11 }}>
         {label}
       </p>
       <p className="text-lg font-bold leading-tight" style={{ color: 'var(--accent)' }}>

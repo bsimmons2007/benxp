@@ -623,7 +623,7 @@ function LevelAvatar({ level }: { level: number }) {
         {/* Tier info */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="flex items-center gap-2 mb-0.5">
-            <p style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: tier.aura }}>{tier.title}</p>
+            <p style={{ fontSize: 15, fontWeight: 700, color: tier.aura }}>{tier.title}</p>
             <span style={{ fontSize: 10, color: 'var(--text-muted)', background: 'var(--input-bg)', padding: '1px 6px', borderRadius: 4 }}>Tier {tier.index + 1}</span>
           </div>
           <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, marginBottom: 6 }}>{tier.desc}</p>
@@ -702,7 +702,7 @@ export function Profile() {
                 background: 'var(--accent)', borderRadius: 10,
                 padding: '2px 7px', border: '2px solid var(--base-bg)',
               }}>
-                <span style={{ fontFamily: 'Cinzel, serif', fontSize: 10, fontWeight: 700, color: '#1A1A2E' }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#1A1A2E' }}>
                   {displayLevel}
                 </span>
               </div>
@@ -710,11 +710,11 @@ export function Profile() {
 
             {/* Name + title + member since */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h2 style={{ fontFamily: 'Cinzel, serif', fontSize: 20, fontWeight: 700,
+              <h2 style={{ fontSize: 20, fontWeight: 700,
                 color: 'var(--text-primary)', lineHeight: 1.1, marginBottom: 3 }}>
                 {userName ?? 'Player'}
               </h2>
-              <p style={{ fontFamily: 'Cinzel, serif', fontSize: 13, fontWeight: 700,
+              <p style={{ fontSize: 13, fontWeight: 700,
                 color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
                 {title}
               </p>
@@ -754,8 +754,7 @@ export function Profile() {
               </div>
               <span style={{
                 fontSize: 32, fontWeight: 900,
-                color: consistencyScore >= 70 ? '#4ade80' : consistencyScore >= 40 ? 'var(--accent)' : '#888',
-                fontFamily: 'Cinzel, serif', lineHeight: 1,
+                color: consistencyScore >= 70 ? '#4ade80' : consistencyScore >= 40 ? 'var(--accent)' : '#888', lineHeight: 1,
               }}>
                 {consistencyScore}%
               </span>

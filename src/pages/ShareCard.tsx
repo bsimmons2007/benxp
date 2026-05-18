@@ -97,7 +97,7 @@ function Card() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, position: 'relative' }}>
         <div>
           <p style={{ color: theme.accent, fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 2 }}>YouXP</p>
-          <p style={{ color: '#ffffff', fontSize: 18, fontWeight: 800, margin: 0 }}>{userName || 'Player'}</p>
+          <p style={{ color: 'var(--text-primary)', fontSize: 18, fontWeight: 800, margin: 0 }}>{userName || 'Player'}</p>
         </div>
         <div style={{ textAlign: 'right' }}>
           <p style={{ color: theme.accent, fontSize: 36, fontWeight: 900, lineHeight: 1, margin: 0, textShadow: `0 0 20px ${theme.accent}` }}>{displayLevel}</p>

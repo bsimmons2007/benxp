@@ -58,7 +58,6 @@ function ChallengeCard({
       className={`rounded-xl p-4 mb-3 slide-in ${isBoss ? 'border-glow' : ''}`}
       style={{
         background: 'var(--card-bg)',
-        backdropFilter: 'blur(12px)',
         border: `1px solid ${isCompleted || autoCompleted ? tierColor : 'var(--border)'}`,
         boxShadow: isCompleted || autoCompleted ? `0 0 20px ${tierGlow}` : 'none',
         transition: 'all 0.3s ease',
@@ -70,7 +69,7 @@ function ChallengeCard({
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <span
               className="font-bold text-white"
-              style={{ fontFamily: isBoss ? 'Cinzel, serif' : 'Inter, sans-serif', fontSize: isBoss ? 15 : 14 }}
+              style={{ fontFamily: 'Inter Variable, Inter, system-ui, sans-serif', fontSize: isBoss ? 15 : 14 }}
             >
               {challenge.challenge_name}
             </span>

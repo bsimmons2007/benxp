@@ -101,7 +101,7 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)',
+        background: 'rgba(0,0,0,0.6)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
     >
@@ -114,7 +114,7 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
           boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
         }}
       >
-        <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12, fontFamily: 'Cinzel, serif' }}>
+        <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>
           Keyboard Shortcuts
         </p>
         {SHORTCUTS.map(s => (
@@ -170,16 +170,14 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
         background: 'radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
-      <p style={{
-        fontFamily: 'Cinzel, serif', fontSize: 42, fontWeight: 900,
+      <p style={{ fontSize: 42, fontWeight: 900,
         color: 'var(--accent)', letterSpacing: '0.05em',
         animation: 'splashLogoIn 0.9s cubic-bezier(0.34,1.56,0.64,1) both',
         marginBottom: 8,
       }}>
         YouXP
       </p>
-      <p style={{
-        fontFamily: 'Cormorant Garamond, serif', fontSize: 14,
+      <p style={{ fontSize: 14,
         color: 'var(--text-muted)', letterSpacing: '0.18em', textTransform: 'uppercase',
         animation: 'splashSubIn 1.1s ease both',
       }}>
