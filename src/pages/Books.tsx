@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import { PieChart, Pie, Cell, Tooltip } from 'recharts'
 import { useForm } from 'react-hook-form'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -727,7 +728,12 @@ export function Books() {
   const genreBreakdown = Object.entries(genreCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8)
-  const maxGenreCount = genreBreakdown[0]?.[1] ?? 1
+
+  const pieData = genreBreakdown.map(([genre, count]) => ({
+    name: genre,
+    value: count,
+    color: GENRE_COLORS[genre] ?? '#555',
+  }))
 
   return (
     <>
@@ -751,21 +757,50 @@ export function Books() {
         {/* Genre breakdown */}
         {genreBreakdown.length > 1 && (
           <div className="rounded-xl p-4 mb-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold mb-4" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Genre Breakdown</p>
-            <div className="flex flex-col gap-2.5">
-              {genreBreakdown.map(([genre, count]) => {
-                const color = GENRE_COLORS[genre] ?? '#555'
-                const pct = (count / maxGenreCount) * 100
-                return (
-                  <div key={genre} className="flex items-center gap-3">
-                    <p className="shrink-0 text-right" style={{ color: 'var(--text-secondary)', width: 100, fontFamily: 'Cormorant Garamond, serif', fontSize: 12 }}>{genre}</p>
-                    <div className="flex-1 rounded-full overflow-hidden" style={{ height: 8, background: 'var(--input-bg)' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 4, transition: 'width 0.6s ease' }} />
+            <p className="font-bold mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Genre Breakdown</p>
+            <div className="flex items-center gap-4">
+
+              {/* Donut chart with centered count */}
+              <div className="relative flex-shrink-0" style={{ width: 140, height: 140 }}>
+                <PieChart width={140} height={140}>
+                  <Pie
+                    data={pieData}
+                    cx={70}
+                    cy={70}
+                    innerRadius={46}
+                    outerRadius={66}
+                    paddingAngle={2}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {pieData.map((entry, i) => (
+                      <Cell key={i} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 11, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}
+                    formatter={(value: number, name: string) => [`${value} book${value !== 1 ? 's' : ''} · ${Math.round(value / finished.length * 100)}%`, name]}
+                  />
+                </PieChart>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <p className="font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'Cinzel, serif', fontSize: 22, lineHeight: 1 }}>{finished.length}</p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>books</p>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+                {pieData.map(({ name, color, value }) => (
+                  <div key={name} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <div className="rounded-full flex-shrink-0" style={{ width: 8, height: 8, background: color }} />
+                      <p className="text-xs truncate" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>{name}</p>
                     </div>
-                    <p className="shrink-0 text-xs font-bold" style={{ color, width: 16, textAlign: 'right' }}>{count}</p>
+                    <p className="text-xs font-bold flex-shrink-0" style={{ color }}>{Math.round(value / finished.length * 100)}%</p>
                   </div>
-                )
-              })}
+                ))}
+              </div>
+
             </div>
           </div>
         )}
