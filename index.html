@@ -31,43 +31,36 @@
 
     <!-- Boot loader — inline styles, CSP allows unsafe-inline -->
     <style>
-      /* ── Loader shell ── */
+      /* ── Loader shell — light mode default ── */
       #lxp-loader {
         position: fixed; inset: 0; z-index: 9999;
-        background: #0d0d1a;          /* matches --base-bg */
+        background: #f5f5f7;
         display: flex; flex-direction: column;
         align-items: center; justify-content: center; gap: 32px;
         transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
       }
       #lxp-loader.lxp-exit { transform: translateY(-100%); }
 
-      /* ── Ambient orbs (mirrors app body::before/after) ── */
-      #lxp-loader::before {
-        content: '';
-        position: absolute; inset: 0; pointer-events: none;
-        background:
-          radial-gradient(ellipse 60% 40% at 20% 30%, rgba(123,47,190,0.18) 0%, transparent 60%),
-          radial-gradient(ellipse 50% 35% at 80% 70%, rgba(26,188,156,0.12) 0%, transparent 60%),
-          radial-gradient(ellipse 40% 30% at 50% 50%, rgba(245,166,35,0.06) 0%, transparent 55%);
-      }
+      /* dark override — applied by loader.js when youxp-mode=dark */
+      #lxp-loader.lxp-dark { background: #0d0d1a; }
 
       /* ── WordMark ── */
       #lxp-title {
         display: flex; align-items: baseline; gap: 0;
-        font-family: 'Cinzel', 'Georgia', serif;
+        font-family: 'Inter', system-ui, sans-serif;
         font-size: clamp(36px, 8vw, 64px);
-        font-weight: 700;
-        letter-spacing: 0.06em;
+        font-weight: 800;
+        letter-spacing: -0.02em;
         position: relative; z-index: 1;
       }
       #lxp-title .lxp-you {
-        color: #e8e8e8;
+        color: #1d1d1f;
         opacity: 0; transform: translateY(-24px);
         transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
       }
+      #lxp-loader.lxp-dark #lxp-title .lxp-you { color: #e8e8e8; }
       #lxp-title .lxp-xp {
         color: #F5A623;
-        text-shadow: 0 0 24px rgba(245,166,35,0.55), 0 0 60px rgba(245,166,35,0.2);
         opacity: 0; transform: translateY(24px);
         transition: opacity 0.3s ease 0.18s, transform 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.18s;
       }
@@ -81,25 +74,26 @@
       }
       #lxp-bar-track {
         width: min(260px, 72vw); height: 2px;
-        background: rgba(255,255,255,0.06);
+        background: rgba(0,0,0,0.08);
         border-radius: 999px; overflow: hidden;
       }
+      #lxp-loader.lxp-dark #lxp-bar-track { background: rgba(255,255,255,0.08); }
       #lxp-bar {
         height: 100%; width: 0%;
         background: #F5A623;
-        box-shadow: 0 0 10px rgba(245,166,35,0.7), 0 0 24px rgba(245,166,35,0.3);
         border-radius: 999px;
         transition: width 1.8s cubic-bezier(0.4,0,0.2,1);
       }
 
       /* ── Sub-label ── */
       #lxp-sub {
-        font-family: 'DM Mono', 'Courier New', monospace;
+        font-family: 'Inter', system-ui, monospace;
         font-size: 10px;
-        color: rgba(255,255,255,0.2);
+        color: rgba(0,0,0,0.25);
         letter-spacing: 0.2em;
         text-transform: uppercase;
       }
+      #lxp-loader.lxp-dark #lxp-sub { color: rgba(255,255,255,0.2); }
       .lxp-blink { animation: lxp-blink 0.9s step-end infinite; }
       @keyframes lxp-blink { 50% { opacity: 0; } }
     </style>

@@ -286,7 +286,7 @@ export function Settings() {
 
   // Reusable chevron
   function Chevron({ open }: { open: boolean }) {
-    return <span style={{ color: '#555', fontSize: 12, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', display: 'block', flexShrink: 0 }}>▾</span>
+    return <span style={{ color: 'var(--text-muted)', fontSize: 12, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', display: 'block', flexShrink: 0 }}>▾</span>
   }
 
   // Reusable toggle pill
@@ -340,7 +340,7 @@ export function Settings() {
                 }
                 {avatarLoading && (
                   <div className="absolute inset-0 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                    <span className="text-xs text-white">...</span>
+                    <span style={{ color: "var(--text-primary)", fontSize: "0.75rem" }}>...</span>
                   </div>
                 )}
               </button>
@@ -367,14 +367,14 @@ export function Settings() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <p className="text-white font-bold text-xl truncate" style={{ }}>{userName || '—'}</p>
+                  <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "1.25rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userName || '—'}</p>
                   <button onClick={() => { setNameInput(userName); setEditingName(true) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: 6, background: 'var(--input-bg)', border: 'none', cursor: 'pointer', flexShrink: 0 }}><EditIcon size={12} color="var(--text-muted)" /></button>
                 </div>
               )}
               <p className="mt-0.5" style={{ color: 'var(--accent)', fontSize: 13 }}>
                 Level {displayLevel}
               </p>
-              <p style={{ color: '#444', fontSize: 12 }}>{totalXP.toLocaleString()} XP total</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>{totalXP.toLocaleString()} XP total</p>
             </div>
           </div>
         </Card>
@@ -430,8 +430,8 @@ export function Settings() {
             <div className="flex items-center gap-3">
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><TrophyIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
-                <p className="font-semibold text-sm text-white">Level Display</p>
-                <p style={{ color: '#444', fontSize: 11 }}>{levelStyle === 'roman' ? `Roman — ${toRoman(level)}` : `Numeric — ${level}`}</p>
+                <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>Level Display</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>{levelStyle === 'roman' ? `Roman — ${toRoman(level)}` : `Numeric — ${level}`}</p>
               </div>
             </div>
             <Chevron open={levelOpen} />
@@ -463,8 +463,8 @@ export function Settings() {
             <div className="flex items-center gap-3">
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><CalendarIcon size={18} color="var(--text-secondary)" /></span>
               <div>
-                <p className="font-semibold text-sm text-white">Time of Day Theme</p>
-                <p style={{ color: '#444', fontSize: 11 }}>
+                <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>Time of Day Theme</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                   {timeTheme ? 'Auto-switches: Dawn · Day · Dusk · Night' : 'Auto-switches with the clock'}
                 </p>
               </div>
@@ -488,8 +488,8 @@ export function Settings() {
             <div className="flex items-center gap-3">
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><DumbbellIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
-                <p className="font-semibold text-sm text-white">Dashboard Sections</p>
-                <p style={{ color: '#444', fontSize: 11 }}>
+                <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>Dashboard Sections</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                   {hiddenSections.length === 0 ? 'All visible' : `${hiddenSections.length} hidden`} · {sectionOrder.length} sections
                 </p>
               </div>
@@ -532,8 +532,8 @@ export function Settings() {
             <div className="flex items-center gap-3">
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><ActivityIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
-                <p className="font-semibold text-sm text-white">Sound</p>
-                <p style={{ color: '#444', fontSize: 11 }}>
+                <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>Sound</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                   {[sfx && 'SFX', ambient && `Ambient · ${AMBIENT_SCENES.find(s => s.id === activeScene)?.name ?? ''}`].filter(Boolean).join(' · ') || 'All off'}
                 </p>
               </div>
@@ -551,8 +551,8 @@ export function Settings() {
                   <div className="flex items-center gap-3">
                     <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{row.icon}</span>
                     <div>
-                      <p className="text-white text-sm font-medium">{row.label}</p>
-                      <p style={{ color: '#555', fontSize: 11 }}>{row.sub}</p>
+                      <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500 }}>{row.label}</p>
+                      <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>{row.sub}</p>
                     </div>
                   </div>
                   <Toggle value={row.value} onToggle={row.toggle} />
@@ -563,19 +563,19 @@ export function Settings() {
               <div className="flex items-center gap-3 py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
                 <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ActivityIcon size={16} color="#555" /></span>
                 <div className="flex-1">
-                  <p className="text-white text-sm font-medium mb-1">Volume</p>
+                  <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500, marginBottom: 4 }}>Volume</p>
                   <input
                     type="range" min={0} max={1} step={0.01} value={volume}
                     onChange={e => { const v = parseFloat(e.target.value); setVolumeState(v); setAmbientVolume(v) }}
                     style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer' }}
                   />
                 </div>
-                <span style={{ color: '#444', fontSize: 11, minWidth: 28, textAlign: 'right' }}>{Math.round(volume * 100)}%</span>
+                <span style={{ color: 'var(--text-muted)', fontSize: 11, minWidth: 28, textAlign: 'right' }}>{Math.round(volume * 100)}%</span>
               </div>
 
               {/* Scene picker */}
               <div style={{ borderTop: '1px solid var(--border-faint)', paddingTop: 12 }}>
-                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#444' }}>Atmosphere</p>
+                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Atmosphere</p>
                 <div className="flex flex-col gap-1.5">
                   {AMBIENT_SCENES.map(scene => {
                     const isActive = activeScene === scene.id
@@ -593,8 +593,8 @@ export function Settings() {
                           <AmbientSceneIcon id={scene.id} size={16} color="var(--accent)" />
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-white">{scene.name}</p>
-                          <p className="text-xs truncate" style={{ color: '#444' }}>{scene.description}</p>
+                          <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 600 }}>{scene.name}</p>
+                          <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{scene.description}</p>
                         </div>
                         {isActive && <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)', boxShadow: '0 0 6px var(--accent)', flexShrink: 0, animation: ambient ? 'glowPulse 2s ease-in-out infinite' : 'none' }} />}
                       </button>
@@ -613,8 +613,8 @@ export function Settings() {
               <div className="flex items-center gap-3">
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><BellIcon size={18} color="var(--text-secondary)" /></span>
                 <div className="text-left">
-                  <p className="font-semibold text-sm text-white">Reminders</p>
-                  <p style={{ color: '#444', fontSize: 11 }}>
+                  <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>Reminders</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                     {notifEnabled && notifPerm
                       ? `Daily reminder at ${notifTime}`
                       : notifEnabled && !notifPerm
@@ -633,8 +633,8 @@ export function Settings() {
                   <div className="flex items-center gap-3">
                     <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BellIcon size={16} color="var(--accent)" /></span>
                     <div>
-                      <p className="text-white text-sm font-medium">Daily log reminder</p>
-                      <p style={{ color: '#555', fontSize: 11 }}>Reminds you when you open the app near your chosen time</p>
+                      <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500 }}>Daily log reminder</p>
+                      <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Reminds you when you open the app near your chosen time</p>
                     </div>
                   </div>
                   <Toggle
@@ -676,8 +676,8 @@ export function Settings() {
                     <div className="flex items-center gap-3">
                       <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CalendarIcon size={16} color="#888" /></span>
                       <div>
-                        <p className="text-white text-sm font-medium">Reminder time</p>
-                        <p style={{ color: '#555', fontSize: 11 }}>Open the app within 5 min to trigger it</p>
+                        <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500 }}>Reminder time</p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Open the app within 5 min to trigger it</p>
                       </div>
                     </div>
                     <input
@@ -707,8 +707,8 @@ export function Settings() {
             <div className="flex items-center gap-3">
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><ActivityIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
-                <p className="font-semibold text-sm text-white">XP Rates</p>
-                <p style={{ color: '#444', fontSize: 11 }}>How XP is earned per activity</p>
+                <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>XP Rates</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>How XP is earned per activity</p>
               </div>
             </div>
             <Chevron open={xpOpen} />
@@ -719,7 +719,7 @@ export function Settings() {
                 <div key={r.label} className="flex items-center justify-between py-2" style={{ borderTop: '1px solid var(--border-faint)' }}>
                   <div className="flex items-center gap-2">
                     <span>{r.icon}</span>
-                    <span className="text-sm" style={{ color: '#BBBBBB' }}>{r.label}</span>
+                    <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{r.label}</span>
                   </div>
                   <span className="font-bold" style={{ color: 'var(--accent)', fontSize: 13 }}>{r.xp}</span>
                 </div>
@@ -734,8 +734,8 @@ export function Settings() {
             <div className="flex items-center gap-3">
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><DotsIcon size={18} color="var(--text-secondary)" /></span>
               <div className="text-left">
-                <p className="font-semibold text-sm text-white">Data & Account</p>
-                <p style={{ color: '#444', fontSize: 11 }}>Export, delete · YouXP</p>
+                <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>Data & Account</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Export, delete · YouXP</p>
               </div>
             </div>
             <Chevron open={dataOpen} />
@@ -749,9 +749,9 @@ export function Settings() {
               >
                 <div className="flex items-center gap-3">
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><ShareIcon size={16} color="#888" /></span>
-                  <span className="text-white text-sm">{exporting ? 'Exporting...' : 'Export data as CSV'}</span>
+                  <span style={{ color: "var(--text-primary)", fontSize: "0.875rem" }}>{exporting ? 'Exporting...' : 'Export data as CSV'}</span>
                 </div>
-                <span style={{ color: '#555' }}>›</span>
+                <span style={{ color: 'var(--text-muted)' }}>›</span>
               </div>
 
               <div
@@ -761,9 +761,9 @@ export function Settings() {
               >
                 <div className="flex items-center gap-3">
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><GamepadIcon size={16} color="#888" /></span>
-                  <span className="text-white text-sm">Restart app tutorial</span>
+                  <span style={{ color: "var(--text-primary)", fontSize: "0.875rem" }}>Restart app tutorial</span>
                 </div>
-                <span style={{ color: '#555' }}>›</span>
+                <span style={{ color: 'var(--text-muted)' }}>›</span>
               </div>
 
               {deleteStep === 'idle' ? (
@@ -774,16 +774,16 @@ export function Settings() {
                 >
                   <div className="flex items-center gap-3">
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><TrashIcon size={16} color="#E94560" /></span>
-                    <span style={{ color: '#E94560', fontSize: 14 }}>Delete account &amp; all data</span>
+                    <span style={{ color: 'var(--red)', fontSize: 14 }}>Delete account &amp; all data</span>
                   </div>
-                  <span style={{ color: '#555' }}>›</span>
+                  <span style={{ color: 'var(--text-muted)' }}>›</span>
                 </div>
               ) : (
                 <div className="py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
-                  <p className="text-sm mb-3" style={{ color: '#E94560' }}>This will permanently delete all your data. This cannot be undone.</p>
+                  <p className="text-sm mb-3" style={{ color: 'var(--red)' }}>This will permanently delete all your data. This cannot be undone.</p>
                   <div className="flex gap-2">
                     <button onClick={() => setDeleteStep('idle')} className="flex-1 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)' }}>Cancel</button>
-                    <button onClick={handleDeleteAccount} disabled={deleting} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{ background: 'rgba(233,69,96,0.2)', color: '#E94560', border: '1px solid rgba(233,69,96,0.4)' }}>
+                    <button onClick={handleDeleteAccount} disabled={deleting} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{ background: 'color-mix(in srgb, var(--red) 15%, transparent)', color: 'var(--red)', border: '1px solid color-mix(in srgb, var(--red) 35%, transparent)' }}>
                       {deleting ? 'Deleting...' : 'Yes, delete everything'}
                     </button>
                   </div>
@@ -815,7 +815,7 @@ export function Settings() {
         </div>
 
         {/* ── Sign out ──────────────────────────────────────────────── */}
-        <button onClick={logout} className="w-full py-3.5 rounded-xl font-semibold mt-2" style={{ background: 'rgba(233,69,96,0.12)', color: '#E94560', border: '1px solid rgba(233,69,96,0.25)' }}>
+        <button onClick={logout} className="w-full py-3.5 rounded-xl font-semibold mt-2" style={{ background: 'color-mix(in srgb, var(--red) 10%, transparent)', color: 'var(--red)', border: '1px solid color-mix(in srgb, var(--red) 25%, transparent)' }}>
           Sign Out
         </button>
 

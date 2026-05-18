@@ -1,6 +1,14 @@
 // YouXP boot loader — runs before React mounts
 (function () {
   var loader = document.getElementById('lxp-loader');
+
+  // Apply dark class immediately if user has dark mode stored
+  try {
+    if (localStorage.getItem('youxp-mode') === 'dark') {
+      loader && loader.classList.add('lxp-dark');
+    }
+  } catch (_) {}
+
   var bar    = document.getElementById('lxp-bar');
   var title  = document.getElementById('lxp-title');
 
