@@ -343,6 +343,53 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   SIDEBAR ICON STRIP — fly-out labels
+───────────────────────────────────────────────────────────── */
+.sidenav-item {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.sidenav-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.12s ease;
+  flex-shrink: 0;
+}
+.sidenav-icon-btn:hover {
+  background: var(--surface-2);
+}
+.sidenav-flyout {
+  position: absolute;
+  left: 56px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-6px);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  z-index: 60;
+}
+.sidenav-item:hover .sidenav-flyout {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ─────────────────────────────────────────────────────────────
    SCROLLBAR HIDE
 ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { display: none; }
