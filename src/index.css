@@ -390,6 +390,16 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   FLOATING EDIT FAB
+───────────────────────────────────────────────────────────── */
+.widget-edit-fab {
+  bottom: calc(68px + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .widget-edit-fab { bottom: 28px; }
+}
+
+/* ─────────────────────────────────────────────────────────────
    SCROLLBAR HIDE
 ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { display: none; }

@@ -12,7 +12,7 @@ import { useStore } from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import { formatDate, toRoman, localDateStr, today as appToday } from '../lib/utils'
 import { ArrowUpIcon, ArrowDownIcon, ActivityIconComp } from '../components/ui/Icon'
-import { PRHeroSkeleton, SecondaryStatSkeleton, ActivityRowSkeleton } from '../components/ui/Skeleton'
+import { SecondaryStatSkeleton, ActivityRowSkeleton } from '../components/ui/Skeleton'
 import { xpForLevel, getLevelTitle } from '../lib/xp'
 import { checkStreakBreakWarning } from '../lib/notifications'
 import { useStrengthSnapshot } from '../components/StrengthTab'
@@ -226,103 +226,6 @@ function WeekDotStrip({ activityDates, streak }: {
   )
 }
 
-// ── Stats Picker Modal ────────────────────────────────────────
-function StatsPickerModal({ picks, onChange, onClose }: {
-  picks: StatId[]
-  onChange: (picks: StatId[]) => void
-  onClose: () => void
-}) {
-  const [local, setLocal] = useState<StatId[]>(picks)
-
-  const toggle = (id: StatId) => {
-    setLocal(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
-  }
-
-  const save = () => { onChange(local); onClose() }
-
-  // Group by section
-  const sections = Array.from(new Set(STAT_DEFS.map(d => d.section)))
-
-  return (
-    <>
-      {/* Overlay */}
-      <div onClick={onClose} style={{
-        position: 'fixed', inset: 0, zIndex: 100,
-        background: 'rgba(0,0,0,0.65)',
-      }} />
-
-      {/* Sheet */}
-      <div className="pop-in" style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 101,
-        background: 'var(--bg-mid)',
-        borderRadius: '20px 20px 0 0',
-        padding: '20px 20px 44px',
-        border: '1px solid var(--border)',
-        borderBottom: 'none',
-        boxShadow: '0 -8px 40px rgba(0,0,0,0.5)',
-      }}>
-        {/* Handle */}
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--border)',
-          margin: '0 auto 18px' }} />
-
-        <div className="flex items-center justify-between" style={{ marginBottom: 18 }}>
-          <p style={{ fontSize: 14, fontWeight: 700,
-            color: 'var(--text-primary)' }}>
-            Customize Stats
-          </p>
-          <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{local.length} selected</p>
-        </div>
-
-        {sections.map(section => (
-          <div key={section} style={{ marginBottom: 14 }}>
-            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em',
-              textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>
-              {section}
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {STAT_DEFS.filter(d => d.section === section).map(def => {
-                const active = local.includes(def.id)
-                return (
-                  <button key={def.id} onClick={() => toggle(def.id)} style={{
-                    padding: '7px 14px',
-                    borderRadius: 999,
-                    border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
-                    background: active ? 'var(--accent-dim)' : 'var(--input-bg)',
-                    color: active ? 'var(--accent)' : 'var(--text-muted)',
-                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}>
-                    {def.label}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        ))}
-
-        <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
-          <button onClick={onClose} style={{
-            flex: 1, padding: '13px',
-            background: 'var(--input-bg)', color: 'var(--text-secondary)',
-            border: '1px solid var(--border)', borderRadius: 12,
-            fontWeight: 600, fontSize: 14, cursor: 'pointer',
-          }}>
-            Cancel
-          </button>
-          <button onClick={save} style={{
-            flex: 2, padding: '13px',
-            background: 'var(--accent)', color: '#0d0d1a',
-            border: 'none', borderRadius: 12,
-            fontWeight: 700, fontSize: 14, cursor: 'pointer', letterSpacing: '0.04em',
-          }}>
-            Save
-          </button>
-        </div>
-      </div>
-    </>
-  )
-}
-
 // ── Category colors ───────────────────────────────────────────
 const CAT_COLORS: Record<string, string> = {
   lifting:  'var(--accent)',
@@ -335,31 +238,32 @@ const CAT_COLORS: Record<string, string> = {
   gaming:   '#a78bfa',
 }
 
-// ── PR Hero Card ──────────────────────────────────────────────
-function PRHeroCard({ label, value, unit = 'lbs', trendDir, delta, to, color }: {
+// ── Unified stat widget card ──────────────────────────────────
+function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, onRemove }: {
   label: string; value: string | number; unit?: string
   trendDir?: TrendDir; delta?: number | null; to?: string; color?: string
+  editMode?: boolean; onRemove?: () => void
 }) {
   const num      = typeof value === 'number' ? value : parseFloat(String(value))
   const isNum    = !isNaN(num)
   const decimals = String(value).includes('.') ? (String(value).split('.')[1]?.length ?? 0) : 0
   const animated = useCountUp(isNum ? num : 0, 900, decimals)
+  const accent   = color ?? 'var(--accent)'
 
-  const borderColor = color ?? 'var(--accent)'
   const inner = (
     <div style={{
-      background: 'var(--card-bg)',
-      border: '1px solid var(--border)',
-      borderLeft: `3px solid ${borderColor}`,
-      borderRadius: 14, padding: '14px 16px',
-      boxShadow: 'var(--card-shadow)',
+      background:  'var(--card-bg)',
+      border:      '1px solid var(--border)',
+      borderLeft:  `3px solid ${accent}`,
+      borderRadius: 12, padding: '12px 14px',
+      boxShadow:   'var(--card-shadow)',
+      height:      '100%',
     }}>
-      <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)',
-        letterSpacing: '-0.01em', marginBottom: 6 }}>
+      <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.01em', marginBottom: 5 }}>
         {label}
       </p>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, lineHeight: 1 }}>
-        <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 30, fontWeight: 700, color: borderColor }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, lineHeight: 1 }}>
+        <span style={{ fontSize: 24, fontWeight: 700, color: accent }}>
           {isNum ? animated : value}
         </span>
         {trendDir && trendDir !== 'flat' && <TrendArrow direction={trendDir} />}
@@ -367,47 +271,90 @@ function PRHeroCard({ label, value, unit = 'lbs', trendDir, delta, to, color }: 
       {unit && <p style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.10em', marginTop: 2 }}>{unit}</p>}
       {delta != null && (
         <p style={{ fontSize: 10, color: delta > 0 ? 'var(--green)' : 'var(--red)', marginTop: 4 }}>
-          {delta > 0 ? `↑ ${delta} lbs this month` : `↓ ${Math.abs(delta)} lbs this month`}
+          {delta > 0 ? `↑ ${delta} lbs` : `↓ ${Math.abs(delta)} lbs`}
         </p>
       )}
     </div>
   )
-  return to ? <Link to={to} style={{ textDecoration: 'none' }}>{inner}</Link> : inner
-}
 
-// ── Secondary stat card (2×2 grid) ───────────────────────────
-function SecondaryStatCard({ label, value, unit, trendDir, to, color }: {
-  label: string; value: string | number; unit?: string; trendDir?: TrendDir; to?: string; delta?: number | null; color?: string
-}) {
-  const num      = typeof value === 'number' ? value : parseFloat(String(value))
-  const isNum    = !isNaN(num)
-  const decimals = String(value).includes('.') ? (String(value).split('.')[1]?.length ?? 0) : 0
-  const animated = useCountUp(isNum ? num : 0, 900, decimals)
-
-  const borderColor = color ?? 'var(--accent)'
-  const inner = (
-    <div style={{
-      background: 'var(--card-bg)',
-      border: '1px solid var(--border)',
-      borderLeft: `3px solid ${borderColor}`,
-      borderRadius: 12, padding: '12px 14px',
-      boxShadow: 'var(--card-shadow)',
-    }}>
-      <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)',
-        letterSpacing: '-0.01em', marginBottom: 4 }}>
-        {label}
-      </p>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, lineHeight: 1 }}>
-        <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20, fontWeight: 700, color: borderColor }}>
-          {isNum ? animated : value}
-        </span>
-        {trendDir && trendDir !== 'flat' && <TrendArrow direction={trendDir} />}
-      </div>
-      {unit && <p style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.10em', marginTop: 2 }}>{unit}</p>}
+  return (
+    <div style={{ position: 'relative' }}>
+      {to ? <Link to={to} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>{inner}</Link> : inner}
+      {editMode && (
+        <button
+          onClick={onRemove}
+          aria-label="Remove widget"
+          style={{
+            position: 'absolute', top: -7, right: -7,
+            width: 22, height: 22, borderRadius: '50%',
+            background: 'var(--red)', color: 'white',
+            border: '2px solid var(--base-bg)',
+            cursor: 'pointer', fontSize: 14, fontWeight: 700,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 5, lineHeight: 1, padding: 0,
+          }}
+        >
+          ×
+        </button>
+      )}
     </div>
   )
+}
 
-  return to ? <Link to={to} style={{ textDecoration: 'none' }}>{inner}</Link> : inner
+// ── Add widget panel (slides from right) ──────────────────────
+function AddPanel({ picks, onAdd, onClose }: {
+  picks: StatId[]; onAdd: (id: StatId) => void; onClose: () => void
+}) {
+  const available = STAT_DEFS.filter(d => !picks.includes(d.id))
+  const sections  = Array.from(new Set(available.map(d => d.section)))
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 199, background: 'rgba(0,0,0,0.4)' }} />
+      <div style={{
+        position: 'fixed', top: 0, right: 0, height: '100%',
+        width: 'clamp(280px, 85vw, 340px)',
+        zIndex: 200, background: 'var(--surface-1)',
+        borderLeft: '1px solid var(--border-default)',
+        animation: 'slideInRight 0.25s cubic-bezier(0.22,1,0.36,1) both',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 16px 14px', borderBottom: '1px solid var(--border-subtle)' }}>
+          <p style={{ fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>Add Widget</p>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 24, lineHeight: 1, padding: 0 }}>×</button>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px 40px' }}>
+          {available.length === 0 ? (
+            <p style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', marginTop: 40 }}>All stats are added</p>
+          ) : sections.map(section => (
+            <div key={section} style={{ marginBottom: 20 }}>
+              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>{section}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {STAT_DEFS.filter(d => d.section === section && !picks.includes(d.id)).map(def => (
+                  <button
+                    key={def.id}
+                    onClick={() => onAdd(def.id)}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '10px 12px', borderRadius: 10,
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      color: 'var(--text-primary)', fontSize: 13, fontWeight: 500, textAlign: 'left',
+                      width: '100%',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-2)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                  >
+                    {def.label}
+                    <span style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 300, lineHeight: 1 }}>+</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  )
 }
 
 // ── Wellness Score widget ─────────────────────────────────────
@@ -433,7 +380,7 @@ function WellnessWidget() {
           Weekly Wellness
         </p>
         <div className="flex items-baseline gap-1">
-          <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 22, fontWeight: 700, color: gradeColor }}>{w.total}</span>
+          <span style={{ fontSize: 22, fontWeight: 700, color: gradeColor }}>{w.total}</span>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>/100</span>
           <span className="ml-1 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: gradeColor + '22', color: gradeColor }}>{grade}</span>
         </div>
@@ -473,14 +420,15 @@ export function Home() {
   const userName        = useUserName()
   const streak          = useStreak()
 
-  // Stat picker
+  // Stat picker / widget grid
   const [statPicks, setStatPicks] = useState<StatId[]>(() => {
     try {
       const saved = localStorage.getItem(HOME_STATS_KEY)
       return saved ? JSON.parse(saved) : DEFAULT_STAT_PICKS
     } catch { return DEFAULT_STAT_PICKS as StatId[] }
   })
-  const [showPicker,     setShowPicker]     = useState(false)
+  const [editMode,       setEditMode]       = useState(false)
+  const [showAddPanel,   setShowAddPanel]   = useState(false)
   const [showUpdatedChip, setShowUpdatedChip] = useState(false)
 
   // Show auto-dismiss "Data updated" chip after background refresh
@@ -496,6 +444,11 @@ export function Home() {
   const savePicks = (picks: StatId[]) => {
     setStatPicks(picks)
     localStorage.setItem(HOME_STATS_KEY, JSON.stringify(picks))
+  }
+  const removeWidget = (id: StatId) => savePicks(statPicks.filter(p => p !== id))
+  const addWidget    = (id: StatId) => {
+    if (statPicks.includes(id) || statPicks.length >= 8) return
+    savePicks([...statPicks, id])
   }
 
   useEffect(() => {
@@ -555,8 +508,6 @@ export function Home() {
     }
   }
 
-  const heroCards      = statPicks.slice(0, 2)
-  const secondaryCards = statPicks.slice(2)
 
   return (
     <>
@@ -644,7 +595,7 @@ export function Home() {
               marginBottom: 2 }}>
               {title}
             </p>
-            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 26, fontWeight: 700,
+            <p style={{ fontSize: 26, fontWeight: 700,
               color: 'var(--text-primary)', lineHeight: 1, marginBottom: 8 }}>
               {Number(animatedXP).toLocaleString()}
               <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 4 }}>XP</span>
@@ -673,70 +624,48 @@ export function Home() {
         {/* ── Weekly Wellness ── */}
         <WellnessWidget />
 
-        {/* ── My Stats ── */}
+        {/* ── Widget grid ── */}
         <div className="mb-5">
-          <div className="flex items-center justify-between mb-3">
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em' }}>
-              My Stats
-            </p>
-            <button
-              onClick={() => setShowPicker(true)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: 'var(--accent)', fontSize: 11, fontWeight: 600, padding: 0,
-              }}
-            >
-              {/* Pencil icon */}
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-              Edit
-            </button>
-          </div>
+          <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 12 }}>
+            My Stats
+          </p>
 
-          {statPicks.length === 0 ? (
-            <button
-              onClick={() => setShowPicker(true)}
-              style={{
-                width: '100%', padding: '18px',
-                background: 'var(--card-bg)', border: '1px dashed var(--border)',
-                borderRadius: 14, cursor: 'pointer',
-                color: 'var(--text-muted)', fontSize: 13, fontWeight: 500,
-              }}
-            >
-              Tap Edit to choose which stats to display
-            </button>
-          ) : loading ? (
-            <>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <PRHeroSkeleton /><PRHeroSkeleton />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {[0,1,2,3].map(i => <SecondaryStatSkeleton key={i} />)}
-              </div>
-            </>
+          {loading ? (
+            <div className="grid grid-cols-2 gap-2">
+              {[0,1,2,3].map(i => <SecondaryStatSkeleton key={i} />)}
+            </div>
           ) : (
-            <>
-              {/* Hero cards — first 2 */}
-              {heroCards.length > 0 && (
-                <div className={`grid gap-3 mb-3 ${heroCards.length >= 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                  {heroCards.map(id => (
-                    <PRHeroCard key={id} {...getCardProps(id)} />
-                  ))}
+            <div className="grid grid-cols-2 gap-2">
+              {statPicks.map(id => (
+                <StatWidget
+                  key={id}
+                  {...getCardProps(id)}
+                  editMode={editMode}
+                  onRemove={() => removeWidget(id)}
+                />
+              ))}
+              {/* Add tile — shown in edit mode when below max */}
+              {editMode && statPicks.length < 8 && (
+                <button
+                  onClick={() => setShowAddPanel(true)}
+                  style={{
+                    borderRadius: 12, minHeight: 72,
+                    border: '1.5px dashed var(--border)',
+                    background: 'transparent',
+                    color: 'var(--text-muted)', fontSize: 28, fontWeight: 300,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  +
+                </button>
+              )}
+              {/* Empty state */}
+              {statPicks.length === 0 && !editMode && (
+                <div className="col-span-2" style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+                  Tap Edit to add stats
                 </div>
               )}
-
-              {/* Secondary cards — rest */}
-              {secondaryCards.length > 0 && (
-                <div className="grid grid-cols-2 gap-2">
-                  {secondaryCards.map(id => (
-                    <SecondaryStatCard key={id} {...getCardProps(id)} />
-                  ))}
-                </div>
-              )}
-            </>
+            </div>
           )}
         </div>
 
@@ -776,12 +705,39 @@ export function Home() {
 
       </PageWrapper>
 
-      {/* ── Stats Picker ── */}
-      {showPicker && (
-        <StatsPickerModal
+      {/* ── Floating edit button ── */}
+      <button
+        onClick={() => { setEditMode(v => !v); setShowAddPanel(false) }}
+        className="widget-edit-fab"
+        style={{
+          position: 'fixed', right: 20, zIndex: 45,
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '9px 18px',
+          background: editMode ? 'var(--surface-1)' : 'var(--accent)',
+          color:      editMode ? 'var(--text-primary)' : 'white',
+          border:     editMode ? '1px solid var(--border-default)' : 'none',
+          borderRadius: 20, fontSize: 13, fontWeight: 600,
+          boxShadow: 'var(--shadow-md)', cursor: 'pointer',
+          transition: 'background 0.2s ease, color 0.2s ease',
+        }}
+      >
+        {editMode ? 'Done' : (
+          <>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit
+          </>
+        )}
+      </button>
+
+      {/* ── Add widget panel ── */}
+      {showAddPanel && (
+        <AddPanel
           picks={statPicks}
-          onChange={savePicks}
-          onClose={() => setShowPicker(false)}
+          onAdd={(id) => { addWidget(id); setShowAddPanel(false) }}
+          onClose={() => setShowAddPanel(false)}
         />
       )}
     </>
