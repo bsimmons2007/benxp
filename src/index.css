@@ -128,6 +128,14 @@ html, body, #root {
   background: var(--surface-0);
 }
 
+body {
+  overscroll-behavior: none;
+}
+
+button, a {
+  touch-action: manipulation;
+}
+
 #root { position: relative; z-index: 1; }
 
 /* No orbs, no grid — clean flat background */
@@ -393,7 +401,7 @@ input:focus, select:focus, textarea:focus {
    FLOATING EDIT FAB
 ───────────────────────────────────────────────────────────── */
 .widget-edit-fab {
-  bottom: calc(68px + env(safe-area-inset-bottom));
+  bottom: calc(72px + env(safe-area-inset-bottom));
 }
 @media (min-width: 768px) {
   .widget-edit-fab { bottom: 28px; }

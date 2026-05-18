@@ -29,11 +29,11 @@ export function BottomNav() {
       data-tutorial="bottom-nav"
       className="fixed bottom-0 left-0 right-0 flex justify-around items-start z-40 md:hidden"
       style={{
-        background:           'var(--nav-bg)',
-        borderTop:            '1px solid var(--border-faint)',
-        height:               'calc(56px + env(safe-area-inset-bottom))',
-        paddingTop:           8,
-        paddingBottom:        'env(safe-area-inset-bottom)',
+        background:    'var(--nav-bg)',
+        borderTop:     '1px solid var(--border-faint)',
+        height:        'calc(60px + env(safe-area-inset-bottom))',
+        paddingTop:    6,
+        paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
       {tabs.map((tab) => (
@@ -41,16 +41,21 @@ export function BottomNav() {
           key={tab.to}
           to={tab.to}
           end={tab.to === '/'}
-          className="flex flex-col items-center gap-0.5 px-2 py-1 transition-all relative"
+          className="flex flex-col items-center gap-0.5 px-1"
           style={({ isActive }) => ({
-            color:     isActive ? 'var(--accent)' : 'var(--text-muted)',
-            transform: isActive ? 'translateY(-1px)' : 'none',
-            minWidth:  44,
+            color:   isActive ? 'var(--accent)' : 'var(--text-muted)',
+            minWidth: 48,
+            textDecoration: 'none',
           })}
         >
           {({ isActive }) => (
             <>
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 22, transform: isActive ? 'scale(1.15)' : 'scale(1)', transition: 'transform 0.15s ease' }}>
+              <span style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                height: 30, width: 46, borderRadius: 10,
+                background: isActive ? 'var(--accent-subtle, rgba(245,166,35,0.12))' : 'transparent',
+                transition: 'background 0.15s ease',
+              }}>
                 {tab.iconKey === '__home'
                   ? <HomeIcon size={20} />
                   : tab.iconKey === '__more'
@@ -58,10 +63,9 @@ export function BottomNav() {
                   : <SectionIcon sectionKey={tab.iconKey} size={20} />
                 }
               </span>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.03em', lineHeight: 1 }}>
+              <span style={{ fontSize: 9, fontWeight: isActive ? 700 : 500, letterSpacing: '0.02em', lineHeight: 1 }}>
                 {tab.label}
               </span>
-              {isActive && <div className="nav-active-dot" />}
             </>
           )}
         </NavLink>

@@ -229,6 +229,29 @@ const CAT_COLORS: Record<string, string> = {
   gaming:   '#a78bfa',
 }
 
+// Activity icon key → accent color
+const ACTIVITY_COLORS: Record<string, string> = {
+  lift:         'var(--accent)',
+  skate:        '#3b82f6',
+  book:         '#fbbf24',
+  game:         '#a78bfa',
+  fortnite:     '#a78bfa',
+  basketball:   '#f97316',
+  pickleball:   '#f97316',
+  golf:         '#34d399',
+  disc_golf:    '#34d399',
+  hiking:       '#34d399',
+  table_tennis: '#f97316',
+  chess:        '#f97316',
+  pool:         '#f97316',
+  volleyball:   '#f97316',
+  spikeball:    '#f97316',
+  run:          '#3b82f6',
+  bike:         '#3b82f6',
+  swim:         '#3b82f6',
+  walk:         '#3b82f6',
+}
+
 // ── Unified stat widget card ──────────────────────────────────
 function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, onRemove }: {
   label: string; value: string | number; unit?: string
@@ -515,7 +538,7 @@ export function Home() {
           }}>
             <div style={{
               width: 32, height: 32, borderRadius: '50%',
-              background: 'rgba(12,14,30,0.92)', border: '1px solid var(--border)',
+              background: 'var(--surface-2)', border: '1px solid var(--border)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
             }}>
@@ -708,16 +731,25 @@ export function Home() {
               <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No activity yet — start logging!</p>
             </div>
           ) : (
-            <div className="flex flex-col gap-2.5">
-              {activity.map((a) => (
-                <div key={`${a.type}-${a.date}-${a.label}`} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <ActivityIconComp activityKey={a.icon} size={17} color="var(--text-muted)" />
-                    <span style={{ fontSize: 13, color: 'var(--text-primary)' }}>{a.label}</span>
+            <div className="flex flex-col gap-1">
+              {activity.map((a) => {
+                const iconColor = ACTIVITY_COLORS[a.icon] ?? 'var(--accent)'
+                return (
+                  <div key={`${a.type}-${a.date}-${a.label}`} className="flex items-center justify-between" style={{ padding: '5px 0' }}>
+                    <div className="flex items-center gap-3" style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{
+                        width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                        background: iconColor + '18',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <ActivityIconComp activityKey={a.icon} size={16} color={iconColor} />
+                      </div>
+                      <span style={{ fontSize: 13, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.label}</span>
+                    </div>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0, marginLeft: 8 }}>{formatDate(a.date)}</span>
                   </div>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{formatDate(a.date)}</span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </Card>
