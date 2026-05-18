@@ -762,11 +762,11 @@ export function Books() {
 
               {/* Donut chart with centered count */}
               <div className="relative flex-shrink-0" style={{ width: 140, height: 140 }}>
-                <PieChart width={140} height={140}>
+                <PieChart width={140} height={140} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                   <Pie
                     data={pieData}
-                    cx={70}
-                    cy={70}
+                    cx="50%"
+                    cy="50%"
                     innerRadius={46}
                     outerRadius={66}
                     paddingAngle={2}
@@ -782,7 +782,7 @@ export function Books() {
                     formatter={(value: number, name: string) => [`${value} book${value !== 1 ? 's' : ''} · ${Math.round(value / finished.length * 100)}%`, name]}
                   />
                 </PieChart>
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <div className="pointer-events-none" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
                   <p className="font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'Cinzel, serif', fontSize: 22, lineHeight: 1 }}>{finished.length}</p>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>books</p>
                 </div>
