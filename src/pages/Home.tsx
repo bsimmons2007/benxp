@@ -13,12 +13,11 @@ import { supabase } from '../lib/supabase'
 import { formatDate, toRoman, localDateStr, today as appToday } from '../lib/utils'
 import { ArrowUpIcon, ArrowDownIcon, ActivityIconComp } from '../components/ui/Icon'
 import { SecondaryStatSkeleton, ActivityRowSkeleton } from '../components/ui/Skeleton'
-import { xpForLevel, getLevelTitle } from '../lib/xp'
+import { xpForLevel, getLevelTitle, XP_RATES } from '../lib/xp'
 import { checkStreakBreakWarning } from '../lib/notifications'
 import { useStrengthSnapshot } from '../components/StrengthTab'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { useUserName } from '../hooks/useUserName'
 import { useWellnessScore } from '../hooks/useWellnessScore'
 
 // ── Types ─────────────────────────────────────────────────────
@@ -77,15 +76,7 @@ function TrendArrow({ direction }: { direction: TrendDir }) {
   return null
 }
 
-function fmtAgo(ts: number | null): string | null {
-  if (!ts) return null
-  const mins = Math.floor((Date.now() - ts) / 60000)
-  if (mins < 1)  return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.floor(mins / 60)
-  if (hrs < 24)  return `${hrs}h ago`
-  return `${Math.floor(hrs / 24)}d ago`
-}
+
 
 // ── Trend cache ───────────────────────────────────────────────
 let trendsCache: { data: TrendResult; ts: number } | null = null
@@ -417,7 +408,6 @@ export function Home() {
   const refreshActivity = useStore(s => s.refreshActivity)
   const lastUpdated     = useStore(s => s.lastUpdated)
   const trends          = useTrends()
-  const userName        = useUserName()
   const streak          = useStreak()
 
   // Stat picker / widget grid
@@ -429,6 +419,7 @@ export function Home() {
   })
   const [editMode,       setEditMode]       = useState(false)
   const [showAddPanel,   setShowAddPanel]   = useState(false)
+  const [showBreakdown,  setShowBreakdown]  = useState(false)
   const [showUpdatedChip, setShowUpdatedChip] = useState(false)
 
   // Show auto-dismiss "Data updated" chip after background refresh
@@ -561,62 +552,90 @@ export function Home() {
           </div>
         </div>
 
-        {/* ── Command Center Header ── */}
-        <div className="flex items-center gap-4 pt-4 pb-5">
+        {/* ── XP Hero Card ── */}
+        <div className="rounded-2xl mb-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', overflow: 'hidden' }}>
+          <div className="flex items-center gap-4 p-4">
+            {/* Level ring — no glow */}
+            <Link to="/profile" style={{ flexShrink: 0, display: 'block', WebkitTapHighlightColor: 'transparent' }}>
+              <svg width="80" height="80" viewBox="0 0 100 100" style={{ display: 'block' }}>
+                <circle cx="50" cy="50" r="44" fill="none" stroke="var(--accent)" strokeWidth="3" opacity="0.12" />
+                <circle cx="50" cy="50" r="44" fill="none"
+                  stroke="var(--accent)" strokeWidth="3"
+                  strokeDasharray={`${2 * Math.PI * 44 * Math.min(ringProgress, 1)} ${2 * Math.PI * 44 * (1 - Math.min(ringProgress, 1))}`}
+                  strokeLinecap="round"
+                  transform="rotate(-90 50 50)"
+                  style={{ transition: 'stroke-dasharray 1s ease' }}
+                />
+                <text x="50" y="46" textAnchor="middle" dominantBaseline="middle"
+                  fill="var(--accent)" fontFamily="Inter Variable, Inter, system-ui, sans-serif" fontSize="26" fontWeight="700">
+                  {displayLevel}
+                </text>
+                <text x="50" y="63" textAnchor="middle" dominantBaseline="middle"
+                  fill="var(--text-muted)" fontSize="9" fontFamily="Inter, sans-serif"
+                  fontWeight="600" letterSpacing="2">
+                  LEVEL
+                </text>
+              </svg>
+            </Link>
 
-          {/* Ring SVG — tappable, navigates to Profile */}
-          <Link to="/profile" style={{ flexShrink: 0, display: 'block', WebkitTapHighlightColor: 'transparent' }}>
-            <svg width="100" height="100" viewBox="0 0 100 100" style={{ display: 'block' }}>
-              <circle cx="50" cy="50" r="44" fill="none"
-                stroke="var(--accent)" strokeWidth="2.5" opacity="0.08" />
-              <circle cx="50" cy="50" r="44" fill="none"
-                stroke="var(--accent)" strokeWidth="2.5"
-                strokeDasharray={`${2 * Math.PI * 44 * Math.min(ringProgress, 1)} ${2 * Math.PI * 44 * (1 - Math.min(ringProgress, 1))}`}
-                strokeLinecap="round"
-                transform="rotate(-90 50 50)"
-                style={{ filter: 'drop-shadow(0 0 5px var(--accent))', transition: 'stroke-dasharray 1s ease' }}
-              />
-              <text x="50" y="46" textAnchor="middle" dominantBaseline="middle"
-                fill="var(--accent)" fontFamily="Inter Variable, Inter, system-ui, sans-serif" fontSize="26" fontWeight="700">
-                {displayLevel}
-              </text>
-              <text x="50" y="63" textAnchor="middle" dominantBaseline="middle"
-                fill="var(--text-muted)" fontSize="9" fontFamily="Inter, sans-serif"
-                fontWeight="600" letterSpacing="2">
-                LEVEL
-              </text>
-            </svg>
-          </Link>
-
-          {/* Stacked info */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: 13, fontWeight: 700,
-              color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase',
-              marginBottom: 2 }}>
-              {title}
-            </p>
-            <p style={{ fontSize: 26, fontWeight: 700,
-              color: 'var(--text-primary)', lineHeight: 1, marginBottom: 8 }}>
-              {Number(animatedXP).toLocaleString()}
-              <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 4 }}>XP</span>
-            </p>
-            <ProgressBar value={progress} height={5} glow />
-            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5 }}>
-              Lv {level}{' '}
-              <span style={{ color: 'var(--text-dim)', margin: '0 3px' }}>←→</span>
-              {' '}{toNext.toLocaleString()} to go
-            </p>
-            <p style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 3 }}>
-              {streak.current > 0 && <>{streak.current} Streak · </>}
-              {stats.booksThisYear} Books · {stats.winCount} Wins
-              {userName && <> · {userName}XP</>}
-              {(() => { const t = fmtAgo(lastUpdated); return t ? <span style={{ marginLeft: 6, opacity: 0.6 }}>· {t}</span> : null })()}
-            </p>
+            {/* Info column */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.1, marginBottom: 2 }}>
+                {title}
+              </p>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 10 }}>
+                {Number(animatedXP).toLocaleString()} XP
+                {!loading && <span style={{ color: 'var(--text-dim)', marginLeft: 6 }}>· {toNext.toLocaleString()} to next</span>}
+              </p>
+              <ProgressBar value={progress} height={4} />
+            </div>
           </div>
-        </div>
 
-        {/* ── Divider ── */}
-        <div style={{ height: 1, background: 'var(--border)', marginBottom: 20 }} />
+          {/* Category breakdown toggle */}
+          <button
+            onClick={() => setShowBreakdown(v => !v)}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '8px 16px', background: 'none', border: 'none', borderTop: '1px solid var(--border)',
+              cursor: 'pointer', color: 'var(--text-muted)', fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.04em',
+            }}
+          >
+            <span>BY CATEGORY</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ transform: showBreakdown ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }}>
+              <path d="M2 4l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+
+          {showBreakdown && (() => {
+            const liftingXP  = Math.round(stats.totalSets * XP_RATES.per_set)
+            const cardioXP   = Math.round(stats.cardioMiles * XP_RATES.cardio_per_mile)
+            const readingXP  = Math.round(stats.booksThisYear * XP_RATES.book_finished)
+            const gamingXP   = Math.round(stats.winCount * XP_RATES.fortnite_win)
+            const skatingXP  = Math.round(stats.totalMiles * XP_RATES.skate_per_mile)
+            const cats = [
+              { label: 'Lifting',  xp: liftingXP,  color: CAT_COLORS.lifting  },
+              { label: 'Cardio',   xp: cardioXP,   color: CAT_COLORS.cardio   },
+              { label: 'Reading',  xp: readingXP,  color: CAT_COLORS.books    },
+              { label: 'Gaming',   xp: gamingXP,   color: CAT_COLORS.gaming   },
+              { label: 'Skating',  xp: skatingXP,  color: CAT_COLORS.cardio   },
+            ]
+            const maxXP = Math.max(...cats.map(c => c.xp), 1)
+            return (
+              <div className="grid grid-cols-5" style={{ padding: '10px 12px 14px', gap: 8 }}>
+                {cats.map(cat => (
+                  <div key={cat.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                    <div style={{ height: 36, width: '100%', background: 'var(--input-bg)', borderRadius: 4, overflow: 'hidden', display: 'flex', alignItems: 'flex-end' }}>
+                      <div style={{ width: '100%', height: `${(cat.xp / maxXP) * 100}%`, background: cat.color, transition: 'height 0.8s ease', minHeight: cat.xp > 0 ? 2 : 0 }} />
+                    </div>
+                    <p style={{ fontSize: 9, color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.2 }}>{cat.label}</p>
+                    <p style={{ fontSize: 10, fontWeight: 700, color: cat.color }}>{cat.xp.toLocaleString()}</p>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
+        </div>
 
         {/* ── Week Dot Strip ── */}
         <WeekDotStrip activityDates={activityDates} streak={streak} />

@@ -95,35 +95,39 @@ async function compressAvatar(file: File): Promise<string> {
 }
 
 
-function ThemeSquare({ theme, active, onSelect }: { theme: Theme; active: boolean; onSelect: () => void }) {
-  const [sweeping, setSweeping] = useState(false)
-  const [sweepKey, setSweepKey] = useState(0)
+function ThemeSwatch({ theme, active, onSelect }: { theme: Theme; active: boolean; onSelect: () => void }) {
   return (
     <button
       onClick={onSelect}
       title={theme.name}
-      className="relative rounded-lg transition-all"
-      onMouseEnter={() => { setSweeping(true); setSweepKey(k => k + 1) }}
-      onMouseLeave={() => setSweeping(false)}
       style={{
-        width: 40, height: 40,
+        width: 64, height: 56,
         background: theme.baseBg,
-        border: active ? `2.5px solid ${theme.accent}` : '2px solid var(--border)',
-        boxShadow: active ? `0 0 12px ${theme.accent}88` : 'none',
-        transform: active ? 'scale(1.12)' : sweeping ? 'scale(1.06)' : 'scale(1)',
+        border: active ? `2px solid ${theme.accent}` : '1px solid rgba(128,128,128,0.2)',
+        borderRadius: 10,
         overflow: 'hidden',
+        position: 'relative',
+        cursor: 'pointer',
+        padding: 0,
         flexShrink: 0,
+        transition: 'transform 0.12s ease, border-color 0.12s ease',
+        transform: active ? 'scale(1.06)' : 'scale(1)',
       }}
     >
-      {/* Orb blobs inside mini square */}
-      <div style={{ position: 'absolute', width: 24, height: 24, borderRadius: '50%', background: theme.orb1, top: -4, left: -4, filter: 'blur(4px)' }} />
-      <div style={{ position: 'absolute', width: 20, height: 20, borderRadius: '50%', background: theme.orb2, bottom: -4, right: -4, filter: 'blur(4px)' }} />
-      {/* Accent dot center */}
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: theme.accent, boxShadow: `0 0 6px ${theme.accent}` }} />
+      {/* Accent bottom strip */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 5, background: theme.accent }} />
+      {/* Theme name */}
+      <div style={{ padding: '8px 4px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ fontSize: 8, fontWeight: 700, color: active ? theme.accent : 'rgba(180,180,180,0.8)', textAlign: 'center', lineHeight: 1.3, letterSpacing: '0.03em' }}>{theme.name}</p>
       </div>
-      {/* Hover shimmer sweep */}
-      {sweeping && <div key={sweepKey} className="swatch-sweep" />}
+      {/* Active checkmark */}
+      {active && (
+        <div style={{ position: 'absolute', top: 4, right: 4, width: 13, height: 13, borderRadius: '50%', background: theme.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
+            <path d="M1 2.5L2.8 4.2L6 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      )}
     </button>
   )
 }
@@ -147,7 +151,6 @@ export function Settings() {
   const avatarInputRef = useRef<HTMLInputElement>(null)
 
   const [activeTheme, setActiveTheme]   = useState<Theme>(loadTheme)
-  const [themeOpen, setThemeOpen]       = useState(false)
   const [lightMode, setLightModeState]  = useState(isLightMode)
   const [timeTheme, setTimeThemeState]  = useState(timeThemeEnabled)
   const [levelStyle, setLevelStyle] = useState<'number' | 'roman'>(
@@ -379,35 +382,20 @@ export function Settings() {
         {/* ── Appearance card ───────────────────────────────────────── */}
         <Card className="mb-2">
 
-          {/* Theme row */}
-          <button onClick={() => setThemeOpen(o => !o)} className="w-full flex items-center justify-between py-2">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg relative overflow-hidden flex-shrink-0" style={{ background: activeTheme.baseBg, border: `2px solid ${activeTheme.accent}` }}>
-                <div style={{ position: 'absolute', width: 18, height: 18, borderRadius: '50%', background: activeTheme.orb1, top: -3, left: -3, filter: 'blur(4px)' }} />
-                <div style={{ position: 'absolute', width: 14, height: 14, borderRadius: '50%', background: activeTheme.orb2, bottom: -3, right: -3, filter: 'blur(3px)' }} />
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: activeTheme.accent, boxShadow: `0 0 6px ${activeTheme.accent}` }} />
-                </div>
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-sm text-white">{activeTheme.name}</p>
-                <p style={{ color: '#444', fontSize: 11 }}>Color theme</p>
+          {/* Theme picker — always visible grid */}
+          <div className="py-2">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Color Theme</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>{activeTheme.name}</p>
               </div>
             </div>
-            <Chevron open={themeOpen} />
-          </button>
-          {themeOpen && (
-            <div className="mt-3 pb-1 pop-in">
-              <div className="flex flex-wrap gap-2">
-                {THEMES.map(t => (
-                  <div key={t.id} className="flex flex-col items-center gap-1">
-                    <ThemeSquare theme={t} active={activeTheme.id === t.id} onSelect={() => handleTheme(t)} />
-                    <span style={{ color: activeTheme.id === t.id ? t.accent : '#555', fontSize: 9, fontWeight: 600, maxWidth: 40, textAlign: 'center', lineHeight: 1.2 }}>{t.name}</span>
-                  </div>
-                ))}
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(64px, 1fr))', gap: 8 }}>
+              {THEMES.map(t => (
+                <ThemeSwatch key={t.id} theme={t} active={activeTheme.id === t.id} onSelect={() => handleTheme(t)} />
+              ))}
             </div>
-          )}
+          </div>
 
           {/* Light / Dark mode toggle */}
           <div className="flex items-center justify-between py-2 mt-1">
