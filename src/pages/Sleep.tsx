@@ -57,7 +57,7 @@ function nDaysAgo(n: number): string {
   return localDateStr(d)
 }
 
-// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log form ──────────────────────────────────────────────────────────────────
 
 interface SleepForm { date: string; bedtime: string; hours_slept: string; wake_time: string }
 
@@ -126,7 +126,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Sleep'}
+        {open ? '✕ Cancel' : '+ Log Sleep'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -161,7 +161,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Nap log panel â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Nap log panel ─────────────────────────────────────────────────────────────
 
 function LogNapPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
@@ -195,7 +195,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all"
         style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', fontSize: 14 }}
       >
-        {open ? 'âœ• Cancel' : 'Log Nap'}
+        {open ? '✕ Cancel' : 'Log Nap'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -211,7 +211,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────────────────────
 
 function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose: () => void; onSaved: () => void }) {
   const [hours,    setHours]    = useState(String(entry.hours_slept ?? ''))
@@ -248,7 +248,7 @@ function EditSleepModal({ entry, onClose, onSaved }: { entry: SleepLog; onClose:
   )
 }
 
-// â"€â"€ Sleep debt card â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Sleep debt card ───────────────────────────────────────────────────────────
 
 function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   const nights = logs.filter(r => !r.is_nap)
@@ -329,15 +329,15 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   )
 }
 
-// â"€â"€ Wake Time Trainer â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Wake Time Trainer ────────────────────────────────────────────────────────
 
-/** Parse "HH:MM" â†’ total minutes since midnight */
+/** Parse "HH:MM" → total minutes since midnight */
 function parseTime(t: string): number {
   const [h, m] = t.split(':').map(Number)
   return (h || 0) * 60 + (m || 0)
 }
 
-/** Format minutes-since-midnight â†’ "h:mm AM/PM" */
+/** Format minutes-since-midnight → "h:mm AM/PM" */
 function fmtTime(mins: number): string {
   const wrapped = ((mins % 1440) + 1440) % 1440          // handle < 0 or > 1440
   const h = Math.floor(wrapped / 60)
@@ -400,7 +400,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
     .filter(l => l.wake_time && l.date >= todayStr)
     .map(l => ({ date: l.date, mins: parseTime(l.wake_time!) }))
 
-  // Days already on-track: wake time â‰¤ scheduled target for that day
+  // Days already on-track: wake time ≤ scheduled target for that day
   const daysOnTrack = recentWakes.filter(w => {
     const dayNum = Math.round((new Date(w.date + 'T12:00:00').getTime() - new Date(todayStr + 'T12:00:00').getTime()) / 86400000)
     const planned = currentWakeMins - dayNum * shiftMins
@@ -424,22 +424,22 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
             <p className="font-bold text-sm" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Wake Time Trainer</p>
             <p style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 2 }}>
               {avgWakeMins !== null
-                ? `Avg wake: ${fmtTime(avgWakeMins)} Â· Set a goal wake time`
+                ? `Avg wake: ${fmtTime(avgWakeMins)} · Set a goal wake time`
                 : 'Plan a gradual wake time shift with a day-by-day schedule'}
             </p>
           </div>
-          <span style={{ color: 'var(--accent)', fontSize: 18 }}>â€º</span>
+          <span style={{ color: 'var(--accent)', fontSize: 18 }}>›</span>
         </div>
       </button>
     )
   }
 
   return (
-    <div className="rounded-xl mb-4 pop-in" style={{ background: 'rgba(10,12,28,0.95)', border: '1px solid rgba(245,166,35,0.25)' }}>
+    <div className="rounded-xl mb-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--accent-dim)' }}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid var(--border-faint)' }}>
         <p className="font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 15 }}>Wake Time Trainer</p>
-        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18 }}>âœ•</button>
+        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18 }}>✕</button>
       </div>
 
       <div className="p-4 flex flex-col gap-4">
@@ -452,7 +452,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
             </p>
             <p style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-serif)' }}>{fmtTime(currentWakeMins)}</p>
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: 22, fontWeight: 300 }}>â†’</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 22, fontWeight: 300 }}>→</div>
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.3)' }}>
             <p style={{ color: 'var(--accent)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Goal</p>
             <p style={{ color: 'var(--accent)', fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif' }}>{fmtTime(targetWakeMins)}</p>
@@ -584,13 +584,13 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                       {/* Date */}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ color: isToday ? 'var(--accent)' : isGoalDay ? '#2ECC71' : '#ccc', fontSize: 12, fontWeight: isToday ? 700 : 500 }}>
-                          {dayLabel(s.date)} Â· {formatDate(s.date)}
+                          {dayLabel(s.date)} · {formatDate(s.date)}
                           {isToday && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(245,166,35,0.2)', color: 'var(--accent)', padding: '1px 6px', borderRadius: 4 }}>TODAY</span>}
                           {isGoalDay && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(46,204,113,0.15)', color: '#2ECC71', padding: '1px 6px', borderRadius: 4 }}>GOAL</span>}
                         </p>
                         {actualWake?.wake_time && (
                           <p style={{ color: onTrack ? '#2ECC71' : '#E94560', fontSize: 10, marginTop: 1 }}>
-                            Actual wake: {fmtTime(parseTime(actualWake.wake_time))} {onTrack ? 'âœ"' : 'âœ—'}
+                            Actual wake: {fmtTime(parseTime(actualWake.wake_time))} {onTrack ? '✓' : '✗'}
                           </p>
                         )}
                       </div>
@@ -618,10 +618,10 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 const ttStyle = {
-  background: 'rgba(10,10,22,0.97)',
+  background: 'var(--card-bg)',
   border: '1px solid var(--border)',
   borderRadius: 8, color: 'var(--text-primary)', fontSize: 12,
   boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
@@ -791,8 +791,8 @@ export function Sleep() {
               </AreaChart>
             </ResponsiveContainer>
             <div className="flex gap-4 mt-1">
-              <span className="text-xs" style={{ color: '#27AE60' }}>â"€â"€ 8h goal</span>
-              <span className="text-xs" style={{ color: 'var(--accent)' }}>â"€â"€ 7h min</span>
+              <span className="text-xs" style={{ color: '#27AE60' }}>── 8h goal</span>
+              <span className="text-xs" style={{ color: 'var(--accent)' }}>── 7h min</span>
             </div>
           </div>
         )}
@@ -803,7 +803,7 @@ export function Sleep() {
             <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>By Day of Week</p>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={dayData} barSize={28}>
-                <XAxis dataKey="label" tick={{ fill: '#888', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="label" tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis domain={[0, 12]} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
                 <Tooltip
                   contentStyle={ttStyle} labelStyle={labelStyle} itemStyle={itemStyle}
@@ -842,7 +842,7 @@ export function Sleep() {
                       {dreamsMap[entry.id] && <span style={{ marginLeft: 6, fontSize: 11 }} title="Had a dream">💭</span>}
                     </p>
                     <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                      {entry.bedtime  && `Bed ${entry.bedtime} Â· `}
+                      {entry.bedtime  && `Bed ${entry.bedtime} · `}
                       {entry.wake_time && `Up ${entry.wake_time}`}
                     </p>
                   </div>

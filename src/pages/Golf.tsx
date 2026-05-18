@@ -40,22 +40,22 @@ function saveScorecardForRound(id: string, holes: number[]) {
   localStorage.setItem(SCORECARDS_KEY, JSON.stringify(m))
 }
 
-// â"€â"€ Helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Helpers ───────────────────────────────────────────────────────
 
 function vsParLabel(diff: number): string {
   if (diff === 0) return 'E'
   return diff > 0 ? `+${diff}` : String(diff)
 }
 function vsParColor(diff: number): string {
-  if (diff < 0) return '#34d399'   // under par â†’ green
-  if (diff === 0) return '#f5a623' // even â†’ gold
-  return '#f87171'                  // over par â†’ red
+  if (diff < 0) return '#34d399'   // under par → green
+  if (diff === 0) return '#f5a623' // even → gold
+  return '#f87171'                  // over par → red
 }
 function defaultPar(holes: number) {
   return holes === 9 ? 36 : 72
 }
 
-// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log form ──────────────────────────────────────────────────────
 
 interface GolfForm {
   date: string
@@ -140,7 +140,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Round'}
+        {open ? '✕ Cancel' : '+ Log Round'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -243,7 +243,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────────
 
 function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose: () => void; onSaved: () => void }) {
   const [score, setScore] = useState(String(round.score))
@@ -282,9 +282,9 @@ function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose:
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────────
 
-const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function Golf() {
   usePageTitle('Golf')
@@ -353,7 +353,7 @@ export function Golf() {
         {chartData.length >= 2 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Score vs Par</p>
-            <p className="section-label mb-3">Lower is better Â· green = under par</p>
+            <p className="section-label mb-3">Lower is better · green = under par</p>
             <ResponsiveContainer width="100%" height={140}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -398,7 +398,7 @@ export function Golf() {
                 <div>
                   <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>{r.course}</p>
                   <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>
-                    {formatDate(r.date)} Â· {r.holes}H
+                    {formatDate(r.date)} · {r.holes}H
                     {r.putts != null && <span style={{ marginLeft: 6 }}>{r.putts} putts</span>}
                   </p>
                   {scorecardMap[r.id] && (

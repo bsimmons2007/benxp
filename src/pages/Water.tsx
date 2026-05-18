@@ -253,7 +253,7 @@ export function Water() {
             style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', cursor: 'pointer' }}
           >
             <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{goalOz}oz</p>
-            <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Goal ✏️</p>
+            <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Goal</p>
           </button>
 
           <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>

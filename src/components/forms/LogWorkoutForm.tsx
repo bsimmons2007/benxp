@@ -54,7 +54,7 @@ export function LogWorkoutForm() {
   const isBodyweight = BODYWEIGHT_LIFTS.includes(lift)
   const showGrip = GRIP_LIFTS.includes(lift)
 
-  // â"€â"€ Load today's bodyweight on mount â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+  // Load today's bodyweight on mount
   useEffect(() => {
     async function loadBW() {
       const { data: { user } } = await supabase.auth.getUser()
@@ -85,7 +85,7 @@ export function LogWorkoutForm() {
     const sets   = Math.min(Math.max(parseInt(data.sets)  || 1, 1), 100)
     const reps   = Math.min(Math.max(parseInt(data.reps)  || 1, 1), 500)
     const weight = isBodyweight ? (parseFloat(data.bodyweight) || 0) : (parseFloat(data.weight) || 0)
-    const est1rm = Math.round((1 + reps / 30) * weight)
+    const est1rm = Math.round((1 + Math.min(reps, 12) / 30) * weight)
 
     // Outlier detection — flag suspiciously large values
     const { data: prData } = await supabase
@@ -135,7 +135,7 @@ export function LogWorkoutForm() {
     }
     saveVariantsForLift(inserted.id, data.equipment, data.grip)
 
-    // â"€â"€ Save bodyweight to bodyweight_log (only once per day) â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+    // Save bodyweight to bodyweight_log (only once per day)
     if (data.bodyweight && parseFloat(data.bodyweight) > 0 && !bwLoggedToday) {
       const bwEntry = parseFloat(data.bodyweight)
       const { error: bwErr } = await supabase.from('bodyweight_log').insert({
@@ -170,7 +170,7 @@ export function LogWorkoutForm() {
         <select
           {...register('lift')}
           className="px-3 py-2 rounded-lg text-white outline-none"
-          style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}
+          style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
         >
           {LIFTS.map((l) => <option key={l} value={l}>{l}</option>)}
         </select>
@@ -183,7 +183,7 @@ export function LogWorkoutForm() {
           <select
             {...register('equipment')}
             className="px-3 py-2 rounded-lg text-white outline-none text-sm"
-            style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
           >
             {EQUIPMENT_TYPES.map(e => <option key={e} value={e}>{e}</option>)}
           </select>
@@ -194,7 +194,7 @@ export function LogWorkoutForm() {
             <select
               {...register('grip')}
               className="px-3 py-2 rounded-lg text-white outline-none text-sm"
-              style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}
+              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
             >
               {GRIP_WIDTHS.map(g => <option key={g} value={g}>{g}</option>)}
             </select>
@@ -247,9 +247,9 @@ export function LogWorkoutForm() {
           disabled={bwLoggedToday}
           style={{
             padding: '8px 12px', borderRadius: 8, fontSize: 14,
-            background: bwLoggedToday ? 'rgba(255,255,255,0.03)' : '#0D1B2A',
-            border: `1px solid ${bwLoggedToday ? 'rgba(76,175,80,0.3)' : 'rgba(255,255,255,0.1)'}`,
-            color: bwLoggedToday ? '#666' : '#fff',
+            background: 'var(--input-bg)',
+            border: `1px solid ${bwLoggedToday ? 'rgba(76,175,80,0.3)' : 'var(--border)'}`,
+            color: bwLoggedToday ? 'var(--text-muted)' : 'var(--text-primary)',
             outline: 'none', width: '100%', boxSizing: 'border-box',
           }}
         />

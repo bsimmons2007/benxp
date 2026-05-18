@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
@@ -523,7 +523,7 @@ export function Home() {
   }, [loading, progress])
 
   // Derive which days this week had activity
-  const activityDates = new Set(activity.map(a => a.date))
+  const activityDates = useMemo(() => new Set(activity.map(a => a.date)), [activity])
 
   // Build card props for a given stat ID
   const getCardProps = (id: StatId) => {

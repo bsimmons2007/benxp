@@ -20,7 +20,7 @@ import type { FortniteGame } from '../types'
 import { TrophyIcon, StarIcon, EditIcon, ZapIcon, GamepadIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// â"€â"€ Shared constants â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Shared constants ───────────────────────────────────────────────
 
 const FN_RANKS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Elite', 'Champion', 'Unreal'] as const
 type FnRank = typeof FN_RANKS[number]
@@ -34,7 +34,7 @@ const RANK_COLORS: Record<FnRank, string> = {
 const ACCENT_NORMAL = 'var(--accent)'
 const ACCENT_BLITZ  = '#a855f7'
 
-const ttStyle  = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }
+const ttStyle  = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }
 const lblStyle = { color: '#aaa' }
 const itmStyle = { color: 'var(--text-primary)' }
 
@@ -50,7 +50,7 @@ const blitzDisplayMode = (mode: string | null) => {
   return mode.replace('Blitz ', '')
 }
 
-// â"€â"€ Chart helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Chart helpers ──────────────────────────────────────────────────
 
 function buildMonthlyWins(games: FortniteGame[]) {
   const map: Record<string, number> = {}
@@ -73,7 +73,7 @@ function buildCumulativeWins(games: FortniteGame[]) {
     .map(g => ({ date: g.date, wins: ++count }))
 }
 
-// â"€â"€ Stat mini-cards â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Stat mini-cards ────────────────────────────────────────────────
 
 function StatCards({ items, accent }: { items: { label: string; value: string | number }[]; accent: string }) {
   return (
@@ -88,7 +88,7 @@ function StatCards({ items, accent }: { items: { label: string; value: string | 
   )
 }
 
-// â"€â"€ Charts block â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Charts block ───────────────────────────────────────────────────
 
 function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: string; gradId: string }) {
   const sorted = [...games].sort((a, b) => a.date.localeCompare(b.date))
@@ -162,7 +162,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <Area type="monotone" dataKey="kills" stroke="#7B2FBE" strokeWidth={2.5} fill={`url(#${gradId}-kills)`} dot={{ fill: '#7B2FBE', r: 3, fillOpacity: 0.7 }} activeDot={{ r: 5, fill: '#7B2FBE', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
-          <p className="text-xs mt-1" style={{ color: accent }}>â"€â"€ avg {avgKills}K</p>
+          <p className="text-xs mt-1" style={{ color: accent }}>── avg {avgKills}K</p>
         </div>
       )}
 
@@ -190,7 +190,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
   )
 }
 
-// â"€â"€ Edit modal (shared) â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal (shared) ────────────────────────────────────────────
 
 function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onClose: () => void; onSaved: () => void }) {
   const [kills, setKills]       = useState(String(game.kills))
@@ -221,16 +221,16 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
             <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Kills</label>
-            <input type="number" value={kills} onChange={e => setKills(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }} />
+            <input type="number" value={kills} onChange={e => setKills(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
           </div>
           <div className="flex flex-col gap-1 flex-1">
             <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Placement</label>
-            <input type="number" value={placement} onChange={e => setPlacement(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }} />
+            <input type="number" value={placement} onChange={e => setPlacement(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
           </div>
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Accuracy %</label>
-          <input type="number" step="0.1" value={accuracy} onChange={e => setAccuracy(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }} />
+          <input type="number" step="0.1" value={accuracy} onChange={e => setAccuracy(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
         </div>
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setWin(w => !w)}>
           <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? '#27AE60' : 'var(--border)' }}>
@@ -243,7 +243,7 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
   )
 }
 
-// â"€â"€ Normal log panel â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Normal log panel ───────────────────────────────────────────────
 
 interface NormalForm {
   date: string
@@ -303,7 +303,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT_NORMAL : 'var(--input-bg)', color: open ? 'var(--base-bg)' : ACCENT_NORMAL, border: `1px solid ${ACCENT_NORMAL}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Game'}
+        {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -312,7 +312,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
 
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Mode</label>
-              <select {...register('mode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}>
+              <select {...register('mode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 <option>Solos</option>
                 <option>Duos</option>
                 <option>Trios</option>
@@ -377,7 +377,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Blitz log panel â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Blitz log panel ────────────────────────────────────────────────
 
 interface BlitzForm {
   date: string
@@ -433,7 +433,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT_BLITZ : 'rgba(168,85,247,0.08)', color: open ? '#fff' : ACCENT_BLITZ, border: `1px solid ${ACCENT_BLITZ}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Blitz Game'}
+        {open ? '✕ Cancel' : '+ Log Blitz Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -442,7 +442,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
 
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Mode</label>
-              <select {...register('blitzMode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: '#0D1B2A', border: '1px solid var(--border)' }}>
+              <select {...register('blitzMode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 <option>Solos</option>
                 <option>Duos</option>
                 <option>Squads</option>
@@ -476,7 +476,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Normal tab â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Normal tab ─────────────────────────────────────────────────────
 
 function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged: () => void; onEdit: (g: FortniteGame) => void }) {
   const wins      = games.filter(g => g.win).length
@@ -525,7 +525,7 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
                   {g.win && <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: ACCENT_NORMAL, color: 'var(--base-bg)' }}>WIN</span>}
                 </p>
                 <p className="text-xs mt-0.5" style={{ color: '#888' }}>
-                  {g.mode}{g.placement ? ` Â· #${g.placement}` : ''}
+                  {g.mode}{g.placement ? ` · #${g.placement}` : ''}
                   {gExt.is_ranked && gExt.rank_name && (
                     <span className="ml-2 font-bold px-1.5 py-0.5 rounded" style={{
                       background: `${RANK_COLORS[gExt.rank_name as FnRank] ?? '#888'}22`,
@@ -563,7 +563,7 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
   )
 }
 
-// â"€â"€ Blitz tab â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Blitz tab ──────────────────────────────────────────────────────
 
 function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged: () => void; onEdit: (g: FortniteGame) => void }) {
   const wins      = games.filter(g => g.win).length
@@ -606,7 +606,7 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
                 {g.win && <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: ACCENT_BLITZ, color: 'var(--text-primary)' }}>WIN</span>}
               </p>
               <p className="text-xs mt-0.5" style={{ color: '#888' }}>
-                Blitz {blitzDisplayMode(g.mode)}{g.placement ? ` Â· #${g.placement}` : ''}
+                Blitz {blitzDisplayMode(g.mode)}{g.placement ? ` · #${g.placement}` : ''}
               </p>
             </div>
           </div>
@@ -633,7 +633,7 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ──────────────────────────────────────────────────────
 
 export function Fortnite() {
   usePageTitle('Fortnite')

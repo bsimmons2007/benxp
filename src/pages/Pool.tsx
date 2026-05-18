@@ -20,7 +20,7 @@ import type { PoolGame } from '../types'
 const ACCENT = '#c084fc'
 const GAME_TYPES = ['8-Ball', '9-Ball', '10-Ball', 'Straight Pool', 'One Pocket', 'Bank Pool']
 
-// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log form ──────────────────────────────────────────────────────
 
 interface PoolForm {
   date: string
@@ -58,7 +58,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
     const xp = XP_RATES.pool_game
       + (isWin       ? XP_RATES.pool_win           : 0)
       + (breakAndRun ? XP_RATES.pool_break_and_run : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — ðŸŽ± Rack 'em!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — 🎱 Rack 'em!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep shooting!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), game_type: '8-Ball', opponent: '', run_count: '', notes: '' })
@@ -72,7 +72,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Game'}
+        {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -120,7 +120,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────────
 
 function EditPoolModal({ game, onClose, onSaved }: { game: PoolGame; onClose: () => void; onSaved: () => void }) {
   const [win,         setWin]         = useState(game.win)
@@ -166,9 +166,9 @@ function EditPoolModal({ game, onClose, onSaved }: { game: PoolGame; onClose: ()
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────────
 
-const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function Pool() {
   usePageTitle('Pool')
@@ -267,7 +267,7 @@ export function Pool() {
                   <span style={{ marginLeft: 8, fontSize: 11, color: '#666' }}>{g.game_type}</span>
                 </p>
                 {g.break_and_run && (
-                  <p style={{ fontSize: 10, color: '#fbbf24', marginTop: 1, fontWeight: 600 }}>âœ¨ Break &amp; Run</p>
+                  <p style={{ fontSize: 10, color: '#fbbf24', marginTop: 1, fontWeight: 600 }}>✨ Break &amp; Run</p>
                 )}
                 {g.opponent && !g.break_and_run && (
                   <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>vs {g.opponent}</p>

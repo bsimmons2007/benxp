@@ -15,7 +15,7 @@ import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, Tr
 import { localDateStr } from '../lib/utils'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// â"€â"€ Preset metric options â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Preset metric options ────────────────────────────────────
 const GOAL_PRESETS = [
   { key: 'squat_1rm',          label: 'Squat 1RM',       unit: 'lbs',   defaultTarget: 315 },
   { key: 'bench_1rm',          label: 'Bench 1RM',       unit: 'lbs',   defaultTarget: 225 },
@@ -44,7 +44,7 @@ function GoalIcon({ metricKey, size = 18, color = 'var(--text-muted)' }: { metri
   return <TargetIcon size={size} color={color} />
 }
 
-// â"€â"€ Current values hook â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Current values hook ──────────────────────────────────────
 interface MetricValues {
   squat_1rm:          number
   bench_1rm:          number
@@ -106,12 +106,11 @@ function currentFor(key: string, vals: MetricValues | null): number {
   return (vals as unknown as Record<string, number>)[key] ?? 0
 }
 
-// â"€â"€ Add Goal form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Add Goal form ────────────────────────────────────────────
 interface GoalForm { metric_key: MetricKey; target_value: string; title: string; xp_reward: string }
 
 function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
   const [open, setOpen] = useState(false)
-  const [addError, setAddError] = useState(false)
   const { register, handleSubmit, watch, setValue, reset, formState: { isSubmitting } } = useForm<GoalForm>({
     defaultValues: { metric_key: 'squat_1rm', target_value: '315', title: '', xp_reward: '500' },
   })
@@ -138,7 +137,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
       target_unit: p.unit,
       xp_reward: parseInt(data.xp_reward) || 500,
     })
-    if (error) { setAddError(true); return }
+    if (error) return
     reset()
     setOpen(false)
     onAdded()
@@ -151,7 +150,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ New Goal'}
+        {open ? '✕ Cancel' : '+ New Goal'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -213,7 +212,7 @@ const METRIC_LINK: Record<string, string> = {
   fn_wins:            '/fortnite',
 }
 
-// â"€â"€ Goal card â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Goal card ────────────────────────────────────────────────
 function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
   goal: Goal
   current: number
@@ -277,7 +276,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
                 style={{ background: 'var(--input-bg)', color: 'var(--accent)', border: '1px solid var(--border)', flexShrink: 0 }}
                 title="View history for this metric"
               >
-                History â†—
+                History ↗
               </button>
             )}
             <button
@@ -310,7 +309,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ────────────────────────────────────────────────
 export function Goals() {
   usePageTitle('Goals')
   const navigate = useNavigate()

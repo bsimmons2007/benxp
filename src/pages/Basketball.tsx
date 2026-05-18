@@ -199,11 +199,11 @@ function TrendChart({ data, dataKey, label, color = 'var(--accent)' }: {
       <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{label}</p>
       <ResponsiveContainer width="100%" height={120}>
         <LineChart data={data} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border-faint)" />
           <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
           <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} domain={[0, 100]} unit="%" />
           <Tooltip
-            contentStyle={{ background: '#1a1a2e', border: '1px solid #333', borderRadius: 8, fontSize: 11 }}
+            contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11 }}
             formatter={(v: unknown) => [`${v}%`, label]}
           />
           <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={{ r: 3, fill: color }} />
@@ -501,11 +501,11 @@ export function Basketball() {
                 <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>Shots per Session</p>
                 <ResponsiveContainer width="100%" height={100}>
                   <BarChart data={shotVolume} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#888' }} />
-                    <YAxis tick={{ fontSize: 9, fill: '#888' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-faint)" />
+                    <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
+                    <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
                     <Tooltip
-                      contentStyle={{ background: '#1a1a2e', border: '1px solid #333', borderRadius: 8, fontSize: 11 }}
+                      contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11 }}
                       formatter={(v: number) => [v, 'FGA']}
                     />
                     <Bar dataKey="shots" radius={[3, 3, 0, 0]}>

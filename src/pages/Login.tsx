@@ -13,7 +13,7 @@ interface AuthForm {
   confirm:  string
 }
 
-// â"€â"€ Friendly Supabase error map â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Friendly Supabase error map ───────────────────────────────
 const ERROR_MAP: Record<string, string> = {
   'Invalid login credentials':             'Wrong email or password.',
   'Email not confirmed':                   'Check your inbox to confirm your email first.',
@@ -31,7 +31,7 @@ function friendlyError(msg: string): string {
   return msg
 }
 
-// â"€â"€ Demo XP feed events â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Demo XP feed events ────────────────────────────────────
 const DEMO_EVENTS = [
   { xp: '+60 XP', label: 'Gym day',         detail: '8 sets · chest & shoulders' },
   { xp: '+250 XP', label: 'New PR!',        detail: 'Bench press · 225 lbs'       },
@@ -41,7 +41,7 @@ const DEMO_EVENTS = [
   { xp: '+100 XP', label: 'Fortnite win',   detail: '#1 · 7 kills'                },
 ]
 
-// â"€â"€ Rotating quotes â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Rotating quotes ───────────────────────────────────────────
 const QUOTES = [
   { text: 'Every rep. Every mile. Every page.', highlight: 'All XP.' },
   { text: 'Small logs compound.', highlight: 'Level up daily.' },
@@ -218,7 +218,7 @@ export function Login() {
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--base-bg)' }}>
 
-      {/* â"€â"€ Left hero panel — desktop only â"€â"€ */}
+      {/* ── Left hero panel — desktop only ── */}
       <div
         className="hidden md:flex flex-col justify-between"
         style={{
@@ -385,7 +385,7 @@ export function Login() {
         </div>
       </div>
 
-      {/* â"€â"€ Right: auth form â"€â"€ */}
+      {/* ── Right: auth form ── */}
       <div
         className="flex-1 flex flex-col items-center justify-center px-6 relative overflow-hidden"
         style={{ minHeight: '100vh' }}
@@ -692,7 +692,7 @@ export function Login() {
   )
 }
 
-// â"€â"€ Small helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Small helpers ─────────────────────────────────────────────
 
 function FieldLabel({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (

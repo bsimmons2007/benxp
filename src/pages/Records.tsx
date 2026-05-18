@@ -112,7 +112,7 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
         <div
           style={{
             position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
-            background: 'rgba(10,12,28,0.98)', border: '1px solid var(--border)',
+            background: 'var(--card-bg)', border: '1px solid var(--border)',
             borderRadius: 12, marginTop: 4, maxHeight: 280, overflowY: 'auto',
             boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
             backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
@@ -653,7 +653,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       {tmplOpen && !open && (
         <div className="pop-in" style={{
           marginBottom: 12, borderRadius: 14,
-          background: 'rgba(12,16,36,0.95)', border: '1px solid rgba(245,166,35,0.2)',
+          background: 'var(--card-bg)', border: '1px solid var(--accent-dim)',
           backdropFilter: 'blur(12px)', overflow: 'hidden',
         }}>
           <p className="section-label" style={{ padding: '12px 14px 8px', borderBottom: '1px solid var(--border-faint)' }}>
@@ -700,7 +700,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
 
       {open && (
         <form onSubmit={handleSubmit}>
-          <div className="mt-3 rounded-2xl p-4 pop-in" style={{ background: 'rgba(12,16,36,0.95)', border: '1px solid var(--border)', backdropFilter: 'blur(12px)' }}>
+          <div className="mt-3 rounded-2xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', backdropFilter: 'blur(12px)' }}>
             {/* Date */}
             <div style={{ marginBottom: 16 }}>
               <label className="section-label" style={{ display: 'block', marginBottom: 6 }}>Workout Date</label>
@@ -984,7 +984,7 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
           ? '1px solid rgba(245,166,35,0.35)'
           : hovered ? '1px solid var(--border)' : '1px solid var(--border)',
         background: open
-          ? 'linear-gradient(135deg, rgba(20,26,56,0.95) 0%, rgba(16,20,44,0.95) 100%)'
+          ? 'linear-gradient(135deg, var(--bg-mid) 0%, var(--base-bg) 100%)'
           : 'var(--card-bg)',
         transition: 'border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease',
         boxShadow: open ? '0 4px 24px rgba(0,0,0,0.3)' : hovered ? '0 4px 16px rgba(0,0,0,0.25)' : 'none',

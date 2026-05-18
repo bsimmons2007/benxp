@@ -19,7 +19,7 @@ import type { HikingSession } from '../types'
 
 const ACCENT = '#84cc16'
 
-// â"€â"€ Helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Helpers ───────────────────────────────────────────────────────
 
 const DIFFICULTIES = ['Easy', 'Moderate', 'Hard', 'Expert'] as const
 function diffColor(d: string | null): string {
@@ -36,7 +36,7 @@ function fmtDuration(mins: number | null): string {
   return h > 0 ? `${h}h ${m > 0 ? `${m}m` : ''}`.trim() : `${m}m`
 }
 
-// â"€â"€ Log form â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Log form ──────────────────────────────────────────────────────
 
 interface HikeForm {
   date: string
@@ -77,7 +77,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
     const elevXP  = Math.floor((elevFt ?? 0) / 500) * XP_RATES.hiking_per_500ft
     const xp = Math.round(milesXP + elevXP)
     playXPGain()
-    setToast(`+${xp} XP — ${miles} mi${elevFt ? ` Â· ${elevFt.toLocaleString()} ft gain` : ''}`)
+    setToast(`+${xp} XP — ${miles} mi${elevFt ? ` · ${elevFt.toLocaleString()} ft gain` : ''}`)
     await refreshXP(); refreshActivity()
     reset({ date: today(), trail: '', distance_miles: '', elevation_gain_ft: '', duration_mins: '', difficulty: 'Moderate', notes: '' })
     setOpen(false); onLogged()
@@ -90,7 +90,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
       >
-        {open ? 'âœ• Cancel' : '+ Log Hike'}
+        {open ? '✕ Cancel' : '+ Log Hike'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -123,7 +123,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
   )
 }
 
-// â"€â"€ Edit modal â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Edit modal ────────────────────────────────────────────────────
 
 function EditHikingModal({ session, onClose, onSaved }: { session: HikingSession; onClose: () => void; onSaved: () => void }) {
   const [distance,   setDistance]   = useState(String(session.distance_miles))
@@ -168,9 +168,9 @@ function EditHikingModal({ session, onClose, onSaved }: { session: HikingSession
   )
 }
 
-// â"€â"€ Main page â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Main page ─────────────────────────────────────────────────────
 
-const ttStyle = { background: 'rgba(10,10,22,0.97)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function Hiking() {
   usePageTitle('Hiking')
@@ -277,7 +277,7 @@ export function Hiking() {
                   <span style={{ fontSize: 11, fontWeight: 400, color: '#555', marginLeft: 2 }}>mi</span>
                 </p>
                 {h.elevation_gain_ft != null && (
-                  <p style={{ fontSize: 11, color: '#666', marginTop: 1 }}>â†‘ {h.elevation_gain_ft.toLocaleString()} ft</p>
+                  <p style={{ fontSize: 11, color: '#666', marginTop: 1 }}>↑ {h.elevation_gain_ft.toLocaleString()} ft</p>
                 )}
               </div>
               <button onClick={() => setEditing(h)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
