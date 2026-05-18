@@ -36,10 +36,10 @@ src/
 │   ├── BodyMap.tsx          # SVG muscle diagram — colored by rank/recency
 │   ├── StrengthTab.tsx      # Lifting log UI (sets table, PRs, trends)
 │   ├── layout/
-│   │   ├── TopBar.tsx       # Header: hamburger/back, logo → /monthly, + log menu, settings gear
-│   │   ├── BottomNav.tsx    # Mobile tab bar (Home + ordered sections + More)
-│   │   ├── SideNav.tsx      # Desktop sidebar drawer
-│   │   └── PageWrapper.tsx  # Wraps every page with safe-area padding + pageEnter animation
+│   │   ├── TopBar.tsx       # Header: hamburger/back, logo → /monthly, + log menu, settings gear; md:left-16 for sidebar offset
+│   │   ├── BottomNav.tsx    # Mobile tab bar; 60px + safe-area; pill bg on active tab; md:hidden
+│   │   ├── SideNav.tsx      # Desktop: persistent 64px icon strip (md:flex) + CSS fly-out labels; exports LogoMark; Mobile: slide-in drawer (md:hidden)
+│   │   └── PageWrapper.tsx  # Wraps every page; paddingBottom: calc(80px + safe-area); pageEnter animation on inner div
 │   ├── ui/
 │   │   ├── Badge.tsx
 │   │   ├── Button.tsx
@@ -91,7 +91,7 @@ src/
 │   ├── utils.ts
 │   └── xp.ts               # XP_RATES, fetchXPAndStats(), level/title calc
 ├── pages/                   # All lazy-loaded in App.tsx
-│   ├── Home.tsx             # Dashboard: XP ring, level, stat chips, week dots, activity feed
+│   ├── Home.tsx             # Dashboard: XP hero card (level ring, rank, progress bar, category breakdown), editable widget grid (2-col, max 8, localStorage), week dots, wellness score, activity feed with colored icon badges
 │   ├── Records.tsx          # Lifting log — log sets, view PRs, body map, strength tab
 │   ├── Cardio.tsx           # Distance sessions — runs, bikes, swims; miles + trend chart
 │   ├── Sleep.tsx            # Sleep log — bedtime/wake, debt, quality score, streak
@@ -115,7 +115,7 @@ src/
 │   ├── Fortnite.tsx         # Game log — kills, placement, win; charts
 │   ├── Hobbies.tsx          # Misc hobbies hub
 │   ├── Profile.tsx          # Level, title, skills, badges/achievements
-│   ├── Settings.tsx         # Theme picker, section order/hide, nav reorder, about
+│   ├── Settings.tsx         # Always-visible ThemeSwatch grid (64×56px, accent strip, no orbs); section order/hide, nav reorder, about
 │   ├── Weekly.tsx           # Weekly XP recap with highlights
 │   ├── Monthly.tsx          # Monthly reel — best moments, PRs, stats
 │   ├── XPHistory.tsx        # Full XP event log with category breakdown
@@ -206,10 +206,19 @@ Displayed on Profile page via `SkillCard`.
 ## Theme system (`src/lib/theme.ts`)
 - 40+ named themes (Crimson, Ocean, Forest, Neon, Sakura, etc.)
 - Auto-switch mode: changes theme based on hour of day
-- Light mode: flat matte `#f2f2f4` background, white cards, no orbs/glow animations
-- All colors injected as CSS variables on `<html>`: `--accent`, `--base-bg`, `--card-bg`, `--nav-bg`, `--bg-mid`
-- Light mode overrides also set in `index.css` under `html[data-mode="light"]`
+- **Light mode is the default** for new users; dark mode opt-in via Settings
+- All colors injected as CSS variables on `<html>`: `--accent`, `--base-bg`, `--card-bg`, `--nav-bg`, etc.
+- Dark mode: `html[data-mode="dark"]` block in `index.css`; no attribute = light
 - User preference stored in `localStorage` (`youxp-theme`, `youxp-mode`)
+
+## Design token system (`src/index.css`)
+- Surface scale: `--surface-0` (page bg) → `--surface-1` (card) → `--surface-2` (input/raised) → `--surface-3` (overlay)
+- Text scale: `--text-primary`, `--text-secondary`, `--text-tertiary`, `--text-disabled`
+- Borders: `--border-subtle`, `--border-default`, `--border-strong`
+- Shadows: `--shadow-sm`, `--shadow-md`, `--shadow-lg`
+- Radius: `--radius-sm/md/lg/xl`
+- Legacy aliases kept for backward compat: `--card-bg → var(--surface-1)`, `--base-bg → var(--surface-0)`, `--input-bg → var(--surface-2)`, `--nav-bg → var(--surface-1)`, `--border → var(--border-default)`, `--border-faint → var(--border-subtle)`
+- **Rule**: never hardcode `rgba(255,255,255,x)`, `#fff`, or `#000` in components — always use CSS vars
 
 ---
 
@@ -327,16 +336,35 @@ Fix with binary replacement (`content.replace(bad_bytes, good_bytes)`) — text 
 ---
 
 ## Recent work (May 2026)
+### Apple-modern redesign (session 2)
+- **Design token system** — `--surface-0/1/2/3`, text/border/shadow/radius scale in `index.css`; legacy aliases preserved; light mode default
+- **Inter Variable font** — `@fontsource-variable/inter/index.css` bundled at build time (no CDN); import as explicit `.css` path
+- **LogoMark** — accent Y-bolt SVG exported from `SideNav.tsx`, used in TopBar (mobile) and desktop sidebar
+- **Desktop sidebar** — persistent 64px icon strip (`md:flex`), pure-CSS fly-out labels (`.sidenav-item:hover .sidenav-flyout`), logo shows level + title on hover
+- **TopBar** — `md:left-16` to offset past sidebar; left button `md:invisible` (keeps space); `LogoMark` shown mobile-only
+- **Home XP hero** — card with level ring (no glow), rank name headline, animated XP bar, collapsible per-category bar chart (Lifting/Cardio/Reading/Gaming/Skating)
+- **Home widget grid** — uniform 2-col grid, max 8 widgets, localStorage (`youxp-home-stat-picks`), edit FAB (`.widget-edit-fab` CSS class for responsive bottom), AddPanel slides from right (`slideInRight` animation)
+- **Activity feed** — colored icon badge per category: lift=accent, cardio/skate=blue, books=yellow, gaming=purple, sports/others=orange, hiking/golf=green
+- **Settings ThemeSwatch** — always-visible auto-fill grid; 64×56px cards; `baseBg` fill, accent bottom strip, theme name, active checkmark; no glassmorphism orbs; removed `themeOpen` accordion
+- **BottomNav** — 60px height + safe-area; pill background (`accent-subtle`) on active tab; label weight 700 when active; removed bottom dot
+- **Loader** — light bg default (`#f5f5f7`), Inter font; `lxp-dark` class applied by `loader.js` reading `youxp-mode` from localStorage before first paint
+- **CSS globals** — `overscroll-behavior: none` on body; `touch-action: manipulation` on buttons/links; FAB bottom offset matches 60px nav
+- **Settings color sweep** — all `text-white`, `#444`, `#555`, `#BBBBBB`, `#E94560` → CSS vars (`--text-primary`, `--text-muted`, `--red`)
+
+### Prior session (session 1)
 - **Site-wide light mode fix** — all hardcoded `rgba(255,255,255,x)` and `color:#fff` replaced with CSS variables across 38 files
 - **Tutorial overhaul** — richer step content, tip callouts, pulse rings, caret arrows, card animations, keyboard nav, scroll lock
 - **Bug fixes** — `More.tsx` `<a href>` → `<Link>`, `EmptyState` colors, `PageWrapper` key moved to inner div, `Toast`/`MilestoneOverlay` drain bar reset fix, `LevelUpOverlay` exit animation
 - **UI polish** — `card-hover:active` tap feedback, `navDotEnter` animation, `prefers-reduced-motion` support, stat picker Cancel button, Dev Tools hidden in prod
 - **Dev PIN** hardcoded to `1337`
-- **Mojibake sweep** — 3,776+ corrupted characters binary-patched across 17 pages (Sleep, Books, Cardio, Chess, DiscGolf, Fortnite, Goals, Golf, Hiking, Login, Mood, Pickleball, Pool, Skate, Spikeball, TableTennis, Volleyball). Scanner confirmed fully clean.
-- **Epley formula cap** — `LogWorkoutForm.tsx`: capped at 12 reps (`Math.min(reps, 12)`) to prevent false PRs on high-rep sets
-- **UTC date fix** — `muscleScore.ts`: `new Date(row.date + 'T12:00:00')` prevents off-by-one daysAgo in US timezones
+- **Mojibake sweep** — 3,776+ corrupted characters binary-patched across 17 pages. Scanner confirmed fully clean.
+- **Epley formula cap** — `LogWorkoutForm.tsx`: capped at 12 reps (`Math.min(reps, 12)`) to prevent false PRs
+- **UTC date fix** — `muscleScore.ts`: `new Date(row.date + 'T12:00:00')` prevents off-by-one daysAgo
 - **parseInt NaN guard** — `useStore.ts`: two `parseInt(…) || 1` fallbacks for localStorage level key
-- **Dead code removal** — `Goals.tsx`: removed `addError` useState that was set but never read (fixed TS6133 build error)
+- **Dead code removal** — `Goals.tsx`: removed `addError` useState (fixed TS6133)
+
+## Pages not yet redesigned (individual page polish pending)
+Records, Cardio, Sleep, Books, Water, Mood, Measurements, Goals, Challenges, Basketball, Pickleball, Golf, DiscGolf, Hiking, Skate, TableTennis, Chess, Volleyball, Spikeball, Pool, Fortnite, Profile, Weekly, Monthly, XPHistory, PRFeed, More — all functional, layout uses existing Card component, no hardcoded colors (swept in session 1), but haven't received the session-2 component treatment.
 - **Stray emoji** — `Water.tsx`: removed accidental `✏️` from goal tile label
 - **`useMemo` for activityDates** — `Home.tsx:526`: Set now only rebuilt when `activity` changes
 - **Books genre donut chart** — replaced horizontal bar chart with Recharts `PieChart` (donut style); book count centered in hole; legend shows genre + %; tooltip on tap; all colors via CSS variables
