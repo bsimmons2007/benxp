@@ -264,13 +264,13 @@ export function Login() {
           <h1
             className="glow-pulse"
             style={{
-              color: 'var(--accent)', fontFamily: 'Cinzel, serif',
+              color: 'var(--accent)',
               fontSize: 52, fontWeight: 900, letterSpacing: '0.04em', lineHeight: 1, marginBottom: 10,
             }}
           >
             YouXP
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'Cormorant Garamond, serif' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
             Level up your life.
           </p>
         </div>
@@ -335,7 +335,7 @@ export function Login() {
                 </p>
               </div>
               <span style={{
-                color: 'var(--accent)', fontFamily: 'Cinzel, serif',
+                color: 'var(--accent)',
                 fontSize: 15, fontWeight: 800, letterSpacing: '0.02em', flexShrink: 0, marginLeft: 12,
               }}>
                 {DEMO_EVENTS[demoIdx].xp}
@@ -361,7 +361,7 @@ export function Login() {
               </svg>
               <span style={{
                 position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 18, fontWeight: 700,
+                color: 'var(--accent)', fontSize: 18, fontWeight: 700,
               }}>1</span>
             </div>
             <div>
@@ -374,7 +374,7 @@ export function Login() {
             style={{
               width: '100%', padding: '10px 0', borderRadius: 10, border: '1px solid rgba(245,166,35,0.3)',
               background: 'rgba(245,166,35,0.07)', color: 'var(--accent)', fontSize: 13, fontWeight: 700,
-              cursor: 'pointer', fontFamily: 'Cinzel, serif', letterSpacing: '0.04em',
+              cursor: 'pointer', letterSpacing: '0.04em',
               transition: 'background 0.15s ease',
             }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,166,35,0.13)')}
@@ -398,10 +398,10 @@ export function Login() {
 
           {/* Mobile-only logo */}
           <div className="md:hidden text-center mb-8">
-            <h1 className="glow-pulse" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 48, fontWeight: 900 }}>
+            <h1 className="glow-pulse" style={{ color: 'var(--accent)', fontSize: 48, fontWeight: 900 }}>
               YouXP
             </h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 6, fontFamily: 'Cormorant Garamond, serif' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 6 }}>
               Level up your life.
             </p>
           </div>
@@ -424,15 +424,13 @@ export function Login() {
             style={{
               borderRadius: 20, padding: '30px 28px',
               background:           'var(--card-bg)',
-              backdropFilter:       'blur(32px)',
-              WebkitBackdropFilter: 'blur(32px)',
               border:     '1px solid var(--border)',
               boxShadow:  '0 24px 64px rgba(0,0,0,0.45)',
             }}
           >
             {/* Heading */}
             <div style={{ marginBottom: 24 }}>
-              <h2 style={{ color: 'var(--text-primary)', fontFamily: 'Cinzel, serif', fontSize: 19, fontWeight: 700, margin: '0 0 5px' }}>
+              <h2 style={{ color: 'var(--text-primary)', fontSize: 19, fontWeight: 700, margin: '0 0 5px' }}>
                 {mode === 'login' ? LOGIN_HEADINGS[headingIdx] : 'Create your account'}
               </h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: 0 }}>
@@ -645,8 +643,7 @@ export function Login() {
                 disabled={isSubmitting}
                 style={{
                   width: '100%', padding: '13px 0', marginTop: 2, borderRadius: 13, border: 'none',
-                  background: 'var(--accent)', color: 'var(--base-bg)',
-                  fontFamily: 'Cinzel, serif', fontSize: 14, fontWeight: 700, letterSpacing: '0.04em',
+                  background: 'var(--accent)', color: 'var(--base-bg)', fontSize: 14, fontWeight: 700, letterSpacing: '0.04em',
                   cursor: isSubmitting ? 'not-allowed' : 'pointer',
                   opacity: isSubmitting ? 0.75 : 1,
                   boxShadow: isSubmitting ? 'none' : '0 4px 24px var(--accent-dim)',

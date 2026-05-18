@@ -334,7 +334,7 @@ export function Volleyball() {
             { label: 'Streak',   value: streak || '—' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: ACCENT, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
+              <p className="text-xl font-bold" style={{ color: ACCENT }}>{s.value}</p>
               <p className="text-xs mt-0.5 section-label">{s.label}</p>
             </div>
           ))}
@@ -356,7 +356,7 @@ export function Volleyball() {
         {/* Chart */}
         {chartData.length >= 2 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Monthly Record</p>
+            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Monthly Record</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={chartData} barGap={4}>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -396,7 +396,7 @@ export function Volleyball() {
             <div className="flex items-center gap-3">
               <div style={{ textAlign: 'right' }}>
                 {g.format === 'Sand' && g.my_score != null && g.opp_score != null && (
-                  <p style={{ fontSize: 16, fontWeight: 800, color: g.win ? ACCENT : '#f87171', fontFamily: 'Cinzel, serif' }}>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: g.win ? ACCENT : '#f87171' }}>
                     {g.my_score}—{g.opp_score}
                   </p>
                 )}

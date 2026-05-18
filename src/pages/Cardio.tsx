@@ -155,7 +155,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }}>Activity</label>
+              <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Activity</label>
               <div className="grid grid-cols-5 gap-2">
                 {ACTIVITIES.map(a => (
                   <label key={a.key} className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl cursor-pointer transition-all" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
@@ -197,7 +197,7 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
   const [saving, setSaving] = useState(false)
 
   const inputStyle = { background: 'var(--input-bg)', border: '1px solid var(--border)' }
-  const labelStyle = { color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif' }
+  const labelStyle = { color: 'var(--text-secondary)' }
 
   async function save() {
     setSaving(true)
@@ -353,10 +353,10 @@ export function Cardio() {
             { label: 'Total XP',    value: totalXP.toLocaleString() },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-lg font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
+              <p className="text-lg font-bold" style={{ color: 'var(--accent)' }}>
                 {s.value}{s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: '#888' }}>{s.unit}</span>}
               </p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -365,15 +365,15 @@ export function Cardio() {
         {!streak.loading && (streak.cardioCurrent > 0 || streak.cardioLongest > 0) && (
           <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <div>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Cardio Streak</p>
-              <p style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif', color: streak.cardioCurrent > 0 ? '#3b82f6' : 'var(--text-muted)', lineHeight: 1.2 }}>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Cardio Streak</p>
+              <p style={{ fontSize: 22, fontWeight: 700, color: streak.cardioCurrent > 0 ? '#3b82f6' : 'var(--text-muted)', lineHeight: 1.2 }}>
                 {streak.cardioCurrent} <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-muted)' }}>days</span>
               </p>
             </div>
             {streak.cardioLongest > 0 && (
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Best</p>
-                <p style={{ fontSize: 18, fontWeight: 700, fontFamily: 'Cinzel, serif', color: 'var(--text-secondary)', lineHeight: 1.2 }}>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Best</p>
+                <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-secondary)', lineHeight: 1.2 }}>
                   {streak.cardioLongest}
                 </p>
               </div>
@@ -384,26 +384,26 @@ export function Cardio() {
         {/* Cardio PRs */}
         {(fastestMileVal !== null || longestRun !== null || mostMilesWeek !== null) && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Personal Records</p>
+            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Personal Records</p>
             <div className="grid grid-cols-3 gap-2">
               {fastestMileVal !== null && (
                 <div className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)' }}>
-                  <p className="text-base font-bold" style={{ color: '#3b82f6', fontFamily: 'Cinzel, serif' }}>{fastestMileVal.toFixed(2)}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Fastest Mile</p>
+                  <p className="text-base font-bold" style={{ color: '#3b82f6' }}>{fastestMileVal.toFixed(2)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Fastest Mile</p>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>min/mi</p>
                 </div>
               )}
               {longestRun !== null && (
                 <div className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)' }}>
-                  <p className="text-base font-bold" style={{ color: '#3b82f6', fontFamily: 'Cinzel, serif' }}>{longestRun.toFixed(1)}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Longest Run</p>
+                  <p className="text-base font-bold" style={{ color: '#3b82f6' }}>{longestRun.toFixed(1)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Longest Run</p>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>miles</p>
                 </div>
               )}
               {mostMilesWeek !== null && (
                 <div className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)' }}>
-                  <p className="text-base font-bold" style={{ color: '#3b82f6', fontFamily: 'Cinzel, serif' }}>{mostMilesWeek.toFixed(1)}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Best Week</p>
+                  <p className="text-base font-bold" style={{ color: '#3b82f6' }}>{mostMilesWeek.toFixed(1)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Best Week</p>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>miles</p>
                 </div>
               )}
@@ -439,7 +439,7 @@ export function Cardio() {
         )}
         {!chartLoading && chartData.length > 0 && chartData.length < 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold mb-2" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Distance Trend</p>
+            <p className="font-bold mb-2" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Distance Trend</p>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
               {chartData.map(d => (
                 <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -455,7 +455,7 @@ export function Cardio() {
         )}
         {!chartLoading && chartData.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-1" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Distance Trend</p>
+            <p className="font-bold text-white mb-1" style={{ fontSize: 15 }}>Distance Trend</p>
             <p className="text-xs mb-3" style={{ color: '#888' }}>Avg {avgMiles.toFixed(1)} mi/session</p>
             <ResponsiveContainer width="100%" height={150}>
               <AreaChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -486,7 +486,7 @@ export function Cardio() {
         {/* Session history */}
         {filtered.length > 0 ? (
           <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="px-4 pt-4 pb-2 font-bold text-white" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Sessions</p>
+            <p className="px-4 pt-4 pb-2 font-bold text-white" style={{ fontSize: 15 }}>Sessions</p>
             {filtered.map(s => {
               const pace = s.duration_mins && s.distance ? (s.duration_mins / s.distance).toFixed(1) : null
               return (

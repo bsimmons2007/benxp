@@ -294,9 +294,9 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <MoonIcon size={18} color={debtColor} />
-          <p className="font-bold text-sm" style={{ color: debtColor, fontFamily: 'Cinzel, serif' }}>Sleep Debt</p>
+          <p className="font-bold text-sm" style={{ color: debtColor }}>Sleep Debt</p>
         </div>
-        <span className="font-bold text-lg" style={{ color: debtColor, fontFamily: 'Cinzel, serif' }}>
+        <span className="font-bold text-lg" style={{ color: debtColor }}>
           {totalDebt.toFixed(1)}h
         </span>
       </div>
@@ -320,7 +320,7 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
           background: 'var(--input-bg)', border: '1px solid var(--border)',
           textAlign: 'center', flexShrink: 0,
         }}>
-          <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 18, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{recoveryNights}</p>
+          <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 18, lineHeight: 1 }}>{recoveryNights}</p>
           <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>nights @ 9h</p>
           <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>to recover</p>
         </div>
@@ -421,7 +421,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-bold text-sm" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Wake Time Trainer</p>
+            <p className="font-bold text-sm" style={{ color: 'var(--accent)' }}>Wake Time Trainer</p>
             <p style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 2 }}>
               {avgWakeMins !== null
                 ? `Avg wake: ${fmtTime(avgWakeMins)} · Set a goal wake time`
@@ -438,7 +438,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
     <div className="rounded-xl mb-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--accent-dim)' }}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid var(--border-faint)' }}>
-        <p className="font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', fontSize: 15 }}>Wake Time Trainer</p>
+        <p className="font-bold" style={{ color: 'var(--accent)', fontSize: 15 }}>Wake Time Trainer</p>
         <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18 }}>✕</button>
       </div>
 
@@ -455,7 +455,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
           <div style={{ color: 'var(--text-muted)', fontSize: 22, fontWeight: 300 }}>→</div>
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.3)' }}>
             <p style={{ color: 'var(--accent)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Goal</p>
-            <p style={{ color: 'var(--accent)', fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif' }}>{fmtTime(targetWakeMins)}</p>
+            <p style={{ color: 'var(--accent)', fontSize: 22, fontWeight: 700 }}>{fmtTime(targetWakeMins)}</p>
           </div>
         </div>
 
@@ -515,7 +515,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                 { label: 'Goal by',       value: formatDate(goalDate)              },
               ].map(s => (
                 <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
-                  <p style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>{s.value}</p>
+                  <p style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700, lineHeight: 1 }}>{s.value}</p>
                   <p style={{ color: 'var(--text-muted)', fontSize: 9, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.10em', fontWeight: 600 }}>{s.label}</p>
                 </div>
               ))}
@@ -540,11 +540,11 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               <div className="flex justify-between items-center">
                 <div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Go to sleep by</p>
-                  <p style={{ color: 'var(--accent)', fontSize: 26, fontWeight: 700, fontFamily: 'Cinzel, serif', lineHeight: 1.1 }}>{schedule[0]?.bed}</p>
+                  <p style={{ color: 'var(--accent)', fontSize: 26, fontWeight: 700, lineHeight: 1.1 }}>{schedule[0]?.bed}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Wake up at</p>
-                  <p style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700, fontFamily: 'Cinzel, serif', lineHeight: 1.1 }}>{schedule[0]?.wake}</p>
+                  <p style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700, lineHeight: 1.1 }}>{schedule[0]?.wake}</p>
                 </div>
               </div>
             </div>
@@ -725,7 +725,7 @@ export function Sleep() {
             { label: 'Best Streak', value: bestStreak },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{s.value}</p>
+              <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{s.value}</p>
               <p className="section-label mt-0.5">{s.label}</p>
             </div>
           ))}
@@ -748,7 +748,7 @@ export function Sleep() {
         )}
         {!chartLoading && sorted.length > 0 && sorted.length < 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold mb-2" style={{ fontFamily: 'Cinzel, serif', fontSize: 15, color: 'var(--text-primary)' }}>Hours Slept</p>
+            <p className="font-bold mb-2" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Hours Slept</p>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
               {sorted.map(d => (
                 <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -764,7 +764,7 @@ export function Sleep() {
         )}
         {!chartLoading && sorted.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>Hours Slept</p>
+            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Hours Slept</p>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={sorted} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
@@ -800,7 +800,7 @@ export function Sleep() {
         {/* Day of week breakdown */}
         {nightLogs.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontFamily: 'Cinzel, serif', fontSize: 15 }}>By Day of Week</p>
+            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>By Day of Week</p>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={dayData} barSize={28}>
                 <XAxis dataKey="label" tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />

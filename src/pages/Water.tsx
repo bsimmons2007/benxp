@@ -118,7 +118,7 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
           x={CW / 2} y={fill > 0.15 ? waterTop + 22 : botY - 10}
           textAnchor="middle" fontSize={fill >= 1 ? 20 : 15}
           fontWeight="700" fill={fill > 0.18 ? '#fff' : 'rgba(255,255,255,0.4)'}
-          fontFamily="Cinzel, serif"
+          fontFamily="Inter Variable, Inter, system-ui, sans-serif"
           style={{ transition: 'all 0.5s ease' }}
         >
           {pct}%
@@ -137,7 +137,7 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
 
       {/* oz label */}
       <div style={{ textAlign: 'center' }}>
-        <p style={{ fontSize: 28, fontWeight: 900, color: fill >= 1 ? glowColor : '#fff', fontFamily: 'Cinzel, serif', lineHeight: 1,
+        <p style={{ fontSize: 28, fontWeight: 900, color: fill >= 1 ? glowColor : '#fff', lineHeight: 1,
           textShadow: fill >= 1 ? `0 0 20px ${glowColor}` : 'none', transition: 'all 0.4s ease' }}>
           {ozDrunk.toFixed(0)}<span style={{ fontSize: 14, fontWeight: 400, color: '#444' }}>oz</span>
         </p>
@@ -242,8 +242,8 @@ export function Water() {
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2 mb-5">
           <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{totalOz.toFixed(0)}oz</p>
-            <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Today</p>
+            <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{totalOz.toFixed(0)}oz</p>
+            <p className="text-xs mt-0.5" style={{ color: '#888' }}>Today</p>
           </div>
 
           {/* Goal tile — tap to edit */}
@@ -252,13 +252,13 @@ export function Water() {
             className="rounded-xl p-3 text-center"
             style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', cursor: 'pointer' }}
           >
-            <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{goalOz}oz</p>
-            <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Goal</p>
+            <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{goalOz}oz</p>
+            <p className="text-xs mt-0.5" style={{ color: '#888' }}>Goal</p>
           </button>
 
           <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{totalOz >= goalOz ? 'Done!' : `${Math.max(0, goalOz - totalOz).toFixed(0)}oz`}</p>
-            <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>Remaining</p>
+            <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{totalOz >= goalOz ? 'Done!' : `${Math.max(0, goalOz - totalOz).toFixed(0)}oz`}</p>
+            <p className="text-xs mt-0.5" style={{ color: '#888' }}>Remaining</p>
           </div>
         </div>
 

@@ -229,7 +229,7 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
           </div>
 
           {/* Title */}
-          <p style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: 'var(--accent)', marginBottom: 8, lineHeight: 1.3 }}>
+          <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent)', marginBottom: 8, lineHeight: 1.3 }}>
             {step.title}
           </p>
 

@@ -143,8 +143,7 @@ function RankLegend() {
             }} />
             <span style={{
               fontSize: 9, fontWeight: 700, whiteSpace: 'nowrap',
-              color: r.glow !== 'none' ? r.glow : '#888',
-              fontFamily: 'Cinzel, serif', letterSpacing: '0.03em',
+              color: r.glow !== 'none' ? r.glow : '#888', letterSpacing: '0.03em',
             }}>
               {shortLabel}
             </span>
@@ -183,7 +182,7 @@ function MuscleLabel({ muscleKey, scores }: { muscleKey: string | null; scores: 
         <span style={{ fontSize: 13, fontWeight: 700, color: '#e0e0f0' }}>{muscle?.name ?? muscleKey}</span>
       </div>
       {tier > 0 && result
-        ? <span style={{ fontSize: 11, color: glow !== 'none' ? glow : '#aaa', fontFamily: 'Cinzel, serif', fontWeight: 700 }}>{result.rank.icon} {result.rank.label}</span>
+        ? <span style={{ fontSize: 11, color: glow !== 'none' ? glow : '#aaa', fontWeight: 700 }}>{result.rank.icon} {result.rank.label}</span>
         : <span style={{ fontSize: 10, color: '#444' }}>Unranked</span>
       }
     </div>

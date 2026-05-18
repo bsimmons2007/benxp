@@ -143,14 +143,14 @@ export function Mood() {
                 key={s.label}
                 className="card-animate"
                 style={{
-                  background: 'var(--card-bg)', backdropFilter: 'blur(12px)',
+                  background: 'var(--card-bg)',
                   border: '1px solid var(--border)', borderRadius: 14,
                   padding: '12px 10px', textAlign: 'center',
                   boxShadow: `0 0 16px ${s.color}15`,
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 3 }}>{s.icon}</div>
-                <p style={{ color: s.color, fontSize: 24, fontWeight: 900, lineHeight: 1, fontFamily: 'Cinzel, serif' }}>
+                <p style={{ color: s.color, fontSize: 24, fontWeight: 900, lineHeight: 1 }}>
                   {s.value}
                 </p>
                 <p style={{ color: '#555', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
@@ -241,10 +241,10 @@ export function Mood() {
             ].map(({ label, name, val, color }) => (
               <div key={name} className="flex flex-col gap-1">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <label style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif', fontSize: 15, fontWeight: 500 }}>
+                  <label style={{ color: 'var(--text-secondary)', fontSize: 15, fontWeight: 500 }}>
                     {label}
                   </label>
-                  <span style={{ color, fontWeight: 700, fontSize: 16, fontFamily: 'Cinzel, serif', minWidth: 20, textAlign: 'right' }}>
+                  <span style={{ color, fontWeight: 700, fontSize: 16, minWidth: 20, textAlign: 'right' }}>
                     {val}
                   </span>
                 </div>
@@ -259,7 +259,7 @@ export function Mood() {
 
             <Input label="Activities" type="text" placeholder="Gym, reading, skating…" {...register('activities')} />
             <div className="flex flex-col gap-1">
-              <label style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif', fontSize: 15, fontWeight: 500 }}>
+              <label style={{ color: 'var(--text-secondary)', fontSize: 15, fontWeight: 500 }}>
                 Notes
               </label>
               <textarea

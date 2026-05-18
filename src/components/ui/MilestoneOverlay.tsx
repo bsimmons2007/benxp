@@ -41,7 +41,6 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
         position: 'fixed', inset: 0, zIndex: 9999,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: `linear-gradient(160deg, rgba(245,166,35,0.08) 0%, rgba(0,0,0,0.78) 40%, rgba(0,0,0,0.78) 100%)`,
-        backdropFilter: 'blur(10px)',
         transition: 'opacity 0.35s ease',
         opacity: visible ? 1 : 0,
         padding: '0 32px',
@@ -66,7 +65,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
         {/* Milestone tag */}
         <p style={{
           fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
-          color: 'var(--accent)', marginBottom: 14, fontFamily: 'Cinzel, serif',
+          color: 'var(--accent)', marginBottom: 14,
         }}>
           <TrophyIcon size={11} color="var(--accent)" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 5 }} />Milestone Unlocked
         </p>
@@ -82,8 +81,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
 
         {/* Name */}
         <p style={{
-          fontSize: 26, fontWeight: 900, color: '#fff', marginBottom: 6,
-          fontFamily: 'Cinzel, serif', letterSpacing: '0.04em',
+          fontSize: 26, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 6, letterSpacing: '0.04em',
           textShadow: '0 0 30px var(--accent)',
         }}>
           {milestone.name}
@@ -92,7 +90,6 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
         {/* Lift + threshold */}
         <p style={{
           fontSize: 14, color: 'var(--accent)', fontWeight: 700, marginBottom: 10,
-          fontFamily: 'Cinzel, serif',
         }}>
           {liftName} · {milestone.threshold}+
         </p>
@@ -108,7 +105,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
           style={{
             width: '100%', padding: '12px 0', borderRadius: 12,
             background: 'var(--accent)', color: 'var(--base-bg)',
-            fontWeight: 700, fontSize: 14, fontFamily: 'Cinzel, serif',
+            fontWeight: 700, fontSize: 14,
             letterSpacing: '0.04em', border: 'none', cursor: 'pointer',
             boxShadow: '0 0 20px var(--accent-dim)',
           }}

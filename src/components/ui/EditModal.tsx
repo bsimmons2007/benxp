@@ -13,7 +13,7 @@ export function EditModal({ title, onClose, onDelete, onSave, saving, children }
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}
+      style={{ background: 'rgba(0,0,0,0.75)' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
@@ -24,7 +24,7 @@ export function EditModal({ title, onClose, onDelete, onSave, saving, children }
         <div className="w-10 h-1 rounded-full mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.2)' }} />
 
         <div className="flex items-center justify-between mb-4">
-          <p className="font-bold text-white text-lg" style={{ fontFamily: 'Cinzel, serif' }}>{title}</p>
+          <p className="font-bold text-white text-lg" style={{ }}>{title}</p>
           <button onClick={onClose} className="text-2xl" style={{ color: '#666' }}>✕</button>
         </div>
 

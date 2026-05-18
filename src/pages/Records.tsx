@@ -115,7 +115,6 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
             background: 'var(--card-bg)', border: '1px solid var(--border)',
             borderRadius: 12, marginTop: 4, maxHeight: 280, overflowY: 'auto',
             boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
-            backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
           }}
         >
           {/* Group filter chips */}
@@ -653,8 +652,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       {tmplOpen && !open && (
         <div className="pop-in" style={{
           marginBottom: 12, borderRadius: 14,
-          background: 'var(--card-bg)', border: '1px solid var(--accent-dim)',
-          backdropFilter: 'blur(12px)', overflow: 'hidden',
+          background: 'var(--card-bg)', border: '1px solid var(--accent-dim)', overflow: 'hidden',
         }}>
           <p className="section-label" style={{ padding: '12px 14px 8px', borderBottom: '1px solid var(--border-faint)' }}>
             Saved Templates
@@ -700,7 +698,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
 
       {open && (
         <form onSubmit={handleSubmit}>
-          <div className="mt-3 rounded-2xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', backdropFilter: 'blur(12px)' }}>
+          <div className="mt-3 rounded-2xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             {/* Date */}
             <div style={{ marginBottom: 16 }}>
               <label className="section-label" style={{ display: 'block', marginBottom: 6 }}>Workout Date</label>
@@ -1265,15 +1263,15 @@ export function Records() {
         {!streak.loading && (streak.gymCurrent > 0 || streak.gymLongest > 0) && (
           <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <div>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Gym Streak</p>
-              <p style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Cinzel, serif', color: streak.gymCurrent > 0 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1.2 }}>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Gym Streak</p>
+              <p style={{ fontSize: 22, fontWeight: 700, color: streak.gymCurrent > 0 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1.2 }}>
                 {streak.gymCurrent} <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-muted)' }}>days</span>
               </p>
             </div>
             {streak.gymLongest > 0 && (
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>Best</p>
-                <p style={{ fontSize: 18, fontWeight: 700, fontFamily: 'Cinzel, serif', color: 'var(--text-secondary)', lineHeight: 1.2 }}>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Best</p>
+                <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-secondary)', lineHeight: 1.2 }}>
                   {streak.gymLongest}
                 </p>
               </div>

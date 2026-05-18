@@ -166,7 +166,7 @@ export function LogWorkoutForm() {
       <Input label="Date" type="date" {...register('date', { required: true })} />
 
       <div className="flex flex-col gap-1">
-        <label className="text-base font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Lift</label>
+        <label className="text-base font-medium" style={{ color: '#AAAAAA' }}>Lift</label>
         <select
           {...register('lift')}
           className="px-3 py-2 rounded-lg text-white outline-none"
@@ -179,7 +179,7 @@ export function LogWorkoutForm() {
       {/* Equipment + Grip row */}
       <div className="flex gap-3">
         <div className="flex flex-col gap-1 flex-1">
-          <label className="text-sm font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Equipment</label>
+          <label className="text-sm font-medium" style={{ color: '#AAAAAA' }}>Equipment</label>
           <select
             {...register('equipment')}
             className="px-3 py-2 rounded-lg text-white outline-none text-sm"
@@ -190,7 +190,7 @@ export function LogWorkoutForm() {
         </div>
         {showGrip && (
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-sm font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Grip</label>
+            <label className="text-sm font-medium" style={{ color: '#AAAAAA' }}>Grip</label>
             <select
               {...register('grip')}
               className="px-3 py-2 rounded-lg text-white outline-none text-sm"
@@ -233,7 +233,7 @@ export function LogWorkoutForm() {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>
+        <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#AAAAAA' }}>
           Bodyweight (lbs)
           {bwLoggedToday && (
             <span style={{ marginLeft: 8, fontSize: 10, color: '#4caf50', fontWeight: 700 }}>✓ logged today</span>

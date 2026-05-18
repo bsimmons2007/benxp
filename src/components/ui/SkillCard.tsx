@@ -25,14 +25,14 @@ export function SkillCard({ skill }: SkillCardProps) {
         <div className="flex items-center gap-2">
           <SectionIcon sectionKey={def.icon} size={22} color="var(--accent)" />
           <div>
-            <p className="font-bold text-white text-sm" style={{ fontFamily: 'Cinzel, serif' }}>{def.label}</p>
+            <p className="font-bold text-white text-sm" style={{ }}>{def.label}</p>
             <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               {skill.title}
             </p>
           </div>
         </div>
         <div className="text-right">
-          <p className="font-bold text-2xl" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif', lineHeight: 1 }}>
+          <p className="font-bold text-2xl" style={{ color: 'var(--accent)', lineHeight: 1 }}>
             {skill.level}
           </p>
           <p style={{ color: 'var(--text-muted)', fontSize: 9 }}>LEVEL</p>

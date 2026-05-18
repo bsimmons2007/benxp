@@ -34,7 +34,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
     <div className="flex flex-col items-center justify-center" style={{ minHeight: '60vh', gap: 32 }}>
       <div>
         <p className="text-xs uppercase tracking-widest text-center mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>Developer Access</p>
-        <p className="text-xl font-bold text-center" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>Enter PIN</p>
+        <p className="text-xl font-bold text-center" style={{ color: 'var(--accent)' }}>Enter PIN</p>
       </div>
 
       {/* Dots */}
@@ -69,7 +69,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
                   background: k === '' ? 'transparent' : 'var(--card-bg)',
                   border: k === '' ? 'none' : '1px solid var(--border)',
                   color: 'var(--text-primary)', fontSize: k === '⌫' ? 20 : 24,
-                  fontWeight: 600, fontFamily: 'Cinzel, serif',
+                  fontWeight: 600,
                   cursor: k === '' ? 'default' : 'pointer',
                   transition: 'background 0.1s ease',
                   boxShadow: k === '' ? 'none' : 'var(--card-shadow)',
@@ -215,7 +215,7 @@ function XPEngine() {
       {/* Total + formula */}
       <Card className="mb-4" goldBorder>
         <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#888' }}>Total XP</p>
-        <p className="text-4xl font-bold mb-1" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>
+        <p className="text-4xl font-bold mb-1" style={{ color: 'var(--accent)' }}>
           {data.total.toLocaleString()}
         </p>
         <p style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Level {level} · {toNext.toLocaleString()} to next</p>
@@ -319,7 +319,7 @@ export function DevSettings() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>// developer mode</p>
-                <p className="font-bold text-white" style={{ fontFamily: 'Cinzel, serif' }}>Settings</p>
+                <p className="font-bold text-white" style={{ }}>Settings</p>
               </div>
               <button
                 onClick={() => { sessionStorage.removeItem(SESSION_KEY); setUnlocked(false) }}

@@ -28,7 +28,6 @@ function HobbyCard({ icon, label, sub, path, statLabel, statValue, accentColor }
         padding: '18px 20px', borderRadius: 16,
         background: 'var(--card-bg)',
         border: `1px solid var(--border)`,
-        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
         display: 'flex', alignItems: 'center', gap: 16,
         transition: 'border-color 0.15s, transform 0.12s',
       }}
@@ -53,7 +52,7 @@ function HobbyCard({ icon, label, sub, path, statLabel, statValue, accentColor }
 
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Cinzel, serif' }}>
+        <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
           {label}
         </p>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{sub}</p>
@@ -62,7 +61,7 @@ function HobbyCard({ icon, label, sub, path, statLabel, statValue, accentColor }
       {/* Quick stat */}
       {statValue !== undefined && (
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <p style={{ fontSize: 20, fontWeight: 900, color: accentColor, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>
+          <p style={{ fontSize: 20, fontWeight: 900, color: accentColor, lineHeight: 1 }}>
             {statValue}
           </p>
           <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{statLabel}</p>

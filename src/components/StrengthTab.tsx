@@ -24,7 +24,7 @@ export function RankBadge({ rank, size = 'md' }: { rank: RankMeta; size?: 'sm' |
         display: 'inline-block', padding: pad, borderRadius: 6,
         background: rank.color, border: `1px solid ${rank.border}`,
         color: rank.glow !== 'none' ? rank.glow : '#aaa',
-        fontSize: sz, fontWeight: 700, fontFamily: 'Cinzel, serif',
+        fontSize: sz, fontWeight: 700,
         letterSpacing: '0.04em',
         boxShadow: rank.glow !== 'none' ? `0 0 8px ${rank.glow}55` : 'none',
       }}
@@ -75,7 +75,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
           <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>
             {muscle?.group}
           </p>
-          <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 17, fontFamily: 'Cinzel, serif' }}>
+          <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 17 }}>
             {muscle?.name ?? result.muscleKey}
           </p>
         </div>
@@ -83,7 +83,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
-        <span style={{ fontSize: 28, fontWeight: 900, color: glow, fontFamily: 'Cinzel, serif' }}>
+        <span style={{ fontSize: 28, fontWeight: 900, color: glow }}>
           {result.score.toFixed(3)}
         </span>
         <span style={{ fontSize: 12, color: '#555' }}>strength score</span>
@@ -96,7 +96,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
 
       {result.rank.tier < 18 && <RankProgressBar result={result} />}
       {result.rank.tier === 18 && (
-        <p style={{ fontSize: 12, color: glow, textAlign: 'center', marginTop: 6, fontFamily: 'Cinzel, serif' }}>
+        <p style={{ fontSize: 12, color: glow, textAlign: 'center', marginTop: 6 }}>
           ✦ Maximum Rank Achieved ✦
         </p>
       )}
@@ -171,7 +171,7 @@ function GroupRow({ group, results, selected, onSelect }: {
   const groupMuscles = MUSCLES.filter(m => m.group === group)
   return (
     <div style={{ marginBottom: 2 }}>
-      <p style={{ fontSize: 10, color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4, fontFamily: 'Cormorant Garamond, serif' }}>
+      <p style={{ fontSize: 10, color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
         {group}
       </p>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -251,7 +251,7 @@ function StrengthOrb({ sq }: { sq: number }) {
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         }}
       >
-        <span style={{ fontSize: 32, fontWeight: 900, color: glow, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>
+        <span style={{ fontSize: 32, fontWeight: 900, color: glow, lineHeight: 1 }}>
           {sq}
         </span>
         <span style={{ fontSize: 9, color: `${glow}aa`, letterSpacing: '0.14em' }}>SQ</span>
@@ -298,7 +298,7 @@ function RankDropdown() {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: isTop ? 16 : 14 }}>{rank.icon}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: glow, fontFamily: 'Cinzel, serif' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: glow }}>
                   {rank.label}
                 </span>
               </div>
@@ -417,7 +417,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }}>
-        <p style={{ color: '#444', fontFamily: 'Cinzel, serif', fontSize: 13 }}>Computing strength scores…</p>
+        <p style={{ color: '#444', fontSize: 13 }}>Computing strength scores…</p>
       </div>
     )
   }

@@ -126,7 +126,7 @@ export function ChartEmptyState({ title, message, color = 'var(--accent)' }: { t
       borderRadius: 16, padding: '20px 16px 16px',
       marginBottom: 16,
     }}>
-      <p style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{title}</p>
+      <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{title}</p>
       <div style={{ position: 'relative', height: 110, marginBottom: 8 }}>
         {/* Ghost sparkline SVG */}
         <svg width="100%" height="100%" viewBox="0 0 300 90" preserveAspectRatio="none" style={{ opacity: 0.18 }}>

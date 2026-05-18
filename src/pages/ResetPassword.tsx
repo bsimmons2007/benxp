@@ -69,12 +69,11 @@ export function ResetPassword() {
         className="fade-in w-full"
         style={{
           maxWidth: 380, borderRadius: 20, padding: '30px 28px',
-          background: 'rgba(13,17,40,0.88)', backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--border)',
+          background: 'rgba(13,17,40,0.88)', border: '1px solid var(--border)',
           boxShadow: '0 24px 64px rgba(0,0,0,0.55)',
         }}
       >
-        <h2 style={{ color: '#e0e0e0', fontFamily: 'Cinzel, serif', fontSize: 19, fontWeight: 700, marginBottom: 6 }}>
+        <h2 style={{ color: '#e0e0e0', fontSize: 19, fontWeight: 700, marginBottom: 6 }}>
           Set New Password
         </h2>
         <p style={{ color: '#555', fontSize: 13, marginBottom: 24 }}>
@@ -152,8 +151,7 @@ export function ResetPassword() {
               disabled={status === 'loading'}
               style={{
                 width: '100%', padding: '13px 0', borderRadius: 13, border: 'none',
-                background: 'var(--accent)', color: '#1A1A2E',
-                fontFamily: 'Cinzel, serif', fontSize: 14, fontWeight: 700,
+                background: 'var(--accent)', color: '#1A1A2E', fontSize: 14, fontWeight: 700,
                 cursor: status === 'loading' ? 'not-allowed' : 'pointer',
                 opacity: status === 'loading' ? 0.75 : 1,
                 boxShadow: '0 4px 24px var(--accent-dim)',
@@ -169,7 +167,7 @@ export function ResetPassword() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 56, height: 56, borderRadius: 16, background: 'rgba(46,204,113,0.12)', border: '1px solid rgba(46,204,113,0.3)', margin: '0 auto 12px' }}>
               <svg width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="#2ECC71" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10l5 5 9-9" /></svg>
             </div>
-            <p style={{ color: '#4caf50', fontWeight: 700, fontSize: 15, fontFamily: 'Cinzel, serif' }}>
+            <p style={{ color: '#4caf50', fontWeight: 700, fontSize: 15 }}>
               Password updated!
             </p>
             <p style={{ color: '#555', fontSize: 13, marginTop: 6 }}>

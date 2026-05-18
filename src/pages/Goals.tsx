@@ -156,7 +156,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium" style={{ color: '#AAAAAA', fontFamily: 'Cormorant Garamond, serif' }}>Type</label>
+              <label className="text-sm font-medium" style={{ color: '#AAAAAA' }}>Type</label>
               <select
                 {...register('metric_key')}
                 onChange={e => handleMetricChange(e.target.value as MetricKey)}
@@ -232,8 +232,6 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
       className="rounded-xl p-4 mb-3"
       style={{
         background: 'var(--card-bg)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
         border: isAutoComplete
           ? '1px solid rgba(245,166,35,0.5)'
           : '1px solid var(--border)',
@@ -355,8 +353,8 @@ export function Goals() {
             { label: 'XP Earned', value: completed.reduce((s, g) => s + g.xp_reward, 0) },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'Cinzel, serif' }}>{s.value.toLocaleString()}</p>
-              <p className="text-xs mt-0.5" style={{ color: '#888', fontFamily: 'Cormorant Garamond, serif' }}>{s.label}</p>
+              <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{s.value.toLocaleString()}</p>
+              <p className="text-xs mt-0.5" style={{ color: '#888' }}>{s.label}</p>
             </div>
           ))}
         </div>

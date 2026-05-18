@@ -75,8 +75,6 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
         paddingLeft:          '12px',
         paddingRight:         '12px',
         background:           'var(--nav-bg)',
-        backdropFilter:       'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
         borderBottom:         '1px solid var(--border-faint)',
       }}
     >
@@ -127,7 +125,6 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
         <span
           style={{
             color:         title ? 'var(--text-primary)' : 'var(--accent)',
-            fontFamily:    'Cinzel, serif',
             fontSize:      title ? 14 : 18,
             fontWeight:    700,
             letterSpacing: title ? '0.08em' : '0.04em',

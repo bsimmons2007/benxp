@@ -36,8 +36,6 @@ export function LevelUpOverlay() {
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
         cursor: 'pointer',
         opacity: dismissing ? 0 : 1,
         transform: dismissing ? 'scale(1.03)' : 'scale(1)',
@@ -80,7 +78,7 @@ export function LevelUpOverlay() {
           animation: 'borderGlow 1.5s ease-in-out infinite',
         }} />
         <span style={{
-          fontSize: 80, fontWeight: 900, fontFamily: 'Cinzel, serif',
+          fontSize: 80, fontWeight: 900,
           color: 'var(--accent)',
           textShadow: '0 0 40px var(--accent), 0 0 80px rgba(245,166,35,0.5)',
           animation: 'glowPulse 2s ease-in-out infinite',
@@ -93,7 +91,6 @@ export function LevelUpOverlay() {
       <p style={{
         fontSize: 13, fontWeight: 700, letterSpacing: '0.25em',
         color: 'var(--accent)', textTransform: 'uppercase',
-        fontFamily: 'Cormorant Garamond, serif',
         animation: 'fadeInUp 0.5s 0.2s ease both',
         marginBottom: 8,
       }}>
@@ -102,8 +99,7 @@ export function LevelUpOverlay() {
 
       <p style={{
         fontSize: 28, fontWeight: 700, letterSpacing: '0.1em',
-        color: '#ffffff',
-        fontFamily: 'Cinzel, serif',
+        color: 'var(--text-primary)',
         textShadow: '0 0 20px rgba(255,255,255,0.4)',
         animation: 'fadeInUp 0.5s 0.3s ease both',
         marginBottom: 32,
