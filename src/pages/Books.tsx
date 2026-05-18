@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import { PieChart, Pie, Cell, Tooltip } from 'recharts'
 import { useForm } from 'react-hook-form'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -16,7 +17,6 @@ import { playGoalComplete } from '../lib/sounds'
 import type { Book, ToRead } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { FirstUseTip } from '../components/ui/EmptyState'
-import { PieChart, Pie, Cell, Tooltip } from 'recharts'
 
 // ── Types ────────────────────────────────────────────────────
 type SortKey = 'date_desc' | 'date_asc' | 'title_asc' | 'title_desc' | 'rating_desc' | 'rating_asc' | 'pages_desc' | 'pages_asc'
