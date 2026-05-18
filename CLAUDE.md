@@ -281,9 +281,11 @@ pool_games
 ---
 
 ## Response format
-Always end every response with a status footer:
-- While changes are unmerged: `(Merged n)`
-- After merging: open the PR via GitHub MCP, merge it, then poll `pull_request_read` → `get_check_runs` every ~15s until Vercel's check run reaches a terminal state (`success`, `failure`, `cancelled`, `timed_out`, `action_required`). Then report: `(Merged y · Vercel: [status])`
+Only include a status footer when code has been built and pushed in that response:
+- Changes pushed but not yet merged: `(Merged n)`
+- After merging + Vercel check completes: `(Merged y · Vercel: [status])`
+  where status is the `conclusion` field from `get_check_runs` (e.g. `success`, `failure`, `timed_out`)
+- Pure conversation responses with no code changes: no footer needed
 
 ## Merge workflow (PR-based — required for Vercel status checks)
 Never push directly to `main`. Always:
