@@ -280,6 +280,11 @@ pool_games
 
 ---
 
+## Response format
+Always end every response with either `(Merged y)` or `(Merged n)` indicating whether all changes have been merged into `main`.
+
+---
+
 ## Recent work (May 2026)
 - **Site-wide light mode fix** — all hardcoded `rgba(255,255,255,x)` and `color:#fff` replaced with CSS variables across 38 files
 - **Tutorial overhaul** — richer step content, tip callouts, pulse rings, caret arrows, card animations, keyboard nav, scroll lock
