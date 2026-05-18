@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState, useMemo } from 'react'
-
-const LOGO_ANIMATED_KEY = 'youxp-logo-animated'
 import { useUserName } from '../../hooks/useUserName'
 import { useNavStore } from '../../store/useNavStore'
+import { LogoMark } from './SideNav'
+
+const LOGO_ANIMATED_KEY = 'youxp-logo-animated'
 
 const LOG_MENU = [
   { label: 'Lifting',  emoji: '🏋️', to: '/lifting' },
@@ -15,8 +16,8 @@ const LOG_MENU = [
 interface TopBarProps {
   title?:        string
   hideSettings?: boolean
-  back?:         boolean   // show back arrow instead of hamburger
-  logButton?:    boolean   // show + Log button on right (Home page)
+  back?:         boolean
+  logButton?:    boolean
 }
 
 export function TopBar({ title, hideSettings = false, back = false, logButton = false }: TopBarProps) {
@@ -26,8 +27,8 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
   const logoLabel     = title ?? (userName ? `${userName}XP` : 'YouXP')
   const logoClickable = !title
 
-  const [showLogMenu,   setShowLogMenu]   = useState(false)
-  const [logoShimmer,   setLogoShimmer]   = useState(false)
+  const [showLogMenu,    setShowLogMenu]    = useState(false)
+  const [logoShimmer,    setLogoShimmer]    = useState(false)
   const [logoShimmerKey, setLogoShimmerKey] = useState(0)
   const logoDrawIn = useMemo(() => {
     const done = sessionStorage.getItem(LOGO_ANIMATED_KEY)
@@ -36,21 +37,15 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
   }, [])
   const logMenuRef = useRef<HTMLDivElement>(null)
 
-  // Show a one-time hint pulse on the hamburger for new users
   const [showHint, setShowHint] = useState(false)
   useEffect(() => {
-    if (!back && !localStorage.getItem('youxp-nav-opened')) {
-      setShowHint(true)
-    }
+    if (!back && !localStorage.getItem('youxp-nav-opened')) setShowHint(true)
   }, [back])
 
-  // Close log menu on outside click
   useEffect(() => {
     if (!showLogMenu) return
     function handle(e: MouseEvent) {
-      if (logMenuRef.current && !logMenuRef.current.contains(e.target as Node)) {
-        setShowLogMenu(false)
-      }
+      if (logMenuRef.current && !logMenuRef.current.contains(e.target as Node)) setShowLogMenu(false)
     }
     document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
@@ -65,54 +60,55 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
     }
   }
 
-
   return (
     <header
-      className="fixed top-0 left-0 right-0 flex items-center justify-between z-40"
+      className="fixed top-0 right-0 flex items-center justify-between z-40 md:left-16"
       style={{
-        height:               'calc(52px + env(safe-area-inset-top))',
-        paddingTop:           'env(safe-area-inset-top)',
-        paddingLeft:          '12px',
-        paddingRight:         '12px',
-        background:           'var(--nav-bg)',
-        borderBottom:         '1px solid var(--border-faint)',
+        left:        0,
+        height:      'calc(52px + env(safe-area-inset-top))',
+        paddingTop:  'env(safe-area-inset-top)',
+        paddingLeft: '12px', paddingRight: '12px',
+        background:  'var(--nav-bg)',
+        borderBottom: '1px solid var(--border-faint)',
       }}
     >
-      {/* Left */}
-      <div style={{ position: 'relative', width: 36, height: 36, flexShrink: 0 }}>
-        {showHint && (
+      {/* Left — hamburger on mobile, back arrow when back=true, invisible spacer on desktop */}
+      <div
+        style={{ position: 'relative', width: 36, height: 36, flexShrink: 0 }}
+        className={!back ? 'md:invisible' : ''}
+      >
+        {showHint && !back && (
           <span style={{
             position: 'absolute', inset: -4, borderRadius: 12, pointerEvents: 'none',
             border: '2px solid var(--accent)', opacity: 0.7,
             animation: 'pulse-ring 1.5s ease-in-out infinite',
           }} />
         )}
-      <button
-        onClick={handleLeft}
-        aria-label={back ? 'Go back' : 'Open menu'}
-        className="flex items-center justify-center rounded-lg transition-colors"
-        style={{
-          width: 36, height: 36, flexShrink: 0,
-          background: 'none', border: 'none', cursor: 'pointer',
-          color: showHint ? 'var(--accent)' : 'var(--text-secondary)',
-          position: 'relative',
-        }}
-      >
-        {back ? (
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M11 4L6 9L11 14" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        ) : (
-          <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
-            <rect y="0"  width="18" height="2" rx="1" fill="currentColor" />
-            <rect y="6"  width="12" height="2" rx="1" fill="currentColor" />
-            <rect y="12" width="15" height="2" rx="1" fill="currentColor" />
-          </svg>
-        )}
-      </button>
+        <button
+          onClick={handleLeft}
+          aria-label={back ? 'Go back' : 'Open menu'}
+          className="flex items-center justify-center rounded-lg transition-colors"
+          style={{
+            width: 36, height: 36, flexShrink: 0,
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: showHint ? 'var(--accent)' : 'var(--text-secondary)',
+          }}
+        >
+          {back ? (
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M11 4L6 9L11 14" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+              <rect y="0"  width="18" height="2" rx="1" fill="currentColor" />
+              <rect y="6"  width="12" height="2" rx="1" fill="currentColor" />
+              <rect y="12" width="15" height="2" rx="1" fill="currentColor" />
+            </svg>
+          )}
+        </button>
       </div>
 
-      {/* Center — absolutely positioned so it stays centered regardless of side buttons */}
+      {/* Center — absolutely positioned to stay centered */}
       <button
         data-tutorial="topbar-logo"
         onClick={() => logoClickable && navigate('/monthly')}
@@ -120,14 +116,21 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
           background: 'none', border: 'none', padding: 0,
           cursor: logoClickable ? 'pointer' : 'default',
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+          display: 'flex', alignItems: 'center', gap: 7,
         }}
       >
+        {/* Mark only on home/non-title, hidden on desktop (sidebar has it) */}
+        {!title && (
+          <span className="md:hidden">
+            <LogoMark size={20} />
+          </span>
+        )}
         <span
           style={{
             color:         title ? 'var(--text-primary)' : 'var(--accent)',
-            fontSize:      title ? 14 : 18,
+            fontSize:      title ? 14 : 17,
             fontWeight:    700,
-            letterSpacing: title ? '0.08em' : '0.04em',
+            letterSpacing: title ? '0.08em' : '0.02em',
             whiteSpace:    'nowrap',
             transition:    'opacity 0.15s ease',
             position:      'relative',
@@ -137,11 +140,7 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
               animation: 'splashLogoIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 1.8s both',
             } : {}),
           }}
-          onMouseEnter={() => {
-            if (!logoClickable) return
-            setLogoShimmer(true)
-            setLogoShimmerKey(k => k + 1)
-          }}
+          onMouseEnter={() => { if (!logoClickable) return; setLogoShimmer(true); setLogoShimmerKey(k => k + 1) }}
           onMouseLeave={() => setLogoShimmer(false)}
         >
           {logoLabel}
@@ -164,7 +163,6 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
               <path d="M8 3v10M3 8h10" stroke="var(--base-bg)" strokeWidth="2.2" strokeLinecap="round" />
             </svg>
           </button>
-
           {showLogMenu && (
             <div className="pop-in" style={{
               position: 'absolute', top: 44, right: 0, zIndex: 200,
@@ -208,14 +206,8 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
           onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'var(--text-muted)')}
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path
-              d="M9 11.5A2.5 2.5 0 1 0 9 6.5a2.5 2.5 0 0 0 0 5Z"
-              stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
-            />
-            <path
-              d="M14.7 7.3l-.6-1.4.9-1.7-1.2-1.2-1.7.9-1.4-.6L10 1.5H8l-.7 1.8-1.4.6-1.7-.9L3 4.2l.9 1.7-.6 1.4L1.5 8v2l1.8.7.6 1.4-.9 1.7 1.2 1.2 1.7-.9 1.4.6.7 1.8h2l.7-1.8 1.4-.6 1.7.9 1.2-1.2-.9-1.7.6-1.4 1.8-.7V8l-1.8-.7Z"
-              stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
-            />
+            <path d="M9 11.5A2.5 2.5 0 1 0 9 6.5a2.5 2.5 0 0 0 0 5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M14.7 7.3l-.6-1.4.9-1.7-1.2-1.2-1.7.9-1.4-.6L10 1.5H8l-.7 1.8-1.4.6-1.7-.9L3 4.2l.9 1.7-.6 1.4L1.5 8v2l1.8.7.6 1.4-.9 1.7 1.2 1.2 1.7-.9 1.4.6.7 1.8h2l.7-1.8 1.4-.6 1.7.9 1.2-1.2-.9-1.7.6-1.4 1.8-.7V8l-1.8-.7Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
           </svg>
         </button>
       ) : (
