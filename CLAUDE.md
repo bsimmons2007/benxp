@@ -281,7 +281,18 @@ pool_games
 ---
 
 ## Response format
-Always end every response with either `(Merged y)` or `(Merged n)` indicating whether all changes have been merged into `main`.
+Always end every response with a status footer:
+- While changes are unmerged: `(Merged n)`
+- After merging: open the PR via GitHub MCP, merge it, then poll `pull_request_read` → `get_check_runs` every ~15s until Vercel's check run reaches a terminal state (`success`, `failure`, `cancelled`, `timed_out`, `action_required`). Then report: `(Merged y · Vercel: [status])`
+
+## Merge workflow (PR-based — required for Vercel status checks)
+Never push directly to `main`. Always:
+1. Commit changes to a feature branch (use existing `claude/…` branch or create one)
+2. `git push -u origin <branch>`
+3. `mcp__github__create_pull_request` — head: feature branch, base: `main`
+4. `mcp__github__merge_pull_request` — merge_method: `squash`
+5. Poll `mcp__github__pull_request_read` → `get_check_runs` on the PR number until Vercel check is done
+6. Report footer with Vercel status
 
 ---
 
