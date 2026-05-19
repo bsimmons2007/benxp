@@ -42,6 +42,7 @@ const Chess        = lazy(() => import('./pages/Chess').then(m => ({ default: m.
 const Volleyball   = lazy(() => import('./pages/Volleyball').then(m => ({ default: m.Volleyball })))
 const Spikeball    = lazy(() => import('./pages/Spikeball').then(m => ({ default: m.Spikeball })))
 const Pool         = lazy(() => import('./pages/Pool').then(m => ({ default: m.Pool })))
+const Leaderboard  = lazy(() => import('./pages/Leaderboard').then(m => ({ default: m.Leaderboard })))
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
@@ -339,6 +340,7 @@ function AppInner() {
         <Route path="/volleyball"   element={<ProtectedRoute><Volleyball /></ProtectedRoute>} />
         <Route path="/spikeball"    element={<ProtectedRoute><Spikeball /></ProtectedRoute>} />
         <Route path="/pool"         element={<ProtectedRoute><Pool /></ProtectedRoute>} />
+        <Route path="/leaderboard"  element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
       </Routes>
       </Suspense>
       {showNav && <BottomNav />}
