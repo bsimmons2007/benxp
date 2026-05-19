@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase'
 import { getLevelTitle } from '../lib/xp'
 import { useStore } from '../store/useStore'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { validateDisplayName } from '../lib/validation'
 
 /*
   Required Supabase migration (run once in SQL editor):
@@ -66,6 +67,7 @@ export function Leaderboard() {
   const [saving,      setSaving]      = useState(false)
   const [syncing,     setSyncing]     = useState(false)
   const [toast,       setToast]       = useState<string | null>(null)
+  const [nameError,   setNameError]   = useState<string | null>(null)
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -171,7 +173,7 @@ export function Leaderboard() {
                   <input
                     type="text"
                     value={editName}
-                    onChange={e => setEditName(e.target.value)}
+                    onChange={e => { setEditName(e.target.value); setNameError(null) }}
                     placeholder={userName || 'Your name'}
                     maxLength={32}
                     className="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
@@ -179,7 +181,12 @@ export function Leaderboard() {
                   />
                   {ownProfile && editName !== ownProfile.display_name && (
                     <button
-                      onClick={() => saveProfile({ display_name: editName.trim() || userName || 'Anonymous' })}
+                      onClick={() => {
+                        const err = validateDisplayName(editName)
+                        if (err) { setNameError(err); return }
+                        setNameError(null)
+                        saveProfile({ display_name: editName.trim() || userName || 'Anonymous' })
+                      }}
                       disabled={saving}
                       style={{ padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}
                     >
@@ -187,6 +194,7 @@ export function Leaderboard() {
                     </button>
                   )}
                 </div>
+                {nameError && <p style={{ color: '#ef4444', fontSize: 11, marginTop: 4 }}>{nameError}</p>}
               </div>
 
               {/* XP row */}

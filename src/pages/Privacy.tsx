@@ -3,7 +3,7 @@ import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-const EFFECTIVE_DATE = 'April 21, 2026'
+const EFFECTIVE_DATE = 'May 19, 2026'
 const APP_NAME       = 'YouXP'
 const CONTACT_EMAIL  = 'benthejamsimmons@gmail.com'
 
@@ -60,6 +60,7 @@ export function Privacy() {
             <li><strong style={{ color: 'var(--text-primary)' }}>Account info</strong> — your email address, used solely for authentication</li>
             <li><strong style={{ color: 'var(--text-primary)' }}>Activity data</strong> — workouts, cardio sessions, sleep logs, book logs, game stats, and any other entries you create</li>
             <li><strong style={{ color: 'var(--text-primary)' }}>Preferences</strong> — app settings, theme choices, and display name stored locally or in your account</li>
+            <li><strong style={{ color: 'var(--text-primary)' }}>Leaderboard profile</strong> — if you opt in, your chosen display name and total XP are shared on the public leaderboard. This is entirely opt-in and can be removed at any time from the Leaderboard page.</li>
           </ul>
           <p style={{ marginTop: 8 }}>
             We do <strong style={{ color: 'var(--text-primary)' }}>not</strong> collect location data,
@@ -73,6 +74,7 @@ export function Privacy() {
             <li>Display your stats, history, and XP progress within the app</li>
             <li>Sync your data across devices via your account</li>
             <li>Generate your shareable profile card (only when you choose to share)</li>
+            <li>Power the opt-in global leaderboard (display name and XP only, never activity details)</li>
           </ul>
           <p style={{ marginTop: 8 }}>
             We do <strong style={{ color: 'var(--text-primary)' }}>not</strong> use your data for
@@ -106,12 +108,21 @@ export function Privacy() {
               </a>
             </li>
             <li>
+              <strong style={{ color: 'var(--text-primary)' }}>Vercel Analytics</strong> — privacy-first,
+              cookieless page-view analytics used solely to understand aggregate usage (e.g., which pages
+              are visited). No personal data or cross-site tracking. Subject to{' '}
+              <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer"
+                style={{ color: 'var(--accent)' }}>
+                Vercel's Privacy Policy
+              </a>
+            </li>
+            <li>
               <strong style={{ color: 'var(--text-primary)' }}>Google Fonts</strong> — font delivery
               only; no tracking
             </li>
           </ul>
           <p style={{ marginTop: 8 }}>
-            No analytics services, ad networks, or data brokers are used.
+            No ad networks or data brokers are used.
           </p>
         </Section>
 
@@ -139,11 +150,11 @@ export function Privacy() {
           </p>
         </Section>
 
-        <Section title="Children's Privacy">
+        <Section title="Children's Privacy (COPPA)">
           <p>
-            {APP_NAME} is not directed at children under 13. We do not knowingly collect personal
-            information from anyone under 13. If you believe a child has provided us data, contact us
-            and we will delete it promptly.
+            {APP_NAME} is not directed at children under 13. Users must confirm they are 13 or older
+            at account creation. We do not knowingly collect personal information from anyone under 13.
+            If you believe a child has provided us data, contact us and we will delete it promptly.
           </p>
         </Section>
 
