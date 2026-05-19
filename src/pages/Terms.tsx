@@ -3,7 +3,7 @@ import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-const EFFECTIVE_DATE = 'April 21, 2026'
+const EFFECTIVE_DATE = 'May 19, 2026'
 const APP_NAME       = 'YouXP'
 const CONTACT_EMAIL  = 'benthejamsimmons@gmail.com'
 
@@ -84,17 +84,30 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="5. Acceptable Use">
+        <Section title="5. Leaderboard & Public Features">
+          <p>
+            {APP_NAME} offers an opt-in global leaderboard. If you choose to participate:
+          </p>
+          <ul style={{ marginTop: 8, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <li>Your chosen display name and total XP will be visible to other authenticated users</li>
+            <li>Your display name must not impersonate others or contain offensive language</li>
+            <li>You can opt out and remove your profile from the leaderboard at any time</li>
+            <li>Your leaderboard entry is permanently deleted when you delete your account</li>
+          </ul>
+        </Section>
+
+        <Section title="6. Acceptable Use">
           <p>You agree not to:</p>
           <ul style={{ marginTop: 8, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <li>Attempt to access another user's account or data</li>
             <li>Reverse-engineer, scrape, or otherwise misuse the app or its backend</li>
             <li>Use the app for any unlawful purpose</li>
             <li>Upload malicious code or interfere with the service</li>
+            <li>Use offensive, impersonating, or misleading display names on public-facing features</li>
           </ul>
         </Section>
 
-        <Section title="6. Health Disclaimer">
+        <Section title="7. Health Disclaimer">
           <p>
             {APP_NAME} is a personal tracking tool, not a medical or fitness professional. Nothing in
             the app constitutes medical advice. Always consult a qualified health professional before
@@ -102,7 +115,7 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="7. Availability & Changes">
+        <Section title="8. Availability & Changes">
           <p>
             We aim to keep {APP_NAME} running reliably but cannot guarantee uninterrupted access.
             Features may be added, changed, or removed at any time. We'll try to communicate significant
@@ -110,14 +123,14 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="8. Termination">
+        <Section title="9. Termination">
           <p>
             You may delete your account at any time from Settings → Data &amp; Account. We reserve the
             right to suspend accounts that violate these terms.
           </p>
         </Section>
 
-        <Section title="9. Limitation of Liability">
+        <Section title="10. Limitation of Liability">
           <p>
             {APP_NAME} is provided "as is" without warranties of any kind. To the fullest extent
             permitted by law, we are not liable for any indirect, incidental, or consequential damages
@@ -125,7 +138,7 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="10. Contact">
+        <Section title="11. Contact">
           <p>
             Questions about these terms? Email us at{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: 'var(--accent)' }}>

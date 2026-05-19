@@ -13,15 +13,35 @@ interface AuthForm {
   confirm:  string
 }
 
-// ── Friendly Supabase error map ───────────────────────────────
+// ── Friendly Supabase error map (login only — signup always generic) ─────────
 const ERROR_MAP: Record<string, string> = {
   'Invalid login credentials':             'Wrong email or password.',
   'Email not confirmed':                   'Check your inbox to confirm your email first.',
-  'User already registered':               'An account with that email already exists.',
   'Password should be at least 6 characters': 'Password must be at least 8 characters.',
   'signup_disabled':                       'Sign-ups are currently disabled.',
   'invalid_credentials':                   'Wrong email or password.',
   'email_not_confirmed':                   'Check your inbox to confirm your email first.',
+}
+
+// ── Login rate limiting ────────────────────────────────────────
+const RATE_KEY        = 'youxp-login-attempts'
+const LOCKOUT_KEY     = 'youxp-login-lockout'
+const MAX_ATTEMPTS    = 5
+const BASE_LOCKOUT_MS = 30_000
+
+function getAttempts(): number { return parseInt(localStorage.getItem(RATE_KEY) ?? '0', 10) }
+function getLockout():  number { return parseInt(localStorage.getItem(LOCKOUT_KEY) ?? '0', 10) }
+function recordFailure() {
+  const attempts = getAttempts() + 1
+  localStorage.setItem(RATE_KEY, String(attempts))
+  if (attempts >= MAX_ATTEMPTS) {
+    const lockoutMs = BASE_LOCKOUT_MS * Math.pow(2, Math.max(0, attempts - MAX_ATTEMPTS))
+    localStorage.setItem(LOCKOUT_KEY, String(Date.now() + lockoutMs))
+  }
+}
+function clearRateLimit() {
+  localStorage.removeItem(RATE_KEY)
+  localStorage.removeItem(LOCKOUT_KEY)
 }
 
 function friendlyError(msg: string): string {
@@ -104,6 +124,9 @@ export function Login() {
   const [modeKey,     setModeKey]     = useState(0)
   const [demoIdx,     setDemoIdx]     = useState(0)
   const [demoFade,    setDemoFade]    = useState(true)
+  const [agreedToAge, setAgreedToAge] = useState(false)
+  const [lockedUntil, setLockedUntil] = useState<number>(() => getLockout())
+  const [lockTick,    setLockTick]    = useState(0)
 
   const emailRef    = useRef<HTMLInputElement | null>(null)
   const passwordRef = useRef<HTMLInputElement | null>(null)
@@ -148,37 +171,65 @@ export function Login() {
     return () => clearInterval(id)
   }, [])
 
+  // Lockout countdown ticker
+  useEffect(() => {
+    if (lockedUntil <= Date.now()) return
+    const id = setInterval(() => setLockTick(t => t + 1), 1000)
+    return () => clearInterval(id)
+  }, [lockedUntil])
+
   const onSubmit = async (data: AuthForm) => {
     setError(null)
     setResetMsg(null)
 
-    if (mode === 'signup' && data.password !== data.confirm) {
-      setError('Passwords do not match.')
+    // Check lockout before doing anything
+    const lockRemaining = getLockout() - Date.now()
+    if (lockRemaining > 0) {
+      setLockedUntil(getLockout())
       return
+    }
+
+    if (mode === 'signup') {
+      if (data.password !== data.confirm) { setError('Passwords do not match.'); return }
+      if (!agreedToAge) { setError('You must confirm you are 13 or older to create an account.'); return }
     }
 
     await supabase.auth.signOut()
     resetStore()
 
-    const { error: authErr } =
-      mode === 'login'
-        ? await supabase.auth.signInWithPassword({ email: data.email, password: data.password })
-        : await supabase.auth.signUp({
-            email: data.email, password: data.password,
-            options: { data: { name: data.name.trim() } },
-          })
+    if (mode === 'signup') {
+      // Always show generic response — never reveal whether email exists (COPPA/privacy)
+      await supabase.auth.signUp({
+        email: data.email, password: data.password,
+        options: { data: { name: data.name.trim() } },
+      })
+      setSuccess(true)
+      setResetMsg('Check your email to confirm your account and get started.')
+      return
+    }
+
+    const { error: authErr } = await supabase.auth.signInWithPassword({
+      email: data.email, password: data.password,
+    })
 
     if (authErr) {
-      setError(friendlyError(authErr.message))
-      // Clear password and re-focus on failed login
-      if (mode === 'login') {
+      recordFailure()
+      const newLockout = getLockout()
+      setLockedUntil(newLockout)
+      const attempts = getAttempts()
+      if (attempts >= MAX_ATTEMPTS) {
+        const secs = Math.ceil((newLockout - Date.now()) / 1000)
+        setError(`Too many failed attempts. Try again in ${secs}s.`)
+      } else {
+        setError(friendlyError(authErr.message))
         setValue('password', '')
         setTimeout(() => passwordRef.current?.focus(), 50)
       }
     } else {
+      clearRateLimit()
       localStorage.setItem('youxp-remember-me', String(rememberMe))
       if (!rememberMe) {
-        // Clear persisted session so it doesn't survive a browser restart
+        // Move session token to sessionStorage so it doesn't survive browser restart
         const tokenKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
         if (tokenKey) {
           sessionStorage.setItem(tokenKey, localStorage.getItem(tokenKey)!)
@@ -599,6 +650,39 @@ export function Login() {
                 </div>
               )}
 
+              {/* Age gate — signup only */}
+              {mode === 'signup' && (
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: 9, cursor: 'pointer', userSelect: 'none' }}>
+                  <div
+                    onClick={() => setAgreedToAge(v => !v)}
+                    style={{
+                      width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 1,
+                      border: `1.5px solid ${agreedToAge ? 'var(--accent)' : 'var(--border)'}`,
+                      background: agreedToAge ? 'var(--accent)' : 'var(--input-bg)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'background 0.15s ease, border-color 0.15s ease',
+                    }}
+                  >
+                    {agreedToAge && (
+                      <svg className="check-pop" width="10" height="8" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4L3.5 6.5L9 1" stroke="var(--base-bg)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  <span style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    I confirm I am 13 years of age or older and agree to the{' '}
+                    <button type="button" onClick={e => { e.stopPropagation(); window.open('/terms', '_blank') }}
+                      style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: 0, fontSize: 'inherit' }}>
+                      Terms of Service
+                    </button>{' '}and{' '}
+                    <button type="button" onClick={e => { e.stopPropagation(); window.open('/privacy', '_blank') }}
+                      style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: 0, fontSize: 'inherit' }}>
+                      Privacy Policy
+                    </button>.
+                  </span>
+                </label>
+              )}
+
               {/* Remember me — login only */}
               {mode === 'login' && (
                 <label style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', userSelect: 'none' }}>
@@ -622,8 +706,27 @@ export function Login() {
                 </label>
               )}
 
+              {/* Lockout banner */}
+              {lockedUntil > Date.now() && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 9,
+                  padding: '10px 14px', borderRadius: 10,
+                  background: 'rgba(245,158,11,0.10)',
+                  border: '1px solid rgba(245,158,11,0.25)',
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#f59e0b" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <rect x="5" y="9" width="10" height="8" rx="1.5" /><path d="M7 9V6a3 3 0 0 1 6 0v3" />
+                  </svg>
+                  <p style={{ color: '#f59e0b', fontSize: 13, margin: 0 }}>
+                    Too many attempts. Try again in {Math.max(0, Math.ceil((lockedUntil - Date.now()) / 1000))}s.
+                    {/* lockTick used to trigger re-render each second */}
+                    <span style={{ display: 'none' }}>{lockTick}</span>
+                  </p>
+                </div>
+              )}
+
               {/* Error banner */}
-              {(error || errors.password) && (
+              {(error || errors.password) && lockedUntil <= Date.now() && (
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 9,
                   padding: '10px 14px', borderRadius: 10,
@@ -640,7 +743,7 @@ export function Login() {
               {/* Submit button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || lockedUntil > Date.now()}
                 style={{
                   width: '100%', padding: '13px 0', marginTop: 2, borderRadius: 13, border: 'none',
                   background: 'var(--accent)', color: 'var(--base-bg)', fontSize: 14, fontWeight: 700, letterSpacing: '0.04em',
