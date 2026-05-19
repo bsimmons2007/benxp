@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
@@ -107,7 +108,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
               <Input label="Duration (min)" type="number" placeholder="95" className="flex-1" {...register('duration_mins')} />
               <div className="flex flex-col gap-1 flex-1">
                 <label className="section-label">Difficulty</label>
-                <select {...register('difficulty')} className="px-3 py-2.5 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
+                <select {...register('difficulty')} className="px-3 py-2.5 rounded-lg outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                   {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
                 </select>
               </div>
@@ -221,7 +222,7 @@ export function Hiking() {
 
         {sessions.length > 0 && (
           <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(132,204,22,0.07)', border: '1px solid rgba(132,204,22,0.2)' }}>
-            <span style={{ fontSize: 13, color: '#888' }}>{sessions.length} hike{sessions.length !== 1 ? 's' : ''}</span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{sessions.length} hike{sessions.length !== 1 ? 's' : ''}</span>
             {longestHike !== null && (
               <span style={{ fontSize: 13, fontWeight: 700, color: ACCENT }}>
                 Longest {longestHike.toFixed(1)} mi
@@ -234,24 +235,24 @@ export function Hiking() {
 
         {/* Monthly miles chart */}
         {chartData.length >= 2 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Miles / Month</p>
+          <Card className="mb-4">
+            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Miles / Month</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={chartData} barSize={24}>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="month" tick={{ fill: '#555', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#555', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
                 <Tooltip contentStyle={ttStyle} formatter={(v: number) => [`${v} mi`, 'Miles']} />
                 <Bar dataKey="miles" fill={ACCENT} fillOpacity={0.8} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* History */}
         {sessions.length > 0 && <p className="section-label mb-3">Hike Log</p>}
         {sessions.map(h => (
-          <div key={h.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
+          <Card key={h.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
             <div className="flex items-center gap-3 min-w-0">
               <div style={{
                 width: 38, height: 38, borderRadius: 10, flexShrink: 0,
@@ -263,7 +264,7 @@ export function Hiking() {
               </div>
               <div className="min-w-0">
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.trail}</p>
-                <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
                   {formatDate(h.date)}
                   {h.difficulty && <span style={{ marginLeft: 6, color: diffColor(h.difficulty) }}>{h.difficulty}</span>}
                   {h.duration_mins && <span style={{ marginLeft: 6 }}>{fmtDuration(h.duration_mins)}</span>}
@@ -274,17 +275,17 @@ export function Hiking() {
               <div style={{ textAlign: 'right' }}>
                 <p style={{ fontSize: 17, fontWeight: 800, color: ACCENT, lineHeight: 1 }}>
                   {Number(h.distance_miles).toFixed(1)}
-                  <span style={{ fontSize: 11, fontWeight: 400, color: '#555', marginLeft: 2 }}>mi</span>
+                  <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 2 }}>mi</span>
                 </p>
                 {h.elevation_gain_ft != null && (
-                  <p style={{ fontSize: 11, color: '#666', marginTop: 1 }}>↑ {h.elevation_gain_ft.toLocaleString()} ft</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>↑ {h.elevation_gain_ft.toLocaleString()} ft</p>
                 )}
               </div>
               <button onClick={() => setEditing(h)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
-          </div>
+          </Card>
         ))}
 
         {sessions.length === 0 && (

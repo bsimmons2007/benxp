@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { EmptyState } from '../components/ui/EmptyState'
 import { TrophyIcon, SearchIcon, DumbbellIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
@@ -31,13 +32,10 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
   const max = ranked[0].est1rm
 
   return (
-    <div
-      className="rounded-xl mb-4 overflow-hidden"
-      style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', padding: '16px' }}
-    >
+    <Card className="mb-4 overflow-hidden">
       <div className="flex items-center gap-2 mb-3">
         <TrophyIcon size={13} color="var(--text-muted)" />
-        <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#888' }}>
+        <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
           Best Lift Ranking
         </p>
       </div>
@@ -52,10 +50,10 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
                     {RANK_LABELS[i] ?? `#${i + 1}`}
                   </span>
                   <DumbbellIcon size={14} color="var(--text-secondary)" />
-                  <span className="text-sm font-semibold text-white">{r.lift}</span>
+                  <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{r.lift}</span>
                 </div>
                 <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>
-                  {r.est1rm.toFixed(0)} <span style={{ color: '#888', fontSize: 11, fontWeight: 400 }}>lbs</span>
+                  {r.est1rm.toFixed(0)} <span style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 400 }}>lbs</span>
                 </span>
               </div>
               <div style={{ height: 6, background: 'var(--input-bg)', borderRadius: 999, overflow: 'hidden' }}>
@@ -63,7 +61,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
                   height: '100%', width: `${pct}%`, borderRadius: 999,
                   background: i === 0
                     ? 'linear-gradient(90deg, var(--accent), #ffd700)'
-                    : 'rgba(255,255,255,0.15)',
+                    : 'var(--border-default)',
                   transition: 'width 0.6s ease',
                 }} />
               </div>
@@ -71,7 +69,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
           )
         })}
       </div>
-    </div>
+    </Card>
   )
 }
 
@@ -138,7 +136,7 @@ export function PRFeed() {
 
         {/* PR count */}
         {!loading && (
-          <p className="text-xs mb-3" style={{ color: '#555' }}>
+          <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>
             {filtered.length} PR{filtered.length !== 1 ? 's' : ''} total
           </p>
         )}
@@ -161,9 +159,7 @@ export function PRFeed() {
                   key={pr.id}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl"
                   style={{
-                    background: isBest && i < 5
-                      ? 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)'
-                      : 'var(--card-bg)',
+                    background: isBest && i < 5 ? 'var(--surface-2)' : 'var(--surface-1)',
                     border: isBest && i < 5
                       ? '1px solid var(--border)'
                       : '1px solid var(--border-faint)',
@@ -174,7 +170,7 @@ export function PRFeed() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white text-sm">{pr.lift}</span>
+                      <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{pr.lift}</span>
                       {isBest && (
                         <span
                           className="text-xs font-bold px-1.5 py-0.5 rounded"
@@ -184,11 +180,11 @@ export function PRFeed() {
                         </span>
                       )}
                     </div>
-                    <span style={{ color: '#555', fontSize: 11 }}>{formatDate(pr.date)}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>{formatDate(pr.date)}</span>
                   </div>
                   <span className="font-bold text-lg" style={{ color: 'var(--accent)' }}>
                     {pr.est_1rm.toFixed(0)}
-                    <span style={{ color: '#444', fontSize: 11, fontWeight: 400, marginLeft: 3 }}>lbs</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 400, marginLeft: 3 }}>lbs</span>
                   </span>
                 </div>
               )

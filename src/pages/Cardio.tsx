@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
@@ -233,22 +234,22 @@ function EditSessionModal({ session, onClose, onSaved }: { session: Session; onC
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-base font-medium" style={labelStyle}>Miles</label>
-          <input type="number" step="0.01" value={miles} onChange={e => setMiles(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={inputStyle} />
+          <input type="number" step="0.01" value={miles} onChange={e => setMiles(e.target.value)} className="px-3 py-3 rounded-lg outline-none text-base" style={{ ...inputStyle, color: 'var(--text-primary)' }} />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-base font-medium" style={labelStyle}>Duration (mins)</label>
-          <input type="number" value={mins} onChange={e => setMins(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={inputStyle} />
+          <input type="number" value={mins} onChange={e => setMins(e.target.value)} className="px-3 py-3 rounded-lg outline-none text-base" style={{ ...inputStyle, color: 'var(--text-primary)' }} />
         </div>
         {session.source === 'skate' && (
           <div className="flex flex-col gap-1">
             <label className="text-base font-medium" style={labelStyle}>Fastest Mile (min/mi)</label>
-            <input type="number" step="0.01" value={fastest} onChange={e => setFastest(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={inputStyle} />
+            <input type="number" step="0.01" value={fastest} onChange={e => setFastest(e.target.value)} className="px-3 py-3 rounded-lg outline-none text-base" style={{ ...inputStyle, color: 'var(--text-primary)' }} />
           </div>
         )}
         {session.source === 'cardio' && (
           <div className="flex flex-col gap-1">
             <label className="text-base font-medium" style={labelStyle}>Notes</label>
-            <input type="text" value={notes} onChange={e => setNotes(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={inputStyle} />
+            <input type="text" value={notes} onChange={e => setNotes(e.target.value)} className="px-3 py-3 rounded-lg outline-none text-base" style={{ ...inputStyle, color: 'var(--text-primary)' }} />
           </div>
         )}
       </div>
@@ -354,7 +355,7 @@ export function Cardio() {
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-lg font-bold" style={{ color: 'var(--accent)' }}>
-                {s.value}{s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: '#888' }}>{s.unit}</span>}
+                {s.value}{s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: 'var(--text-tertiary)' }}>{s.unit}</span>}
               </p>
               <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
             </div>
@@ -363,7 +364,7 @@ export function Cardio() {
 
         {/* Cardio streak */}
         {!streak.loading && (streak.cardioCurrent > 0 || streak.cardioLongest > 0) && (
-          <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="flex items-center justify-between mb-4" style={{ padding: '12px 16px' }}>
             <div>
               <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Cardio Streak</p>
               <p style={{ fontSize: 22, fontWeight: 700, color: streak.cardioCurrent > 0 ? '#3b82f6' : 'var(--text-muted)', lineHeight: 1.2 }}>
@@ -378,12 +379,12 @@ export function Cardio() {
                 </p>
               </div>
             )}
-          </div>
+          </Card>
         )}
 
         {/* Cardio PRs */}
         {(fastestMileVal !== null || longestRun !== null || mostMilesWeek !== null) && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Personal Records</p>
             <div className="grid grid-cols-3 gap-2">
               {fastestMileVal !== null && (
@@ -408,7 +409,7 @@ export function Cardio() {
                 </div>
               )}
             </div>
-          </div>
+          </Card>
         )}
 
         <LogCardioPanel onLogged={load} />
@@ -438,7 +439,7 @@ export function Cardio() {
           <ChartEmptyState title="Distance Trend" message="Log your first session to start building your trend chart" color="#3b82f6" />
         )}
         {!chartLoading && chartData.length > 0 && chartData.length < 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-2" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Distance Trend</p>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
               {chartData.map(d => (
@@ -451,12 +452,12 @@ export function Cardio() {
             <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
               Log {3 - chartData.length} more session{3 - chartData.length > 1 ? 's' : ''} to unlock your trend chart
             </p>
-          </div>
+          </Card>
         )}
         {!chartLoading && chartData.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-1" style={{ fontSize: 15 }}>Distance Trend</p>
-            <p className="text-xs mb-3" style={{ color: '#888' }}>Avg {avgMiles.toFixed(1)} mi/session</p>
+          <Card className="mb-4">
+            <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Distance Trend</p>
+            <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>Avg {avgMiles.toFixed(1)} mi/session</p>
             <ResponsiveContainer width="100%" height={150}>
               <AreaChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
@@ -465,9 +466,9 @@ export function Cardio() {
                     <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
-                <YAxis domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.25)]} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.25)]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
                 <Tooltip
                   contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -480,19 +481,19 @@ export function Cardio() {
                 <Area type="monotone" dataKey="miles" stroke="#3b82f6" strokeWidth={2.5} fill="url(#cardio-grad)" dot={{ fill: '#3b82f6', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#3b82f6', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* Session history */}
         {filtered.length > 0 ? (
-          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="px-4 pt-4 pb-2 font-bold text-white" style={{ fontSize: 15 }}>Sessions</p>
+          <Card noPadding className="overflow-hidden">
+            <p className="px-4 pt-4 pb-2 font-bold" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Sessions</p>
             {filtered.map(s => {
               const pace = s.duration_mins && s.distance ? (s.duration_mins / s.distance).toFixed(1) : null
               return (
                 <div key={`${s.source}-${s.id}`} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
                   <div>
-                    <p className="text-white text-sm font-semibold flex items-center gap-1.5">
+                    <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
                       <ActivityIconComp activityKey={s.activity} size={14} color="var(--text-secondary)" />
                       {s.distance.toFixed(2)} mi
                       {s.fastest_mile && (
@@ -500,9 +501,9 @@ export function Cardio() {
                           <ZapIcon size={11} color="#2ECC71" /> {s.fastest_mile.toFixed(2)} min/mi
                         </span>
                       )}
-                      {pace && !s.fastest_mile && <span className="ml-1 text-xs font-normal" style={{ color: '#888' }}>{pace} min/mi</span>}
+                      {pace && !s.fastest_mile && <span className="ml-1 text-xs font-normal" style={{ color: 'var(--text-muted)' }}>{pace} min/mi</span>}
                     </p>
-                    <p className="text-xs mt-0.5" style={{ color: '#888' }}>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                       {formatDate(s.date)}
                       {s.duration_mins ? ` · ${s.duration_mins}min` : ''}
                       {s.notes ? ` · ${s.notes}` : ''}
@@ -529,9 +530,9 @@ export function Cardio() {
                 </div>
               )
             })}
-          </div>
+          </Card>
         ) : (
-          <p className="text-center py-8" style={{ color: '#555' }}>
+          <p className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
             {sessions.length === 0 ? 'No sessions yet.' : 'No sessions for this activity.'}
           </p>
         )}

@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
@@ -156,8 +157,8 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
                 {...register('course', { required: true })}
                 onFocus={() => setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                className="px-3 py-3 rounded-lg text-white outline-none text-base w-full"
-                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}
+                className="px-3 py-3 rounded-lg outline-none text-base w-full"
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
               />
               {showSuggestions && savedCourses.length > 0 && (
                 <div className="absolute top-full left-0 right-0 z-20 rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', marginTop: 2, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
@@ -180,7 +181,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
             <div className="flex gap-3">
               <div className="flex flex-col gap-1 flex-1">
                 <label className="section-label">Holes</label>
-                <select {...register('holes')} className="px-3 py-2.5 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
+                <select {...register('holes')} className="px-3 py-2.5 rounded-lg outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                   <option value="9">9</option>
                   <option value="18">18</option>
                 </select>
@@ -339,9 +340,9 @@ export function Golf() {
         {/* Summary bar */}
         {rounds.length > 0 && (
           <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(52,211,153,0.07)', border: `1px solid rgba(52,211,153,0.2)` }}>
-            <span style={{ fontSize: 13, color: '#888' }}>{rounds.length} round{rounds.length !== 1 ? 's' : ''}</span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{rounds.length} round{rounds.length !== 1 ? 's' : ''}</span>
             <div className="flex items-center gap-4">
-              {fwyPct !== null && <span style={{ fontSize: 13, color: '#888' }}>FWY {fwyPct}%</span>}
+              {fwyPct !== null && <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>FWY {fwyPct}%</span>}
               {latestWithFwy?.putts != null && <span style={{ fontSize: 13, color: ACCENT, fontWeight: 700 }}>{latestWithFwy.putts} putts</span>}
             </div>
           </div>
@@ -351,14 +352,14 @@ export function Golf() {
 
         {/* Score vs Par trend */}
         {chartData.length >= 2 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-1" style={{ fontSize: 15 }}>Score vs Par</p>
+          <Card className="mb-4">
+            <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Score vs Par</p>
             <p className="section-label mb-3">Lower is better · green = under par</p>
             <ResponsiveContainer width="100%" height={140}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: '#555', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#555', fontSize: 9 }} axisLine={false} tickLine={false} width={24}
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={24}
                   tickFormatter={v => vsParLabel(v)} />
                 <ReferenceLine y={0} stroke="rgba(245,166,35,0.4)" strokeDasharray="4 4" />
                 <Tooltip
@@ -372,7 +373,7 @@ export function Golf() {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* Round history */}
@@ -380,10 +381,10 @@ export function Golf() {
         {rounds.map(r => {
           const diff = r.score - r.par
           return (
-            <div
+            <Card
               key={r.id}
-              className="flex items-center justify-between px-4 py-3 rounded-xl mb-2"
-              style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}
+              className="flex items-center justify-between mb-2"
+              style={{ padding: '12px 16px' }}
             >
               <div className="flex items-center gap-3">
                 <div style={{
@@ -393,11 +394,11 @@ export function Golf() {
                 }}>
                   {diff <= 0
                     ? <TrophyIcon size={16} color={ACCENT} />
-                    : <GolfIcon size={16} color="#555" />}
+                    : <GolfIcon size={16} color="var(--text-muted)" />}
                 </div>
                 <div>
                   <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>{r.course}</p>
-                  <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
                     {formatDate(r.date)} · {r.holes}H
                     {r.putts != null && <span style={{ marginLeft: 6 }}>{r.putts} putts</span>}
                   </p>
@@ -417,7 +418,7 @@ export function Golf() {
                   <p style={{ fontSize: 18, fontWeight: 800, color: vsParColor(diff), lineHeight: 1 }}>
                     {vsParLabel(diff)}
                   </p>
-                  <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{r.score} / {r.par}</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{r.score} / {r.par}</p>
                 </div>
                 <button
                   onClick={() => setEditing(r)}
@@ -426,7 +427,7 @@ export function Golf() {
                   <EditIcon size={13} color="var(--text-muted)" />
                 </button>
               </div>
-            </div>
+            </Card>
           )
         })}
 

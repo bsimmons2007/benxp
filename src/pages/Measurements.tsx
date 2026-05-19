@@ -116,12 +116,12 @@ function SnapshotStat({
   const delta = prev != null ? latest - prev : null
   return (
     <div className="flex flex-col">
-      <p style={{ color: '#444', fontSize: 10, marginBottom: 2 }}>{label}</p>
+      <p style={{ color: 'var(--text-tertiary)', fontSize: 10, marginBottom: 2 }}>{label}</p>
       <p className="font-bold" style={{ color: 'var(--accent)', fontSize: 16 }}>
-        {latest.toFixed(1)}<span style={{ color: '#444', fontSize: 10, marginLeft: 2 }}>{unit}</span>
+        {latest.toFixed(1)}<span style={{ color: 'var(--text-tertiary)', fontSize: 10, marginLeft: 2 }}>{unit}</span>
       </p>
       {delta != null && (
-        <p style={{ fontSize: 10, color: delta < 0 ? '#4ade80' : delta > 0 ? '#f87171' : '#888', marginTop: 1 }}>
+        <p style={{ fontSize: 10, color: delta < 0 ? '#4ade80' : delta > 0 ? '#f87171' : 'var(--text-muted)', marginTop: 1 }}>
           {delta > 0 ? '+' : ''}{delta.toFixed(1)}
         </p>
       )}
@@ -228,7 +228,7 @@ export function Measurements() {
                   <div className="grid grid-cols-2 gap-2">
                     {group.fields.map(f => (
                       <div key={f.key}>
-                        <p style={{ color: '#888', fontSize: 11, marginBottom: 3 }}>{f.label} <span style={{ color: '#555' }}>({f.unit})</span></p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 11, marginBottom: 3 }}>{f.label} <span style={{ color: 'var(--text-tertiary)' }}>({f.unit})</span></p>
                         <Input
                           type="number"
                           step="0.1"
@@ -243,7 +243,7 @@ export function Measurements() {
               ))}
 
               <div className="mb-4">
-                <p style={{ color: '#888', fontSize: 11, marginBottom: 3 }}>Notes</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11, marginBottom: 3 }}>Notes</p>
                 <Input placeholder="Optional notes…" {...register('notes')} style={{ width: '100%' }} />
               </div>
 
@@ -295,8 +295,8 @@ export function Measurements() {
                     onClick={() => setActiveChart(o.key)}
                     className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
                     style={{
-                      background: activeChart === o.key ? 'var(--accent)' : 'var(--input-bg)',
-                      color:      activeChart === o.key ? 'var(--base-bg)' : '#888',
+                      background: activeChart === o.key ? 'var(--accent)' : 'var(--surface-2)',
+                      color:      activeChart === o.key ? 'var(--base-bg)' : 'var(--text-muted)',
                     }}
                   >
                     {o.label}
@@ -312,7 +312,7 @@ export function Measurements() {
               {rows.map((row, i) => (
                 <Card key={row.id} className="card-animate">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="font-semibold text-sm text-white">{formatDate(row.date)}</p>
+                    <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{formatDate(row.date)}</p>
                     {i === 0 && (
                       <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: 'var(--accent-dim)', color: 'var(--accent)' }}>Latest</span>
                     )}
@@ -328,14 +328,14 @@ export function Measurements() {
                     ]
                       .filter(f => row[f.key] != null)
                       .map(f => (
-                        <span key={f.key} style={{ color: '#888', fontSize: 12 }}>
-                          <span style={{ color: '#444' }}>{f.label} </span>
+                        <span key={f.key} style={{ color: 'var(--text-muted)', fontSize: 12 }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>{f.label} </span>
                           <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{(row[f.key] as number).toFixed(1)}</span>
-                          <span style={{ color: '#555', fontSize: 10 }}>{f.unit}</span>
+                          <span style={{ color: 'var(--text-tertiary)', fontSize: 10 }}>{f.unit}</span>
                         </span>
                       ))}
                   </div>
-                  {row.notes && <p className="mt-1.5 text-xs italic" style={{ color: '#555' }}>{row.notes}</p>}
+                  {row.notes && <p className="mt-1.5 text-xs italic" style={{ color: 'var(--text-muted)' }}>{row.notes}</p>}
                 </Card>
               ))}
             </div>

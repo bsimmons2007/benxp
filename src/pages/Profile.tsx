@@ -313,8 +313,8 @@ function BadgeTile({ badge }: { badge: Badge }) {
         width: 56, height: 56, borderRadius: 14,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: badge.earned
-          ? 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)'
-          : 'rgba(255,255,255,0.03)',
+          ? 'var(--surface-1)'
+          : 'var(--surface-0)',
         border: badge.earned
           ? '1px solid var(--border)'
           : '1px solid var(--border-faint)',
@@ -332,7 +332,7 @@ function BadgeTile({ badge }: { badge: Badge }) {
         <div style={{
           position: 'absolute', bottom: 'calc(100% + 8px)', left: '50%',
           transform: 'translateX(-50%)',
-          background: 'rgba(10,10,20,0.95)',
+          background: 'var(--card-bg)',
           border: '1px solid var(--border)',
           borderRadius: 8, padding: '6px 10px',
           whiteSpace: 'nowrap', zIndex: 50,
@@ -340,7 +340,7 @@ function BadgeTile({ badge }: { badge: Badge }) {
           boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
         }}>
           <p style={{ color: 'var(--text-primary)', fontSize: 12, fontWeight: 700, marginBottom: 2 }}>{badge.name}</p>
-          <p style={{ color: '#888', fontSize: 10 }}>{badge.description}</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>{badge.description}</p>
           {badge.earned && badge.earnedDate && (
             <p style={{ color: 'var(--accent)', fontSize: 9, marginTop: 2 }}>
               Earned {badge.earnedDate}
@@ -424,9 +424,9 @@ function ActivityHeatmap() {
 
   function cellBg(date: string | null): string {
     if (!date)        return 'transparent'
-    if (date > today) return 'rgba(255,255,255,0.03)'
+    if (date > today) return 'var(--border-subtle)'
     const n = counts[date] ?? 0
-    if (n === 0) return 'rgba(255,255,255,0.07)'
+    if (n === 0) return 'var(--border-subtle)'
     if (n === 1) return 'rgba(245,166,35,0.30)'
     if (n === 2) return 'rgba(245,166,35,0.55)'
     if (n === 3) return 'rgba(245,166,35,0.75)'
@@ -448,13 +448,13 @@ function ActivityHeatmap() {
           {year} Activity
         </p>
         {loaded && (
-          <p style={{ color: '#555', fontSize: 11 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>
             {Object.keys(counts).length} active days
           </p>
         )}
       </div>
       {!loaded ? (
-        <p style={{ color: '#555', fontSize: 12 }}>Loading…</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>Loading…</p>
       ) : (
         <div style={{ overflowX: 'auto', paddingBottom: 4 }}>
           <div style={{ display: 'block', width: 'fit-content', margin: '0 auto' }}>
@@ -464,7 +464,7 @@ function ActivityHeatmap() {
                 const mc = monthCols.find(m => m.col === wi)
                 return (
                   <div key={wi} style={{ width: CELL + GAP, flexShrink: 0, position: 'relative' }}>
-                    {mc && <span style={{ fontSize: 8, color: '#444', userSelect: 'none', position: 'absolute', whiteSpace: 'nowrap' }}>{mc.label}</span>}
+                    {mc && <span style={{ fontSize: 8, color: 'var(--text-muted)', userSelect: 'none', position: 'absolute', whiteSpace: 'nowrap' }}>{mc.label}</span>}
                   </div>
                 )
               })}
@@ -498,7 +498,7 @@ function ActivityHeatmap() {
       {/* Legend */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, justifyContent: 'flex-end' }}>
         <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>Less</span>
-        {['rgba(255,255,255,0.07)','rgba(245,166,35,0.30)','rgba(245,166,35,0.55)','rgba(245,166,35,0.75)','rgba(245,166,35,0.95)'].map((bg, i) => (
+        {['var(--border-subtle)','rgba(245,166,35,0.30)','rgba(245,166,35,0.55)','rgba(245,166,35,0.75)','rgba(245,166,35,0.95)'].map((bg, i) => (
           <div key={i} style={{ width: CELL, height: CELL, borderRadius: 2, background: bg }} />
         ))}
         <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>More</span>
@@ -754,7 +754,7 @@ export function Profile() {
               </div>
               <span style={{
                 fontSize: 32, fontWeight: 900,
-                color: consistencyScore >= 70 ? '#4ade80' : consistencyScore >= 40 ? 'var(--accent)' : '#888', lineHeight: 1,
+                color: consistencyScore >= 70 ? '#4ade80' : consistencyScore >= 40 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1,
               }}>
                 {consistencyScore}%
               </span>
@@ -768,7 +768,7 @@ export function Profile() {
                   ? 'linear-gradient(90deg, #16a34a, #4ade80)'
                   : consistencyScore >= 40
                   ? 'linear-gradient(90deg, var(--accent), #fbbf24)'
-                  : 'rgba(255,255,255,0.2)',
+                  : 'var(--border-default)',
                 transition: 'width 0.8s ease',
               }} />
             </div>
@@ -803,7 +803,7 @@ export function Profile() {
           <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)',
             letterSpacing: '-0.015em', marginBottom: 12 }}>Skill Mastery</p>
           {skillsLoading ? (
-            <p style={{ color: '#444', fontSize: 13 }}>Loading skills…</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Loading skills…</p>
           ) : (
             <div className="flex flex-col gap-2">
               {skills.map(s => <SkillCard key={s.key} skill={s} />)}
@@ -813,13 +813,13 @@ export function Profile() {
 
         {/* Badges by category */}
         {loading ? (
-          <p style={{ color: '#444', textAlign: 'center', paddingTop: 20 }}>Loading badges…</p>
+          <p style={{ color: 'var(--text-muted)', textAlign: 'center', paddingTop: 20 }}>Loading badges…</p>
         ) : (
           byCategory.map(({ cat, label, items, earnedCount }) => (
             <Card key={cat} className="mb-3">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-white text-sm">{label}</h3>
-                <span style={{ color: earnedCount === items.length ? 'var(--accent)' : '#555', fontSize: 11 }}>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{label}</h3>
+                <span style={{ color: earnedCount === items.length ? 'var(--accent)' : 'var(--text-muted)', fontSize: 11 }}>
                   {earnedCount}/{items.length}
                 </span>
               </div>

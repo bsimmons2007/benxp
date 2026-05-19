@@ -103,7 +103,7 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
           <button
             type="button"
             onClick={() => { setQuery(''); onChange('', false); setOpen(true) }}
-            style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#555', fontSize: 14 }}
+            style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 14 }}
           >✕</button>
         )}
       </div>
@@ -128,12 +128,12 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
                   style={{
                     padding: '3px 10px', borderRadius: 12, fontSize: 11, cursor: 'pointer',
                     background: activeGrp === g ? 'var(--accent)' : 'var(--input-bg)',
-                    color: activeGrp === g ? 'var(--base-bg)' : '#888',
+                    color: activeGrp === g ? 'var(--base-bg)' : 'var(--text-muted)',
                     border: 'none',
                     fontWeight: activeGrp === g ? 700 : 400,
                   }}
                 >
-                  <MuscleGroupIcon group={g} color={activeGrp === g ? 'var(--base-bg)' : '#888'} /> {g}
+                  <MuscleGroupIcon group={g} color={activeGrp === g ? 'var(--base-bg)' : 'var(--text-muted)'} /> {g}
                 </button>
               ))}
             </div>
@@ -150,7 +150,7 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
                   + Use "{query}" as custom exercise
                 </button>
               ) : (
-                <p style={{ color: '#555', fontSize: 12 }}>Select a group or type to search</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>Select a group or type to search</p>
               )}
             </div>
           )}
@@ -304,7 +304,7 @@ function ExerciseRow({
             style={{
               background: isTimed ? 'rgba(245,166,35,0.15)' : 'var(--input-bg)',
               border: isTimed ? '1px solid rgba(245,166,35,0.4)' : '1px solid var(--border)',
-              color: isTimed ? 'var(--accent)' : '#555',
+              color: isTimed ? 'var(--accent)' : 'var(--text-muted)',
               borderRadius: 6, padding: '3px 8px', fontSize: 10, fontWeight: 700,
               cursor: 'pointer', letterSpacing: '0.06em',
             }}
@@ -315,7 +315,7 @@ function ExerciseRow({
             <button
               type="button"
               onClick={onRemove}
-              style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 2 }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 2 }}
             >
               ✕
             </button>
@@ -364,7 +364,7 @@ function ExerciseRow({
 
         {/* Sets */}
         <div>
-          <label style={{ display: 'block', color: '#444', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Sets</label>
+          <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Sets</label>
           <input
             type="number" placeholder="3"
             value={entry.sets}
@@ -386,7 +386,7 @@ function ExerciseRow({
               style={{ ...FIELD_STYLE, borderColor: 'rgba(245,166,35,0.3)' }}
             />
             {entry.duration && parseDuration(entry.duration) > 0 && (
-              <p style={{ color: '#555', fontSize: 10, marginTop: 2 }}>{fmtDuration(parseDuration(entry.duration))}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 10, marginTop: 2 }}>{fmtDuration(parseDuration(entry.duration))}</p>
             )}
           </div>
         ) : (
@@ -404,10 +404,10 @@ function ExerciseRow({
 
         {/* RPE */}
         <div>
-          <label style={{ display: 'block', color: '#444', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             RPE
             <span title="Rate of Perceived Exertion — how hard the set felt on a scale of 1–10. 6 = easy, 8 = 2 reps left in tank, 10 = absolute max effort."
-              style={{ marginLeft: 5, cursor: 'help', color: '#555', fontSize: 11, fontStyle: 'normal' }}>ⓘ</span>
+              style={{ marginLeft: 5, cursor: 'help', color: 'var(--text-muted)', fontSize: 11, fontStyle: 'normal' }}>ⓘ</span>
           </label>
           <input
             type="number" step="0.5" min="1" max="10" placeholder="8 (optional)"
@@ -417,7 +417,7 @@ function ExerciseRow({
             onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
             onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
           />
-          <p style={{ fontSize: 9, color: '#444', marginTop: 3 }}>1–10 · How hard did that feel? (e.g. 8 = 2 reps left)</p>
+          <p style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 3 }}>1–10 · How hard did that feel? (e.g. 8 = 2 reps left)</p>
         </div>
       </div>
     </div>
@@ -698,7 +698,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
 
       {open && (
         <form onSubmit={handleSubmit}>
-          <div className="mt-3 rounded-2xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mt-3 pop-in">
             {/* Date */}
             <div style={{ marginBottom: 16 }}>
               <label className="section-label" style={{ display: 'block', marginBottom: 6 }}>Workout Date</label>
@@ -732,7 +732,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
               style={{
                 width: '100%', marginTop: 10, padding: '10px', borderRadius: 10,
                 background: 'var(--input-bg)', border: '1px dashed var(--border)',
-                color: '#555', fontSize: 13, cursor: 'pointer', transition: 'all 0.15s ease',
+                color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', transition: 'all 0.15s ease',
               }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(245,166,35,0.4)'; e.currentTarget.style.color = 'var(--accent)' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)' }}
@@ -749,10 +749,10 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
                   width: '100%', marginTop: 8, padding: '6px', borderRadius: 8,
                   background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#555', fontSize: 12, transition: 'color 0.15s',
+                  color: 'var(--text-muted)', fontSize: 12, transition: 'color 0.15s',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#555')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
               >
                 <BookmarkIcon size={12} /> Save as Template
               </button>
@@ -787,7 +787,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                   style={{
                     padding: '8px 14px', borderRadius: 8, flexShrink: 0,
                     background: tmplName.trim() ? 'var(--accent)' : 'var(--input-bg)',
-                    color: tmplName.trim() ? '#1A1A2E' : '#555', border: 'none',
+                    color: tmplName.trim() ? '#1A1A2E' : 'var(--text-muted)', border: 'none',
                     fontSize: 12, fontWeight: 700, cursor: tmplName.trim() ? 'pointer' : 'not-allowed',
                   }}
                 >Save</button>
@@ -797,7 +797,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                   style={{
                     width: 32, height: 32, borderRadius: 8, flexShrink: 0,
                     background: 'var(--input-bg)', border: '1px solid var(--border)',
-                    color: '#555', cursor: 'pointer', fontSize: 13,
+                    color: 'var(--text-muted)', cursor: 'pointer', fontSize: 13,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                 >✕</button>
@@ -831,7 +831,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                 {submitting ? 'Logging…' : `Log ${entries.filter(e => e.liftName).length || ''} Exercise${entries.filter(e => e.liftName).length !== 1 ? 's' : ''}`}
               </button>
             </div>
-          </div>
+          </Card>
         </form>
       )}
 
@@ -1261,7 +1261,7 @@ export function Records() {
 
         {/* ── Gym streak banner ── */}
         {!streak.loading && (streak.gymCurrent > 0 || streak.gymLongest > 0) && (
-          <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="flex items-center justify-between mb-4" style={{ padding: '12px 16px' }}>
             <div>
               <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Gym Streak</p>
               <p style={{ fontSize: 22, fontWeight: 700, color: streak.gymCurrent > 0 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1.2 }}>
@@ -1276,7 +1276,7 @@ export function Records() {
                 </p>
               </div>
             )}
-          </div>
+          </Card>
         )}
 
         {/* ── Tab switcher ── */}

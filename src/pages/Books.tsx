@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, Tooltip } from 'recharts'
 import { useForm } from 'react-hook-form'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
@@ -176,7 +177,7 @@ function Stars({ rating }: { rating: number | null }) {
           ★
         </span>
       ))}
-      <span className="ml-1 text-xs" style={{ color: '#888' }}>{rating.toFixed(1)}</span>
+      <span className="ml-1 text-xs" style={{ color: 'var(--text-muted)' }}>{rating.toFixed(1)}</span>
     </span>
   )
 }
@@ -315,7 +316,7 @@ function EditBookModal({ book, onClose, onSaved }: { book: Book; onClose: () => 
               style={{
                 flex: 1, padding: '10px 0', fontSize: 13, fontWeight: 600,
                 background: finished === val ? 'var(--accent)' : 'transparent',
-                color: finished === val ? 'var(--base-bg)' : '#888',
+                color: finished === val ? 'var(--base-bg)' : 'var(--text-muted)',
                 border: 'none', cursor: 'pointer', transition: 'all 0.15s',
               }}
             >
@@ -351,19 +352,19 @@ function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () =
   return (
     <>
       <div className="rounded-xl p-4 mb-3 card-animate" style={{
-        background: 'rgba(16,24,52,0.7)',
-        border: '1px solid rgba(245,166,35,0.25)',
+        background: 'var(--surface-1)',
+        border: '1px solid var(--accent-dim)',
         boxShadow: '0 0 20px rgba(245,166,35,0.08)',
       }}>
         <div className="flex items-start gap-3">
           {/* Reading indicator */}
           <div style={{ width: 4, borderRadius: 2, alignSelf: 'stretch', background: 'var(--accent)', flexShrink: 0 }} />
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-white leading-tight" style={{ fontSize: 15 }}>{book.title}</p>
+            <p className="font-bold leading-tight" style={{ fontSize: 15, color: 'var(--text-primary)' }}>{book.title}</p>
             {book.author && <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>{book.author}</p>}
             <div className="flex items-center gap-2 mt-2">
               <GenreChip genre={book.genre} />
-              {book.pages && <span style={{ color: '#444', fontSize: 11 }}>{book.pages} pp</span>}
+              {book.pages && <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>{book.pages} pp</span>}
             </div>
           </div>
           <div className="flex flex-col gap-2 flex-shrink-0">
@@ -413,7 +414,7 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
         <div className="flex items-start justify-between gap-3">
           <div className="w-1 rounded-full flex-shrink-0 self-stretch" style={{ background: GENRE_COLORS[book.genre ?? ''] ?? '#555', minHeight: 40 }} />
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-white leading-tight" style={{ fontSize: 15 }}>{book.title}</p>
+            <p className="font-bold leading-tight" style={{ fontSize: 15, color: 'var(--text-primary)' }}>{book.title}</p>
             {book.author && <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>{book.author}</p>}
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <GenreChip genre={book.genre} />
@@ -421,8 +422,8 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
             </div>
           </div>
           <div className="flex flex-col items-end gap-1 flex-shrink-0">
-            {book.date_finished && <p className="text-xs" style={{ color: '#888' }}>{formatDate(book.date_finished)}</p>}
-            {book.pages && <p className="text-xs" style={{ color: '#444' }}>{book.pages} pp</p>}
+            {book.date_finished && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{formatDate(book.date_finished)}</p>}
+            {book.pages && <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{book.pages} pp</p>}
             <button onClick={e => { e.stopPropagation(); setEditing(true) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer', marginTop: 4 }}>
               <EditIcon size={13} color="var(--text-muted)" />
             </button>
@@ -439,8 +440,8 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
                 { label: 'Finished', value: book.date_finished ? formatDate(book.date_finished) : '—' },
               ].map(item => (
                 <div key={item.label}>
-                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#444' }}>{item.label}</p>
-                  <p className="text-white">{item.value}</p>
+                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>{item.label}</p>
+                  <p style={{ color: 'var(--text-primary)' }}>{item.value}</p>
                 </div>
               ))}
             </div>
@@ -527,7 +528,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
       </button>
 
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mt-3 pop-in">
           <FirstUseTip formKey="books" tip="Add books you're currently reading too — mark them finished later to earn +250 XP. Genre tags power the breakdown chart." />
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 
@@ -539,7 +540,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
                   <div style={{
                     padding: '10px 0', fontSize: 13, fontWeight: 600,
                     background: status === s ? 'var(--accent)' : 'transparent',
-                    color: status === s ? 'var(--base-bg)' : '#888',
+                    color: status === s ? 'var(--base-bg)' : 'var(--text-muted)',
                     transition: 'all 0.15s ease',
                   }}>
                     {s === 'reading' ? 'Currently Reading' : '✓ Finished'}
@@ -575,7 +576,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
               {isSubmitting ? 'Saving…' : status === 'reading' ? 'Start Reading' : 'Log Finished Book'}
             </Button>
           </form>
-        </div>
+        </Card>
       )}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </div>
@@ -625,7 +626,8 @@ function ToReadSection() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl p-4 mb-4 pop-in flex flex-col gap-3" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mb-4 pop-in">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
           <Input label="Title" type="text" {...register('title', { required: true })} />
           <Input label="Author" type="text" {...register('author')} />
           <div className="flex gap-2">
@@ -639,27 +641,28 @@ function ToReadSection() {
           </div>
           <Button type="submit" fullWidth>Add to List</Button>
         </form>
+        </Card>
       )}
 
       <div className="flex flex-col gap-2">
         {books.map(b => (
-          <div key={b.id} className="flex items-center justify-between px-4 py-3 rounded-xl card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
+          <Card key={b.id} className="flex items-center justify-between card-animate" style={{ padding: '12px 16px' }}>
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-1.5 h-8 rounded-full flex-shrink-0" style={{ background: b.priority ? PRIORITY_COLORS[b.priority] : '#555' }} />
               <div className="min-w-0">
-                <p className="text-white font-medium text-sm truncate">{b.title}</p>
-                {b.author && <p className="text-xs truncate" style={{ color: '#888' }}>{b.author}</p>}
+                <p className="font-medium text-sm truncate" style={{ color: 'var(--text-primary)' }}>{b.title}</p>
+                {b.author && <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{b.author}</p>}
               </div>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0 ml-2">
               {b.priority && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: PRIORITY_COLORS[b.priority], color: 'var(--text-primary)' }}>{b.priority}</span>
               )}
-              <button onClick={() => remove(b.id)} style={{ color: '#444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <button onClick={() => remove(b.id)} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
-          </div>
+          </Card>
         ))}
-        {books.length === 0 && <p className="text-sm py-2" style={{ color: '#888' }}>No books in list yet.</p>}
+        {books.length === 0 && <p className="text-sm py-2" style={{ color: 'var(--text-muted)' }}>No books in list yet.</p>}
       </div>
     </div>
   )
@@ -753,7 +756,7 @@ export function Books() {
 
         {/* Genre breakdown */}
         {genreBreakdown.length > 1 && (
-          <div className="rounded-xl p-4 mb-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-5">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Genre Breakdown</p>
             <div className="flex items-center gap-4">
 
@@ -798,7 +801,7 @@ export function Books() {
                 ))}
               </div>
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Add book */}
@@ -828,7 +831,7 @@ export function Books() {
         {/* Genre filter */}
         {finished.length > 0 && (
           <>
-            <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: '#444' }}>
+            <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: 'var(--text-tertiary)' }}>
               Finished ({finished.length})
             </p>
             <div className="flex gap-2 overflow-x-auto pb-1 mb-3" style={{ scrollbarWidth: 'none' }}>
@@ -848,7 +851,7 @@ export function Books() {
 
             <div className="flex items-center justify-between mb-4 gap-2">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold" style={{ color: '#888' }}>{sorted.length} books</p>
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>{sorted.length} books</p>
                 {hasSeries && (
                   <button
                     onClick={() => setGroupBySeries(g => !g)}
@@ -867,7 +870,7 @@ export function Books() {
                 value={sort}
                 onChange={e => setSort(e.target.value as SortKey)}
                 className="text-sm px-3 py-1.5 rounded-lg outline-none"
-                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: '#CCCCCC' }}
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
               >
                 {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
               </select>

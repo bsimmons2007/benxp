@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
@@ -103,7 +104,7 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
-              <span className="font-semibold" style={{ color: isWin ? ACCENT : '#888', fontSize: 13 }}>
+              <span className="font-semibold" style={{ color: isWin ? ACCENT : 'var(--text-muted)', fontSize: 13 }}>
                 {isWin ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TrophyIcon size={14} color={ACCENT} /> Win</span> : 'Loss'}
               </span>
             </div>
@@ -187,7 +188,7 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
-              <span className="font-semibold" style={{ color: isWin ? ACCENT : '#888', fontSize: 13 }}>
+              <span className="font-semibold" style={{ color: isWin ? ACCENT : 'var(--text-muted)', fontSize: 13 }}>
                 {isWin ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TrophyIcon size={14} color={ACCENT} /> Win</span> : 'Loss'}
               </span>
             </div>
@@ -260,7 +261,7 @@ function EditVBModal({ session, onClose, onSaved }: { session: VolleyballSession
           <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? ACCENT : 'var(--border)' }}>
             <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: win ? 'translateX(26px)' : 'translateX(2px)' }} />
           </div>
-          <span className="font-medium text-white">Win</span>
+          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Win</span>
         </div>
       </div>
     </EditModal>
@@ -342,7 +343,7 @@ export function Volleyball() {
 
         {games.length > 0 && (
           <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: `${ACCENT}10`, border: `1px solid ${ACCENT}30` }}>
-            <span style={{ fontSize: 13, color: '#888' }}>{games.length} games</span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{games.length} games</span>
             <div className="flex items-center gap-4">
               <span style={{ fontSize: 14, fontWeight: 700, color: ACCENT }}>{wins}W</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: '#f87171' }}>{losses}L</span>
@@ -355,25 +356,25 @@ export function Volleyball() {
 
         {/* Chart */}
         {chartData.length >= 2 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Monthly Record</p>
+          <Card className="mb-4">
+            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Monthly Record</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={chartData} barGap={4}>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="month" tick={{ fill: '#666', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis allowDecimals={false} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
-                <Tooltip contentStyle={ttStyle} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
+                <Tooltip contentStyle={ttStyle} cursor={{ fill: 'var(--border-subtle)' }} />
                 <Bar dataKey="wins"   name="Wins"   fill={ACCENT}   fillOpacity={0.85} radius={[4, 4, 0, 0]} />
                 <Bar dataKey="losses" name="Losses" fill="#f87171"  fillOpacity={0.7}  radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* History */}
         {games.length > 0 && <p className="section-label mb-3">History</p>}
         {games.map(g => (
-          <div key={g.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
+          <Card key={g.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
             <div className="flex items-center gap-3">
               <div style={{
                 width: 36, height: 36, borderRadius: 10, flexShrink: 0,
@@ -382,11 +383,11 @@ export function Volleyball() {
               }}>
                 {g.win
                   ? <TrophyIcon size={16} color={ACCENT} />
-                  : <VolleyballIcon size={16} color="#555" />}
+                  : <VolleyballIcon size={16} color="var(--text-muted)" />}
               </div>
               <div>
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>{formatDate(g.date)}</p>
-                <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
                   {g.format === 'Indoor'
                     ? (g.sets_won != null && g.sets_lost != null ? `${g.sets_won}—${g.sets_lost} sets` : 'Indoor')
                     : (g.partner ? `w/ ${g.partner}` : 'Sand')}
@@ -408,7 +409,7 @@ export function Volleyball() {
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
-          </div>
+          </Card>
         ))}
 
         {games.length === 0 && (

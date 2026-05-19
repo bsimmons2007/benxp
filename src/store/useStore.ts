@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 import { calculateLevel, levelProgress, fetchXPAndStats, getCachedXPData, setCachedXPData, getCachedXPTimestamp } from '../lib/xp'
-import type { AppStats } from '../lib/xp'
+import type { AppStats, RawActivityData } from '../lib/xp'
 import { supabase } from '../lib/supabase'
 import { invalidateStreakCache } from '../hooks/useStreak'
 import { invalidateBadgeCache } from '../hooks/useAchievements'
 
-export type { AppStats }
+export type { AppStats, RawActivityData }
 
 const LS_LEVEL_KEY = 'youxp-last-seen-level'
 
@@ -125,6 +125,7 @@ interface AppState {
 
   // Shared data
   stats:          AppStats
+  rawRows:        RawActivityData | null
   recentActivity: ActivityEntry[]
 
   // Cache metadata
@@ -153,6 +154,7 @@ export const useStore = create<AppState>((set, get) => ({
   userName:       '',
   avatarUrl:      null,
   stats:          DEFAULT_STATS,
+  rawRows:        null,
   recentActivity: [],
   lastUpdated:    getCachedXPTimestamp(),
   initialized:    false,
@@ -175,6 +177,7 @@ export const useStore = create<AppState>((set, get) => ({
     userName:       '',
     avatarUrl:      null,
     stats:          DEFAULT_STATS,
+    rawRows:        null,
     recentActivity: [],
     lastUpdated:    null,
     initialized:    false,
@@ -202,7 +205,7 @@ export const useStore = create<AppState>((set, get) => ({
     }
 
     try {
-      const [{ totalXP, stats }, userData, recentActivity] = await Promise.all([
+      const [{ totalXP, stats, rawRows }, userData, recentActivity] = await Promise.all([
         fetchXPAndStats(supabase),
         fetchUser(),
         fetchActivity(),
@@ -222,6 +225,7 @@ export const useStore = create<AppState>((set, get) => ({
         _initializing:  false,
         levelUpPending: level > lastSeen ? level : null,
         stats,
+        rawRows,
         recentActivity,
         lastUpdated:    now,
         ...userData,
@@ -236,7 +240,7 @@ export const useStore = create<AppState>((set, get) => ({
   /** XP + stats refresh — called after logging any activity. */
   refreshXP: async () => {
     try {
-      const { totalXP, stats } = await fetchXPAndStats(supabase)
+      const { totalXP, stats, rawRows } = await fetchXPAndStats(supabase)
       setCachedXPData({ totalXP, stats })
       const level    = calculateLevel(totalXP)
       const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10) || 1
@@ -246,6 +250,7 @@ export const useStore = create<AppState>((set, get) => ({
         progress:    levelProgress(totalXP),
         loading:     false,
         stats,
+        rawRows,
         lastUpdated: Date.now(),
         ...(level > lastSeen ? { levelUpPending: level } : {}),
       })

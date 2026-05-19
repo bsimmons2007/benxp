@@ -156,40 +156,40 @@ export function Monthly() {
         {/* Month navigator */}
         <div className="flex items-center justify-between mb-5">
           <button onClick={prevMonth} style={{ color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: '4px 8px' }}>‹</button>
-          <p className="font-semibold text-white">{MONTH_NAMES[month]} {year}</p>
+          <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>{MONTH_NAMES[month]} {year}</p>
           <button
             onClick={nextMonth}
             disabled={isCurrentMonth}
-            style={{ color: isCurrentMonth ? '#444' : 'var(--accent)', background: 'none', border: 'none', cursor: isCurrentMonth ? 'default' : 'pointer', fontSize: 20, padding: '4px 8px' }}
+            style={{ color: isCurrentMonth ? 'var(--text-disabled)' : 'var(--accent)', background: 'none', border: 'none', cursor: isCurrentMonth ? 'default' : 'pointer', fontSize: 20, padding: '4px 8px' }}
           >›</button>
         </div>
 
         {loading ? (
-          <p style={{ color: '#666', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
+          <p style={{ color: 'var(--text-muted)', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
         ) : !data || data.xpEarned === 0 ? (
           <Card>
-            <p className="text-center text-sm py-4" style={{ color: '#666' }}>No activity logged this month.</p>
+            <p className="text-center text-sm py-4" style={{ color: 'var(--text-muted)' }}>No activity logged this month.</p>
           </Card>
         ) : (
           <>
             {/* XP hero */}
             <Card className="mb-4 text-center" goldBorder>
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#888' }}>XP Earned</p>
+              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>XP Earned</p>
               <p className="text-5xl font-bold" style={{ color: 'var(--accent)' }}>
                 +{parseInt(animatedXP).toLocaleString()}
               </p>
-              <p className="text-xs mt-1" style={{ color: '#666' }}>{MONTH_NAMES[month]} {year}</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{MONTH_NAMES[month]} {year}</p>
             </Card>
 
             {/* Stat highlights grid */}
             {data.highlights.length > 0 && (
               <div className="grid grid-cols-3 gap-2 mb-4">
                 {data.highlights.map(h => (
-                  <div key={h.label} className="card-animate rounded-xl p-3" style={{ background: 'var(--card-bg)', border: h.accent ? '1px solid var(--accent)' : '1px solid var(--border)', boxShadow: h.accent ? '0 0 16px var(--accent-dim)' : '0 4px 16px rgba(0,0,0,0.15)' }}>
+                  <div key={h.label} className="card-animate rounded-xl p-3" style={{ background: 'var(--surface-1)', border: h.accent ? '1px solid var(--accent)' : '1px solid var(--border-default)', boxShadow: h.accent ? '0 0 16px var(--accent-dim)' : 'var(--shadow-sm)' }}>
                     <div style={{ marginBottom: 4 }}>{h.icon}</div>
                     <p style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 700, lineHeight: 1 }}>{h.value}</p>
-                    <p style={{ color: '#aaa', fontSize: 10, marginTop: 2 }}>{h.label}</p>
-                    {h.sub && <p style={{ color: '#666', fontSize: 9, marginTop: 1 }}>{h.sub}</p>}
+                    <p style={{ color: 'var(--text-muted)', fontSize: 10, marginTop: 2 }}>{h.label}</p>
+                    {h.sub && <p style={{ color: 'var(--text-tertiary)', fontSize: 9, marginTop: 1 }}>{h.sub}</p>}
                   </div>
                 ))}
               </div>
@@ -198,12 +198,12 @@ export function Monthly() {
             {/* Top moments */}
             {data.topMoments.length > 0 && (
               <Card className="mb-4">
-                <h3 className="font-semibold text-white text-sm mb-3" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><StarIcon size={14} color="var(--accent)" /> Top Moments</h3>
+                <h3 className="font-semibold text-sm mb-3" style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-primary)' }}><StarIcon size={14} color="var(--accent)" /> Top Moments</h3>
                 <div className="flex flex-col gap-2.5">
                   {data.topMoments.map((m, i) => (
                     <div key={i} className="flex items-center gap-3 slide-in" style={{ animationDelay: `${i * 0.06}s` }}>
                       <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>{m.icon}</span>
-                      <span className="text-sm text-white">{m.text}</span>
+                      <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{m.text}</span>
                     </div>
                   ))}
                 </div>
@@ -213,11 +213,11 @@ export function Monthly() {
             {/* PR list */}
             {data.newPRs.length > 0 && (
               <Card className="mb-4">
-                <h3 className="font-semibold text-white text-sm mb-3">Personal Records</h3>
+                <h3 className="font-semibold text-sm mb-3" style={{ color: 'var(--text-primary)' }}>Personal Records</h3>
                 <div className="flex flex-col gap-2">
                   {data.newPRs.map((pr, i) => (
                     <div key={i} className="flex items-center justify-between">
-                      <span className="text-sm text-white">{pr.lift}</span>
+                      <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{pr.lift}</span>
                       <span className="font-bold text-sm" style={{ color: 'var(--accent)' }}>{pr.est_1rm.toFixed(0)} lbs</span>
                     </div>
                   ))}
@@ -228,11 +228,11 @@ export function Monthly() {
             {/* Books */}
             {data.booksRead.length > 0 && (
               <Card>
-                <h3 className="font-semibold text-white text-sm mb-3">Books Finished</h3>
+                <h3 className="font-semibold text-sm mb-3" style={{ color: 'var(--text-primary)' }}>Books Finished</h3>
                 {data.booksRead.map((b, i) => (
                   <div key={i} className="flex items-center gap-2 py-1">
                     <span style={{ color: 'var(--accent)' }}>✓</span>
-                    <span className="text-sm text-white">{b.title}</span>
+                    <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{b.title}</span>
                   </div>
                 ))}
               </Card>

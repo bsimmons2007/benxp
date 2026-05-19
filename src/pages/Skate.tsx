@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { today, formatDate, formatDateTooltip } from '../lib/utils'
@@ -167,7 +168,7 @@ export function Skate() {
               <p className="section-label">{s.label}</p>
               <p className="text-lg font-bold" style={{ color: 'var(--accent)' }}>
                 {s.value}
-                {s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: '#888' }}>{s.unit}</span>}
+                {s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: 'var(--text-muted)' }}>{s.unit}</span>}
               </p>
             </div>
           ))}
@@ -183,9 +184,9 @@ export function Skate() {
           </div>
         )}
         {milesTrend.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-1" style={{ fontSize: 15 }}>Miles per Session</p>
-            <p className="text-xs mb-3" style={{ color: '#888' }}>
+          <Card className="mb-4">
+            <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Miles per Session</p>
+            <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>
               Avg {avgMiles.toFixed(1)} mi/session
             </p>
             <ResponsiveContainer width="100%" height={150}>
@@ -196,9 +197,9 @@ export function Skate() {
                     <stop offset="100%" stopColor="var(--accent)" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
-                <YAxis domain={['auto', 'auto']} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis domain={['auto', 'auto']} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
                 <Tooltip
                   contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -212,14 +213,14 @@ export function Skate() {
               </AreaChart>
             </ResponsiveContainer>
             <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>── avg</p>
-          </div>
+          </Card>
         )}
 
         {/* Fastest mile trend */}
         {fastestTrend.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-1" style={{ fontSize: 15 }}>Fastest Mile Trend</p>
-            <p className="text-xs mb-3" style={{ color: '#888' }}>Lower is faster</p>
+          <Card className="mb-4">
+            <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Fastest Mile Trend</p>
+            <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>Lower is faster</p>
             <ResponsiveContainer width="100%" height={150}>
               <AreaChart data={fastestTrend} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
@@ -228,9 +229,9 @@ export function Skate() {
                     <stop offset="100%" stopColor="#2ECC71" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
-                <YAxis domain={['auto', 'auto']} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={35} />
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis domain={['auto', 'auto']} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={35} />
                 <Tooltip
                   contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -244,7 +245,7 @@ export function Skate() {
               </AreaChart>
             </ResponsiveContainer>
             {fastestMile && <p className="text-xs mt-1" style={{ color: '#2ECC71' }}>── PR {fastestMile.toFixed(2)} min/mi</p>}
-          </div>
+          </Card>
         )}
 
         {sessions.length === 0 && (
@@ -257,12 +258,12 @@ export function Skate() {
 
         {/* Session history */}
         {sessions.length > 0 && (
-          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="px-4 pt-4 pb-2 font-bold text-white" style={{ fontSize: 15 }}>Sessions</p>
+          <Card noPadding className="overflow-hidden">
+            <p className="px-4 pt-4 pb-2 font-bold" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Sessions</p>
             {sessions.map((s) => (
               <div key={s.id} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
                 <div>
-                  <p className="text-white text-sm font-semibold">
+                  <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
                     {s.miles.toFixed(2)} mi
                     {s.fastest_mile && (
                       <span className="ml-2 flex items-center gap-1 text-xs font-normal" style={{ color: '#2ECC71' }}>
@@ -270,7 +271,7 @@ export function Skate() {
                       </span>
                     )}
                   </p>
-                  <p className="text-xs mt-0.5" style={{ color: '#888' }}>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                     {formatDate(s.date)}{s.duration ? ` · ${s.duration}` : ''}
                   </p>
                 </div>
@@ -287,7 +288,7 @@ export function Skate() {
                 </div>
               </div>
             ))}
-          </div>
+          </Card>
         )}
 
         {editing && (
