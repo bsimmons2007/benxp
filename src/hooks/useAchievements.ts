@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { useMemo } from 'react'
 import { useStore } from '../store/useStore'
 
 export interface Badge {
@@ -460,88 +459,47 @@ function cacheHit(xp: number): boolean {
 export function useAchievements() {
   const totalXP     = useStore(s => s.totalXP)
   const level       = useStore(s => s.level)
+  const rawRows     = useStore(s => s.rawRows)
   const initialized = useStore(s => s.initialized)
 
-  const [badges, setBadges]   = useState<Badge[]>(cacheHit(totalXP) ? badgeCache!.badges : [])
-  const [loading, setLoading] = useState(!cacheHit(totalXP))
-  // Local revision mirror so the effect re-runs when the cache is busted
-  const [rev, setRev] = useState(badgeCacheRevision)
+  return useMemo(() => {
+    if (!initialized || !rawRows) {
+      return { badges: [], earned: [], unearned: [], loading: true }
+    }
 
-  useEffect(() => {
-    if (!initialized) return
-    // Sync rev to the current module-level value on every render cycle
-    // so that external invalidation triggers a re-fetch
-    if (rev !== badgeCacheRevision) setRev(badgeCacheRevision)
-  })
-
-  useEffect(() => {
-    if (!initialized) return
     if (cacheHit(totalXP)) {
-      setBadges(badgeCache!.badges)
-      setLoading(false)
-      return
+      const badges   = badgeCache!.badges
+      const earned   = badges.filter(b => b.earned)
+      const unearned = badges.filter(b => !b.earned && !b.secret)
+      return { badges, earned, unearned, loading: false }
     }
 
-    let cancelled = false
-    async function load() {
-      const [
-        lifting, prs, skate, books, games, sleep, challenges,
-        basketball, pickleball, golf, discGolf, hiking,
-        tableTennis, chess, pool, volleyball, spikeball, cardio,
-      ] = await Promise.all([
-        supabase.from('lifting_log').select('date, lift, est_1rm, weight, sets, reps').order('created_at', { ascending: false }),
-        supabase.from('pr_history').select('lift, est_1rm, date'),
-        supabase.from('skate_sessions').select('miles, date').order('created_at', { ascending: false }),
-        supabase.from('books').select('date_finished, title').not('date_finished', 'is', null).order('created_at', { ascending: false }),
-        supabase.from('fortnite_games').select('date, kills, win, accuracy').order('created_at', { ascending: false }),
-        supabase.from('sleep_log').select('date, hours_slept').order('created_at', { ascending: false }),
-        supabase.from('challenges').select('status, xp_reward'),
-        supabase.from('basketball_sessions').select('date, points, fg_made, fg_attempted'),
-        supabase.from('pickleball_games').select('date, win'),
-        supabase.from('golf_rounds').select('date, score, par, holes'),
-        supabase.from('disc_golf_rounds').select('date, score, par, holes'),
-        supabase.from('hiking_sessions').select('date, distance_miles, elevation_gain_ft, difficulty'),
-        supabase.from('table_tennis_games').select('date, win, my_score, opp_score'),
-        supabase.from('chess_games').select('date, result, rating_after, opening'),
-        supabase.from('pool_games').select('date, win, break_and_run'),
-        supabase.from('volleyball_sessions').select('date, win, format, kills'),
-        supabase.from('spikeball_games').select('date, win'),
-        supabase.from('cardio_sessions').select('date, distance_miles, activity'),
-      ])
-      if (cancelled) return
+    const badges = evaluate({
+      liftingRows:   rawRows.liftingRows,
+      prRows:        rawRows.prRows,
+      skateRows:     rawRows.skateRows,
+      bookRows:      rawRows.bookRows,
+      gameRows:      rawRows.gameRows,
+      sleepRows:     rawRows.sleepRows,
+      challengeRows: rawRows.challengeRows,
+      bbRows:        rawRows.bbRows,
+      pbRows:        rawRows.pbRows,
+      golfRows:      rawRows.golfRows,
+      dgRows:        rawRows.dgRows,
+      hikeRows:      rawRows.hikeRows,
+      ttRows:        rawRows.ttRows,
+      chessRows:     rawRows.chessRows,
+      poolRows:      rawRows.poolRows,
+      vbRows:        rawRows.vbRows,
+      sbRows:        rawRows.sbRows,
+      cardioRows:    rawRows.cardioRows,
+      totalXP,
+      level,
+    })
 
-      const result = evaluate({
-        liftingRows:   lifting.data    ?? [],
-        prRows:        prs.data        ?? [],
-        skateRows:     skate.data      ?? [],
-        bookRows:      books.data      ?? [],
-        gameRows:      games.data      ?? [],
-        sleepRows:     sleep.data      ?? [],
-        challengeRows: challenges.data ?? [],
-        bbRows:        basketball.data ?? [],
-        pbRows:        pickleball.data ?? [],
-        golfRows:      golf.data       ?? [],
-        dgRows:        discGolf.data   ?? [],
-        hikeRows:      hiking.data     ?? [],
-        ttRows:        tableTennis.data ?? [],
-        chessRows:     chess.data      ?? [],
-        poolRows:      pool.data       ?? [],
-        vbRows:        volleyball.data ?? [],
-        sbRows:        spikeball.data  ?? [],
-        cardioRows:    cardio.data     ?? [],
-        totalXP,
-        level,
-      })
-
-      badgeCache = { xp: totalXP, rev: badgeCacheRevision, ts: Date.now(), badges: result }
-      setBadges(result)
-      setLoading(false)
-    }
-    load()
-    return () => { cancelled = true }
-  }, [initialized, totalXP, level, rev])
-
-  const earned   = badges.filter(b => b.earned)
-  const unearned = badges.filter(b => !b.earned && !b.secret)
-  return { badges, earned, unearned, loading }
+    badgeCache = { xp: totalXP, rev: badgeCacheRevision, ts: Date.now(), badges }
+    const earned   = badges.filter(b => b.earned)
+    const unearned = badges.filter(b => !b.earned && !b.secret)
+    return { badges, earned, unearned, loading: false }
+  }, [initialized, rawRows, totalXP, level])
 }

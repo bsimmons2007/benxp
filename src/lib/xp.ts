@@ -132,6 +132,29 @@ export interface AppStats {
   latestBodyFat: number | null
 }
 
+/** Raw rows from the 22-table fetch — shared with useStreak and useAchievements to eliminate duplicate queries. */
+export interface RawActivityData {
+  liftingRows:   { date: string; lift: string; est_1rm: number | null; weight: number | null; sets: number | null; reps: number | null }[]
+  prRows:        { lift: string; est_1rm: number; date: string }[]
+  skateRows:     { miles: number; date: string }[]
+  bookRows:      { date_finished: string | null; title: string }[]
+  gameRows:      { date: string; kills: number; win: boolean; mode?: string | null; accuracy?: number | null }[]
+  challengeRows: { status: string; xp_reward: number }[]
+  sleepRows:     { date: string; hours_slept: number | null }[]
+  cardioRows:    { date: string; distance_miles: number; activity: string }[]
+  bbRows:        { date: string; points: number; fg_made: number; fg_attempted: number }[]
+  pbRows:        { date: string; win: boolean }[]
+  golfRows:      { date: string; score: number; par: number; holes: number }[]
+  dgRows:        { date: string; score: number; par: number; holes: number }[]
+  hikeRows:      { date: string; distance_miles: number; elevation_gain_ft: number | null; difficulty: string | null }[]
+  ttRows:        { date: string; win: boolean; my_score: number | null; opp_score: number | null }[]
+  chessRows:     { date: string; result: string; rating_after: number | null; opening: string | null }[]
+  poolRows:      { date: string; win: boolean; break_and_run: boolean }[]
+  vbRows:        { date: string; win: boolean; format: string; kills: number | null }[]
+  sbRows:        { date: string; win: boolean }[]
+  moodRows:      { date: string }[]
+}
+
 // ── localStorage cache (stale-while-revalidate) ──────────────────
 const XP_CACHE_KEY = 'youxp-xp-cache-v2'
 const XP_CACHE_TTL = 5 * 60 * 1000
@@ -159,34 +182,33 @@ export function getCachedXPTimestamp(): number | null {
   } catch { return null }
 }
 
-/**
- * Single 7-query fetch that computes both totalXP and stats.
- * Previously these were two separate fetch calls (7 + 4 queries) with 4 overlapping tables.
+/** Fetch XP, stats, and raw activity rows in one parallel batch.
+ *  Raw rows are shared with useStreak and useAchievements to eliminate ~35 duplicate queries per session.
  */
-export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ totalXP: number; stats: AppStats }> {
+export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ totalXP: number; stats: AppStats; rawRows: RawActivityData }> {
   const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess, volleyball, spikeball, pool] = await Promise.all([
-    supabase.from('lifting_log').select('date'),
-    supabase.from('skate_sessions').select('miles'),
-    supabase.from('pr_history').select('lift, est_1rm'),
-    supabase.from('books').select('date_finished').not('date_finished', 'is', null),
-    supabase.from('fortnite_games').select('win, kills, mode'),
-    supabase.from('challenges').select('xp_reward').eq('status', 'completed'),
+    supabase.from('lifting_log').select('date, lift, est_1rm, weight, sets, reps'),
+    supabase.from('skate_sessions').select('miles, date'),
+    supabase.from('pr_history').select('lift, est_1rm, date'),
+    supabase.from('books').select('date_finished, title').not('date_finished', 'is', null),
+    supabase.from('fortnite_games').select('win, kills, mode, date, accuracy'),
+    supabase.from('challenges').select('status, xp_reward'),
     supabase.from('sleep_log').select('hours_slept, date').eq('is_nap', false),
-    supabase.from('cardio_sessions').select('distance_miles, activity'),
+    supabase.from('cardio_sessions').select('distance_miles, activity, date'),
     supabase.from('goals').select('xp_reward').eq('status', 'completed'),
-    supabase.from('mood_log').select('rating, date'),
+    supabase.from('mood_log').select('date, rating'),
     supabase.from('body_measurements').select('date, weight_lbs, body_fat_pct').order('date', { ascending: false }).limit(1),
     supabase.from('water_log').select('date, oz'),
-    supabase.from('basketball_sessions').select('points'),
-    supabase.from('pickleball_games').select('win'),
-    supabase.from('golf_rounds').select('score, par'),
-    supabase.from('disc_golf_rounds').select('score, par'),
-    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft'),
-    supabase.from('table_tennis_games').select('win'),
-    supabase.from('chess_games').select('result'),
-    supabase.from('volleyball_sessions').select('win'),
-    supabase.from('spikeball_games').select('win'),
-    supabase.from('pool_games').select('win, break_and_run'),
+    supabase.from('basketball_sessions').select('points, date, fg_made, fg_attempted'),
+    supabase.from('pickleball_games').select('win, date'),
+    supabase.from('golf_rounds').select('score, par, date, holes'),
+    supabase.from('disc_golf_rounds').select('score, par, date, holes'),
+    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft, date, difficulty'),
+    supabase.from('table_tennis_games').select('win, date, my_score, opp_score'),
+    supabase.from('chess_games').select('result, date, rating_after, opening'),
+    supabase.from('volleyball_sessions').select('win, date, format, kills'),
+    supabase.from('spikeball_games').select('win, date'),
+    supabase.from('pool_games').select('win, break_and_run, date'),
   ])
 
   // ── XP ──────────────────────────────────────────────────────
@@ -207,7 +229,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     const winXP   = r.win ? (isBlitz ? XP_RATES.fortnite_blitz_win : XP_RATES.fortnite_win) : 0
     return s + winXP + ((r.kills ?? 0) * XP_RATES.fortnite_kill)
   }, 0)
-  const challengeXP = (challenges.data ?? []).reduce((s: number, r: { xp_reward: number }) => s + (r.xp_reward ?? 0), 0)
+  const challengeXP = (challenges.data ?? []).filter((r: { status: string }) => r.status === 'completed').reduce((s: number, r: { xp_reward: number }) => s + (r.xp_reward ?? 0), 0)
   const sleepXP     = (sleepLogs.data ?? []).reduce(
     (s: number, r: { hours_slept: number | null }) =>
       s + XP_RATES.sleep_log + ((r.hours_slept ?? 0) >= 7 ? XP_RATES.sleep_quality_bonus : 0),
@@ -321,7 +343,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     .reduce((s: number, r: { oz: number }) => s + Number(r.oz), 0)
 
   // Cardio breakdowns
-  const cardioRows = (cardio.data ?? []) as { distance_miles: number; activity: string }[]
+  const cardioRows = (cardio.data ?? []) as { distance_miles: number; activity: string; date: string }[]
   const cardioMiles = Math.round(cardioRows.reduce((s, r) => s + (r.distance_miles ?? 0), 0) * 10) / 10
   const runMiles    = Math.round(cardioRows.filter(r => r.activity === 'run').reduce((s, r) => s + (r.distance_miles ?? 0), 0) * 10) / 10
   const hikeMiles   = Math.round((hiking.data ?? []).reduce((s: number, r: { distance_miles: number }) => s + (r.distance_miles ?? 0), 0) * 10) / 10
@@ -361,7 +383,29 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     latestBodyFat:  latestMeas?.body_fat_pct ?? null,
   }
 
-  return { totalXP, stats }
+  const rawRows: RawActivityData = {
+    liftingRows:   liftRows as RawActivityData['liftingRows'],
+    prRows:        prRows as RawActivityData['prRows'],
+    skateRows:     skateRows as RawActivityData['skateRows'],
+    bookRows:      bookRows as RawActivityData['bookRows'],
+    gameRows:      gameRows as RawActivityData['gameRows'],
+    challengeRows: (challenges.data ?? []) as RawActivityData['challengeRows'],
+    sleepRows:     (sleepLogs.data ?? []) as RawActivityData['sleepRows'],
+    cardioRows:    cardioRows as RawActivityData['cardioRows'],
+    bbRows:        (basketball.data ?? []) as RawActivityData['bbRows'],
+    pbRows:        (pickleball.data ?? []) as RawActivityData['pbRows'],
+    golfRows:      (golf.data ?? []) as RawActivityData['golfRows'],
+    dgRows:        (discGolf.data ?? []) as RawActivityData['dgRows'],
+    hikeRows:      (hiking.data ?? []) as RawActivityData['hikeRows'],
+    ttRows:        (tableTennis.data ?? []) as RawActivityData['ttRows'],
+    chessRows:     (chess.data ?? []) as RawActivityData['chessRows'],
+    poolRows:      (pool.data ?? []) as RawActivityData['poolRows'],
+    vbRows:        (volleyball.data ?? []) as RawActivityData['vbRows'],
+    sbRows:        (spikeball.data ?? []) as RawActivityData['sbRows'],
+    moodRows:      (moodLogs.data ?? []) as RawActivityData['moodRows'],
+  }
+
+  return { totalXP, stats, rawRows }
 }
 
 // ── Strength milestones ────────────────────────────────────────
