@@ -7,6 +7,7 @@ import { SideNav } from './components/layout/SideNav'
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { ResetPassword } from './pages/ResetPassword'
+import { AuthCallback } from './pages/AuthCallback'
 // All other pages — code-split into their own chunks
 const Records      = lazy(() => import('./pages/Records').then(m => ({ default: m.Records })))
 const Challenges   = lazy(() => import('./pages/Challenges').then(m => ({ default: m.Challenges })))
@@ -250,7 +251,7 @@ function TopLoadBar() {
 
 function AppInner() {
   const location = useLocation()
-  const showNav = location.pathname !== '/login' && location.pathname !== '/reset-password'
+  const showNav = location.pathname !== '/login' && location.pathname !== '/reset-password' && location.pathname !== '/auth/callback'
   const { helpVisible, setHelpVisible } = useKeyboardShortcuts()
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/reset-password'
   const refreshXP  = useStore(s => s.refreshXP)
@@ -304,6 +305,7 @@ function AppInner() {
       <Routes>
         <Route path="/login"         element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/auth/callback"  element={<AuthCallback />} />
         <Route path="/"           element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/lifting"    element={<ProtectedRoute><Records /></ProtectedRoute>} />
         <Route path="/records"    element={<Navigate to="/lifting" replace />} />

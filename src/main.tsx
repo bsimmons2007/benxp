@@ -5,6 +5,9 @@ import { Analytics } from '@vercel/analytics/react'
 import '@fontsource-variable/inter/index.css'
 import './index.css'
 import App from './App.tsx'
+import { initSentry } from './lib/sentry'
+
+initSentry()
 
 // Strip non-numeric characters (keep digits, minus, dot) when pasting into number inputs
 document.addEventListener('paste', (e) => {

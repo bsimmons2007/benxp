@@ -167,7 +167,9 @@ export function Settings() {
   const [sectionsOpen, setSectionsOpen] = useState(false)
   const [xpOpen, setXpOpen]           = useState(false)
   const [dataOpen, setDataOpen]        = useState(false)
-  const [deleteStep, setDeleteStep] = useState<'idle' | 'confirm'>('idle')
+  const [deleteStep, setDeleteStep] = useState<'idle' | 'confirm' | 'type-email'>('idle')
+  const [deleteEmailInput, setDeleteEmailInput] = useState('')
+  const [accountEmail, setAccountEmail] = useState('')
   const [deleting, setDeleting] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [notifOpen, setNotifOpen]       = useState(false)
@@ -770,7 +772,12 @@ export function Settings() {
                 <div
                   className="flex items-center justify-between py-2.5 cursor-pointer"
                   style={{ borderTop: '1px solid var(--border-faint)' }}
-                  onClick={() => setDeleteStep('confirm')}
+                  onClick={async () => {
+                    const { data: { user } } = await supabase.auth.getUser()
+                    setAccountEmail(user?.email ?? '')
+                    setDeleteEmailInput('')
+                    setDeleteStep('confirm')
+                  }}
                 >
                   <div className="flex items-center gap-3">
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><TrashIcon size={16} color="#E94560" /></span>
@@ -778,13 +785,48 @@ export function Settings() {
                   </div>
                   <span style={{ color: 'var(--text-muted)' }}>›</span>
                 </div>
+              ) : deleteStep === 'confirm' ? (
+                <div className="py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                  <p className="text-sm mb-1 font-bold" style={{ color: 'var(--red)' }}>Permanently delete your account?</p>
+                  <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>All workouts, logs, XP, and settings will be erased forever. This cannot be undone.</p>
+                  <div className="flex gap-2">
+                    <button onClick={() => setDeleteStep('idle')} className="flex-1 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', border: 'none', cursor: 'pointer' }}>Cancel</button>
+                    <button onClick={() => setDeleteStep('type-email')} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{ background: 'color-mix(in srgb, var(--red) 15%, transparent)', color: 'var(--red)', border: '1px solid color-mix(in srgb, var(--red) 35%, transparent)', cursor: 'pointer' }}>
+                      Continue
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <div className="py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
-                  <p className="text-sm mb-3" style={{ color: 'var(--red)' }}>This will permanently delete all your data. This cannot be undone.</p>
+                  <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
+                    Type your account email to confirm:
+                  </p>
+                  <input
+                    type="email"
+                    value={deleteEmailInput}
+                    onChange={e => setDeleteEmailInput(e.target.value)}
+                    placeholder={accountEmail || 'your@email.com'}
+                    style={{
+                      width: '100%', padding: '9px 12px', borderRadius: 8, marginBottom: 10,
+                      background: 'var(--input-bg)', border: '1px solid var(--border)',
+                      color: 'var(--text-primary)', fontSize: 13, outline: 'none', boxSizing: 'border-box',
+                    }}
+                  />
                   <div className="flex gap-2">
-                    <button onClick={() => setDeleteStep('idle')} className="flex-1 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)' }}>Cancel</button>
-                    <button onClick={handleDeleteAccount} disabled={deleting} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{ background: 'color-mix(in srgb, var(--red) 15%, transparent)', color: 'var(--red)', border: '1px solid color-mix(in srgb, var(--red) 35%, transparent)' }}>
-                      {deleting ? 'Deleting...' : 'Yes, delete everything'}
+                    <button onClick={() => setDeleteStep('idle')} className="flex-1 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', border: 'none', cursor: 'pointer' }}>Cancel</button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={deleting || deleteEmailInput.toLowerCase() !== accountEmail.toLowerCase()}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-bold"
+                      style={{
+                        background: 'color-mix(in srgb, var(--red) 15%, transparent)',
+                        color: 'var(--red)',
+                        border: '1px solid color-mix(in srgb, var(--red) 35%, transparent)',
+                        cursor: deleting || deleteEmailInput.toLowerCase() !== accountEmail.toLowerCase() ? 'not-allowed' : 'pointer',
+                        opacity: deleteEmailInput.toLowerCase() !== accountEmail.toLowerCase() ? 0.5 : 1,
+                      }}
+                    >
+                      {deleting ? 'Deleting…' : 'Delete forever'}
                     </button>
                   </div>
                 </div>

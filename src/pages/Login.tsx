@@ -763,6 +763,33 @@ export function Login() {
               </button>
             </form>
 
+            {/* OAuth — Google & Apple */}
+            <div style={{ marginTop: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <div style={{ flex: 1, height: 1, background: 'var(--border-faint)' }} />
+                <span style={{ color: 'var(--text-muted)', fontSize: 11, flexShrink: 0 }}>or continue with</span>
+                <div style={{ flex: 1, height: 1, background: 'var(--border-faint)' }} />
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <OAuthButton
+                  label="Google"
+                  onClick={() => supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: `${window.location.origin}/auth/callback` },
+                  })}
+                  icon={<GoogleIcon />}
+                />
+                <OAuthButton
+                  label="Apple"
+                  onClick={() => supabase.auth.signInWithOAuth({
+                    provider: 'apple',
+                    options: { redirectTo: `${window.location.origin}/auth/callback` },
+                  })}
+                  icon={<AppleIcon />}
+                />
+              </div>
+            </div>
+
             {/* Divider + mode switch */}
             <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid var(--border-faint)' }}>
               <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, margin: 0 }}>
@@ -832,6 +859,46 @@ function WarningIcon() {
       <path d="M10 2L1.5 17h17L10 2Z" />
       <path d="M10 8v4" />
       <circle cx="10" cy="14.5" r="0.75" fill="#E94560" stroke="none" />
+    </svg>
+  )
+}
+
+function OAuthButton({ label, icon, onClick }: { label: string; icon: React.ReactNode; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        padding: '10px 0', borderRadius: 10,
+        background: 'var(--input-bg)', border: '1px solid var(--border)',
+        color: 'var(--text-primary)', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+        transition: 'background 0.15s ease',
+      }}
+      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-2)')}
+      onMouseLeave={e => (e.currentTarget.style.background = 'var(--input-bg)')}
+    >
+      {icon}
+      {label}
+    </button>
+  )
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+      <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+      <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+    </svg>
+  )
+}
+
+function AppleIcon() {
+  return (
+    <svg width="15" height="16" viewBox="0 0 15 18" fill="currentColor">
+      <path d="M14.25 13.65c-.27.62-.59 1.19-.97 1.72-.51.72-.93 1.22-1.26 1.49-.5.46-1.04.7-1.62.71-.41 0-.91-.12-1.49-.35-.58-.24-1.11-.35-1.6-.35-.52 0-1.06.12-1.64.35-.58.24-1.05.36-1.41.37-.56.02-1.11-.23-1.65-.73-.36-.29-.8-.81-1.32-1.55-.57-.79-1.03-1.71-1.4-2.75C.28 11.5 0 10.44 0 9.41c0-1.19.26-2.21.77-3.06.41-.68.94-1.22 1.61-1.62.67-.4 1.39-.61 2.18-.62.43 0 .99.13 1.69.39.7.26 1.15.39 1.35.39.15 0 .65-.15 1.5-.46.81-.29 1.49-.41 2.05-.37 1.52.12 2.66.72 3.42 1.8-1.36.82-2.03 1.98-2.02 3.46.01 1.15.43 2.11 1.26 2.87.37.35.79.62 1.26.82-.1.29-.21.57-.32.84Zm-3.68-13.2c0 .9-.33 1.74-.99 2.51-.8.93-1.76 1.47-2.8 1.38a2.9 2.9 0 0 1-.02-.34c0-.87.38-1.79 1.05-2.55.33-.38.76-.7 1.27-.95.51-.25.99-.38 1.45-.39.01.11.02.23.02.34Z"/>
     </svg>
   )
 }
