@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
@@ -93,7 +94,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
         {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mt-3 pop-in">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
@@ -143,7 +144,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
 
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
-        </div>
+        </Card>
       )}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </div>
@@ -309,7 +310,7 @@ export function Chess() {
 
         {/* Rating trend */}
         {ratingData.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Rating Trend</p>
             <ResponsiveContainer width="100%" height={150}>
               <LineChart data={ratingData}>
@@ -329,13 +330,13 @@ export function Chess() {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* History */}
         {filtered.length > 0 && <p className="section-label mb-3">Game History</p>}
         {filtered.map(g => (
-          <div key={g.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
+          <Card key={g.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
             <div className="flex items-center gap-3">
               <div style={{
                 width: 36, height: 36, borderRadius: 10, flexShrink: 0, fontSize: 16,
@@ -363,7 +364,7 @@ export function Chess() {
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
-          </div>
+          </Card>
         ))}
 
         {games.length === 0 && (

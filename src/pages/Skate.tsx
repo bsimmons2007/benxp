@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { today, formatDate, formatDateTooltip } from '../lib/utils'
@@ -183,7 +184,7 @@ export function Skate() {
           </div>
         )}
         {milesTrend.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Miles per Session</p>
             <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>
               Avg {avgMiles.toFixed(1)} mi/session
@@ -212,12 +213,12 @@ export function Skate() {
               </AreaChart>
             </ResponsiveContainer>
             <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>── avg</p>
-          </div>
+          </Card>
         )}
 
         {/* Fastest mile trend */}
         {fastestTrend.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Fastest Mile Trend</p>
             <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>Lower is faster</p>
             <ResponsiveContainer width="100%" height={150}>
@@ -244,7 +245,7 @@ export function Skate() {
               </AreaChart>
             </ResponsiveContainer>
             {fastestMile && <p className="text-xs mt-1" style={{ color: '#2ECC71' }}>── PR {fastestMile.toFixed(2)} min/mi</p>}
-          </div>
+          </Card>
         )}
 
         {sessions.length === 0 && (
@@ -257,7 +258,7 @@ export function Skate() {
 
         {/* Session history */}
         {sessions.length > 0 && (
-          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card noPadding className="overflow-hidden">
             <p className="px-4 pt-4 pb-2 font-bold" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Sessions</p>
             {sessions.map((s) => (
               <div key={s.id} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
@@ -287,7 +288,7 @@ export function Skate() {
                 </div>
               </div>
             ))}
-          </div>
+          </Card>
         )}
 
         {editing && (

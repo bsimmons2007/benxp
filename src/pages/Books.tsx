@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, Tooltip } from 'recharts'
 import { useForm } from 'react-hook-form'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
@@ -527,7 +528,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
       </button>
 
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mt-3 pop-in">
           <FirstUseTip formKey="books" tip="Add books you're currently reading too — mark them finished later to earn +250 XP. Genre tags power the breakdown chart." />
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 
@@ -575,7 +576,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
               {isSubmitting ? 'Saving…' : status === 'reading' ? 'Start Reading' : 'Log Finished Book'}
             </Button>
           </form>
-        </div>
+        </Card>
       )}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </div>
@@ -625,7 +626,8 @@ function ToReadSection() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl p-4 mb-4 pop-in flex flex-col gap-3" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mb-4 pop-in">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
           <Input label="Title" type="text" {...register('title', { required: true })} />
           <Input label="Author" type="text" {...register('author')} />
           <div className="flex gap-2">
@@ -639,11 +641,12 @@ function ToReadSection() {
           </div>
           <Button type="submit" fullWidth>Add to List</Button>
         </form>
+        </Card>
       )}
 
       <div className="flex flex-col gap-2">
         {books.map(b => (
-          <div key={b.id} className="flex items-center justify-between px-4 py-3 rounded-xl card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
+          <Card key={b.id} className="flex items-center justify-between card-animate" style={{ padding: '12px 16px' }}>
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-1.5 h-8 rounded-full flex-shrink-0" style={{ background: b.priority ? PRIORITY_COLORS[b.priority] : '#555' }} />
               <div className="min-w-0">
@@ -657,7 +660,7 @@ function ToReadSection() {
               )}
               <button onClick={() => remove(b.id)} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
-          </div>
+          </Card>
         ))}
         {books.length === 0 && <p className="text-sm py-2" style={{ color: 'var(--text-muted)' }}>No books in list yet.</p>}
       </div>
@@ -753,7 +756,7 @@ export function Books() {
 
         {/* Genre breakdown */}
         {genreBreakdown.length > 1 && (
-          <div className="rounded-xl p-4 mb-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-5">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Genre Breakdown</p>
             <div className="flex items-center gap-4">
 
@@ -798,7 +801,7 @@ export function Books() {
                 ))}
               </div>
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Add book */}

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -153,7 +154,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
         {open ? '✕ Cancel' : '+ New Goal'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mt-3 pop-in">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Type</label>
@@ -195,7 +196,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
               {isSubmitting ? 'Saving…' : 'Add Goal'}
             </Button>
           </form>
-        </div>
+        </Card>
       )}
     </div>
   )
@@ -228,13 +229,10 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
   const isAutoComplete = pct >= 100 && goal.status === 'active'
 
   return (
-    <div
-      className="rounded-xl p-4 mb-3"
+    <Card
+      className="mb-3"
       style={{
-        background: 'var(--card-bg)',
-        border: isAutoComplete
-          ? '1px solid rgba(245,166,35,0.5)'
-          : '1px solid var(--border)',
+        border: isAutoComplete ? '1px solid rgba(245,166,35,0.5)' : undefined,
         boxShadow: isAutoComplete ? '0 0 20px rgba(245,166,35,0.15)' : 'none',
       }}
     >
@@ -303,7 +301,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
           </>
         )}
       </div>
-    </div>
+    </Card>
   )
 }
 

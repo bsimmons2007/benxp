@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
@@ -355,7 +356,7 @@ export function Volleyball() {
 
         {/* Chart */}
         {chartData.length >= 2 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Monthly Record</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={chartData} barGap={4}>
@@ -367,13 +368,13 @@ export function Volleyball() {
                 <Bar dataKey="losses" name="Losses" fill="#f87171"  fillOpacity={0.7}  radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* History */}
         {games.length > 0 && <p className="section-label mb-3">History</p>}
         {games.map(g => (
-          <div key={g.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
+          <Card key={g.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
             <div className="flex items-center gap-3">
               <div style={{
                 width: 36, height: 36, borderRadius: 10, flexShrink: 0,
@@ -408,7 +409,7 @@ export function Volleyball() {
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
-          </div>
+          </Card>
         ))}
 
         {games.length === 0 && (

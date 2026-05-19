@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
@@ -207,7 +208,7 @@ export function DiscGolf() {
 
         {/* Score vs Par chart */}
         {chartData.length >= 2 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Score vs Par</p>
             <p className="section-label mb-3">Green = under par</p>
             <ResponsiveContainer width="100%" height={140}>
@@ -224,7 +225,7 @@ export function DiscGolf() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* History */}
@@ -232,7 +233,7 @@ export function DiscGolf() {
         {rounds.map(r => {
           const diff = r.score - r.par
           return (
-            <div key={r.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
+            <Card key={r.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
               <div className="flex items-center gap-3">
                 <div style={{
                   width: 36, height: 36, borderRadius: 10, flexShrink: 0,
@@ -255,7 +256,7 @@ export function DiscGolf() {
                   <EditIcon size={13} color="var(--text-muted)" />
                 </button>
               </div>
-            </div>
+            </Card>
           )
         })}
 

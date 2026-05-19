@@ -6,6 +6,7 @@ import {
 } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { EditModal } from '../components/ui/EditModal'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
@@ -104,7 +105,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
   return (
     <>
       {cumulativeWins.length >= 3 && (
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mb-4">
           <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Cumulative Wins</p>
           <ResponsiveContainer width="100%" height={160}>
             <AreaChart data={cumulativeWins} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -121,11 +122,11 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <Area type="monotone" dataKey="wins" stroke={accent} strokeWidth={2.5} fill={`url(#${gradId}-cum)`} dot={false} activeDot={{ r: 5, fill: accent, stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
+        </Card>
       )}
 
       {monthlyWins.length >= 2 && (
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mb-4">
           <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Monthly Wins</p>
           <ResponsiveContainer width="100%" height={130}>
             <BarChart data={monthlyWins} barSize={26} margin={{ top: 4 }}>
@@ -140,11 +141,11 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </Card>
       )}
 
       {killsData.length >= 3 && (
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mb-4">
           <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Kills per Game</p>
           <ResponsiveContainer width="100%" height={140}>
             <AreaChart data={killsData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -163,11 +164,11 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
             </AreaChart>
           </ResponsiveContainer>
           <p className="text-xs mt-1" style={{ color: accent }}>── avg {avgKills}K</p>
-        </div>
+        </Card>
       )}
 
       {accuracyData.length >= 3 && (
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mb-4">
           <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Accuracy %</p>
           <ResponsiveContainer width="100%" height={120}>
             <AreaChart data={accuracyData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -184,7 +185,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <Area type="monotone" dataKey="accuracy" stroke="#2ECC71" strokeWidth={2.5} fill={`url(#${gradId}-acc)`} dot={false} activeDot={{ r: 4, fill: '#2ECC71', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
+        </Card>
       )}
     </>
   )

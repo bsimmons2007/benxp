@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EditIcon, DropletIcon } from '../components/ui/Icon'
@@ -270,7 +271,7 @@ export function Water() {
         )}
 
         {/* Quick add buttons */}
-        <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mb-4">
           <p className="card-title mb-3">Quick Add</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {QUICK_ADDS.map(oz => (
@@ -298,8 +299,7 @@ export function Water() {
               value={customOz}
               onChange={e => setCustomOz(e.target.value)}
               className="flex-1 px-3 py-2 rounded-lg outline-none text-sm"
-              style={{ color: 'var(--text-primary)' }}
-              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}
+              style={{ color: 'var(--text-primary)', background: 'var(--input-bg)', border: '1px solid var(--border)' }}
             />
             <button
               onClick={() => { addWater(parseFloat(customOz) || 0); setCustomOz('') }}
@@ -314,15 +314,14 @@ export function Water() {
               Add
             </button>
           </div>
-        </div>
+        </Card>
 
         {/* Today's log */}
         {entries.length > 0 && (
           <div>
             <p className="card-title mb-3">Today's Log</p>
             {entries.map(e => (
-              <div key={e.id} className="flex items-center justify-between px-4 py-3 rounded-xl mb-2"
-                style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}>
+              <Card key={e.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
                 <div className="flex items-center gap-3">
                   <DropletIcon size={18} color="#29b6f6" />
                   <div>
@@ -341,7 +340,7 @@ export function Water() {
                 >
                   <EditIcon size={13} color="var(--text-muted)" />
                 </button>
-              </div>
+              </Card>
             ))}
           </div>
         )}

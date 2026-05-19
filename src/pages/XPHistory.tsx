@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
+import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { useXP } from '../hooks/useXP'
@@ -184,13 +185,9 @@ export function XPHistory() {
       <PageWrapper>
 
         {/* Summary */}
-        <div
-          className="rounded-xl mb-5 px-4 py-3 flex items-center justify-between"
-          style={{
-            background: 'var(--card-bg)',
-            border: '1px solid var(--border)',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
-          }}
+        <Card
+          className="mb-5 flex items-center justify-between"
+          style={{ padding: '12px 16px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)' }}
         >
           <div>
             <p className="section-label">All-time XP</p>
@@ -204,7 +201,7 @@ export function XPHistory() {
               {loading ? '—' : events.length}
             </p>
           </div>
-        </div>
+        </Card>
 
         {/* Event list */}
         {loadError ? (
@@ -230,13 +227,10 @@ export function XPHistory() {
 
                 {/* Events for that day */}
                 {group.items.map(ev => (
-                  <div
+                  <Card
                     key={ev.key}
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 mb-1"
-                    style={{
-                      background: 'var(--card-bg)',
-                      border: '1px solid var(--border-faint)',
-                    }}
+                    className="flex items-center gap-3 mb-1"
+                    style={{ padding: '10px 12px' }}
                   >
                     <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{ev.icon}</span>
                     <span className="flex-1 text-sm truncate" style={{ color: 'var(--text-primary)' }}>{ev.label}</span>
@@ -246,7 +240,7 @@ export function XPHistory() {
                     >
                       +{ev.xp}
                     </span>
-                  </div>
+                  </Card>
                 ))}
               </div>
             ))}

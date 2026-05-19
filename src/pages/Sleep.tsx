@@ -5,6 +5,7 @@ import { useStore } from '../store/useStore'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, BarChart, Bar, Cell, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
@@ -129,7 +130,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
         {open ? '✕ Cancel' : '+ Log Sleep'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mt-3 pop-in">
           <FirstUseTip formKey="sleep" tip="Log bedtime + wake time to auto-calculate hours, or just enter hours directly. 7+ hours earns a quality bonus XP." />
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date"     type="date" {...register('date', { required: true })} />
@@ -154,7 +155,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
 
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Sleep'}</Button>
           </form>
-        </div>
+        </Card>
       )}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </div>
@@ -198,13 +199,13 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
         {open ? '✕ Cancel' : 'Log Nap'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <Card className="mt-3 pop-in">
           <form onSubmit={submit} className="flex flex-col gap-4">
             <Input label="Date" type="date" value={date} onChange={e => setDate(e.target.value)} />
             <Input label="Nap Length (hours)" type="number" step="0.25" placeholder="1.5" value={hours} onChange={e => setHours(e.target.value)} required />
             <Button type="submit" fullWidth disabled={saving}>{saving ? 'Logging...' : 'Log Nap'}</Button>
           </form>
-        </div>
+        </Card>
       )}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </div>
@@ -435,7 +436,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
   }
 
   return (
-    <div className="rounded-xl mb-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--accent-dim)' }}>
+    <Card className="mb-4 pop-in" style={{ border: '1px solid var(--accent-dim)' }}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid var(--border-faint)' }}>
         <p className="font-bold" style={{ color: 'var(--accent)', fontSize: 15 }}>Wake Time Trainer</p>
@@ -614,7 +615,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
           </>
         )}
       </div>
-    </div>
+    </Card>
   )
 }
 
@@ -747,7 +748,7 @@ export function Sleep() {
           <ChartEmptyState title="Hours Slept" message="Log your first night to start tracking sleep trends" color="#818cf8" />
         )}
         {!chartLoading && sorted.length > 0 && sorted.length < 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-2" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Hours Slept</p>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
               {sorted.map(d => (
@@ -760,10 +761,10 @@ export function Sleep() {
             <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
               Log {3 - sorted.length} more night{3 - sorted.length > 1 ? 's' : ''} to unlock your trend chart
             </p>
-          </div>
+          </Card>
         )}
         {!chartLoading && sorted.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Hours Slept</p>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={sorted} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
@@ -794,12 +795,12 @@ export function Sleep() {
               <span className="text-xs" style={{ color: '#27AE60' }}>── 8h goal</span>
               <span className="text-xs" style={{ color: 'var(--accent)' }}>── 7h min</span>
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Day of week breakdown */}
         {nightLogs.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>By Day of Week</p>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={dayData} barSize={28}>
@@ -817,7 +818,7 @@ export function Sleep() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* History */}
@@ -827,10 +828,10 @@ export function Sleep() {
           const q        = isNap ? { label: 'Nap', color: '#888' } : sleepQuality(entry.hours_slept)
           const dayLabel = DAYS[new Date(entry.date + 'T12:00:00').getDay()]
           return (
-            <div
+            <Card
               key={entry.id}
-              className="rounded-xl mb-2 card-animate"
-              style={{ background: isNap ? 'var(--input-bg)' : 'var(--card-bg)', border: '1px solid var(--border-faint)', opacity: isNap ? 0.7 : 1 }}
+              className="mb-2 card-animate"
+              style={{ background: isNap ? 'var(--input-bg)' : undefined, opacity: isNap ? 0.7 : 1, padding: 0 }}
             >
               <div className="flex items-center justify-between px-4 py-3">
                 <div className="flex items-center gap-3">
@@ -879,7 +880,7 @@ export function Sleep() {
                   </div>
                 )
               })()}
-            </div>
+            </Card>
           )
         })}
         {nightLogs.length === 0 && (

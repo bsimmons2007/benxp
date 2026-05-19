@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
@@ -54,10 +55,9 @@ function ChallengeCard({
   const autoCompleted = pct !== null && pct >= 100
 
   return (
-    <div
-      className={`rounded-xl p-4 mb-3 slide-in ${isBoss ? 'border-glow' : ''}`}
+    <Card
+      className={`mb-3 slide-in ${isBoss ? 'border-glow' : ''}`}
       style={{
-        background: 'var(--card-bg)',
         border: `1px solid ${isCompleted || autoCompleted ? tierColor : 'var(--border)'}`,
         boxShadow: isCompleted || autoCompleted ? `0 0 20px ${tierGlow}` : 'none',
         transition: 'all 0.3s ease',
@@ -128,7 +128,7 @@ function ChallengeCard({
           </div>
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 

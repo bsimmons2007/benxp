@@ -698,7 +698,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
 
       {open && (
         <form onSubmit={handleSubmit}>
-          <div className="mt-3 rounded-2xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mt-3 pop-in">
             {/* Date */}
             <div style={{ marginBottom: 16 }}>
               <label className="section-label" style={{ display: 'block', marginBottom: 6 }}>Workout Date</label>
@@ -831,7 +831,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                 {submitting ? 'Logging…' : `Log ${entries.filter(e => e.liftName).length || ''} Exercise${entries.filter(e => e.liftName).length !== 1 ? 's' : ''}`}
               </button>
             </div>
-          </div>
+          </Card>
         </form>
       )}
 
@@ -1261,7 +1261,7 @@ export function Records() {
 
         {/* ── Gym streak banner ── */}
         {!streak.loading && (streak.gymCurrent > 0 || streak.gymLongest > 0) && (
-          <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="flex items-center justify-between mb-4" style={{ padding: '12px 16px' }}>
             <div>
               <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Gym Streak</p>
               <p style={{ fontSize: 22, fontWeight: 700, color: streak.gymCurrent > 0 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1.2 }}>
@@ -1276,7 +1276,7 @@ export function Records() {
                 </p>
               </div>
             )}
-          </div>
+          </Card>
         )}
 
         {/* ── Tab switcher ── */}

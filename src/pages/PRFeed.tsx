@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { EmptyState } from '../components/ui/EmptyState'
 import { TrophyIcon, SearchIcon, DumbbellIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
@@ -31,10 +32,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
   const max = ranked[0].est1rm
 
   return (
-    <div
-      className="rounded-xl mb-4 overflow-hidden"
-      style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', padding: '16px' }}
-    >
+    <Card className="mb-4 overflow-hidden">
       <div className="flex items-center gap-2 mb-3">
         <TrophyIcon size={13} color="var(--text-muted)" />
         <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
@@ -71,7 +69,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
           )
         })}
       </div>
-    </div>
+    </Card>
   )
 }
 

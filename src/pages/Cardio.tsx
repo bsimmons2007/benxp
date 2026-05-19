@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
@@ -363,7 +364,7 @@ export function Cardio() {
 
         {/* Cardio streak */}
         {!streak.loading && (streak.cardioCurrent > 0 || streak.cardioLongest > 0) && (
-          <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="flex items-center justify-between mb-4" style={{ padding: '12px 16px' }}>
             <div>
               <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Cardio Streak</p>
               <p style={{ fontSize: 22, fontWeight: 700, color: streak.cardioCurrent > 0 ? '#3b82f6' : 'var(--text-muted)', lineHeight: 1.2 }}>
@@ -378,12 +379,12 @@ export function Cardio() {
                 </p>
               </div>
             )}
-          </div>
+          </Card>
         )}
 
         {/* Cardio PRs */}
         {(fastestMileVal !== null || longestRun !== null || mostMilesWeek !== null) && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Personal Records</p>
             <div className="grid grid-cols-3 gap-2">
               {fastestMileVal !== null && (
@@ -408,7 +409,7 @@ export function Cardio() {
                 </div>
               )}
             </div>
-          </div>
+          </Card>
         )}
 
         <LogCardioPanel onLogged={load} />
@@ -438,7 +439,7 @@ export function Cardio() {
           <ChartEmptyState title="Distance Trend" message="Log your first session to start building your trend chart" color="#3b82f6" />
         )}
         {!chartLoading && chartData.length > 0 && chartData.length < 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-2" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Distance Trend</p>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
               {chartData.map(d => (
@@ -451,10 +452,10 @@ export function Cardio() {
             <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
               Log {3 - chartData.length} more session{3 - chartData.length > 1 ? 's' : ''} to unlock your trend chart
             </p>
-          </div>
+          </Card>
         )}
         {!chartLoading && chartData.length >= 3 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Distance Trend</p>
             <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>Avg {avgMiles.toFixed(1)} mi/session</p>
             <ResponsiveContainer width="100%" height={150}>
@@ -480,12 +481,12 @@ export function Cardio() {
                 <Area type="monotone" dataKey="miles" stroke="#3b82f6" strokeWidth={2.5} fill="url(#cardio-grad)" dot={{ fill: '#3b82f6', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#3b82f6', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* Session history */}
         {filtered.length > 0 ? (
-          <div className="rounded-xl overflow-hidden" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card noPadding className="overflow-hidden">
             <p className="px-4 pt-4 pb-2 font-bold" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Sessions</p>
             {filtered.map(s => {
               const pace = s.duration_mins && s.distance ? (s.duration_mins / s.distance).toFixed(1) : null
@@ -529,7 +530,7 @@ export function Cardio() {
                 </div>
               )
             })}
-          </div>
+          </Card>
         ) : (
           <p className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
             {sessions.length === 0 ? 'No sessions yet.' : 'No sessions for this activity.'}

@@ -14,6 +14,7 @@ import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
 import { EditIcon, TrophyIcon } from '../components/ui/Icon'
+import { Card } from '../components/ui/Card'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 
@@ -267,7 +268,7 @@ export function Pickleball() {
 
         {/* Monthly chart */}
         {monthData.length >= 2 && (
-          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+          <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Monthly Record</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={monthData} barGap={4}>
@@ -279,7 +280,7 @@ export function Pickleball() {
                 <Bar dataKey="losses" name="Losses" fill="#f87171" fillOpacity={0.7} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </Card>
         )}
 
         {/* History */}
@@ -287,10 +288,10 @@ export function Pickleball() {
           <p className="section-label mb-3">History</p>
         )}
         {filteredGames.map(game => (
-          <div
+          <Card
             key={game.id}
-            className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
-            style={{ background: 'var(--card-bg)', border: '1px solid var(--border-faint)' }}
+            className="flex items-center justify-between mb-2 card-animate"
+            style={{ padding: '12px 16px' }}
           >
             <div className="flex items-center gap-3">
               <div style={{
@@ -329,7 +330,7 @@ export function Pickleball() {
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
-          </div>
+          </Card>
         ))}
 
         {games.length === 0 && (
