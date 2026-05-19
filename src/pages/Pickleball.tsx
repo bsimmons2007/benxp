@@ -93,7 +93,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
             {/* Game type */}
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Game Type</label>
-              <select {...register('game_type')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
+              <select {...register('game_type')} className="px-3 py-2 rounded-lg outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 <option>Singles</option>
                 <option>Doubles</option>
               </select>
@@ -113,7 +113,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
-              <span className="font-semibold" style={{ color: isWin ? ACCENT : '#888', fontSize: 13 }}>
+              <span className="font-semibold" style={{ color: isWin ? ACCENT : 'var(--text-muted)', fontSize: 13 }}>
                 {isWin
                   ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TrophyIcon size={14} color={ACCENT} /> Win</span>
                   : 'Loss'}
@@ -158,18 +158,18 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
             <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>My Score</label>
-            <input type="number" value={myScore} onChange={e => setMyScore(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }} />
+            <input type="number" value={myScore} onChange={e => setMyScore(e.target.value)} className="px-3 py-3 rounded-lg outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
           </div>
           <div className="flex flex-col gap-1 flex-1">
             <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Opp Score</label>
-            <input type="number" value={oppScore} onChange={e => setOppScore(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }} />
+            <input type="number" value={oppScore} onChange={e => setOppScore(e.target.value)} className="px-3 py-3 rounded-lg outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
           </div>
         </div>
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setWin(w => !w)}>
           <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? ACCENT : 'var(--border)' }}>
             <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: win ? 'translateX(26px)' : 'translateX(2px)' }} />
           </div>
-          <span className="font-medium text-white">Win</span>
+          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Win</span>
         </div>
       </div>
     </EditModal>
@@ -249,14 +249,14 @@ export function Pickleball() {
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: ACCENT }}>{s.value}</p>
-              <p className="text-xs mt-0.5" style={{ color: '#888' }}>{s.label}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* W/L row */}
         <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.2)' }}>
-          <span style={{ fontSize: 13, color: '#888' }}>{filteredGames.length} games{formatFilter !== 'All' ? ` (${formatFilter})` : ''}</span>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{filteredGames.length} games{formatFilter !== 'All' ? ` (${formatFilter})` : ''}</span>
           <div className="flex items-center gap-4">
             <span style={{ fontSize: 14, fontWeight: 700, color: ACCENT }}>{wins}W</span>
             <span style={{ fontSize: 14, fontWeight: 700, color: '#f87171' }}>{losses}L</span>
@@ -268,13 +268,13 @@ export function Pickleball() {
         {/* Monthly chart */}
         {monthData.length >= 2 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Monthly Record</p>
+            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Monthly Record</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={monthData} barGap={4}>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="month" tick={{ fill: '#666', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis allowDecimals={false} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
-                <Tooltip contentStyle={ttStyle} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
+                <Tooltip contentStyle={ttStyle} cursor={{ fill: 'var(--border-subtle)' }} />
                 <Bar dataKey="wins" name="Wins" fill={ACCENT} fillOpacity={0.85} radius={[4, 4, 0, 0]} />
                 <Bar dataKey="losses" name="Losses" fill="#f87171" fillOpacity={0.7} radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -299,15 +299,15 @@ export function Pickleball() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 16,
               }}>
-                {game.win ? <TrophyIcon size={16} color='#22c55e' /> : <span style={{ color: '#555', fontSize: 14 }}>○</span>}
+                {game.win ? <TrophyIcon size={16} color='#22c55e' /> : <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>○</span>}
               </div>
               <div>
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>
                   {formatDate(game.date)}
-                  <span style={{ marginLeft: 8, fontSize: 11, color: '#666' }}>{game.game_type}</span>
+                  <span style={{ marginLeft: 8, fontSize: 11, color: 'var(--text-muted)' }}>{game.game_type}</span>
                 </p>
                 {game.opponent && (
-                  <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>vs {game.opponent}</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>vs {game.opponent}</p>
                 )}
               </div>
             </div>

@@ -88,7 +88,7 @@ function LogSBPanel({ onLogged }: { onLogged: () => void }) {
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
-              <span className="font-semibold" style={{ color: isWin ? ACCENT : '#888', fontSize: 13 }}>
+              <span className="font-semibold" style={{ color: isWin ? ACCENT : 'var(--text-muted)', fontSize: 13 }}>
                 {isWin ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TrophyIcon size={14} color={ACCENT} /> Win</span> : 'Loss'}
               </span>
             </div>
@@ -142,7 +142,7 @@ function EditSBModal({ game, onClose, onSaved }: { game: SpikeballGame; onClose:
           <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? ACCENT : 'var(--border)' }}>
             <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: win ? 'translateX(26px)' : 'translateX(2px)' }} />
           </div>
-          <span className="font-medium text-white">Win</span>
+          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Win</span>
         </div>
       </div>
     </EditModal>
@@ -202,7 +202,7 @@ export function Spikeball() {
 
         {games.length > 0 && (
           <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: `${ACCENT}10`, border: `1px solid ${ACCENT}30` }}>
-            <span style={{ fontSize: 13, color: '#888' }}>{games.length} games</span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{games.length} games</span>
             <div className="flex items-center gap-4">
               <span style={{ fontSize: 14, fontWeight: 700, color: ACCENT }}>{wins}W</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: '#f87171' }}>{losses}L</span>
@@ -214,13 +214,13 @@ export function Spikeball() {
 
         {chartData.length >= 2 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Monthly Record</p>
+            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Monthly Record</p>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={chartData} barGap={4}>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="month" tick={{ fill: '#666', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis allowDecimals={false} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
-                <Tooltip contentStyle={ttStyle} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
+                <Tooltip contentStyle={ttStyle} cursor={{ fill: 'var(--border-subtle)' }} />
                 <Bar dataKey="wins"   name="Wins"   fill={ACCENT}   fillOpacity={0.85} radius={[4, 4, 0, 0]} />
                 <Bar dataKey="losses" name="Losses" fill="#f87171"  fillOpacity={0.7}  radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -239,11 +239,11 @@ export function Spikeball() {
               }}>
                 {g.win
                   ? <TrophyIcon size={16} color={ACCENT} />
-                  : <SpikeballIcon size={16} color="#555" />}
+                  : <SpikeballIcon size={16} color="var(--text-muted)" />}
               </div>
               <div>
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>{formatDate(g.date)}</p>
-                {g.partner && <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>w/ {g.partner}</p>}
+                {g.partner && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>w/ {g.partner}</p>}
               </div>
             </div>
             <div className="flex items-center gap-3">

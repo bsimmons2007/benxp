@@ -312,7 +312,7 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
 
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Last 7 nights: <span style={{ color: '#ccc', fontWeight: 700 }}>{recentDebt.toFixed(1)}h deficit</span></p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Last 7 nights: <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{recentDebt.toFixed(1)}h deficit</span></p>
           <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>14-day rolling: <span style={{ color: debtColor, fontWeight: 700 }}>{totalDebt.toFixed(1)}h</span></p>
         </div>
         <div style={{
@@ -439,7 +439,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
       {/* Header */}
       <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid var(--border-faint)' }}>
         <p className="font-bold" style={{ color: 'var(--accent)', fontSize: 15 }}>Wake Time Trainer</p>
-        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18 }}>✕</button>
+        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 18 }}>✕</button>
       </div>
 
       <div className="p-4 flex flex-col gap-4">
@@ -486,7 +486,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               <select
                 value={shiftMins}
                 onChange={e => setShiftMins(Number(e.target.value))}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'rgba(10,12,24,0.9)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, outline: 'none' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, outline: 'none' }}
               >
                 <option value={10}>Slow (10 min/day)</option>
                 <option value={15}>Gentle (15 min/day)</option>
@@ -567,7 +567,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                       style={{
                         display: 'flex', alignItems: 'center', gap: 10,
                         padding: '8px 10px', borderRadius: 8,
-                        background: isToday ? 'rgba(245,166,35,0.08)' : isGoalDay ? 'rgba(46,204,113,0.06)' : 'rgba(255,255,255,0.02)',
+                        background: isToday ? 'rgba(245,166,35,0.08)' : isGoalDay ? 'rgba(46,204,113,0.06)' : 'transparent',
                         border: isToday ? '1px solid rgba(245,166,35,0.3)' : isGoalDay ? '1px solid rgba(46,204,113,0.2)' : '1px solid transparent',
                       }}
                     >
@@ -577,13 +577,13 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                           ? <CheckIcon size={14} color="#2ECC71" />
                           : onTrack === true
                             ? <CheckIcon size={14} color="#2ECC71" />
-                            : <span style={{ color: isToday ? 'var(--accent)' : '#444', fontSize: 11, fontWeight: 700 }}>D{i + 1}</span>
+                            : <span style={{ color: isToday ? 'var(--accent)' : 'var(--text-muted)', fontSize: 11, fontWeight: 700 }}>D{i + 1}</span>
                         }
                       </div>
 
                       {/* Date */}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ color: isToday ? 'var(--accent)' : isGoalDay ? '#2ECC71' : '#ccc', fontSize: 12, fontWeight: isToday ? 700 : 500 }}>
+                        <p style={{ color: isToday ? 'var(--accent)' : isGoalDay ? '#2ECC71' : 'var(--text-secondary)', fontSize: 12, fontWeight: isToday ? 700 : 500 }}>
                           {dayLabel(s.date)} · {formatDate(s.date)}
                           {isToday && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(245,166,35,0.2)', color: 'var(--accent)', padding: '1px 6px', borderRadius: 4 }}>TODAY</span>}
                           {isGoalDay && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(46,204,113,0.15)', color: '#2ECC71', padding: '1px 6px', borderRadius: 4 }}>GOAL</span>}
@@ -597,8 +597,8 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
                       {/* Bedtime & Wake */}
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <p style={{ color: '#888', fontSize: 10 }}>Sleep <span style={{ color: '#ccc', fontWeight: 600 }}>{s.bed}</span></p>
-                        <p style={{ color: '#888', fontSize: 10 }}>Wake <span style={{ color: isGoalDay ? '#2ECC71' : 'var(--accent)', fontWeight: 700 }}>{s.wake}</span></p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>Sleep <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{s.bed}</span></p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>Wake <span style={{ color: isGoalDay ? '#2ECC71' : 'var(--accent)', fontWeight: 700 }}>{s.wake}</span></p>
                       </div>
                     </div>
                   )
@@ -626,7 +626,7 @@ const ttStyle = {
   borderRadius: 8, color: 'var(--text-primary)', fontSize: 12,
   boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
-const labelStyle = { color: '#aaa' }
+const labelStyle = { color: 'var(--text-muted)' }
 const itemStyle  = { color: 'var(--text-primary)' }
 
 export function Sleep() {
@@ -764,7 +764,7 @@ export function Sleep() {
         )}
         {!chartLoading && sorted.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Hours Slept</p>
+            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Hours Slept</p>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={sorted} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
@@ -773,14 +773,14 @@ export function Sleep() {
                     <stop offset="100%" stopColor="#818cf8" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
-                <YAxis domain={[0, 12]} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, 12]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
                 <Tooltip
                   contentStyle={ttStyle} labelStyle={labelStyle} itemStyle={itemStyle}
                   labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)}
                   formatter={(v: unknown) => [`${v}h`, 'Sleep']}
-                  cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
+                  cursor={{ stroke: 'var(--border-default)', strokeWidth: 1 }}
                 />
                 <ReferenceLine y={8} stroke="#27AE60" strokeDasharray="4 2" strokeOpacity={0.45} />
                 <ReferenceLine y={7} stroke="#818cf8" strokeDasharray="4 2" strokeOpacity={0.35} />
@@ -800,19 +800,19 @@ export function Sleep() {
         {/* Day of week breakdown */}
         {nightLogs.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>By Day of Week</p>
+            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>By Day of Week</p>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={dayData} barSize={28}>
                 <XAxis dataKey="label" tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis domain={[0, 12]} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
+                <YAxis domain={[0, 12]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
                 <Tooltip
                   contentStyle={ttStyle} labelStyle={labelStyle} itemStyle={itemStyle}
                   formatter={(v: unknown) => [`${v}h avg`, 'Sleep']}
-                  cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                  cursor={{ fill: 'var(--border-subtle)' }}
                 />
                 <Bar dataKey="avg" radius={[4, 4, 0, 0]}>
                   {dayData.map((d, i) => (
-                    <Cell key={i} fill={d.avg >= 8 ? '#27AE60' : d.avg >= 7 ? 'var(--accent)' : d.avg >= 6 ? '#E67E22' : d.avg > 0 ? '#E94560' : 'rgba(255,255,255,0.06)'} fillOpacity={d.avg > 0 ? 0.85 : 1} />
+                    <Cell key={i} fill={d.avg >= 8 ? '#27AE60' : d.avg >= 7 ? 'var(--accent)' : d.avg >= 6 ? '#E67E22' : d.avg > 0 ? '#E94560' : 'var(--border-subtle)'} fillOpacity={d.avg > 0 ? 0.85 : 1} />
                   ))}
                 </Bar>
               </BarChart>

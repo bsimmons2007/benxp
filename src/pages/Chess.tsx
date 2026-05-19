@@ -123,13 +123,13 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
             <div className="flex gap-3">
               <div className="flex flex-col gap-1 flex-1">
                 <label className="section-label">Time Control</label>
-                <select {...register('time_control')} className="px-3 py-2.5 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
+                <select {...register('time_control')} className="px-3 py-2.5 rounded-lg outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                   {TIME_CONTROLS.map(t => <option key={t}>{t}</option>)}
                 </select>
               </div>
               <div className="flex flex-col gap-1 flex-1">
                 <label className="section-label">Color</label>
-                <select {...register('color')} className="px-3 py-2.5 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
+                <select {...register('color')} className="px-3 py-2.5 rounded-lg outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                   <option>White</option>
                   <option>Black</option>
                 </select>
@@ -253,7 +253,7 @@ export function Chess() {
               {currentRating.toLocaleString()}
             </p>
             {peakRating && peakRating > currentRating && (
-              <p style={{ fontSize: 12, color: '#666', marginTop: 4 }}>Peak {peakRating.toLocaleString()}</p>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Peak {peakRating.toLocaleString()}</p>
             )}
             {peakRating && peakRating === currentRating && (
               <p style={{ fontSize: 12, color: '#f59e0b', marginTop: 4 }}>⭐ Personal best</p>
@@ -279,7 +279,7 @@ export function Chess() {
         {/* Streak + summary */}
         {games.length > 0 && (
           <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.2)' }}>
-            <span style={{ fontSize: 13, color: '#888' }}>{games.length} games</span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{games.length} games</span>
             {streak > 1 && (
               <span style={{ fontSize: 13, fontWeight: 700, color: '#34d399' }}>🏆 {streak} win streak</span>
             )}
@@ -297,7 +297,7 @@ export function Chess() {
                   flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
                   background: tcFilter === tc ? ACCENT : 'var(--input-bg)',
                   color: tcFilter === tc ? '#0d0d1a' : 'var(--text-secondary)',
-                  border: `1px solid ${tcFilter === tc ? ACCENT : 'rgba(255,255,255,0.1)'}`,
+                  border: `1px solid ${tcFilter === tc ? ACCENT : 'var(--border-subtle)'}`,
                   cursor: 'pointer', transition: 'all 0.12s',
                 }}
               >{tc ?? 'All'}</button>
@@ -310,12 +310,12 @@ export function Chess() {
         {/* Rating trend */}
         {ratingData.length >= 3 && (
           <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Rating Trend</p>
+            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Rating Trend</p>
             <ResponsiveContainer width="100%" height={150}>
               <LineChart data={ratingData}>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: '#555', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#555', fontSize: 9 }} axisLine={false} tickLine={false} width={36}
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={36}
                   domain={['auto', 'auto']} />
                 {peakRating && (
                   <ReferenceLine y={peakRating} stroke="rgba(245,158,11,0.3)" strokeDasharray="4 4"
@@ -347,17 +347,17 @@ export function Chess() {
               <div>
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>
                   {formatDate(g.date)}
-                  <span style={{ marginLeft: 8, fontSize: 11, color: '#555' }}>{g.time_control}</span>
-                  {g.color && <span style={{ marginLeft: 6, fontSize: 10, color: g.color === 'White' ? '#ddd' : '#888', background: g.color === 'White' ? 'var(--input-bg)' : 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: 4 }}>{g.color}</span>}
+                  <span style={{ marginLeft: 8, fontSize: 11, color: 'var(--text-muted)' }}>{g.time_control}</span>
+                  {g.color && <span style={{ marginLeft: 6, fontSize: 10, color: g.color === 'White' ? 'var(--text-secondary)' : '#e5e5e5', background: g.color === 'White' ? 'var(--surface-2)' : 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: 4 }}>{g.color}</span>}
                 </p>
-                {g.opening && <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{g.opening}</p>}
-                {g.opponent && <p style={{ fontSize: 11, color: '#555', marginTop: 1 }}>vs {g.opponent}</p>}
+                {g.opening && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{g.opening}</p>}
+                {g.opponent && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>vs {g.opponent}</p>}
               </div>
             </div>
             <div className="flex items-center gap-3">
               <div style={{ textAlign: 'right' }}>
                 <p style={{ fontSize: 14, fontWeight: 800, color: resultColor(g.result) }}>{resultLabel(g.result)}</p>
-                {g.rating_after && <p style={{ fontSize: 11, color: '#666', marginTop: 1 }}>{g.rating_after}</p>}
+                {g.rating_after && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{g.rating_after}</p>}
               </div>
               <button onClick={() => setEditing(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />

@@ -137,11 +137,11 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
 
       {/* oz label */}
       <div style={{ textAlign: 'center' }}>
-        <p style={{ fontSize: 28, fontWeight: 900, color: fill >= 1 ? glowColor : '#fff', lineHeight: 1,
+        <p style={{ fontSize: 28, fontWeight: 900, color: fill >= 1 ? glowColor : 'var(--text-primary)', lineHeight: 1,
           textShadow: fill >= 1 ? `0 0 20px ${glowColor}` : 'none', transition: 'all 0.4s ease' }}>
-          {ozDrunk.toFixed(0)}<span style={{ fontSize: 14, fontWeight: 400, color: '#444' }}>oz</span>
+          {ozDrunk.toFixed(0)}<span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-tertiary)' }}>oz</span>
         </p>
-        <p style={{ fontSize: 12, color: '#555', marginTop: 2 }}>of {goal}oz goal</p>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>of {goal}oz goal</p>
         {fill >= 1 && (
           <p className="pop-in" style={{ fontSize: 12, color: glowColor, fontWeight: 700, marginTop: 4 }}>
             Goal reached!
@@ -243,7 +243,7 @@ export function Water() {
         <div className="grid grid-cols-3 gap-2 mb-5">
           <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{totalOz.toFixed(0)}oz</p>
-            <p className="text-xs mt-0.5" style={{ color: '#888' }}>Today</p>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Today</p>
           </div>
 
           {/* Goal tile — tap to edit */}
@@ -253,12 +253,12 @@ export function Water() {
             style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', cursor: 'pointer' }}
           >
             <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{goalOz}oz</p>
-            <p className="text-xs mt-0.5" style={{ color: '#888' }}>Goal</p>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Goal</p>
           </button>
 
           <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
             <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{totalOz >= goalOz ? 'Done!' : `${Math.max(0, goalOz - totalOz).toFixed(0)}oz`}</p>
-            <p className="text-xs mt-0.5" style={{ color: '#888' }}>Remaining</p>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Remaining</p>
           </div>
         </div>
 
@@ -297,7 +297,8 @@ export function Water() {
               placeholder="Custom oz..."
               value={customOz}
               onChange={e => setCustomOz(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg text-white outline-none text-sm"
+              className="flex-1 px-3 py-2 rounded-lg outline-none text-sm"
+              style={{ color: 'var(--text-primary)' }}
               style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}
             />
             <button
@@ -346,7 +347,7 @@ export function Water() {
         )}
 
         {entries.length === 0 && !loading && (
-          <div style={{ textAlign: 'center', padding: '32px 0', color: '#444' }}>
+          <div style={{ textAlign: 'center', padding: '32px 0' }}>
             <DropletIcon size={36} color="var(--text-muted)" />
             <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)' }}>No water logged yet today</p>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Tap a quick add button to get started</p>

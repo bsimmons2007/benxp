@@ -143,8 +143,8 @@ export function Mood() {
                 key={s.label}
                 className="card-animate"
                 style={{
-                  background: 'var(--card-bg)',
-                  border: '1px solid var(--border)', borderRadius: 14,
+                  background: 'var(--surface-1)',
+                  border: '1px solid var(--border-default)', borderRadius: 14,
                   padding: '12px 10px', textAlign: 'center',
                   boxShadow: `0 0 16px ${s.color}15`,
                 }}
@@ -153,7 +153,7 @@ export function Mood() {
                 <p style={{ color: s.color, fontSize: 24, fontWeight: 900, lineHeight: 1 }}>
                   {s.value}
                 </p>
-                <p style={{ color: '#555', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <p style={{ color: 'var(--text-tertiary)', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   {s.label}
                 </p>
               </div>
@@ -168,7 +168,7 @@ export function Mood() {
         )}
         {!chartLoading && chartData.length > 0 && chartData.length < 3 && (
           <Card className="mb-5">
-            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', marginBottom: 8 }}>Mood Trends</p>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 8 }}>Mood Trends</p>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
               {chartData.map(d => (
                 <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -184,7 +184,7 @@ export function Mood() {
         )}
         {!chartLoading && chartData.length >= 3 && (
           <Card className="mb-5">
-            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', marginBottom: 12 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 12 }}>
               Mood Trends
             </p>
             <ResponsiveContainer width="100%" height={160}>
@@ -199,14 +199,14 @@ export function Mood() {
                     <stop offset="100%" stopColor="#4ade80" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis
                   dataKey="date"
                   tickFormatter={(d: string) => formatDate(d)}
-                  tick={{ fill: '#555', fontSize: 8 }}
+                  tick={{ fill: 'var(--text-tertiary)', fontSize: 8 }}
                   axisLine={false} tickLine={false}
                 />
-                <YAxis domain={[1, 10]} tick={{ fill: '#555', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
+                <YAxis domain={[1, 10]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
                 <Tooltip
                   contentStyle={TT_STYLE}
                   labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)}
@@ -227,7 +227,7 @@ export function Mood() {
 
         {/* Log form */}
         <Card className="mb-5">
-          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', marginBottom: 16 }}>
+          <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 16 }}>
             {moodLabel(moodVal)} Daily Check-in
           </p>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -265,8 +265,8 @@ export function Mood() {
               <textarea
                 {...register('notes')}
                 rows={3}
-                className="px-3 py-2 rounded-lg text-white outline-none resize-none"
-                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: 14 }}
+                className="px-3 py-2 rounded-lg outline-none resize-none"
+                style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)', fontSize: 14, color: 'var(--text-primary)' }}
                 placeholder="How was today?"
               />
             </div>
@@ -279,7 +279,7 @@ export function Mood() {
         {/* Recent entries */}
         {recent.length > 0 && (
           <Card>
-            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', marginBottom: 12 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 12 }}>
               Recent Entries
             </p>
             <div className="flex flex-col gap-1">
@@ -293,7 +293,7 @@ export function Mood() {
                   }}
                 >
                   <div className="flex justify-between items-center">
-                    <p style={{ fontSize: 12, color: '#444' }}>{formatDate(r.date)}</p>
+                    <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{formatDate(r.date)}</p>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                       <span style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700 }}>{moodLabel(r.mood ?? 5)} {r.mood}</span>
                       <span style={{ color: '#4ade80',       fontSize: 12 }}>E:{r.energy}</span>
@@ -304,7 +304,7 @@ export function Mood() {
                     </div>
                   </div>
                   {r.notes && (
-                    <p style={{ fontSize: 11, color: '#555', marginTop: 4, fontStyle: 'italic' }}>"{r.notes}"</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 4, fontStyle: 'italic' }}>"{r.notes}"</p>
                   )}
                 </div>
               ))}
@@ -331,7 +331,7 @@ export function Mood() {
             ]).map(({ label, key, color }) => (
               <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <label style={{ fontSize: 13, color: '#aaa' }}>{label}</label>
+                  <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>{label}</label>
                   <span style={{ fontSize: 14, fontWeight: 700, color }}>{editVals[key]}</span>
                 </div>
                 <input type="range" min="1" max="10" step="1"
@@ -343,13 +343,13 @@ export function Mood() {
               </div>
             ))}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <label style={{ fontSize: 13, color: '#aaa' }}>Activities</label>
+              <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>Activities</label>
               <input value={editVals.activities} onChange={e => setEditVals(v => ({ ...v, activities: e.target.value }))}
                 placeholder="Gym, reading…"
                 style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <label style={{ fontSize: 13, color: '#aaa' }}>Notes</label>
+              <label style={{ fontSize: 13, color: 'var(--text-muted)' }}>Notes</label>
               <textarea value={editVals.notes} onChange={e => setEditVals(v => ({ ...v, notes: e.target.value }))}
                 rows={3} placeholder="How was today?"
                 style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', color: 'var(--text-primary)', fontSize: 14, width: '100%', resize: 'none' }} />

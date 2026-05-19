@@ -68,15 +68,15 @@ function ChallengeCard({
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <span
-              className="font-bold text-white"
-              style={{ fontFamily: 'Inter Variable, Inter, system-ui, sans-serif', fontSize: isBoss ? 15 : 14 }}
+              className="font-bold"
+              style={{ color: 'var(--text-primary)', fontFamily: 'Inter Variable, Inter, system-ui, sans-serif', fontSize: isBoss ? 15 : 14 }}
             >
               {challenge.challenge_name}
             </span>
             {challenge.category && <Badge label={challenge.category} />}
           </div>
           {challenge.target && (
-            <p className="text-xs mb-2" style={{ color: '#888', fontSize: 13 }}>
+            <p className="text-xs mb-2" style={{ color: 'var(--text-muted)', fontSize: 13 }}>
               Target: {challenge.target}
             </p>
           )}
@@ -109,7 +109,7 @@ function ChallengeCard({
       {progress && !isCompleted && (
         <div>
           <div className="flex justify-between mb-1">
-            <span className="text-xs" style={{ color: '#888' }}>Progress</span>
+            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Progress</span>
             <span className="text-xs font-semibold" style={{ color: autoCompleted ? '#4ade80' : 'var(--accent)' }}>
               {progress.current} / {progress.target}
             </span>
@@ -202,7 +202,7 @@ export function Challenges() {
                 className="flex-1 flex flex-col items-center py-3 rounded-xl font-semibold transition-all duration-200"
                 style={{
                   background: isActive ? t.color : 'var(--input-bg)',
-                  color: isActive ? '#fff' : '#888',
+                  color: isActive ? '#fff' : 'var(--text-muted)',
                   boxShadow: isActive ? `0 4px 20px ${t.glow}` : 'none',
                   border: `1px solid ${isActive ? t.color : 'var(--border-faint)'}`,
                   transform: isActive ? 'translateY(-2px)' : 'none',
@@ -252,8 +252,8 @@ export function Challenges() {
 
         {/* Loading state */}
         {syncing && (
-          <div className="text-center py-8" style={{ color: '#888', fontSize: 14 }}>
-            Loading challenges...
+          <div className="text-center py-8" style={{ color: 'var(--text-muted)', fontSize: 14 }}>
+            Loading challenges…
           </div>
         )}
 
@@ -286,7 +286,7 @@ export function Challenges() {
 
         {/* Empty state */}
         {!syncing && active.length === 0 && completed.length === 0 && (
-          <div className="text-center py-12" style={{ color: '#555', fontSize: 14 }}>
+          <div className="text-center py-12" style={{ color: 'var(--text-muted)', fontSize: 14 }}>
             No {activeTier.toLowerCase()} challenges yet.
           </div>
         )}

@@ -160,7 +160,7 @@ export function Weekly() {
             onClick={() => setWeekOffset(w => w - 1)}
             style={{ color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: '4px 8px' }}
           >‹</button>
-          <p className="font-semibold text-white text-sm">{weekLabel}</p>
+          <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{weekLabel}</p>
           <button
             onClick={() => setWeekOffset(w => Math.min(0, w + 1))}
             disabled={isCurrentWeek}
@@ -174,23 +174,23 @@ export function Weekly() {
         </div>
 
         {loading ? (
-          <p style={{ color: '#444', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
+          <p style={{ color: 'var(--text-muted)', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
         ) : !data ? null : (
           <>
             {/* XP Earned hero */}
             <Card className="mb-4 text-center" goldBorder>
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#888' }}>XP This Week</p>
+              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>XP This Week</p>
               <p className="text-5xl font-bold xp-number" style={{ color: 'var(--accent)' }}>
                 +{data.xpEarned.toLocaleString()}
               </p>
               {data.xpEarned === 0 && (
-                <p className="text-xs mt-2" style={{ color: '#555' }}>No activity logged this week yet.</p>
+                <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>No activity logged this week yet.</p>
               )}
             </Card>
 
             {/* Day activity heatmap */}
             <Card className="mb-4">
-              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#888' }}>Activity This Week</p>
+              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--text-tertiary)' }}>Activity This Week</p>
               <div className="flex justify-between gap-1">
                 {WEEK_DAYS.map((day, i) => {
                   const date = new Date(monday + 'T12:00:00')
@@ -210,7 +210,7 @@ export function Weekly() {
                         boxShadow: active ? '0 0 12px var(--accent-dim)' : 'none',
                         transition: 'all 0.2s ease',
                       }} />
-                      <span style={{ fontSize: 9, color: isToday ? 'var(--accent)' : '#555' }}>{day}</span>
+                      <span style={{ fontSize: 9, color: isToday ? 'var(--accent)' : 'var(--text-tertiary)' }}>{day}</span>
                     </div>
                   )
                 })}
@@ -227,15 +227,15 @@ export function Weekly() {
               {/* Lifting */}
               {data.workoutDays > 0 && (
                 <Card>
-                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#888' }}>Lifting</p>
+                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Lifting</p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{data.workoutDays}</p>
-                  <p style={{ color: '#888', fontSize: 11 }}>workout days</p>
-                  <p className="mt-1" style={{ color: '#aaa', fontSize: 11 }}>{data.totalSets} sets total</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>workout days</p>
+                  <p className="mt-1" style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{data.totalSets} sets total</p>
                   {data.newPRs > 0 && (
                     <p style={{ color: '#4ade80', fontSize: 11 }}>{data.newPRs} new PR{data.newPRs > 1 ? 's' : ''}</p>
                   )}
                   {data.bestLift && (
-                    <p style={{ color: '#888', fontSize: 11 }}>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                       Best: {data.bestLift.lift} {data.bestLift.weight}lbs ×{data.bestLift.reps}
                     </p>
                   )}
@@ -245,30 +245,30 @@ export function Weekly() {
               {/* Skate */}
               {data.skateSessions > 0 && (
                 <Card>
-                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#888' }}>Skating</p>
+                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Skating</p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{data.milesSkated.toFixed(1)}</p>
-                  <p style={{ color: '#888', fontSize: 11 }}>miles</p>
-                  <p className="mt-1" style={{ color: '#aaa', fontSize: 11 }}>{data.skateSessions} session{data.skateSessions > 1 ? 's' : ''}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>miles</p>
+                  <p className="mt-1" style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{data.skateSessions} session{data.skateSessions > 1 ? 's' : ''}</p>
                 </Card>
               )}
 
               {/* Fortnite */}
               {(data.wins > 0 || data.kills > 0) && (
                 <Card>
-                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#888' }}>Fortnite</p>
+                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Fortnite</p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{data.wins}</p>
-                  <p style={{ color: '#888', fontSize: 11 }}>wins</p>
-                  {data.kills > 0 && <p className="mt-1" style={{ color: '#aaa', fontSize: 11 }}>{data.kills} kills</p>}
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>wins</p>
+                  {data.kills > 0 && <p className="mt-1" style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{data.kills} kills</p>}
                 </Card>
               )}
 
               {/* Sleep */}
               {data.sleepNights > 0 && (
                 <Card>
-                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#888' }}>Sleep</p>
+                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>Sleep</p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{data.avgSleep.toFixed(1)}</p>
-                  <p style={{ color: '#888', fontSize: 11 }}>avg hours/night</p>
-                  <p className="mt-1" style={{ color: '#aaa', fontSize: 11 }}>{data.sleepNights} nights logged</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>avg hours/night</p>
+                  <p className="mt-1" style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{data.sleepNights} nights logged</p>
                   {data.goodSleepNights > 0 && (
                     <p style={{ color: '#4ade80', fontSize: 11 }}>{data.goodSleepNights} good night{data.goodSleepNights > 1 ? 's' : ''}</p>
                   )}
@@ -283,11 +283,11 @@ export function Weekly() {
             {/* Books finished */}
             {data.booksFinished.length > 0 && (
               <Card className="mb-4">
-                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#888' }}>Finished This Week</p>
+                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--text-tertiary)' }}>Finished This Week</p>
                 {data.booksFinished.map((b, i) => (
                   <div key={i} className="flex items-center gap-2 py-1">
                     <span style={{ color: 'var(--accent)', fontSize: 14 }}>✓</span>
-                    <span className="text-sm text-white">{b.title}</span>
+                    <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{b.title}</span>
                   </div>
                 ))}
               </Card>
@@ -308,7 +308,7 @@ export function Weekly() {
               return (
                 <Card className="mb-4">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs uppercase tracking-widest" style={{ color: '#888' }}>Weekly Score</p>
+                    <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-tertiary)' }}>Weekly Score</p>
                     <div className="flex items-center gap-2">
                       <span style={{ fontSize: 28, fontWeight: 900, color: gradeColor, lineHeight: 1 }}>{grade}</span>
                       <span style={{ color: '#888', fontSize: 12 }}>{score}/100</span>
@@ -329,7 +329,7 @@ export function Weekly() {
                     ].map(s => (
                       <div key={s.label} style={{ textAlign: 'center' }}>
                         <p style={{ color: 'var(--accent)', fontSize: 14, fontWeight: 700 }}>{s.val}</p>
-                        <p style={{ color: '#444', fontSize: 10 }}>{s.label}</p>
+                        <p style={{ color: 'var(--text-tertiary)', fontSize: 10 }}>{s.label}</p>
                       </div>
                     ))}
                   </div>
@@ -340,7 +340,7 @@ export function Weekly() {
             {/* Empty state */}
             {data.xpEarned === 0 && (
               <Card>
-                <p className="text-center text-sm" style={{ color: '#444', padding: '8px 0' }}>
+                <p className="text-center text-sm" style={{ color: 'var(--text-muted)', padding: '8px 0' }}>
                   No activity this week yet — get after it.
                 </p>
               </Card>

@@ -156,7 +156,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium" style={{ color: '#AAAAAA' }}>Type</label>
+              <label className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Type</label>
               <select
                 {...register('metric_key')}
                 onChange={e => handleMetricChange(e.target.value as MetricKey)}
@@ -243,7 +243,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'var(--input-bg)', flexShrink: 0 }}>
             <GoalIcon metricKey={goal.metric_key} size={17} color="var(--text-secondary)" />
           </div>
-          <p className="font-semibold text-white text-sm truncate">{goal.title}</p>
+          <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>{goal.title}</p>
         </div>
         <span className="text-xs font-bold ml-2 shrink-0" style={{ color: 'var(--accent)' }}>
           +{goal.xp_reward} XP
@@ -252,7 +252,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
 
       {goal.metric_key !== 'manual' && (
         <div className="mb-2">
-          <div className="flex justify-between text-xs mb-1" style={{ color: '#888' }}>
+          <div className="flex justify-between text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
             <span>{current.toFixed(current % 1 === 0 ? 0 : 1)} {goal.target_unit}</span>
             <span>{goal.target_value} {goal.target_unit}</span>
           </div>
@@ -354,7 +354,7 @@ export function Goals() {
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
               <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{s.value.toLocaleString()}</p>
-              <p className="text-xs mt-0.5" style={{ color: '#888' }}>{s.label}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -364,7 +364,7 @@ export function Goals() {
         {/* Active goals */}
         {active.length === 0 ? (
           <div style={{ padding: '12px 0' }}>
-            <p style={{ color: '#555', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet — try one of these:</p>
+            <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginBottom: 14, fontSize: 13 }}>No active goals yet — try one of these:</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { label: 'Bench 225 lbs',   metric: 'bench_1rm',         target: 225, unit: 'lbs',   xp: 500 },
@@ -419,25 +419,25 @@ export function Goals() {
         {/* Completed goals */}
         {completed.length > 0 && (
           <>
-            <p className="text-xs uppercase tracking-widest mt-4 mb-3 font-semibold" style={{ color: '#555' }}>Completed</p>
+            <p className="text-xs uppercase tracking-widest mt-4 mb-3 font-semibold" style={{ color: 'var(--text-tertiary)' }}>Completed</p>
             {completed.map(g => (
               <div
                 key={g.id}
                 className="rounded-xl px-4 py-3 mb-2 flex items-center justify-between"
-                style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)', opacity: 0.6 }}
+                style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)', opacity: 0.6 }}
               >
                 <div className="flex items-center gap-2">
                   <GoalIcon metricKey={g.metric_key} size={15} color="var(--text-muted)" />
                   <div>
-                    <p className="text-sm text-white">{g.title}</p>
+                    <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{g.title}</p>
                     {g.completed_at && (
-                      <p className="text-xs" style={{ color: '#555' }}>
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                         {new Date(g.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </p>
                     )}
                   </div>
                 </div>
-                <span className="text-xs font-bold" style={{ color: '#888' }}>+{g.xp_reward} XP</span>
+                <span className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>+{g.xp_reward} XP</span>
               </div>
             ))}
           </>

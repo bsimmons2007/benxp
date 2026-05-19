@@ -35,7 +35,7 @@ const ACCENT_NORMAL = 'var(--accent)'
 const ACCENT_BLITZ  = '#a855f7'
 
 const ttStyle  = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }
-const lblStyle = { color: '#aaa' }
+const lblStyle = { color: 'var(--text-muted)' }
 const itmStyle = { color: 'var(--text-primary)' }
 
 type FnTab = 'normal' | 'blitz'
@@ -81,7 +81,7 @@ function StatCards({ items, accent }: { items: { label: string; value: string | 
       {items.map(s => (
         <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
           <p className="text-xl font-bold" style={{ color: accent }}>{s.value}</p>
-          <p className="text-xs mt-0.5" style={{ color: '#888' }}>{s.label}</p>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
         </div>
       ))}
     </div>
@@ -105,7 +105,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
     <>
       {cumulativeWins.length >= 3 && (
         <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-          <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Cumulative Wins</p>
+          <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Cumulative Wins</p>
           <ResponsiveContainer width="100%" height={160}>
             <AreaChart data={cumulativeWins} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
               <defs>
@@ -114,9 +114,9 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
                   <stop offset="100%" stopColor={accent} stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-              <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
+              <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+              <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
               <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [v as number, 'Total Wins']} />
               <Area type="monotone" dataKey="wins" stroke={accent} strokeWidth={2.5} fill={`url(#${gradId}-cum)`} dot={false} activeDot={{ r: 5, fill: accent, stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
             </AreaChart>
@@ -126,12 +126,12 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
 
       {monthlyWins.length >= 2 && (
         <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-          <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Monthly Wins</p>
+          <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Monthly Wins</p>
           <ResponsiveContainer width="100%" height={130}>
             <BarChart data={monthlyWins} barSize={26} margin={{ top: 4 }}>
-              <XAxis dataKey="month" tick={{ fill: '#666', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={20} allowDecimals={false} />
-              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ fill: 'rgba(255,255,255,0.04)' }} formatter={(v: unknown) => [v as number, 'Wins']} />
+              <XAxis dataKey="month" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} allowDecimals={false} />
+              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ fill: 'var(--border-subtle)' }} formatter={(v: unknown) => [v as number, 'Wins']} />
               <Bar dataKey="wins" radius={[4, 4, 0, 0]}>
                 {monthlyWins.map((d, i) => {
                   const fraction = maxMonthlyWins > 0 ? d.wins / maxMonthlyWins : 0
@@ -145,7 +145,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
 
       {killsData.length >= 3 && (
         <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-          <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Kills per Game</p>
+          <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Kills per Game</p>
           <ResponsiveContainer width="100%" height={140}>
             <AreaChart data={killsData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
               <defs>
@@ -154,9 +154,9 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
                   <stop offset="100%" stopColor="#7B2FBE" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-              <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
+              <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+              <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
               <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [v as number, 'Kills']} />
               <ReferenceLine y={avgKills} stroke={accent} strokeDasharray="4 2" strokeOpacity={0.4} />
               <Area type="monotone" dataKey="kills" stroke="#7B2FBE" strokeWidth={2.5} fill={`url(#${gradId}-kills)`} dot={{ fill: '#7B2FBE', r: 3, fillOpacity: 0.7 }} activeDot={{ r: 5, fill: '#7B2FBE', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
@@ -168,7 +168,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
 
       {accuracyData.length >= 3 && (
         <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-          <p className="font-bold text-white mb-3" style={{ fontSize: 15 }}>Accuracy %</p>
+          <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Accuracy %</p>
           <ResponsiveContainer width="100%" height={120}>
             <AreaChart data={accuracyData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
               <defs>
@@ -177,9 +177,9 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
                   <stop offset="100%" stopColor="#2ECC71" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
-              <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} />
-              <YAxis domain={[0, 100]} tick={{ fill: '#666', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
+              <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+              <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
+              <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
               <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [`${v}%`, 'Accuracy']} />
               <Area type="monotone" dataKey="accuracy" stroke="#2ECC71" strokeWidth={2.5} fill={`url(#${gradId}-acc)`} dot={false} activeDot={{ r: 4, fill: '#2ECC71', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
             </AreaChart>
@@ -220,11 +220,11 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
       <div className="flex flex-col gap-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: '#AAAAAA' }}>Kills</label>
+            <label className="text-base font-medium" style={{ color: 'var(--text-muted)' }}>Kills</label>
             <input type="number" value={kills} onChange={e => setKills(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
           </div>
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-base font-medium" style={{ color: '#AAAAAA' }}>Placement</label>
+            <label className="text-base font-medium" style={{ color: 'var(--text-muted)' }}>Placement</label>
             <input type="number" value={placement} onChange={e => setPlacement(e.target.value)} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
           </div>
         </div>
@@ -236,7 +236,7 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
           <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? '#27AE60' : 'var(--border)' }}>
             <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: win ? 'translateX(26px)' : 'translateX(2px)' }} />
           </div>
-          <span className="font-medium text-white">Win</span>
+          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Win</span>
         </div>
       </div>
     </EditModal>
@@ -311,7 +311,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
             <div className="flex flex-col gap-1">
-              <label className="text-base font-medium" style={{ color: '#AAAAAA' }}>Mode</label>
+              <label className="text-base font-medium" style={{ color: 'var(--text-muted)' }}>Mode</label>
               <select {...register('mode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 <option>Solos</option>
                 <option>Duos</option>
@@ -332,7 +332,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? 'var(--accent)' : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
-              <span className="font-semibold" style={{ color: isWin ? 'var(--accent)' : '#888', fontSize: 13 }}>
+              <span className="font-semibold" style={{ color: isWin ? 'var(--accent)' : 'var(--text-muted)', fontSize: 13 }}>
                 {isWin
                   ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TrophyIcon size={14} color="var(--accent)" /> Victory Royale</span>
                   : 'No win'}
@@ -344,7 +344,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isRanked ? '#5c85d6' : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isRanked ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
-              <span className="font-semibold" style={{ color: isRanked ? '#5c85d6' : '#888', fontSize: 13 }}>
+              <span className="font-semibold" style={{ color: isRanked ? '#5c85d6' : 'var(--text-muted)', fontSize: 13 }}>
                 {isRanked
                   ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><StarIcon size={14} color="#5c85d6" /> Ranked Match</span>
                   : 'Casual / Pubs'}
@@ -354,14 +354,14 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
             {/* Rank selector */}
             {isRanked && (
               <div className="pop-in flex flex-col gap-2">
-                <label className="text-sm font-medium" style={{ color: '#AAAAAA' }}>Current Rank</label>
+                <label className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Current Rank</label>
                 <div className="flex flex-wrap gap-2">
                   {FN_RANKS.map(r => (
                     <button key={r} type="button" onClick={() => setRankName(r)} style={{
                       padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700,
                       background: rankName === r ? `${RANK_COLORS[r]}22` : 'var(--input-bg)',
-                      border: `1.5px solid ${rankName === r ? RANK_COLORS[r] : 'rgba(255,255,255,0.1)'}`,
-                      color: rankName === r ? RANK_COLORS[r] : '#666', cursor: 'pointer', transition: 'all 0.12s ease',
+                      border: `1.5px solid ${rankName === r ? RANK_COLORS[r] : 'var(--border-subtle)'}`,
+                      color: rankName === r ? RANK_COLORS[r] : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.12s ease',
                     }}>{r}</button>
                   ))}
                 </div>
@@ -441,7 +441,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
             <div className="flex flex-col gap-1">
-              <label className="text-base font-medium" style={{ color: '#AAAAAA' }}>Mode</label>
+              <label className="text-base font-medium" style={{ color: 'var(--text-muted)' }}>Mode</label>
               <select {...register('blitzMode')} className="px-3 py-2 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 <option>Solos</option>
                 <option>Duos</option>
@@ -460,7 +460,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT_BLITZ : 'var(--border)' }}>
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
-              <span className="font-semibold" style={{ color: isWin ? ACCENT_BLITZ : '#888', fontSize: 13 }}>
+              <span className="font-semibold" style={{ color: isWin ? ACCENT_BLITZ : 'var(--text-muted)', fontSize: 13 }}>
                 {isWin
                   ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><ZapIcon size={14} color={ACCENT_BLITZ} /> Blitz Win</span>
                   : 'No win'}
@@ -518,13 +518,13 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
             style={{ background: 'var(--card-bg)', border: `1px solid ${g.win ? 'rgba(245,166,35,0.3)' : 'var(--border-faint)'}` }}
           >
             <div className="flex items-center gap-3">
-              <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: g.win ? ACCENT_NORMAL : '#444' }} />
+              <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: g.win ? ACCENT_NORMAL : 'var(--border-default)' }} />
               <div>
-                <p className="text-white font-semibold text-sm">
+                <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
                   {formatDate(g.date)}
                   {g.win && <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: ACCENT_NORMAL, color: 'var(--base-bg)' }}>WIN</span>}
                 </p>
-                <p className="text-xs mt-0.5" style={{ color: '#888' }}>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                   {g.mode}{g.placement ? ` · #${g.placement}` : ''}
                   {gExt.is_ranked && gExt.rank_name && (
                     <span className="ml-2 font-bold px-1.5 py-0.5 rounded" style={{
@@ -541,8 +541,8 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="font-bold text-white text-base">{g.kills}K</p>
-                {g.accuracy != null && <p className="text-xs" style={{ color: '#888' }}>{g.accuracy}%</p>}
+                <p className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>{g.kills}K</p>
+                {g.accuracy != null && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{g.accuracy}%</p>}
               </div>
               <button onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />
@@ -599,21 +599,21 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
           style={{ background: 'var(--card-bg)', border: `1px solid ${g.win ? 'rgba(168,85,247,0.3)' : 'var(--border-faint)'}` }}
         >
           <div className="flex items-center gap-3">
-            <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: g.win ? ACCENT_BLITZ : '#444' }} />
+            <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: g.win ? ACCENT_BLITZ : 'var(--border-default)' }} />
             <div>
-              <p className="text-white font-semibold text-sm">
+              <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
                 {formatDate(g.date)}
                 {g.win && <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: ACCENT_BLITZ, color: 'var(--text-primary)' }}>WIN</span>}
               </p>
-              <p className="text-xs mt-0.5" style={{ color: '#888' }}>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                 Blitz {blitzDisplayMode(g.mode)}{g.placement ? ` · #${g.placement}` : ''}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <p className="font-bold text-white text-base">{g.kills}K</p>
-              {g.accuracy != null && <p className="text-xs" style={{ color: '#888' }}>{g.accuracy}%</p>}
+              <p className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>{g.kills}K</p>
+              {g.accuracy != null && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{g.accuracy}%</p>}
             </div>
             <button onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
               <EditIcon size={13} color="var(--text-muted)" />

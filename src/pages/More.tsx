@@ -1,6 +1,7 @@
 ﻿import { Link } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
+import { Card } from '../components/ui/Card'
 import {
   PersonIcon, TargetIcon, RulerIcon, CalendarIcon, GridIcon,
   TrophyIcon, ShareIcon, TrendingIcon, ChevronRightIcon, TerminalIcon,
@@ -34,31 +35,25 @@ export function More() {
         <div className="flex flex-col gap-2">
           {NAV_LINKS.map(link => (
             <Link key={link.to} to={link.to} style={{ textDecoration: 'none' }}>
-              <div
-                className="card-hover"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 14,
-                  padding: '14px 16px', borderRadius: 14,
-                  background: 'var(--card-bg)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <div style={{
-                  width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                  background: 'var(--input-bg)',
-                  border: '1px solid var(--border-faint)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <link.Icon size={18} color="var(--text-secondary)" />
-                </div>
+              <Card className="card-hover" style={{ padding: '14px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                    background: 'var(--surface-2)',
+                    border: '1px solid var(--border-subtle)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <link.Icon size={18} color="var(--text-secondary)" />
+                  </div>
 
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{link.label}</p>
-                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{link.sub}</p>
-                </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{link.label}</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 1 }}>{link.sub}</p>
+                  </div>
 
-                <ChevronRightIcon size={16} color="var(--text-dim)" />
-              </div>
+                  <ChevronRightIcon size={16} color="var(--text-disabled)" />
+                </div>
+              </Card>
             </Link>
           ))}
         </div>
