@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
+import { logAuditEvent } from '../lib/audit'
 import { DumbbellIcon, BookIcon, RunIcon, MoonIcon, SwordIcon, BrainIcon, GamepadIcon, TargetIcon } from '../components/ui/Icon'
 
 interface AuthForm {
@@ -214,6 +215,7 @@ export function Login() {
 
     if (authErr) {
       recordFailure()
+      logAuditEvent('login_failed', { email: data.email })
       const newLockout = getLockout()
       setLockedUntil(newLockout)
       const attempts = getAttempts()
@@ -227,6 +229,7 @@ export function Login() {
       }
     } else {
       clearRateLimit()
+      logAuditEvent('login_success')
       localStorage.setItem('youxp-remember-me', String(rememberMe))
       if (!rememberMe) {
         // Move session token to sessionStorage so it doesn't survive browser restart

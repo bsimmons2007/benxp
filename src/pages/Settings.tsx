@@ -8,6 +8,7 @@ import { useStore } from '../store/useStore'
 import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme, timeThemeEnabled, setTimeThemeEnabled, applyTimeOrSavedTheme, isLightMode, setLightMode, applyTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
+import { logAuditEvent } from '../lib/audit'
 import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon } from '../components/ui/Icon'
 import { getNotifPrefs, saveNotifPrefs, requestPermission, permissionGranted, notificationsSupported } from '../lib/notifications'
 import { toRoman } from '../lib/utils'
@@ -167,6 +168,8 @@ export function Settings() {
   const [sectionsOpen, setSectionsOpen] = useState(false)
   const [xpOpen, setXpOpen]           = useState(false)
   const [dataOpen, setDataOpen]        = useState(false)
+  const [privacyOpen, setPrivacyOpen]  = useState(false)
+  const [isOnLeaderboard, setIsOnLeaderboard] = useState<boolean | null>(null)
   const [deleteStep, setDeleteStep] = useState<'idle' | 'confirm' | 'type-email'>('idle')
   const [deleteEmailInput, setDeleteEmailInput] = useState('')
   const [accountEmail, setAccountEmail] = useState('')
@@ -234,6 +237,7 @@ export function Settings() {
       return
     }
 
+    await logAuditEvent('account_delete')
     await supabase.auth.signOut()
     resetStore()
     navigate('/login')
@@ -726,6 +730,103 @@ export function Settings() {
                   <span className="font-bold" style={{ color: 'var(--accent)', fontSize: 13 }}>{r.xp}</span>
                 </div>
               ))}
+            </div>
+          )}
+        </Card>
+
+        {/* ── Privacy card ─────────────────────────────────────────── */}
+        <Card className="mb-2">
+          <button
+            onClick={async () => {
+              if (!privacyOpen && isOnLeaderboard === null) {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
+                  const { data } = await supabase
+                    .from('public_profiles')
+                    .select('is_public')
+                    .eq('user_id', user.id)
+                    .maybeSingle()
+                  setIsOnLeaderboard(data?.is_public ?? false)
+                }
+              }
+              setPrivacyOpen(o => !o)
+            }}
+            className="w-full flex items-center justify-between py-2"
+          >
+            <div className="flex items-center gap-3">
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}>
+                <ShieldIcon size={18} color="var(--text-secondary)" />
+              </span>
+              <div className="text-left">
+                <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Privacy</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Leaderboard · data visibility</p>
+              </div>
+            </div>
+            <Chevron open={privacyOpen} />
+          </button>
+
+          {privacyOpen && (
+            <div className="pb-1 pop-in">
+              {/* Leaderboard visibility */}
+              <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Global leaderboard</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                    {isOnLeaderboard
+                      ? 'Your display name and XP are visible to other users.'
+                      : 'You are not listed publicly.'}
+                  </p>
+                </div>
+                <button
+                  onClick={async () => {
+                    const { data: { user } } = await supabase.auth.getUser()
+                    if (!user) return
+                    const next = !isOnLeaderboard
+                    await supabase
+                      .from('public_profiles')
+                      .update({ is_public: next })
+                      .eq('user_id', user.id)
+                    setIsOnLeaderboard(next)
+                  }}
+                  style={{
+                    width: 44, height: 26, borderRadius: 13, border: 'none', cursor: 'pointer', flexShrink: 0,
+                    background: isOnLeaderboard ? 'var(--accent)' : 'var(--input-bg)',
+                    position: 'relative', transition: 'background 0.2s ease',
+                  }}
+                >
+                  <span style={{
+                    position: 'absolute', top: 3, left: isOnLeaderboard ? 21 : 3,
+                    width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                    transition: 'left 0.2s ease', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                  }} />
+                </button>
+              </div>
+
+              {/* What's always private */}
+              <div className="py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <p className="text-xs font-bold mb-2" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Always private</p>
+                {[
+                  'Workout logs & personal records',
+                  'Sleep, mood & water data',
+                  'Goals & challenges',
+                  'Game stats & scores',
+                ].map(item => (
+                  <div key={item} className="flex items-center gap-2 mb-1.5">
+                    <ShieldIcon size={12} color="var(--text-muted)" />
+                    <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{item}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Link to full leaderboard settings */}
+              <div className="py-2" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <button
+                  onClick={() => { window.location.href = '/leaderboard' }}
+                  style={{ fontSize: 12, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                >
+                  Manage display name & leaderboard profile →
+                </button>
+              </div>
             </div>
           )}
         </Card>
