@@ -393,12 +393,73 @@ Records, Cardio, Sleep, Books, Water, Mood, Measurements, Goals, Challenges, Bas
 | `VITE_SENTRY_DSN` | Vercel + .env.local | Sentry error reporting |
 
 ### Manual steps remaining
-| Item | Location | Notes |
-|---|---|---|
-| Google OAuth | Supabase → Auth → Providers → Google | Needs Google Cloud client ID + secret; add `https://youxp.app/auth/callback` to authorized redirect URIs |
-| Apple OAuth | Supabase → Auth → Providers → Apple | Needs Apple Developer account + Services ID |
-| Leaked password protection | Supabase → Auth → Sign In → Password Protection | Dashboard toggle only — checks HaveIBeenPwned.org |
-| Sentry project | sentry.io → New Project → React | Free tier fine; add DSN to env vars |
+
+#### 1. Google OAuth (~10 min)
+
+**Step 1 — Create OAuth credentials in Google Cloud Console**
+1. Go to https://console.cloud.google.com → select or create a project
+2. APIs & Services → Credentials → **Create Credentials → OAuth 2.0 Client ID**
+3. Application type: **Web application**
+4. Authorized redirect URIs — add **both**:
+   - `https://vgizwizpqfjcptyyfmvi.supabase.co/auth/v1/callback`
+   - `https://youxp.app/auth/callback` (or your Vercel preview URL while testing)
+5. Copy the **Client ID** and **Client Secret**
+
+**Step 2 — Enable in Supabase**
+1. https://supabase.com/dashboard/project/vgizwizpqfjcptyyfmvi/auth/providers
+2. Expand **Google** → toggle **Enable**
+3. Paste Client ID and Client Secret → **Save**
+
+Once done: paste the client ID and secret in chat and I'll verify the Supabase side is configured.
+
+---
+
+#### 2. Apple OAuth (~20 min, requires paid Apple Developer account $99/yr)
+
+**Step 1 — Create a Services ID in Apple Developer**
+1. Go to https://developer.apple.com → Certificates, Identifiers & Profiles
+2. Identifiers → **+** → **Services IDs** → Continue
+3. Description: `YouXP`, Identifier: e.g. `app.youxp.web` → Register
+4. Select the new Services ID → enable **Sign In with Apple** → Configure
+5. Primary App ID: your main app bundle ID (or create one)
+6. Domains: `vgizwizpqfjcptyyfmvi.supabase.co`
+7. Return URLs: `https://vgizwizpqfjcptyyfmvi.supabase.co/auth/v1/callback`
+8. Save and register
+
+**Step 2 — Create a Private Key**
+1. Keys → **+** → enable **Sign In with Apple** → Configure → select your Primary App ID
+2. Download the `.p8` private key file (**one-time download**)
+3. Note the **Key ID**
+
+**Step 3 — Enable in Supabase**
+1. https://supabase.com/dashboard/project/vgizwizpqfjcptyyfmvi/auth/providers
+2. Expand **Apple** → toggle **Enable**
+3. Fill in: Service ID (e.g. `app.youxp.web`), Team ID (from developer.apple.com top-right), Key ID, paste the `.p8` file contents → **Save**
+
+---
+
+#### 3. Leaked Password Protection (Pro plan required)
+
+**Requirement**: Supabase Pro plan ($25/mo). Not available on free tier.
+
+If on Pro:
+1. https://supabase.com/dashboard/project/vgizwizpqfjcptyyfmvi/auth/sign-in
+2. Scroll to **Password Protection** → toggle on **"Prevent use of leaked passwords"**
+3. Save
+
+This checks new passwords against HaveIBeenPwned.org's database of 600M+ leaked passwords.
+
+---
+
+#### 4. Sentry (~5 min)
+
+1. Go to https://sentry.io → New Project → **React** → name it `youxp`
+2. Copy the DSN (looks like `https://abc123@o123.ingest.sentry.io/456`)
+3. Add to **Vercel**: Project → Settings → Environment Variables → `VITE_SENTRY_DSN` = your DSN
+4. Add to **`.env.local`**: `VITE_SENTRY_DSN=https://...`
+5. Redeploy (or it picks up on next push to main)
+
+Free tier (5k errors/mo) is sufficient for personal use.
 
 ### Backup schedule (item 12)
 Supabase Pro plan includes daily automated backups with 7-day retention.
