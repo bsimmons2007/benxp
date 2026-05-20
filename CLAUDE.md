@@ -368,3 +368,58 @@ Records, Cardio, Sleep, Books, Water, Mood, Measurements, Goals, Challenges, Bas
 - **Stray emoji** — `Water.tsx`: removed accidental `✏️` from goal tile label
 - **`useMemo` for activityDates** — `Home.tsx:526`: Set now only rebuilt when `activity` changes
 - **Books genre donut chart** — replaced horizontal bar chart with Recharts `PieChart` (donut style); book count centered in hole; legend shows genre + %; tooltip on tap; all colors via CSS variables
+
+---
+
+## Security hardening (session 3 — May 2026)
+
+### What was done
+- **vercel.json** — CSP (no `unsafe-inline` scripts), HSTS 2yr+preload, X-Frame-Options DENY, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
+- **npm audit** — 0 vulnerabilities (was 8; serialize-javascript DoS + ws memory disclosure)
+- **Login** — signup always returns generic "check your email" (no email enumeration); 5-attempt lockout with exponential backoff; 13+ age gate (COPPA)
+- **validation.ts** — sanitizeText, validateDisplayName (profanity filter + charset allowlist), validateNote
+- **Google + Apple OAuth** — PKCE flow via supabase.auth.signInWithOAuth; /auth/callback page; AuthCallback.tsx
+- **Sentry** — @sentry/react behind VITE_SENTRY_DSN env var; PII stripped before sending
+- **Account deletion** — 3-step: click → warning → type exact email to confirm
+- **Supabase Storage** — `avatars` bucket: public read, auth write, 5MB cap, JPEG/PNG/WebP
+- **Edge Functions deployed** — upload-avatar (magic-byte validation), rate-limit-login (15-min rolling window per IP), log-audit-event (JWT-verified, service-role insert)
+- **audit.ts** — client helper; fires on login success/failure and account deletion
+- **Settings Privacy card** — leaderboard toggle, "always private" list, link to leaderboard profile
+- **SQL migrations** — user_audit_log, user_privacy_settings, user_follows, user_blocks, public_profiles unique display name constraint
+
+### Env vars required (not yet set)
+| Var | Where | Purpose |
+|---|---|---|
+| `VITE_SENTRY_DSN` | Vercel + .env.local | Sentry error reporting |
+
+### Manual steps remaining
+| Item | Location | Notes |
+|---|---|---|
+| Google OAuth | Supabase → Auth → Providers → Google | Needs Google Cloud client ID + secret; add `https://youxp.app/auth/callback` to authorized redirect URIs |
+| Apple OAuth | Supabase → Auth → Providers → Apple | Needs Apple Developer account + Services ID |
+| Leaked password protection | Supabase → Auth → Sign In → Password Protection | Dashboard toggle only — checks HaveIBeenPwned.org |
+| Sentry project | sentry.io → New Project → React | Free tier fine; add DSN to env vars |
+
+### Backup schedule (item 12)
+Supabase Pro plan includes daily automated backups with 7-day retention.
+Free plan has no automated backups — manual options:
+
+**Option A (recommended): pg_dump via cron**
+```bash
+# Run daily — add to a cron job or GitHub Actions scheduled workflow
+PGPASSWORD=$DB_PASSWORD pg_dump \
+  -h db.vgizwizpqfjcptyyfmvi.supabase.co \
+  -U postgres \
+  -d postgres \
+  --no-owner --no-acl \
+  -f "backup-$(date +%Y%m%d).sql"
+```
+Get the DB password from: Supabase → Settings → Database → Connection string
+
+**Option B: Supabase CLI**
+```bash
+supabase db dump --db-url "$SUPABASE_DB_URL" -f backup.sql
+```
+
+**Recommended cadence**: weekly automated backup via GitHub Actions, monthly manual verification.
+The `migrations/` folder in the repo already tracks all schema changes — restoring data is the main risk, not schema.
