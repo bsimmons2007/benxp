@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
@@ -656,12 +656,40 @@ export function Profile() {
   const displayLevel = levelStyle === 'roman' ? toRoman(level) : String(level)
 
   const { score: consistencyScore, activeDays } = useConsistencyScore()
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [avatarUrl,       setAvatarUrl]       = useState<string | null>(null)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [avatarError,     setAvatarError]     = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setAvatarUrl(user?.user_metadata?.avatar_url ?? null)
     })
   }, [])
+
+  async function handleAvatarUpload(file: File) {
+    setAvatarError(null)
+    setUploadingAvatar(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) { setAvatarError('Not signed in'); return }
+
+      const form = new FormData()
+      form.append('avatar', file)
+
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upload-avatar`,
+        { method: 'POST', headers: { Authorization: `Bearer ${session.access_token}` }, body: form },
+      )
+      const json = await res.json()
+      if (!res.ok) { setAvatarError(json.error ?? 'Upload failed'); return }
+      setAvatarUrl(json.url)
+    } catch {
+      setAvatarError('Upload failed — try again')
+    } finally {
+      setUploadingAvatar(false)
+    }
+  }
 
   const byCategory = CATEGORY_ORDER.map(cat => ({
     cat,
@@ -682,20 +710,51 @@ export function Profile() {
           borderRadius: 18, padding: '20px 18px',
         }}>
           <div className="flex items-center gap-4">
-            {/* Avatar with decorative accent ring */}
+            {/* Avatar with decorative accent ring — tap to upload */}
             <div style={{ position: 'relative', flexShrink: 0 }}>
-              <div style={{
-                width: 76, height: 76, borderRadius: '50%',
-                background: 'var(--input-bg)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                overflow: 'hidden',
-                border: '2px solid var(--accent)',
-              }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                style={{ display: 'none' }}
+                onChange={e => {
+                  const file = e.target.files?.[0]
+                  if (file) handleAvatarUpload(file)
+                  e.target.value = ''
+                }}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                style={{
+                  position: 'relative', width: 76, height: 76, borderRadius: '50%',
+                  background: 'var(--input-bg)', overflow: 'hidden',
+                  border: '2px solid var(--accent)',
+                  cursor: uploadingAvatar ? 'wait' : 'pointer',
+                  padding: 0,
+                }}
+                title="Change avatar"
+              >
                 {avatarUrl
                   ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   : <PersonIcon size={32} color="var(--text-secondary)" />
                 }
-              </div>
+                {/* Camera overlay on hover */}
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: uploadingAvatar ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0)',
+                  transition: 'background 0.15s ease',
+                }}
+                  onMouseEnter={e => { if (!uploadingAvatar) e.currentTarget.style.background = 'rgba(0,0,0,0.4)' }}
+                  onMouseLeave={e => { if (!uploadingAvatar) e.currentTarget.style.background = 'rgba(0,0,0,0)' }}
+                >
+                  {uploadingAvatar
+                    ? <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}><path d="M10 2a8 8 0 1 0 8 8" /></svg>
+                    : <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0, transition: 'opacity 0.15s' }} className="avatar-cam"><path d="M1 7c0-1.1.9-2 2-2h1.2L6 3h8l1.8 2H17a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7Z"/><circle cx="10" cy="11" r="3"/></svg>
+                  }
+                </div>
+              </button>
               {/* Level badge pill */}
               <div style={{
                 position: 'absolute', bottom: -4, right: -4,
@@ -707,6 +766,11 @@ export function Profile() {
                 </span>
               </div>
             </div>
+            {avatarError && (
+              <p style={{ position: 'absolute', fontSize: 11, color: '#ef4444', marginTop: 2 }}>
+                {avatarError}
+              </p>
+            )}
 
             {/* Name + title + member since */}
             <div style={{ flex: 1, minWidth: 0 }}>

@@ -283,6 +283,9 @@ button, a {
 /* ─────────────────────────────────────────────────────────────
    CARD HOVER  (lift via shadow, not colored glow)
 ───────────────────────────────────────────────────────────── */
+/* Avatar upload button — reveal camera icon on hover */
+button:hover .avatar-cam { opacity: 1 !important; }
+
 .card-hover {
   transition: box-shadow 0.18s ease, transform 0.18s ease;
   cursor: pointer;
