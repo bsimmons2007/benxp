@@ -1,96 +1,13 @@
 import { create } from 'zustand'
-import { calculateLevel, levelProgress, fetchXPAndStats, getCachedXPData, setCachedXPData, getCachedXPTimestamp } from '../lib/xp'
-import type { AppStats, RawActivityData } from '../lib/xp'
+import { calculateLevel, levelProgress, fetchXPAndStats, getCachedXPData, setCachedXPData, getCachedXPTimestamp, deriveActivityFromRawRows } from '../lib/xp'
+import type { AppStats, RawActivityData, ActivityEntry } from '../lib/xp'
 import { supabase } from '../lib/supabase'
 import { invalidateStreakCache } from '../hooks/useStreak'
 import { invalidateBadgeCache } from '../hooks/useAchievements'
 
-export type { AppStats, RawActivityData }
+export type { AppStats, RawActivityData, ActivityEntry }
 
 const LS_LEVEL_KEY = 'youxp-last-seen-level'
-
-export interface ActivityEntry {
-  type: string
-  label: string
-  date: string
-  icon: string
-}
-
-async function fetchActivity(): Promise<ActivityEntry[]> {
-  const [
-    lifting, skate, books, games,
-    basketball, pickleball, golf, discGolf, hiking,
-    tableTennis, chess, pool, volleyball, spikeball,
-  ] = await Promise.all([
-    supabase.from('lifting_log').select('date, lift, weight, reps').order('created_at', { ascending: false }).limit(3),
-    supabase.from('skate_sessions').select('date, miles').order('created_at', { ascending: false }).limit(2),
-    supabase.from('books').select('date_finished, title').not('date_finished', 'is', null).order('created_at', { ascending: false }).limit(2),
-    supabase.from('fortnite_games').select('date, kills, win').order('created_at', { ascending: false }).limit(2),
-    supabase.from('basketball_sessions').select('date, points').order('created_at', { ascending: false }).limit(2),
-    supabase.from('pickleball_games').select('date, win, my_score, opp_score').order('created_at', { ascending: false }).limit(2),
-    supabase.from('golf_rounds').select('date, course, score, par').order('created_at', { ascending: false }).limit(2),
-    supabase.from('disc_golf_rounds').select('date, course, score, par').order('created_at', { ascending: false }).limit(2),
-    supabase.from('hiking_sessions').select('date, trail, distance_miles').order('created_at', { ascending: false }).limit(2),
-    supabase.from('table_tennis_games').select('date, win').order('created_at', { ascending: false }).limit(2),
-    supabase.from('chess_games').select('date, result, rating_after').order('created_at', { ascending: false }).limit(2),
-    supabase.from('pool_games').select('date, win, game_type').order('created_at', { ascending: false }).limit(2),
-    supabase.from('volleyball_sessions').select('date, win, format').order('created_at', { ascending: false }).limit(2),
-    supabase.from('spikeball_games').select('date, win').order('created_at', { ascending: false }).limit(2),
-  ])
-
-  const entries: ActivityEntry[] = [
-    ...(lifting.data ?? []).map((r: { date: string; lift: string; weight: number; reps: number }) => ({
-      type: 'lift', label: `${r.lift} ${r.weight ? `${r.weight}lbs` : ''} ×${r.reps}`, date: r.date, icon: 'lift',
-    })),
-    ...(skate.data ?? []).map((r: { date: string; miles: number }) => ({
-      type: 'skate', label: `Skate — ${r.miles} mi`, date: r.date, icon: 'skate',
-    })),
-    ...(books.data ?? []).map((r: { date_finished: string; title: string }) => ({
-      type: 'book', label: r.title, date: r.date_finished, icon: 'book',
-    })),
-    ...(games.data ?? []).map((r: { date: string; kills: number; win: boolean }) => ({
-      type: 'fortnite', label: `Fortnite — ${r.kills} kills${r.win ? ' · WIN' : ''}`, date: r.date, icon: 'game',
-    })),
-    ...(basketball.data ?? []).map((r: { date: string; points: number }) => ({
-      type: 'basketball', label: `Hoops — ${r.points} pts`, date: r.date, icon: 'basketball',
-    })),
-    ...(pickleball.data ?? []).map((r: { date: string; win: boolean; my_score: number | null; opp_score: number | null }) => ({
-      type: 'pickleball',
-      label: `Pickleball — ${r.my_score != null && r.opp_score != null ? `${r.my_score}–${r.opp_score}` : r.win ? 'Win' : 'Loss'}`,
-      date: r.date, icon: 'pickleball',
-    })),
-    ...(golf.data ?? []).map((r: { date: string; course: string; score: number; par: number }) => {
-      const vp = r.score - r.par; const vpStr = vp === 0 ? 'E' : vp > 0 ? `+${vp}` : String(vp)
-      return { type: 'golf', label: `Golf — ${r.course} (${vpStr})`, date: r.date, icon: 'golf' }
-    }),
-    ...(discGolf.data ?? []).map((r: { date: string; course: string; score: number; par: number }) => {
-      const vp = r.score - r.par; const vpStr = vp === 0 ? 'E' : vp > 0 ? `+${vp}` : String(vp)
-      return { type: 'disc_golf', label: `Disc Golf — ${r.course} (${vpStr})`, date: r.date, icon: 'disc_golf' }
-    }),
-    ...(hiking.data ?? []).map((r: { date: string; trail: string; distance_miles: number }) => ({
-      type: 'hiking', label: `Hike — ${r.trail} (${r.distance_miles} mi)`, date: r.date, icon: 'hiking',
-    })),
-    ...(tableTennis.data ?? []).map((r: { date: string; win: boolean }) => ({
-      type: 'table_tennis', label: `Table Tennis — ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'table_tennis',
-    })),
-    ...(chess.data ?? []).map((r: { date: string; result: string; rating_after: number | null }) => ({
-      type: 'chess',
-      label: `Chess — ${r.result.charAt(0).toUpperCase() + r.result.slice(1)}${r.rating_after ? ` (${r.rating_after})` : ''}`,
-      date: r.date, icon: 'chess',
-    })),
-    ...(pool.data ?? []).map((r: { date: string; win: boolean; game_type: string }) => ({
-      type: 'pool', label: `Pool — ${r.game_type} · ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'pool',
-    })),
-    ...(volleyball.data ?? []).map((r: { date: string; win: boolean; format: string }) => ({
-      type: 'volleyball', label: `Volleyball — ${r.format} · ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'volleyball',
-    })),
-    ...(spikeball.data ?? []).map((r: { date: string; win: boolean }) => ({
-      type: 'spikeball', label: `Spikeball — ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'spikeball',
-    })),
-  ]
-  entries.sort((a, b) => b.date.localeCompare(a.date))
-  return entries.slice(0, 8)
-}
 
 async function fetchUser(): Promise<{ userName: string; avatarUrl: string | null }> {
   const { data: { user } } = await supabase.auth.getUser()
@@ -140,7 +57,7 @@ interface AppState {
   reset:                   () => void
   init:                    () => Promise<void>
   refreshXP:               () => Promise<void>
-  refreshActivity:         () => Promise<void>
+  refreshActivity:         () => void
   refreshUser:             () => Promise<void>
   addOptimisticActivity:   (entry: ActivityEntry) => void
 }
@@ -205,10 +122,9 @@ export const useStore = create<AppState>((set, get) => ({
     }
 
     try {
-      const [{ totalXP, stats, rawRows }, userData, recentActivity] = await Promise.all([
-        fetchXPAndStats(supabase),
+      const [userData, { totalXP, stats, rawRows }] = await Promise.all([
         fetchUser(),
-        fetchActivity(),
+        fetchXPAndStats(supabase),
       ])
       setCachedXPData({ totalXP, stats })
       const now = Date.now()
@@ -226,7 +142,7 @@ export const useStore = create<AppState>((set, get) => ({
         levelUpPending: level > lastSeen ? level : null,
         stats,
         rawRows,
-        recentActivity,
+        recentActivity: deriveActivityFromRawRows(rawRows),
         lastUpdated:    now,
         ...userData,
       })
@@ -247,11 +163,12 @@ export const useStore = create<AppState>((set, get) => ({
       set({
         totalXP,
         level,
-        progress:    levelProgress(totalXP),
-        loading:     false,
+        progress:       levelProgress(totalXP),
+        loading:        false,
         stats,
         rawRows,
-        lastUpdated: Date.now(),
+        recentActivity: deriveActivityFromRawRows(rawRows),
+        lastUpdated:    Date.now(),
         ...(level > lastSeen ? { levelUpPending: level } : {}),
       })
     } catch (err) {
@@ -259,11 +176,11 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
-  refreshActivity: async () => {
+  refreshActivity: () => {
     invalidateStreakCache()
     invalidateBadgeCache()
-    const recentActivity = await fetchActivity()
-    set({ recentActivity })
+    const rawRows = get().rawRows
+    if (rawRows) set({ recentActivity: deriveActivityFromRawRows(rawRows) })
   },
 
   addOptimisticActivity: (entry: ActivityEntry) => {

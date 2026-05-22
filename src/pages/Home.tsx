@@ -9,11 +9,11 @@ import { useStats } from '../hooks/useStats'
 import { useCountUp } from '../hooks/useCountUp'
 import { useStreak } from '../hooks/useStreak'
 import { useStore } from '../store/useStore'
-import { supabase } from '../lib/supabase'
 import { formatDate, toRoman, localDateStr, today as appToday } from '../lib/utils'
 import { ArrowUpIcon, ArrowDownIcon, ActivityIconComp } from '../components/ui/Icon'
 import { SecondaryStatSkeleton, ActivityRowSkeleton } from '../components/ui/Skeleton'
-import { xpForLevel, getLevelTitle, XP_RATES } from '../lib/xp'
+import { xpForLevel, getLevelTitle, XP_RATES, deriveTrendsFromRawRows } from '../lib/xp'
+import type { TrendResult } from '../lib/xp'
 import { checkStreakBreakWarning } from '../lib/notifications'
 import { useStrengthSnapshot } from '../components/StrengthTab'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -22,11 +22,6 @@ import { useWellnessScore } from '../hooks/useWellnessScore'
 
 // ── Types ─────────────────────────────────────────────────────
 type TrendDir = 'up' | 'down' | 'flat'
-
-interface TrendResult {
-  dirs:      Record<string, TrendDir>
-  prDeltas:  { bench: number | null; squat: number | null; deadlift: number | null }
-}
 
 // ── Stat picker config ────────────────────────────────────────
 const HOME_STATS_KEY = 'youxp-home-stat-picks'
@@ -78,81 +73,13 @@ function TrendArrow({ direction }: { direction: TrendDir }) {
 
 
 
-// ── Trend cache ───────────────────────────────────────────────
-let trendsCache: { data: TrendResult; ts: number } | null = null
-const TRENDS_TTL = 5 * 60 * 1000
-
 function useTrends(): TrendResult {
+  const rawRows = useStore(s => s.rawRows)
   const empty: TrendResult = { dirs: {}, prDeltas: { bench: null, squat: null, deadlift: null } }
-  const [trends, setTrends] = useState<TrendResult>(trendsCache?.data ?? empty)
-
-  useEffect(() => {
-    if (trendsCache && Date.now() - trendsCache.ts < TRENDS_TTL) return
-
-    let cancelled = false
-    async function load() {
-      const now            = new Date()
-      const thisMonthStart = localDateStr(new Date(now.getFullYear(), now.getMonth(), 1))
-      const lastMonthStart = localDateStr(new Date(now.getFullYear(), now.getMonth() - 1, 1))
-      const lastMonthEnd   = localDateStr(new Date(now.getFullYear(), now.getMonth(), 0))
-      const thirtyDaysAgo  = localDateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30))
-      const sixtyDaysAgo   = localDateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 60))
-
-      const [skateThis, skateLast, booksThis, booksLast, winsThis, winsLast, prsRecent, prsPrev] = await Promise.all([
-        supabase.from('skate_sessions').select('miles').gte('date', thisMonthStart),
-        supabase.from('skate_sessions').select('miles').gte('date', lastMonthStart).lte('date', lastMonthEnd),
-        supabase.from('books').select('id').not('date_finished', 'is', null).gte('date_finished', thisMonthStart),
-        supabase.from('books').select('id').not('date_finished', 'is', null).gte('date_finished', lastMonthStart).lte('date_finished', lastMonthEnd),
-        supabase.from('fortnite_games').select('id').eq('win', true).gte('date', thisMonthStart),
-        supabase.from('fortnite_games').select('id').eq('win', true).gte('date', lastMonthStart).lte('date', lastMonthEnd),
-        supabase.from('pr_history').select('lift, est_1rm').gte('date', thirtyDaysAgo),
-        supabase.from('pr_history').select('lift, est_1rm').gte('date', sixtyDaysAgo).lt('date', thirtyDaysAgo),
-      ])
-
-      const dir = (a: number, b: number): TrendDir =>
-        a > b * 1.05 ? 'up' : a < b * 0.95 ? 'down' : 'flat'
-
-      const skateMilesThis = (skateThis.data ?? []).reduce((s: number, r: { miles: number }) => s + r.miles, 0)
-      const skateMilesLast = (skateLast.data ?? []).reduce((s: number, r: { miles: number }) => s + r.miles, 0)
-
-      const bestPR = (rows: { lift: string; est_1rm: number }[], lift: string) =>
-        (rows ?? []).filter(r => r.lift === lift).reduce((m, r) => Math.max(m, r.est_1rm), 0)
-
-      const recentRows = prsRecent.data ?? []
-      const prevRows   = prsPrev.data ?? []
-
-      const calcDelta = (lift: string): number | null => {
-        const recent = bestPR(recentRows, lift)
-        const prev   = bestPR(prevRows, lift)
-        if (recent === 0) return null
-        const delta = Math.round((recent - prev) * 10) / 10
-        return delta !== 0 ? delta : null
-      }
-
-      const result: TrendResult = {
-        dirs: {
-          bench:    dir(bestPR(recentRows, 'Bench'),    bestPR(prevRows, 'Bench')),
-          squat:    dir(bestPR(recentRows, 'Squat'),    bestPR(prevRows, 'Squat')),
-          deadlift: dir(bestPR(recentRows, 'Deadlift'), bestPR(prevRows, 'Deadlift')),
-          miles:    dir(skateMilesThis, skateMilesLast),
-          books:    dir(booksThis.data?.length ?? 0, booksLast.data?.length ?? 0),
-          wins:     dir(winsThis.data?.length ?? 0, winsLast.data?.length ?? 0),
-        },
-        prDeltas: {
-          bench:    calcDelta('Bench'),
-          squat:    calcDelta('Squat'),
-          deadlift: calcDelta('Deadlift'),
-        },
-      }
-
-      trendsCache = { data: result, ts: Date.now() }
-      if (!cancelled) setTrends(result)
-    }
-    load()
-    return () => { cancelled = true }
-  }, [])
-
-  return trends
+  return useMemo(
+    () => rawRows ? deriveTrendsFromRawRows(rawRows) : empty,
+    [rawRows], // eslint-disable-line react-hooks/exhaustive-deps
+  )
 }
 
 // ── Week Dot Strip ────────────────────────────────────────────
@@ -471,7 +398,8 @@ export function Home() {
 
   const toNext       = xpForLevel(level + 1) - totalXP
   const { refreshing, pullDistance, threshold } = usePullToRefresh(async () => {
-    await Promise.all([refreshXP(), refreshActivity()])
+    await refreshXP()
+    refreshActivity()
   })
   const levelStyle   = (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
   const displayLevel = loading ? '—' : levelStyle === 'roman' ? toRoman(level) : String(level)

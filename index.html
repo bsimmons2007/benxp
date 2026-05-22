@@ -11,10 +11,10 @@
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
       script-src  'self' 'unsafe-inline';
-      style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
-      font-src    'self' https://fonts.gstatic.com;
+      style-src   'self' 'unsafe-inline';
+      font-src    'self' data:;
       img-src     'self' data: blob: https://*.supabase.co;
-      connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com https://va.vercel-scripts.com https://o*.ingest.sentry.io;
       media-src   'self';
       object-src  'none';
       frame-ancestors 'none';
@@ -24,10 +24,7 @@
     <meta name="apple-mobile-web-app-title" content="YouXP" />
     <title>YouXP</title>
 
-    <!-- Design system fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Inter Variable is bundled via @fontsource-variable/inter in main.tsx — no CDN needed -->
 
     <!-- Boot loader — inline styles, CSP allows unsafe-inline -->
     <style>

@@ -856,7 +856,7 @@ export function Profile() {
             }}>
               <p style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 600,
                 letterSpacing: '-0.01em', marginBottom: 4 }}>{s.label}</p>
-              <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 20, fontWeight: 700,
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: 20, fontWeight: 700,
                 color: 'var(--text-primary)', lineHeight: 1 }}>{s.value}</p>
             </div>
           ))}
