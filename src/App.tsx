@@ -57,9 +57,29 @@ import { useStore } from './store/useStore'
 // navigating between routes doesn't create a new getSession() call each time.
 const AuthContext = createContext<ReturnType<typeof useAuth>>(null as never)
 
+function AppShellSkeleton() {
+  return (
+    <div style={{ background: 'var(--surface-0)', minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+      {/* TopBar placeholder */}
+      <div style={{ height: 56, background: 'var(--surface-1)', borderBottom: '1px solid var(--border-subtle)', flexShrink: 0 }} />
+      {/* Content shimmer */}
+      <div style={{ flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ height: 160, borderRadius: 16, background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', animation: 'shimmer 1.4s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%)' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {[1,2,3,4].map(i => (
+            <div key={i} style={{ height: 72, borderRadius: 12, backgroundImage: 'linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s ease-in-out infinite', animationDelay: `${i * 0.1}s` }} />
+          ))}
+        </div>
+      </div>
+      {/* BottomNav placeholder */}
+      <div style={{ height: 60, background: 'var(--surface-1)', borderTop: '1px solid var(--border-subtle)', flexShrink: 0 }} />
+    </div>
+  )
+}
+
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { session, loading, error } = useContext(AuthContext)
-  if (loading) return <div style={{ background: 'var(--base-bg)', minHeight: '100dvh' }} />
+  if (loading) return <AppShellSkeleton />
   if (error || !session) return <Navigate to="/login" replace />
   return <>{children}</>
 }
@@ -154,7 +174,7 @@ const SPLASH_KEY = 'youxp-splashed'
 
 function SplashScreen({ onDone }: { onDone: () => void }) {
   useEffect(() => {
-    const t = setTimeout(onDone, 1800)
+    const t = setTimeout(onDone, 900)
     return () => clearTimeout(t)
   }, [onDone])
 
@@ -163,7 +183,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
       position: 'fixed', inset: 0, zIndex: 99999,
       background: 'var(--base-bg)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      animation: 'splashFadeOut 1.8s ease forwards',
+      animation: 'splashFadeOut 0.9s ease forwards',
       pointerEvents: 'none',
     }}>
       {/* Glow orb */}
@@ -174,14 +194,14 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
       }} />
       <p style={{ fontSize: 42, fontWeight: 900,
         color: 'var(--accent)', letterSpacing: '0.05em',
-        animation: 'splashLogoIn 0.9s cubic-bezier(0.34,1.56,0.64,1) both',
+        animation: 'splashLogoIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
         marginBottom: 8,
       }}>
         YouXP
       </p>
       <p style={{ fontSize: 14,
         color: 'var(--text-muted)', letterSpacing: '0.18em', textTransform: 'uppercase',
-        animation: 'splashSubIn 1.1s ease both',
+        animation: 'splashSubIn 0.6s ease both',
       }}>
         Level up your life
       </p>
@@ -189,7 +209,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'var(--border)' }}>
         <div style={{
           height: '100%', background: 'var(--accent)',
-          animation: 'splashBarFill 1.6s cubic-bezier(0.4,0,0.2,1) forwards',
+          animation: 'splashBarFill 0.85s cubic-bezier(0.4,0,0.2,1) forwards',
         }} />
       </div>
     </div>

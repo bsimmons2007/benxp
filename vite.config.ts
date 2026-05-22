@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     tailwindcss(),
@@ -31,9 +31,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Cache all JS/CSS/HTML on install
         globPatterns: ['**/*.{js,css,html,ico,svg,png,woff2}'],
-        // Runtime caching for Supabase API calls — network-first with fallback
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
@@ -42,7 +40,6 @@ export default defineConfig({
               cacheName: 'supabase-cache',
               expiration: { maxEntries: 50, maxAgeSeconds: 5 * 60 },
               networkTimeoutSeconds: 10,
-              // Only cache successful responses — prevents caching 4xx/5xx errors
               cacheableResponse: { statuses: [0, 200] },
             },
           },
@@ -51,15 +48,33 @@ export default defineConfig({
     }),
   ],
   build: {
+    // Target modern browsers — smaller output, native ESM, no legacy transforms
+    target: 'esnext',
+
+    // esbuild drop — strips all console.* and debugger statements from production build
+    minify: 'esbuild',
+
+    // Hidden sourcemaps — uploaded to Sentry, never served to browsers
+    sourcemap: 'hidden',
+
+    // Inline assets < 4 kB (most SVG icons)
+    assetsInlineLimit: 4096,
+
     rollupOptions: {
       output: {
         manualChunks: {
           'vendor-react':    ['react', 'react-dom', 'react-router-dom'],
           'vendor-supabase': ['@supabase/supabase-js'],
           'vendor-charts':   ['recharts'],
+          'vendor-form':     ['react-hook-form'],
+          'vendor-state':    ['zustand'],
         },
       },
     },
+
     chunkSizeWarningLimit: 500,
   },
-})
+
+  // Strip console.* and debugger only in production
+  esbuild: mode === 'production' ? { drop: ['console', 'debugger'] as const } : {},
+}))

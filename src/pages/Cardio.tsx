@@ -511,7 +511,7 @@ export function Cardio() {
                     {splitsMap[s.id] && s.source === 'cardio' && s.activity === 'run' && (
                       <div className="flex flex-wrap gap-1 mt-1.5">
                         {splitsMap[s.id].map((split, i) => (
-                          <span key={i} className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--input-bg)', color: '#3b82f6', fontFamily: 'Space Grotesk, sans-serif' }}>
+                          <span key={i} className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--input-bg)', color: '#3b82f6', fontFamily: 'var(--font-sans)' }}>
                             {i + 1}: {split}
                           </span>
                         ))}
