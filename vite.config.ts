@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
@@ -51,12 +51,6 @@ export default defineConfig(({ mode }) => ({
     // Target modern browsers — smaller output, native ESM, no legacy transforms
     target: 'esnext',
 
-    // esbuild drop — strips all console.* and debugger statements from production build
-    minify: 'esbuild',
-
-    // Hidden sourcemaps — uploaded to Sentry, never served to browsers
-    sourcemap: 'hidden',
-
     // Inline assets < 4 kB (most SVG icons)
     assetsInlineLimit: 4096,
 
@@ -74,7 +68,4 @@ export default defineConfig(({ mode }) => ({
 
     chunkSizeWarningLimit: 500,
   },
-
-  // Strip console.* and debugger only in production
-  esbuild: mode === 'production' ? { drop: ['console', 'debugger'] as const } : {},
-}))
+})
