@@ -1,19 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { localDateStr } from './utils'
 
-export interface ActivityEntry {
-  type: string
-  label: string
-  date: string
-  icon: string
-}
-
-type TrendDir = 'up' | 'down' | 'flat'
-export interface TrendResult {
-  dirs:      Record<string, TrendDir>
-  prDeltas:  { bench: number | null; squat: number | null; deadlift: number | null }
-}
-
 // ── Level Titles ── every 5 levels, themed progression arc
 const LEVEL_TITLES: [number, string][] = [
   [1,   'Newcomer'],
@@ -145,7 +132,7 @@ export interface AppStats {
   latestBodyFat: number | null
 }
 
-/** Raw rows from the 22-table fetch — shared with useStreak, useAchievements, activity feed, and trend computation to eliminate duplicate queries. */
+/** Raw rows from the 22-table fetch — shared with useStreak and useAchievements to eliminate duplicate queries. */
 export interface RawActivityData {
   liftingRows:   { date: string; lift: string; est_1rm: number | null; weight: number | null; sets: number | null; reps: number | null }[]
   prRows:        { lift: string; est_1rm: number; date: string }[]
@@ -156,13 +143,13 @@ export interface RawActivityData {
   sleepRows:     { date: string; hours_slept: number | null }[]
   cardioRows:    { date: string; distance_miles: number; activity: string }[]
   bbRows:        { date: string; points: number; fg_made: number; fg_attempted: number }[]
-  pbRows:        { date: string; win: boolean; my_score: number | null; opp_score: number | null }[]
-  golfRows:      { date: string; score: number; par: number; holes: number; course: string | null }[]
-  dgRows:        { date: string; score: number; par: number; holes: number; course: string | null }[]
-  hikeRows:      { date: string; distance_miles: number; elevation_gain_ft: number | null; difficulty: string | null; trail: string | null }[]
+  pbRows:        { date: string; win: boolean }[]
+  golfRows:      { date: string; score: number; par: number; holes: number }[]
+  dgRows:        { date: string; score: number; par: number; holes: number }[]
+  hikeRows:      { date: string; distance_miles: number; elevation_gain_ft: number | null; difficulty: string | null }[]
   ttRows:        { date: string; win: boolean; my_score: number | null; opp_score: number | null }[]
   chessRows:     { date: string; result: string; rating_after: number | null; opening: string | null }[]
-  poolRows:      { date: string; win: boolean; break_and_run: boolean; game_type: string | null }[]
+  poolRows:      { date: string; win: boolean; break_and_run: boolean }[]
   vbRows:        { date: string; win: boolean; format: string; kills: number | null }[]
   sbRows:        { date: string; win: boolean }[]
   moodRows:      { date: string }[]
@@ -213,15 +200,15 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     supabase.from('body_measurements').select('date, weight_lbs, body_fat_pct').order('date', { ascending: false }).limit(1),
     supabase.from('water_log').select('date, oz'),
     supabase.from('basketball_sessions').select('points, date, fg_made, fg_attempted'),
-    supabase.from('pickleball_games').select('win, date, my_score, opp_score'),
-    supabase.from('golf_rounds').select('score, par, date, holes, course'),
-    supabase.from('disc_golf_rounds').select('score, par, date, holes, course'),
-    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft, date, difficulty, trail'),
+    supabase.from('pickleball_games').select('win, date'),
+    supabase.from('golf_rounds').select('score, par, date, holes'),
+    supabase.from('disc_golf_rounds').select('score, par, date, holes'),
+    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft, date, difficulty'),
     supabase.from('table_tennis_games').select('win, date, my_score, opp_score'),
     supabase.from('chess_games').select('result, date, rating_after, opening'),
     supabase.from('volleyball_sessions').select('win, date, format, kills'),
     supabase.from('spikeball_games').select('win, date'),
-    supabase.from('pool_games').select('win, break_and_run, date, game_type'),
+    supabase.from('pool_games').select('win, break_and_run, date'),
   ])
 
   // ── XP ──────────────────────────────────────────────────────
@@ -419,112 +406,6 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
   }
 
   return { totalXP, stats, rawRows }
-}
-
-/** Derive the activity feed from rawRows — eliminates 14 duplicate Supabase queries. */
-export function deriveActivityFromRawRows(rawRows: RawActivityData): ActivityEntry[] {
-  const entries: ActivityEntry[] = [
-    ...rawRows.liftingRows.slice(-3).map(r => ({
-      type: 'lift', label: `${r.lift}${r.weight ? ` ${r.weight}lbs` : ''} ×${r.reps ?? 0}`, date: r.date, icon: 'lift',
-    })),
-    ...rawRows.skateRows.slice(-2).map(r => ({
-      type: 'skate', label: `Skate — ${r.miles} mi`, date: r.date, icon: 'skate',
-    })),
-    ...rawRows.bookRows.filter(r => r.date_finished).slice(-2).map(r => ({
-      type: 'book', label: r.title, date: r.date_finished!, icon: 'book',
-    })),
-    ...rawRows.gameRows.slice(-2).map(r => ({
-      type: 'fortnite', label: `Fortnite — ${r.kills} kills${r.win ? ' · WIN' : ''}`, date: r.date, icon: 'game',
-    })),
-    ...rawRows.bbRows.slice(-2).map(r => ({
-      type: 'basketball', label: `Hoops — ${r.points} pts`, date: r.date, icon: 'basketball',
-    })),
-    ...rawRows.pbRows.slice(-2).map(r => ({
-      type: 'pickleball',
-      label: `Pickleball — ${r.my_score != null && r.opp_score != null ? `${r.my_score}–${r.opp_score}` : r.win ? 'Win' : 'Loss'}`,
-      date: r.date, icon: 'pickleball',
-    })),
-    ...rawRows.golfRows.slice(-2).map(r => {
-      const vp = r.score - r.par; const vpStr = vp === 0 ? 'E' : vp > 0 ? `+${vp}` : String(vp)
-      return { type: 'golf', label: `Golf${r.course ? ` — ${r.course}` : ''} (${vpStr})`, date: r.date, icon: 'golf' }
-    }),
-    ...rawRows.dgRows.slice(-2).map(r => {
-      const vp = r.score - r.par; const vpStr = vp === 0 ? 'E' : vp > 0 ? `+${vp}` : String(vp)
-      return { type: 'disc_golf', label: `Disc Golf${r.course ? ` — ${r.course}` : ''} (${vpStr})`, date: r.date, icon: 'disc_golf' }
-    }),
-    ...rawRows.hikeRows.slice(-2).map(r => ({
-      type: 'hiking', label: `Hike${r.trail ? ` — ${r.trail}` : ''} (${r.distance_miles} mi)`, date: r.date, icon: 'hiking',
-    })),
-    ...rawRows.ttRows.slice(-2).map(r => ({
-      type: 'table_tennis', label: `Table Tennis — ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'table_tennis',
-    })),
-    ...rawRows.chessRows.slice(-2).map(r => ({
-      type: 'chess',
-      label: `Chess — ${r.result.charAt(0).toUpperCase() + r.result.slice(1)}${r.rating_after ? ` (${r.rating_after})` : ''}`,
-      date: r.date, icon: 'chess',
-    })),
-    ...rawRows.poolRows.slice(-2).map(r => ({
-      type: 'pool', label: `Pool${r.game_type ? ` — ${r.game_type}` : ''} · ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'pool',
-    })),
-    ...rawRows.vbRows.slice(-2).map(r => ({
-      type: 'volleyball', label: `Volleyball — ${r.format} · ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'volleyball',
-    })),
-    ...rawRows.sbRows.slice(-2).map(r => ({
-      type: 'spikeball', label: `Spikeball — ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'spikeball',
-    })),
-  ]
-  entries.sort((a, b) => b.date.localeCompare(a.date))
-  return entries.slice(0, 8)
-}
-
-/** Compute trend arrows + PR deltas from rawRows — eliminates 8 duplicate Supabase queries on Home mount. */
-export function deriveTrendsFromRawRows(rawRows: RawActivityData): TrendResult {
-  const now            = new Date()
-  const thisMonthStart = localDateStr(new Date(now.getFullYear(), now.getMonth(), 1))
-  const lastMonthStart = localDateStr(new Date(now.getFullYear(), now.getMonth() - 1, 1))
-  const lastMonthEnd   = localDateStr(new Date(now.getFullYear(), now.getMonth(), 0))
-  const thirtyDaysAgo  = localDateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30))
-  const sixtyDaysAgo   = localDateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 60))
-
-  const dir = (a: number, b: number): TrendDir =>
-    a > b * 1.05 ? 'up' : a < b * 0.95 ? 'down' : 'flat'
-
-  const skateMilesThis = rawRows.skateRows.filter(r => r.date >= thisMonthStart).reduce((s, r) => s + r.miles, 0)
-  const skateMilesLast = rawRows.skateRows.filter(r => r.date >= lastMonthStart && r.date <= lastMonthEnd).reduce((s, r) => s + r.miles, 0)
-  const booksThis      = rawRows.bookRows.filter(r => r.date_finished && r.date_finished >= thisMonthStart).length
-  const booksLast      = rawRows.bookRows.filter(r => r.date_finished && r.date_finished >= lastMonthStart && r.date_finished <= lastMonthEnd).length
-  const winsThis       = rawRows.gameRows.filter(r => r.win && r.date >= thisMonthStart).length
-  const winsLast       = rawRows.gameRows.filter(r => r.win && r.date >= lastMonthStart && r.date <= lastMonthEnd).length
-
-  const prsRecent = rawRows.prRows.filter(r => r.date >= thirtyDaysAgo)
-  const prsPrev   = rawRows.prRows.filter(r => r.date >= sixtyDaysAgo && r.date < thirtyDaysAgo)
-
-  const bestPR = (rows: { lift: string; est_1rm: number }[], lift: string) =>
-    rows.filter(r => r.lift === lift).reduce((m, r) => Math.max(m, r.est_1rm), 0)
-
-  const calcDelta = (lift: string): number | null => {
-    const recent = bestPR(prsRecent, lift)
-    const prev   = bestPR(prsPrev, lift)
-    if (recent === 0) return null
-    const delta = Math.round((recent - prev) * 10) / 10
-    return delta !== 0 ? delta : null
-  }
-
-  return {
-    dirs: {
-      bench:    dir(bestPR(prsRecent, 'Bench'),    bestPR(prsPrev, 'Bench')),
-      squat:    dir(bestPR(prsRecent, 'Squat'),    bestPR(prsPrev, 'Squat')),
-      deadlift: dir(bestPR(prsRecent, 'Deadlift'), bestPR(prsPrev, 'Deadlift')),
-      miles:    dir(skateMilesThis, skateMilesLast),
-      books:    dir(booksThis, booksLast),
-      wins:     dir(winsThis, winsLast),
-    },
-    prDeltas: {
-      bench:    calcDelta('Bench'),
-      squat:    calcDelta('Squat'),
-      deadlift: calcDelta('Deadlift'),
-    },
-  }
 }
 
 // ── Strength milestones ────────────────────────────────────────
