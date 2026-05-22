@@ -13,4 +13,4 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Fire-and-forget wake ping — wakes Supabase from free-tier inactivity pause immediately
 // on bundle load, before auth resolves, so the DB is ready when real queries fire.
-supabase.from('sleep_log').select('id').limit(1).then(() => {}).catch(() => {})
+supabase.from('sleep_log').select('id').limit(1).then(() => {}, () => {})
