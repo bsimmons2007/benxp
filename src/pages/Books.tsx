@@ -182,10 +182,30 @@ function Stars({ rating }: { rating: number | null }) {
   )
 }
 
+function hexContrast(hex: string): string {
+  let h = hex.replace('#', '')
+  if (h.length === 3) h = h.split('').map(c => c + c).join('')
+  const r = parseInt(h.substring(0, 2), 16)
+  const g = parseInt(h.substring(2, 4), 16)
+  const b = parseInt(h.substring(4, 6), 16)
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return '#ffffff'
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.55 ? '#1a1a2e' : '#ffffff'
+}
+
 function GenreChip({ genre }: { genre: string | null }) {
   if (!genre) return null
+  const bg = GENRE_COLORS[genre] ?? '#555'
   return (
-    <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: GENRE_COLORS[genre] ?? '#555', color: 'var(--text-primary)' }}>
+    <span style={{
+      display: 'inline-block',
+      background: bg,
+      color: hexContrast(bg),
+      fontSize: 11, fontWeight: 700,
+      padding: '4px 10px',
+      borderRadius: 999,
+      whiteSpace: 'nowrap',
+      letterSpacing: '0.02em',
+    }}>
       {genre}
     </span>
   )

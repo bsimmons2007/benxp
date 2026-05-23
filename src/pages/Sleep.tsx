@@ -650,6 +650,10 @@ export function Sleep() {
 
   const nightLogs = logs.filter(r => !r.is_nap)
   const sorted = [...nightLogs].sort((a, b) => a.date.localeCompare(b.date))
+  const sorted30 = (() => {
+    const cutoff = nDaysAgo(29)
+    return sorted.filter(r => r.date >= cutoff)
+  })()
 
   // Stats (nights only)
   const withHours = nightLogs.filter(r => r.hours_slept != null)
@@ -765,9 +769,12 @@ export function Sleep() {
         )}
         {!chartLoading && sorted.length >= 3 && (
           <Card className="mb-4">
-            <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Hours Slept</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <p className="font-bold" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Hours Slept</p>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>Last 30 days</span>
+            </div>
             <ResponsiveContainer width="100%" height={160}>
-              <AreaChart data={sorted} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
+              <AreaChart data={sorted30.length >= 2 ? sorted30 : sorted} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="sleep-grad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#818cf8" stopOpacity={0.3} />
@@ -813,7 +820,7 @@ export function Sleep() {
                 />
                 <Bar dataKey="avg" radius={[4, 4, 0, 0]}>
                   {dayData.map((d, i) => (
-                    <Cell key={i} fill={d.avg >= 8 ? '#27AE60' : d.avg >= 7 ? 'var(--accent)' : d.avg >= 6 ? '#E67E22' : d.avg > 0 ? '#E94560' : 'var(--border-subtle)'} fillOpacity={d.avg > 0 ? 0.85 : 1} />
+                    <Cell key={i} fill={d.avg >= 8.5 ? '#15803d' : d.avg >= 7.5 ? '#4ade80' : d.avg >= 6.5 ? '#fbbf24' : d.avg >= 5.5 ? '#f97316' : d.avg > 0 ? '#ef4444' : 'var(--border-subtle)'} fillOpacity={d.avg > 0 ? 0.9 : 1} />
                   ))}
                 </Bar>
               </BarChart>

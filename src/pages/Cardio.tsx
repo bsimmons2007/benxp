@@ -158,13 +158,24 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Activity</label>
               <div className="grid grid-cols-5 gap-2">
-                {ACTIVITIES.map(a => (
-                  <label key={a.key} className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl cursor-pointer transition-all" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
-                    <input type="radio" value={a.key} {...register('activity')} className="sr-only" />
-                    <ActivityIconComp activityKey={a.key} size={18} color="var(--text-secondary)" />
-                    <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>{a.label}</span>
-                  </label>
-                ))}
+                {ACTIVITIES.map(a => {
+                  const isSelected = activity === a.key
+                  return (
+                    <label
+                      key={a.key}
+                      className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl cursor-pointer transition-all"
+                      style={{
+                        background: isSelected ? 'var(--accent-subtle, rgba(245,166,35,0.1))' : 'var(--input-bg)',
+                        border: isSelected ? '1.5px solid var(--accent)' : '1px solid var(--border)',
+                        boxShadow: isSelected ? '0 0 0 2px var(--accent-dim, rgba(245,166,35,0.25))' : 'none',
+                      }}
+                    >
+                      <input type="radio" value={a.key} {...register('activity')} className="sr-only" />
+                      <ActivityIconComp activityKey={a.key} size={18} color={isSelected ? 'var(--accent)' : 'var(--text-secondary)'} />
+                      <span style={{ fontSize: 10, color: isSelected ? 'var(--accent)' : 'var(--text-muted)', fontWeight: isSelected ? 700 : 600 }}>{a.label}</span>
+                    </label>
+                  )
+                })}
               </div>
             </div>
             <div className="flex gap-3">

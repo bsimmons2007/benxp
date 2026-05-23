@@ -53,6 +53,7 @@ export function Mood() {
   const [editVals,     setEditVals]     = useState({ mood: '7', energy: '7', stress: '5', activities: '', notes: '' })
   const [saving,       setSaving]       = useState(false)
   const [chartLoading, setChartLoading] = useState(true)
+  const [visibleLines, setVisibleLines] = useState({ mood: true, energy: true, stress: true })
   const refreshXP = useStore(s => s.refreshXP)
 
   const moodVal   = parseInt(watch('mood')   ?? '7')
@@ -114,9 +115,9 @@ export function Mood() {
     loadRecent()
   }
 
-  const avgMood   = recent.length ? recent.reduce((s, r) => s + (r.mood ?? 5), 0) / recent.length : null
-  const avgEnergy = recent.length ? recent.reduce((s, r) => s + (r.energy ?? 5), 0) / recent.length : null
-  const avgStress = recent.length ? recent.reduce((s, r) => s + (r.stress ?? 5), 0) / recent.length : null
+  const avgMood   = recent.length ? Math.round(recent.reduce((s, r) => s + (r.mood ?? 5), 0) / recent.length * 10) / 10 : null
+  const avgEnergy = recent.length ? Math.round(recent.reduce((s, r) => s + (r.energy ?? 5), 0) / recent.length * 10) / 10 : null
+  const avgStress = recent.length ? Math.round(recent.reduce((s, r) => s + (r.stress ?? 5), 0) / recent.length * 10) / 10 : null
 
   // Chart data — oldest first
   const chartData = [...recent].reverse().map(r => ({
@@ -198,6 +199,10 @@ export function Mood() {
                     <stop offset="0%"   stopColor="#4ade80" stopOpacity={0.22} />
                     <stop offset="100%" stopColor="#4ade80" stopOpacity={0.02} />
                   </linearGradient>
+                  <linearGradient id="stress-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor="#f87171" stopOpacity={0.22} />
+                    <stop offset="100%" stopColor="#f87171" stopOpacity={0.02} />
+                  </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis
@@ -212,15 +217,32 @@ export function Mood() {
                   labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any, name: string) => [v, name.charAt(0).toUpperCase() + name.slice(1)]}
-                  cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }}
+                  cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }}
                 />
-                <Area type="monotone" dataKey="mood"   stroke="#f472b6" strokeWidth={2} fill="url(#mood-grad)"   dot={false} />
-                <Area type="monotone" dataKey="energy" stroke="#4ade80"        strokeWidth={1.5} fill="url(#energy-grad)" dot={false} />
+                {visibleLines.mood   && <Area type="monotone" dataKey="mood"   stroke="#f472b6" strokeWidth={2}   fill="url(#mood-grad)"   dot={false} />}
+                {visibleLines.energy && <Area type="monotone" dataKey="energy" stroke="#4ade80" strokeWidth={1.5} fill="url(#energy-grad)" dot={false} />}
+                {visibleLines.stress && <Area type="monotone" dataKey="stress" stroke="#f87171" strokeWidth={1.5} fill="url(#stress-grad)" dot={false} />}
               </AreaChart>
             </ResponsiveContainer>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 6 }}>
-              <span style={{ fontSize: 10, color: 'var(--accent)' }}>── Mood</span>
-              <span style={{ fontSize: 10, color: '#4ade80' }}>── Energy</span>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 8, flexWrap: 'wrap' }}>
+              {([
+                { key: 'mood'   as const, label: 'Mood',   color: '#f472b6' },
+                { key: 'energy' as const, label: 'Energy', color: '#4ade80' },
+                { key: 'stress' as const, label: 'Stress', color: '#f87171' },
+              ]).map(({ key, label, color }) => (
+                <button
+                  key={key}
+                  onClick={() => setVisibleLines(v => ({ ...v, [key]: !v[key] }))}
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px',
+                    borderRadius: 4, display: 'flex', alignItems: 'center', gap: 5,
+                    opacity: visibleLines[key] ? 1 : 0.35, transition: 'opacity 0.15s',
+                  }}
+                >
+                  <span style={{ display: 'inline-block', width: 20, height: 2, background: color, borderRadius: 1 }} />
+                  <span style={{ fontSize: 10, color, fontWeight: 600 }}>{label}</span>
+                </button>
+              ))}
             </div>
           </Card>
         )}

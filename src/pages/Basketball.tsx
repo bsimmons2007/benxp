@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, BarChart, Bar, Cell,
 } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -198,7 +198,13 @@ function TrendChart({ data, dataKey, label, color = 'var(--accent)' }: {
     <div style={{ marginBottom: 24 }}>
       <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{label}</p>
       <ResponsiveContainer width="100%" height={120}>
-        <LineChart data={data} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+          <defs>
+            <linearGradient id={`bb-grad-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor={color} stopOpacity={0.18} />
+              <stop offset="100%" stopColor={color} stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border-faint)" />
           <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
           <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} domain={[0, 100]} unit="%" />
@@ -206,8 +212,8 @@ function TrendChart({ data, dataKey, label, color = 'var(--accent)' }: {
             contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11 }}
             formatter={(v: unknown) => [`${v}%`, label]}
           />
-          <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={{ r: 3, fill: color }} />
-        </LineChart>
+          <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} fill={`url(#bb-grad-${dataKey})`} dot={{ r: 3, fill: color }} />
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   )
@@ -377,7 +383,7 @@ export function Basketball() {
 
   return (
     <>
-      <TopBar title="Basketball" />
+      <TopBar title="Basketball" back />
       <PageWrapper>
         <LogBasketballPanel onLogged={load} />
 

@@ -165,7 +165,7 @@ export function Weekly() {
             onClick={() => setWeekOffset(w => Math.min(0, w + 1))}
             disabled={isCurrentWeek}
             style={{
-              color: isCurrentWeek ? '#444' : 'var(--accent)',
+              color: isCurrentWeek ? 'var(--text-disabled)' : 'var(--accent)',
               background: 'none', border: 'none',
               cursor: isCurrentWeek ? 'default' : 'pointer',
               fontSize: 20, padding: '4px 8px',
@@ -204,8 +204,8 @@ export function Weekly() {
                         width: '100%', aspectRatio: '1',
                         borderRadius: 8,
                         background: active
-                          ? 'linear-gradient(135deg, var(--accent) 0%, rgba(245,166,35,0.5) 100%)'
-                          : 'var(--input-bg)',
+                          ? 'var(--accent)'
+                          : 'var(--surface-2)',
                         border: isToday ? '1px solid var(--accent)' : '1px solid transparent',
                         boxShadow: active ? '0 0 12px var(--accent-dim)' : 'none',
                         transition: 'all 0.2s ease',
@@ -304,7 +304,7 @@ export function Weekly() {
               const bookScore     = Math.min(data.booksFinished.length, 2) / 2 * 5
               const score = Math.round(workoutScore + prScore + skateScore + sleepScore + fnScore + bookScore)
               const grade = score >= 85 ? 'S' : score >= 70 ? 'A' : score >= 55 ? 'B' : score >= 40 ? 'C' : 'D'
-              const gradeColor = score >= 85 ? '#ffd700' : score >= 70 ? '#4ade80' : score >= 55 ? 'var(--accent)' : score >= 40 ? '#f97316' : '#888'
+              const gradeColor = score >= 85 ? '#ffd700' : score >= 70 ? '#4ade80' : score >= 55 ? 'var(--accent)' : score >= 40 ? '#f97316' : 'var(--text-muted)'
               return (
                 <Card className="mb-4">
                   <div className="flex items-center justify-between mb-3">
@@ -314,7 +314,7 @@ export function Weekly() {
                       <span style={{ color: '#888', fontSize: 12 }}>{score}/100</span>
                     </div>
                   </div>
-                  <div style={{ height: 8, background: 'var(--input-bg)', borderRadius: 999, overflow: 'hidden' }}>
+                  <div style={{ height: 8, background: 'var(--surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 999, overflow: 'hidden' }}>
                     <div style={{
                       height: '100%', width: `${score}%`, borderRadius: 999,
                       background: `linear-gradient(90deg, ${gradeColor}88, ${gradeColor})`,

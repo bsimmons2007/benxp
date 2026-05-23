@@ -6,7 +6,7 @@ import { useXP } from '../hooks/useXP'
 import { useUserName } from '../hooks/useUserName'
 import { useStore } from '../store/useStore'
 import { XP_RATES } from '../lib/xp'
-import { THEMES, saveTheme, loadTheme, timeThemeEnabled, setTimeThemeEnabled, applyTimeOrSavedTheme, isLightMode, setLightMode, applyTheme } from '../lib/theme'
+import { THEMES, saveTheme, loadTheme, isLightMode, setLightMode, applyTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
 import { logAuditEvent } from '../lib/audit'
 import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, SunIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon } from '../components/ui/Icon'
@@ -119,7 +119,7 @@ function ThemeSwatch({ theme, active, onSelect }: { theme: Theme; active: boolea
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 5, background: theme.accent }} />
       {/* Theme name */}
       <div style={{ padding: '8px 4px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ fontSize: 8, fontWeight: 700, color: active ? theme.accent : 'rgba(180,180,180,0.8)', textAlign: 'center', lineHeight: 1.3, letterSpacing: '0.03em' }}>{theme.name}</p>
+        <p style={{ fontSize: 8, fontWeight: 700, color: active ? theme.accent : 'var(--text-tertiary)', textAlign: 'center', lineHeight: 1.3, letterSpacing: '0.03em' }}>{theme.name}</p>
       </div>
       {/* Active checkmark */}
       {active && (
@@ -153,7 +153,6 @@ export function Settings() {
 
   const [activeTheme, setActiveTheme]   = useState<Theme>(loadTheme)
   const [lightMode, setLightModeState]  = useState(isLightMode)
-  const [timeTheme, setTimeThemeState]  = useState(timeThemeEnabled)
   const [levelStyle, setLevelStyle] = useState<'number' | 'roman'>(
     () => (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
   )
@@ -462,30 +461,6 @@ export function Settings() {
               </div>
             </div>
           )}
-          <div style={{ borderTop: '1px solid var(--border-faint)', margin: '2px 0' }} />
-
-          {/* Time of day auto-theme row */}
-          <div className="flex items-center justify-between py-2">
-            <div className="flex items-center gap-3">
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><CalendarIcon size={18} color="var(--text-secondary)" /></span>
-              <div>
-                <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>Time of Day Theme</p>
-                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>
-                  {timeTheme ? 'Auto-switches: Dawn · Day · Dusk · Night' : 'Auto-switches with the clock'}
-                </p>
-              </div>
-            </div>
-            <Toggle
-              value={timeTheme}
-              onToggle={() => {
-                const next = !timeTheme
-                setTimeThemeState(next)
-                setTimeThemeEnabled(next)
-                const applied = applyTimeOrSavedTheme()
-                setActiveTheme(applied)
-              }}
-            />
-          </div>
         </Card>
 
         {/* ── Dashboard sections card ───────────────────────────────── */}
@@ -515,7 +490,7 @@ export function Settings() {
                       style={{ background: isHidden ? 'var(--border-faint)' : 'var(--input-bg)', opacity: isHidden ? 0.5 : 1 }}
                     >
                       <SectionIcon sectionKey={key} size={18} color="var(--text-secondary)" />
-                      <span className="flex-1 font-medium text-sm" style={{ color: isHidden ? '#555' : '#CCC' }}>{def.label}</span>
+                      <span className="flex-1 font-medium text-sm" style={{ color: isHidden ? 'var(--text-tertiary)' : 'var(--text-primary)' }}>{def.label}</span>
                       <button onClick={() => moveSection(key, -1)} disabled={idx === 0} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === 0 ? 'var(--text-dim)' : 'var(--text-muted)', background: 'var(--input-bg)' }}>↑</button>
                       <button onClick={() => moveSection(key, 1)} disabled={idx === sectionOrder.length - 1} className="w-7 h-7 rounded flex items-center justify-center text-sm" style={{ color: idx === sectionOrder.length - 1 ? 'var(--text-dim)' : 'var(--text-muted)', background: 'var(--input-bg)' }}>↓</button>
                       <button onClick={() => toggleHidden(key)} className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: isHidden ? 'var(--border-faint)' : 'var(--border)' }}>
