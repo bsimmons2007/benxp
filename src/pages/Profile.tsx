@@ -45,10 +45,14 @@ const CATEGORY_LABELS: Record<Badge['category'], string> = {
   volleyball:   'Volleyball',
   spikeball:    'Spikeball',
   cardio:       'Cardio',
+  consistency:  'Consistency',
+  wellness:     'Wellness',
+  multisport:   'Multi-Sport',
 }
 
 const CATEGORY_ORDER: Badge['category'][] = [
   'general', 'lifting', 'skate', 'cardio', 'books', 'sleep', 'challenges',
+  'consistency', 'wellness', 'multisport',
   'fortnite', 'basketball', 'pickleball', 'golf', 'disc_golf', 'hiking',
   'table_tennis', 'chess', 'pool', 'volleyball', 'spikeball',
 ]
@@ -274,6 +278,25 @@ const BADGE_ICON: Record<string, IconComponent> = {
   cardio_10k:          RocketIcon,
   cardio_half:         CrownIcon,
   cardio_100mi:        TrophyIcon,
+  // ── Consistency ─────────────────────────────────────────
+  log_streak_3:        CalendarIcon,
+  log_streak_7:        FlameIcon,
+  log_streak_14:       RocketIcon,
+  log_streak_30:       DiamondIcon,
+  log_streak_100:      CrownIcon,
+  // ── Multi-Sport ──────────────────────────────────────────
+  sports_triple:       TrophyIcon,
+  sports_five:         ShieldIcon,
+  sports_eight:        DiamondIcon,
+  sports_all:          CrownIcon,
+  // ── Wellness ────────────────────────────────────────────
+  mood_first:          BrainIcon,
+  mood_14_logs:        BrainIcon,
+  mood_30_logs:        StarIcon,
+  mood_100_logs:       DiamondIcon,
+  mood_avg_8:          RocketIcon,
+  water_streak_7:      ZapIcon,
+  water_streak_30:     CrownIcon,
 }
 
 const CATEGORY_DEFAULT: Record<Badge['category'], IconComponent> = {
@@ -295,6 +318,9 @@ const CATEGORY_DEFAULT: Record<Badge['category'], IconComponent> = {
   volleyball:   VolleyballIcon,
   spikeball:    SpikeballIcon,
   cardio:       ActivityIcon,
+  consistency:  CalendarIcon,
+  wellness:     BrainIcon,
+  multisport:   TrophyIcon,
 }
 
 function badgeIcon(badge: Badge, size = 22): ReactNode {
