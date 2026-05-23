@@ -102,52 +102,29 @@ function ThemeSwatch({ theme, active, onSelect }: { theme: Theme; active: boolea
       onClick={onSelect}
       title={theme.name}
       style={{
-        height: 82,
-        background: theme.baseBg,
-        border: active ? `2px solid ${theme.accent}` : '1.5px solid var(--border-subtle)',
-        borderRadius: 12,
-        overflow: 'hidden',
-        position: 'relative',
+        display: 'flex', alignItems: 'center', gap: 7,
+        padding: '5px 10px 5px 7px',
+        borderRadius: 999,
+        border: active ? `1.5px solid ${theme.accent}` : '1.5px solid var(--border-subtle)',
+        background: active
+          ? `color-mix(in srgb, ${theme.accent} 10%, var(--surface-1))`
+          : 'var(--surface-1)',
         cursor: 'pointer',
-        padding: 0,
-        width: '100%',
-        boxShadow: active
-          ? `0 0 0 2px ${theme.accent}55, 0 4px 16px ${theme.accent}33`
-          : '0 1px 4px rgba(0,0,0,0.06)',
-        transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+        transition: 'border-color 0.15s, background 0.15s',
+        boxShadow: active ? `0 0 0 2px ${theme.accent}28` : 'none',
+        flexShrink: 0,
       }}
     >
-      {/* Accent dominant block */}
-      <div style={{ height: 54, background: theme.accent }} />
-      {/* Base bg + name strip */}
-      <div style={{
-        height: 28, background: theme.baseBg,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '0 4px',
-        borderTop: `1px solid ${theme.accent}22`,
-      }}>
-        <p style={{
-          fontSize: 9.5, fontWeight: 600,
-          color: active ? theme.accent : 'var(--text-secondary)',
-          textAlign: 'center', lineHeight: 1.2, letterSpacing: '0.01em',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%',
-          transition: 'color 0.15s',
-        }}>{theme.name}</p>
-      </div>
-      {/* Active checkmark */}
-      {active && (
-        <div style={{
-          position: 'absolute', top: 6, right: 6,
-          width: 18, height: 18, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.95)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-        }}>
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-            <path d="M1 3.5L3.5 6L8 1" stroke={theme.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      )}
+      <span style={{
+        width: 11, height: 11, borderRadius: '50%',
+        background: theme.accent, flexShrink: 0,
+        outline: `2px solid ${theme.accent}44`, outlineOffset: 1,
+      }} />
+      <span style={{
+        fontSize: 11.5, fontWeight: active ? 600 : 500,
+        color: active ? theme.accent : 'var(--text-secondary)',
+        whiteSpace: 'nowrap',
+      }}>{theme.name}</span>
     </button>
   )
 }
@@ -414,7 +391,7 @@ export function Settings() {
                 <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>{activeTheme.name}</p>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {THEMES.map(t => (
                 <ThemeSwatch key={t.id} theme={t} active={activeTheme.id === t.id} onSelect={() => handleTheme(t)} />
               ))}
