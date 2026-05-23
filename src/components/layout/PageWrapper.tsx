@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom'
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
+import { animatePageEnter } from '../../lib/animations'
 
 interface PageWrapperProps {
   children:   ReactNode
@@ -8,6 +9,11 @@ interface PageWrapperProps {
 
 export function PageWrapper({ children, noPadding = false }: PageWrapperProps) {
   const { pathname } = useLocation()
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (containerRef.current) animatePageEnter(containerRef.current)
+  }, [pathname])
 
   return (
     <main
@@ -20,8 +26,7 @@ export function PageWrapper({ children, noPadding = false }: PageWrapperProps) {
         minHeight:     '100dvh',
       }}
     >
-      {/* key here triggers pageEnter animation on each route without remounting <main> */}
-      <div key={pathname} style={{ animation: 'pageEnter 0.24s cubic-bezier(0.22,1,0.36,1) both' }}>
+      <div key={pathname} ref={containerRef}>
         {children}
       </div>
     </main>

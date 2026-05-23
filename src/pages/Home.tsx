@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { animateStreakDots, animateWidgets } from '../lib/animations'
 import { Link } from 'react-router-dom'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
@@ -90,6 +91,8 @@ function WeekDotStrip({ streak }: {
   const todayDate = new Date(todayStr + 'T12:00:00')
   const dow       = todayDate.getDay() // 0=Sun
   const monOffset = dow === 0 ? -6 : 1 - dow
+  const dotsRef   = useRef<HTMLDivElement>(null)
+  const animated  = useRef(false)
 
   const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   const days = DAY_LABELS.map((label, i) => {
@@ -99,10 +102,17 @@ function WeekDotStrip({ streak }: {
     return { label, dateStr, isToday: dateStr === todayStr, isActive: streak.activeDays.has(dateStr) }
   })
 
+  useEffect(() => {
+    if (streak.loading || animated.current || !dotsRef.current) return
+    animated.current = true
+    const dots = Array.from(dotsRef.current.children) as HTMLElement[]
+    animateStreakDots(dots)
+  }, [streak.loading])
+
   return (
     <div className="flex items-center justify-between mb-5 px-1">
       {/* Day squares */}
-      <div className="flex gap-1">
+      <div ref={dotsRef} className="flex gap-1">
         {days.map((day, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <div style={{
@@ -373,6 +383,8 @@ export function Home() {
   })
   const [editMode,       setEditMode]       = useState(false)
   const [showAddPanel,   setShowAddPanel]   = useState(false)
+  const widgetGridRef  = useRef<HTMLDivElement>(null)
+  const widgetsAnimated = useRef(false)
   const [showBreakdown,  setShowBreakdown]  = useState(false)
   const [showUpdatedChip, setShowUpdatedChip] = useState(false)
 
@@ -399,6 +411,13 @@ export function Home() {
   useEffect(() => {
     if (!streak.loading) checkStreakBreakWarning(streak.current, streak.activeToday)
   }, [streak.loading, streak.current, streak.activeToday])
+
+  useEffect(() => {
+    if (loading || widgetsAnimated.current || !widgetGridRef.current) return
+    widgetsAnimated.current = true
+    const cards = Array.from(widgetGridRef.current.children) as HTMLElement[]
+    animateWidgets(cards)
+  }, [loading])
 
   const toNext       = xpForLevel(level + 1) - totalXP
   const { refreshing, pullDistance, threshold } = usePullToRefresh(async () => {
@@ -606,7 +625,7 @@ export function Home() {
               {[0,1,2,3].map(i => <SecondaryStatSkeleton key={i} />)}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2">
+            <div ref={widgetGridRef} className="grid grid-cols-2 gap-2">
               {statPicks.map(id => (
                 <StatWidget
                   key={id}
