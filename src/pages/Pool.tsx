@@ -203,7 +203,7 @@ export function Pool() {
 
   return (
     <>
-      <TopBar title="Pool" back />
+      <TopBar title="Pool" back backTo="/hobbies" />
       <PageWrapper>
 
         {/* Stats */}

@@ -6,6 +6,7 @@ export interface StreakData {
   current: number
   longest: number
   activeToday: boolean
+  activeDays: Set<string>
   loading: boolean
   sleepCurrent: number
   sleepLongest: number
@@ -52,7 +53,7 @@ export function useStreak(): StreakData {
 
   return useMemo(() => {
     if (!initialized || !rawRows) {
-      return { current: 0, longest: 0, activeToday: false, loading: true, sleepCurrent: 0, sleepLongest: 0, gymCurrent: 0, gymLongest: 0, cardioCurrent: 0, cardioLongest: 0 }
+      return { current: 0, longest: 0, activeToday: false, activeDays: new Set<string>(), loading: true, sleepCurrent: 0, sleepLongest: 0, gymCurrent: 0, gymLongest: 0, cardioCurrent: 0, cardioLongest: 0 }
     }
 
     const today = appToday()
@@ -105,6 +106,6 @@ export function useStreak(): StreakData {
     const { cur: gymCurrent,    long: gymLongest }     = calcStreakPair(gymDates,    today)
     const { cur: cardioCurrent, long: cardioLongest }  = calcStreakPair(cardioDates, today)
 
-    return { current, longest, activeToday, loading: false, sleepCurrent, sleepLongest, gymCurrent, gymLongest, cardioCurrent, cardioLongest }
+    return { current, longest, activeToday, activeDays: allDates, loading: false, sleepCurrent, sleepLongest, gymCurrent, gymLongest, cardioCurrent, cardioLongest }
   }, [rawRows, initialized])
 }

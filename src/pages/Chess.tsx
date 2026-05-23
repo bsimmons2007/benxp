@@ -240,7 +240,7 @@ export function Chess() {
 
   return (
     <>
-      <TopBar title="Chess" back />
+      <TopBar title="Chess" back backTo="/hobbies" />
       <PageWrapper>
 
         {/* Rating hero */}

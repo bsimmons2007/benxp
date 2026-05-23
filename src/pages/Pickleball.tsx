@@ -218,7 +218,7 @@ export function Pickleball() {
 
   return (
     <>
-      <TopBar title="Pickleball" back />
+      <TopBar title="Pickleball" back backTo="/hobbies" />
       <PageWrapper>
 
         {/* Format filter */}

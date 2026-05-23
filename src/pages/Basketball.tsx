@@ -383,7 +383,7 @@ export function Basketball() {
 
   return (
     <>
-      <TopBar title="Basketball" back />
+      <TopBar title="Basketball" back backTo="/hobbies" />
       <PageWrapper>
         <LogBasketballPanel onLogged={load} />
 

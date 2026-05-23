@@ -9,6 +9,7 @@ import {
   Bike, Waves, Footprints, Search, Crown, Shield, Diamond, Rocket,
   Mountain, Snowflake, Terminal, Volleyball, CircleDot, Flag,
   Disc3, Sparkles, Grid3x3, Sun, Sprout, Bird,
+  Dribbble, Crosshair, Radio, Table2,
 } from 'lucide-react'
 
 export type IconProps = { size?: number; color?: string; style?: CSSProperties; className?: string }
@@ -68,13 +69,13 @@ export const MountainIcon    = adapt(Mountain)
 export const SnowflakeIcon   = adapt(Snowflake)
 export const TerminalIcon    = adapt(Terminal)
 export const VolleyballIcon  = adapt(Volleyball)
-export const SpikeballIcon   = adapt(CircleDot)
-export const PoolIcon        = adapt(CircleDot)
-export const TableTennisIcon = adapt(CircleDot)
+export const SpikeballIcon   = adapt(Radio)
+export const PoolIcon        = adapt(Crosshair)
+export const TableTennisIcon = adapt(Table2)
 export const ChessIcon       = adapt(Grid3x3)
 export const GolfIcon        = adapt(Flag)
 export const DiscIcon        = adapt(Disc3)
-export const BasketballIcon  = adapt(CircleDot)
+export const BasketballIcon  = adapt(Dribbble)
 export const HobbiesIcon     = adapt(Sparkles)
 export const SunIcon         = adapt(Sun)
 export const SproutIcon      = adapt(Sprout)

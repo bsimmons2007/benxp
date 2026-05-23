@@ -22,92 +22,100 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
   const fill = Math.min(1, ozDrunk / goal)
   const pct  = Math.round(fill * 100)
 
-  // Glass geometry — rounded rect, 120×180 interior
-  const W = 120, H = 220
-  const glassX = 10, glassY = 20
-  const glassW = 100, glassH = 170
-  const r = 14  // corner radius bottom
+  // Trapezoid glass — wider at top, tapered at bottom
+  const CW = 140, CH = 200
+  const topL = 18, topR = 122    // top rim x coords
+  const botL = 32, botR = 108    // bottom x coords (narrower)
+  const rimY = 18, botY = 182    // y positions
+  const cupH = botY - rimY
 
-  // Water top Y (higher fill = lower Y value)
-  const waterTopY = glassY + glassH * (1 - fill)
+  // Interpolate x at a given y within the glass
+  const taper = (y: number) => {
+    const t = (y - rimY) / cupH
+    return { l: topL + (botL - topL) * t, r: topR + (botR - topR) * t }
+  }
 
-  // Color ramp: low → mid → full
+  const waterTop = botY - cupH * fill
+  const wt = taper(waterTop)
+
   const waterColor = fill >= 1 ? '#22d3ee' : fill >= 0.6 ? '#38bdf8' : fill >= 0.3 ? '#60c8f5' : '#7dd3fc'
-  const borderColor = fill >= 1 ? '#22d3ee' : '#38bdf8'
-
-  // Clip path for the glass interior
-  const clipId = 'wc-clip'
+  const accentStroke = fill >= 1 ? '#22d3ee' : '#38bdf8'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: 130, height: 210, userSelect: 'none', overflow: 'visible' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+      <svg viewBox={`0 0 ${CW} ${CH}`} style={{ width: 140, height: 200, userSelect: 'none', overflow: 'visible' }}>
         <defs>
           <linearGradient id="wc-water" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor={waterColor} stopOpacity={0.85} />
-            <stop offset="100%" stopColor={waterColor} stopOpacity={0.55} />
+            <stop offset="0%"   stopColor={waterColor} stopOpacity={0.88} />
+            <stop offset="100%" stopColor={waterColor} stopOpacity={0.60} />
           </linearGradient>
-          {/* Clip to glass interior */}
-          <clipPath id={clipId}>
-            <rect x={glassX} y={glassY} width={glassW} height={glassH} rx={r} />
+          <clipPath id="wc-clip">
+            <polygon points={`${topL},${rimY} ${topR},${rimY} ${botR},${botY} ${botL},${botY}`} />
           </clipPath>
         </defs>
 
-        {/* Glass body — empty fill */}
-        <rect
-          x={glassX} y={glassY} width={glassW} height={glassH} rx={r}
-          style={{ fill: 'var(--surface-2)', transition: 'fill 0.4s' }}
-          stroke="var(--border-strong)"
-          strokeWidth={1.5}
+        {/* Empty glass interior */}
+        <polygon
+          points={`${topL},${rimY} ${topR},${rimY} ${botR},${botY} ${botL},${botY}`}
+          style={{ fill: 'var(--surface-2)' }}
         />
 
-        {/* Water fill (clipped inside glass) */}
+        {/* Water fill */}
         {fill > 0 && (
-          <rect
-            x={glassX} y={waterTopY}
-            width={glassW} height={glassH - (waterTopY - glassY)}
+          <polygon
+            points={`${wt.l},${waterTop} ${wt.r},${waterTop} ${botR},${botY} ${botL},${botY}`}
             fill="url(#wc-water)"
-            clipPath={`url(#${clipId})`}
-            rx={r}
-            style={{ transition: 'y 0.55s cubic-bezier(0.22,1,0.36,1), height 0.55s cubic-bezier(0.22,1,0.36,1)' }}
+            clipPath="url(#wc-clip)"
+            style={{ transition: 'all 0.55s cubic-bezier(0.22,1,0.36,1)' }}
           />
         )}
 
-        {/* Water surface shimmer line */}
+        {/* Water surface shimmer */}
         {fill > 0 && fill < 1 && (
           <line
-            x1={glassX + 2} y1={waterTopY}
-            x2={glassX + glassW - 2} y2={waterTopY}
-            stroke={waterColor} strokeWidth={1.5} strokeOpacity={0.6}
+            x1={wt.l + 2} y1={waterTop}
+            x2={wt.r - 2} y2={waterTop}
+            stroke={waterColor} strokeWidth={1.5} strokeOpacity={0.7}
             strokeLinecap="round"
-            style={{ transition: 'y1 0.55s cubic-bezier(0.22,1,0.36,1)' }}
+            style={{ transition: 'all 0.55s cubic-bezier(0.22,1,0.36,1)' }}
           />
         )}
 
-        {/* Left highlight — glass shine (theme-agnostic via blue tint) */}
-        <rect
-          x={glassX + 8} y={glassY + 10}
-          width={6} height={glassH * 0.5}
-          rx={3}
-          fill={waterColor} fillOpacity={fill > 0 ? 0.18 : 0.1}
-          clipPath={`url(#${clipId})`}
+        {/* Left highlight — blue tint, no rgba-white (works in light mode) */}
+        <line
+          x1={topL + 10} y1={rimY + 14}
+          x2={botL + 7}  y2={botY - 14}
+          stroke={waterColor} strokeWidth={3.5}
+          strokeLinecap="round"
+          strokeOpacity={fill > 0 ? 0.28 : 0.14}
+          clipPath="url(#wc-clip)"
+          style={{ transition: 'stroke-opacity 0.4s' }}
         />
 
-        {/* Glass border overlay (on top of water) */}
-        <rect
-          x={glassX} y={glassY} width={glassW} height={glassH} rx={r}
+        {/* Glass outline on top of water */}
+        <polygon
+          points={`${topL},${rimY} ${topR},${rimY} ${botR},${botY} ${botL},${botY}`}
           fill="none"
-          stroke={fill >= 1 ? borderColor : 'var(--border-strong)'}
-          strokeWidth={fill >= 1 ? 2 : 1.5}
+          stroke={fill >= 1 ? accentStroke : 'var(--border-strong)'}
+          strokeWidth={fill >= 1 ? 2 : 1.75}
           style={{ transition: 'stroke 0.4s' }}
         />
 
-        {/* Percentage text inside glass */}
+        {/* Rim cap */}
+        <line
+          x1={topL} y1={rimY} x2={topR} y2={rimY}
+          stroke={fill >= 1 ? accentStroke : 'var(--border-default)'}
+          strokeWidth={2.5} strokeLinecap="round"
+          style={{ transition: 'stroke 0.4s' }}
+        />
+
+        {/* Fill % inside glass */}
         <text
-          x={glassX + glassW / 2}
-          y={fill > 0.12 ? waterTopY + 20 : glassY + glassH - 16}
+          x={CW / 2}
+          y={fill > 0.15 ? waterTop + 22 : botY - 14}
           textAnchor="middle"
-          fontSize={14} fontWeight="800"
-          fill={fill > 0.15 ? '#fff' : 'var(--text-muted)'}
+          fontSize={15} fontWeight="800"
+          fill={fill > 0.18 ? '#fff' : 'var(--text-muted)'}
           fontFamily="Inter Variable, Inter, system-ui, sans-serif"
           style={{ transition: 'all 0.5s ease' }}
         >
@@ -119,7 +127,7 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
       <div style={{ textAlign: 'center' }}>
         <p style={{
           fontSize: 30, fontWeight: 900, lineHeight: 1,
-          color: fill >= 1 ? borderColor : 'var(--text-primary)',
+          color: fill >= 1 ? accentStroke : 'var(--text-primary)',
           transition: 'color 0.4s',
         }}>
           {ozDrunk.toFixed(0)}
@@ -127,7 +135,7 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
         </p>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>of {goal}oz goal</p>
         {fill >= 1 && (
-          <p className="pop-in" style={{ fontSize: 12, color: borderColor, fontWeight: 700, marginTop: 4 }}>
+          <p className="pop-in" style={{ fontSize: 12, color: accentStroke, fontWeight: 700, marginTop: 4 }}>
             Goal reached!
           </p>
         )}

@@ -199,7 +199,7 @@ export function TableTennis() {
 
   return (
     <>
-      <TopBar title="Table Tennis" back />
+      <TopBar title="Table Tennis" back backTo="/hobbies" />
       <PageWrapper>
 
         {/* Format filter */}

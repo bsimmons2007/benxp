@@ -176,7 +176,7 @@ export function DiscGolf() {
 
   return (
     <>
-      <TopBar title="Disc Golf" back />
+      <TopBar title="Disc Golf" back backTo="/hobbies" />
       <PageWrapper>
 
         {/* Stats */}

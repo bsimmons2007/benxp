@@ -305,7 +305,7 @@ export function Volleyball() {
 
   return (
     <>
-      <TopBar title="Volleyball" back />
+      <TopBar title="Volleyball" back backTo="/hobbies" />
       <PageWrapper>
 
         {/* Tab switcher */}
