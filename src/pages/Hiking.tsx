@@ -203,7 +203,7 @@ export function Hiking() {
 
   return (
     <>
-      <TopBar title="Hiking" back />
+      <TopBar title="Hiking" back backTo="/hobbies" />
       <PageWrapper>
 
         {/* Stats */}

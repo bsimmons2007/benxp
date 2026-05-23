@@ -653,7 +653,7 @@ export function Fortnite() {
 
   return (
     <>
-      <TopBar title="Fortnite" back />
+      <TopBar title="Fortnite" back backTo="/hobbies" />
       <PageWrapper>
 
         {/* Tab switcher */}

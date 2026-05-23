@@ -83,9 +83,8 @@ function useTrends(): TrendResult {
 }
 
 // ── Week Dot Strip ────────────────────────────────────────────
-function WeekDotStrip({ activityDates, streak }: {
-  activityDates: Set<string>
-  streak: { current: number; longest: number; loading: boolean }
+function WeekDotStrip({ streak }: {
+  streak: { current: number; longest: number; loading: boolean; activeDays: Set<string> }
 }) {
   const todayStr  = appToday()
   const todayDate = new Date(todayStr + 'T12:00:00')
@@ -97,7 +96,7 @@ function WeekDotStrip({ activityDates, streak }: {
     const d = new Date(todayDate)
     d.setDate(d.getDate() + monOffset + i)
     const dateStr = localDateStr(d)
-    return { label, dateStr, isToday: dateStr === todayStr, isActive: activityDates.has(dateStr) }
+    return { label, dateStr, isToday: dateStr === todayStr, isActive: streak.activeDays.has(dateStr) }
   })
 
   return (
@@ -108,15 +107,20 @@ function WeekDotStrip({ activityDates, streak }: {
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <div style={{
               width: 34, height: 34, borderRadius: 8,
-              background: day.isActive ? 'var(--accent)' : 'var(--input-bg)',
-              outline: day.isToday ? '1.5px solid var(--border)' : 'none',
-              outlineOffset: 2,
-              boxShadow: day.isActive ? '0 0 10px var(--accent-dim)' : 'none',
+              background: day.isActive
+                ? 'var(--accent)'
+                : day.isToday
+                ? 'color-mix(in srgb, var(--accent) 12%, transparent)'
+                : 'var(--surface-2)',
+              border: day.isToday
+                ? '2px solid var(--accent)'
+                : '1.5px solid transparent',
+              boxShadow: day.isActive ? '0 0 10px color-mix(in srgb, var(--accent) 40%, transparent)' : 'none',
               transition: 'background 0.2s ease, box-shadow 0.2s ease',
             }} />
             <span style={{
-              fontSize: 9, fontWeight: 600, letterSpacing: '0.02em',
-              color: day.isToday ? 'var(--text-primary)' : 'var(--text-dim)',
+              fontSize: 9, fontWeight: day.isToday ? 700 : 500, letterSpacing: '0.02em',
+              color: day.isToday ? 'var(--accent)' : 'var(--text-tertiary)',
             }}>
               {day.label}
             </span>
@@ -415,9 +419,6 @@ export function Home() {
     return () => clearTimeout(id)
   }, [loading, progress])
 
-  // Derive which days this week had activity
-  const activityDates = useMemo(() => new Set(activity.map(a => a.date)), [activity])
-
   // Build card props for a given stat ID
   const getCardProps = (id: StatId) => {
     const yr = new Date().getFullYear()
@@ -589,7 +590,7 @@ export function Home() {
         </div>
 
         {/* ── Week Dot Strip ── */}
-        <WeekDotStrip activityDates={activityDates} streak={streak} />
+        <WeekDotStrip streak={streak} />
 
         {/* ── Weekly Wellness ── */}
         <WellnessWidget />

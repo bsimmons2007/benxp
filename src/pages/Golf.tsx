@@ -320,7 +320,7 @@ export function Golf() {
 
   return (
     <>
-      <TopBar title="Golf" back />
+      <TopBar title="Golf" back backTo="/hobbies" />
       <PageWrapper>
 
         {/* Stat cards */}

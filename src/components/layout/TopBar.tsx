@@ -19,10 +19,11 @@ interface TopBarProps {
   title?:        string
   hideSettings?: boolean
   back?:         boolean
+  backTo?:       string
   logButton?:    boolean
 }
 
-export function TopBar({ title, hideSettings = false, back = false, logButton = false }: TopBarProps) {
+export function TopBar({ title, hideSettings = false, back = false, backTo, logButton = false }: TopBarProps) {
   const navigate      = useNavigate()
   const userName      = useUserName()
   const toggleNav     = useNavStore(s => s.toggleNav)
@@ -54,8 +55,10 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
   }, [showLogMenu])
 
   function handleLeft() {
-    if (back) navigate(-1)
-    else {
+    if (back) {
+      if (backTo) navigate(backTo)
+      else navigate(-1)
+    } else {
       toggleNav()
       localStorage.setItem('youxp-nav-opened', '1')
       setShowHint(false)

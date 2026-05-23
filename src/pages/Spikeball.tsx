@@ -185,7 +185,7 @@ export function Spikeball() {
 
   return (
     <>
-      <TopBar title="Spikeball" back />
+      <TopBar title="Spikeball" back backTo="/hobbies" />
       <PageWrapper>
 
         <div className="grid grid-cols-3 gap-2 mb-3">
