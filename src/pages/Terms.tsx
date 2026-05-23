@@ -1,20 +1,36 @@
 import { useNavigate } from 'react-router-dom'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
+import { ShieldIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const EFFECTIVE_DATE = 'May 19, 2026'
 const APP_NAME       = 'YouXP'
 const CONTACT_EMAIL  = 'benthejamsimmons@gmail.com'
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ num, title, children }: { num?: string; title: string; children: React.ReactNode }) {
   return (
-    <div className="mb-6">
-      <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase', marginBottom: 8 }}>
-        {title}
-      </p>
-      <div style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.7 }}>
+    <div style={{
+      marginBottom: 16, borderRadius: 14,
+      background: 'var(--surface-1)', border: '1px solid var(--border-default)',
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '12px 16px', borderBottom: '1px solid var(--border-subtle)',
+      }}>
+        {num && (
+          <span style={{
+            width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+            background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 10, fontWeight: 800, color: 'var(--base-bg)',
+          }}>{num}</span>
+        )}
+        <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+          {title}
+        </p>
+      </div>
+      <div style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.65 }}>
         {children}
       </div>
     </div>
@@ -27,26 +43,32 @@ export function Terms() {
 
   return (
     <>
-      <TopBar />
+      <TopBar title="Terms of Service" back />
       <PageWrapper>
 
-        <button
-          onClick={() => navigate(-1)}
-          style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20, background: 'none',
-            border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
-        >
-          ← Back
-        </button>
+        {/* Hero */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 14,
+          padding: '18px 20px', borderRadius: 16, marginBottom: 20,
+          background: 'var(--surface-1)', border: '1px solid var(--border-default)',
+        }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+            background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <ShieldIcon size={24} color="var(--base-bg)" />
+          </div>
+          <div>
+            <p style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+              Terms of Service
+            </p>
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+              {APP_NAME} · Effective {EFFECTIVE_DATE}
+            </p>
+          </div>
+        </div>
 
-        <h1 style={{ fontSize: 26, fontWeight: 900,
-          color: 'var(--text-primary)', marginBottom: 4 }}>
-          Terms of Service
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: 12, marginBottom: 28 }}>
-          Effective {EFFECTIVE_DATE}
-        </p>
-
-        <Section title="1. Acceptance">
+        <Section num="1" title="Acceptance">
           <p>
             By creating an account and using {APP_NAME}, you agree to these Terms of Service.
             If you do not agree, please do not use the app. These terms may be updated from time to time;
@@ -54,14 +76,14 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="2. Who Can Use YouXP">
+        <Section num="2" title="Who Can Use YouXP">
           <p>
             {APP_NAME} is intended for personal, non-commercial use. You must be at least 13 years old
             to create an account. By using the app you confirm you meet this requirement.
           </p>
         </Section>
 
-        <Section title="3. Your Account">
+        <Section num="3" title="Your Account">
           <p>
             You are responsible for keeping your login credentials secure. You are responsible for all
             activity that occurs under your account. Please notify us immediately if you believe your
@@ -69,7 +91,7 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="4. Your Data">
+        <Section num="4" title="Your Data">
           <p>
             All workout logs, sleep entries, scores, and other content you enter belong to you. We do not
             sell, share, or monetize your personal data. See our{' '}
@@ -84,7 +106,7 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="5. Leaderboard & Public Features">
+        <Section num="5" title="Leaderboard & Public Features">
           <p>
             {APP_NAME} offers an opt-in global leaderboard. If you choose to participate:
           </p>
@@ -96,7 +118,7 @@ export function Terms() {
           </ul>
         </Section>
 
-        <Section title="6. Acceptable Use">
+        <Section num="6" title="Acceptable Use">
           <p>You agree not to:</p>
           <ul style={{ marginTop: 8, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <li>Attempt to access another user's account or data</li>
@@ -107,7 +129,7 @@ export function Terms() {
           </ul>
         </Section>
 
-        <Section title="7. Health Disclaimer">
+        <Section num="7" title="Health Disclaimer">
           <p>
             {APP_NAME} is a personal tracking tool, not a medical or fitness professional. Nothing in
             the app constitutes medical advice. Always consult a qualified health professional before
@@ -115,7 +137,7 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="8. Availability & Changes">
+        <Section num="8" title="Availability & Changes">
           <p>
             We aim to keep {APP_NAME} running reliably but cannot guarantee uninterrupted access.
             Features may be added, changed, or removed at any time. We'll try to communicate significant
@@ -123,14 +145,14 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="9. Termination">
+        <Section num="9" title="Termination">
           <p>
             You may delete your account at any time from Settings → Data &amp; Account. We reserve the
             right to suspend accounts that violate these terms.
           </p>
         </Section>
 
-        <Section title="10. Limitation of Liability">
+        <Section num="10" title="Limitation of Liability">
           <p>
             {APP_NAME} is provided "as is" without warranties of any kind. To the fullest extent
             permitted by law, we are not liable for any indirect, incidental, or consequential damages
@@ -138,7 +160,7 @@ export function Terms() {
           </p>
         </Section>
 
-        <Section title="11. Contact">
+        <Section num="11" title="Contact">
           <p>
             Questions about these terms? Email us at{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: 'var(--accent)' }}>

@@ -183,7 +183,7 @@ export function Hobbies() {
 
           <HobbyCard
             icon={<BasketballIcon size={28} color="#f97316" />}
-            label="Hoops"
+            label="Basketball"
             sub="Shot charts, box scores & streaks"
             path="/basketball"
             accentColor="#f97316"

@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-export type SkillKey = 'lifting' | 'skating' | 'reading' | 'fortnite' | 'sleep' | 'cardio'
+export type SkillKey = 'lifting' | 'sports' | 'reading' | 'fortnite' | 'sleep' | 'cardio'
 
 export interface SkillDef {
   key:         SkillKey
@@ -11,7 +11,7 @@ export interface SkillDef {
 
 export const SKILL_DEFS: Record<SkillKey, SkillDef> = {
   lifting:  { key: 'lifting',  label: 'Lifting',  icon: 'lifting',  description: 'Consistency and strength in the gym' },
-  skating:  { key: 'skating',  label: 'Skating',  icon: 'skate',    description: 'Total miles and sessions on wheels' },
+  sports:   { key: 'sports',   label: 'Sports',   icon: 'trophy',   description: 'Wins and sessions across all sports' },
   reading:  { key: 'reading',  label: 'Reading',  icon: 'books',    description: 'Books consumed and knowledge gained' },
   fortnite: { key: 'fortnite', label: 'Fortnite', icon: 'fortnite', description: 'Victory Royales and eliminations' },
   sleep:    { key: 'sleep',    label: 'Sleep',    icon: 'sleep',    description: 'Consistency and quality of rest' },
@@ -69,43 +69,81 @@ export interface SkillState {
 }
 
 export async function fetchSkillXP(supabase: SupabaseClient): Promise<Record<SkillKey, number>> {
-  const [lifting, skate, books, games, sleep, cardio] = await Promise.all([
+  const [lifting, books, games, sleep, cardio, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess, volleyball, spikeball, pool] = await Promise.all([
     supabase.from('lifting_log').select('date'),
-    supabase.from('skate_sessions').select('miles'),
     supabase.from('books').select('id').not('date_finished', 'is', null),
     supabase.from('fortnite_games').select('kills, win'),
     supabase.from('sleep_log').select('hours_slept'),
     supabase.from('cardio_sessions').select('distance_miles'),
+    supabase.from('basketball_sessions').select('points'),
+    supabase.from('pickleball_games').select('win'),
+    supabase.from('golf_rounds').select('score, par'),
+    supabase.from('disc_golf_rounds').select('score, par'),
+    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft'),
+    supabase.from('table_tennis_games').select('win'),
+    supabase.from('chess_games').select('result'),
+    supabase.from('volleyball_sessions').select('win'),
+    supabase.from('spikeball_games').select('win'),
+    supabase.from('pool_games').select('win, break_and_run'),
   ])
 
-  // Lifting XP: 15/set + 60/workout day (mirrors global rates)
-  const liftRows   = lifting.data  ?? []
-  const sets       = liftRows.length
-  const days       = new Set(liftRows.map((r: { date: string }) => r.date)).size
-  const liftingXP  = sets * 15 + days * 60
-
-  // Skating XP: 12/mile
-  const skateXP    = (skate.data ?? []).reduce((s: number, r: { miles: number }) => s + r.miles * 12, 0)
+  // Lifting XP: 15/set + 60/workout day
+  const liftRows  = lifting.data ?? []
+  const sets      = liftRows.length
+  const days      = new Set(liftRows.map((r: { date: string }) => r.date)).size
+  const liftingXP = sets * 15 + days * 60
 
   // Reading XP: 250/book
-  const readingXP  = (books.data?.length ?? 0) * 250
+  const readingXP = (books.data?.length ?? 0) * 250
 
   // Fortnite XP: 100/win + 5/kill
-  const gameRows   = games.data ?? []
-  const fnXP       = gameRows.reduce((s: number, r: { kills: number; win: boolean }) =>
+  const gameRows = games.data ?? []
+  const fnXP = gameRows.reduce((s: number, r: { kills: number; win: boolean }) =>
     s + (r.win ? 100 : 0) + (r.kills ?? 0) * 5, 0)
 
   // Sleep XP: 20/night + 35 bonus for 7+ hrs
-  const sleepXP    = (sleep.data ?? []).reduce((s: number, r: { hours_slept: number | null }) =>
+  const sleepXP = (sleep.data ?? []).reduce((s: number, r: { hours_slept: number | null }) =>
     s + 20 + ((r.hours_slept ?? 0) >= 7 ? 35 : 0), 0)
 
-  // Cardio XP: 12/mile (run, bike, swim — same rate as skating)
-  const cardioXP   = (cardio.data ?? []).reduce((s: number, r: { distance_miles: number }) =>
+  // Cardio XP: 12/mile
+  const cardioXP = (cardio.data ?? []).reduce((s: number, r: { distance_miles: number }) =>
     s + (r.distance_miles ?? 0) * 12, 0)
+
+  // Sports XP: aggregate across all sport tables, mirroring global XP rates
+  const bbXP = (basketball.data ?? []).reduce(
+    (s: number, r: { points: number }) => s + 25 + (r.points ?? 0), 0)
+  const pbXP = (pickleball.data ?? []).reduce(
+    (s: number, r: { win: boolean }) => s + 15 + (r.win ? 20 : 0), 0)
+  const golfXP = (golf.data ?? []).reduce(
+    (s: number, r: { score: number; par: number }) => {
+      const vsP = r.score - r.par
+      return s + 50 + (vsP < 0 ? Math.abs(vsP) * 25 : 0)
+    }, 0)
+  const dgXP = (discGolf.data ?? []).reduce(
+    (s: number, r: { score: number; par: number }) => {
+      const vsP = r.score - r.par
+      return s + 30 + (vsP < 0 ? Math.abs(vsP) * 15 : 0)
+    }, 0)
+  const hikeXP = (hiking.data ?? []).reduce(
+    (s: number, r: { distance_miles: number; elevation_gain_ft: number | null }) =>
+      s + (r.distance_miles ?? 0) * 20 + Math.floor((r.elevation_gain_ft ?? 0) / 500) * 15, 0)
+  const ttXP = (tableTennis.data ?? []).reduce(
+    (s: number, r: { win: boolean }) => s + 10 + (r.win ? 15 : 0), 0)
+  const chessXP = (chess.data ?? []).reduce(
+    (s: number, r: { result: string }) =>
+      s + 15 + (r.result === 'win' ? 25 : 0) + (r.result === 'draw' ? 8 : 0), 0)
+  const vbXP = (volleyball.data ?? []).reduce(
+    (s: number, r: { win: boolean }) => s + 15 + (r.win ? 20 : 0), 0)
+  const sbXP = (spikeball.data ?? []).reduce(
+    (s: number, r: { win: boolean }) => s + 15 + (r.win ? 20 : 0), 0)
+  const poolXP = (pool.data ?? []).reduce(
+    (s: number, r: { win: boolean; break_and_run: boolean }) =>
+      s + 10 + (r.win ? 15 : 0) + (r.break_and_run ? 25 : 0), 0)
+  const sportsXP = bbXP + pbXP + golfXP + dgXP + hikeXP + ttXP + chessXP + vbXP + sbXP + poolXP
 
   return {
     lifting:  Math.round(liftingXP),
-    skating:  Math.round(skateXP),
+    sports:   Math.round(sportsXP),
     reading:  Math.round(readingXP),
     fortnite: Math.round(fnXP),
     sleep:    Math.round(sleepXP),

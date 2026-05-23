@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Input } from '../components/ui/Input'
@@ -356,7 +356,13 @@ export function Golf() {
             <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Score vs Par</p>
             <p className="section-label mb-3">Lower is better · green = under par</p>
             <ResponsiveContainer width="100%" height={140}>
-              <LineChart data={chartData}>
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="golf-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor={ACCENT} stopOpacity={0.18} />
+                    <stop offset="100%" stopColor={ACCENT} stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={24}
@@ -366,12 +372,12 @@ export function Golf() {
                   contentStyle={ttStyle}
                   formatter={(v: number) => [vsParLabel(v), 'vs Par']}
                 />
-                <Line
-                  type="monotone" dataKey="vsPar" stroke={ACCENT} strokeWidth={2}
+                <Area
+                  type="monotone" dataKey="vsPar" stroke={ACCENT} strokeWidth={2} fill="url(#golf-grad)"
                   dot={{ r: 3, fill: ACCENT, strokeWidth: 0 }}
                   activeDot={{ r: 5, fill: ACCENT }}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </Card>
         )}

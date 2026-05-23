@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
@@ -313,7 +313,13 @@ export function Chess() {
           <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Rating Trend</p>
             <ResponsiveContainer width="100%" height={150}>
-              <LineChart data={ratingData}>
+              <AreaChart data={ratingData}>
+                <defs>
+                  <linearGradient id="chess-rating-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor={ACCENT} stopOpacity={0.18} />
+                    <stop offset="100%" stopColor={ACCENT} stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={36}
@@ -323,12 +329,12 @@ export function Chess() {
                     label={{ value: 'Peak', fill: '#f59e0b', fontSize: 9, position: 'insideTopRight' }} />
                 )}
                 <Tooltip contentStyle={ttStyle} formatter={(v: number) => [v, 'Rating']} />
-                <Line
-                  type="monotone" dataKey="rating" stroke={ACCENT} strokeWidth={2.5}
+                <Area
+                  type="monotone" dataKey="rating" stroke={ACCENT} strokeWidth={2.5} fill="url(#chess-rating-grad)"
                   dot={{ r: 3, fill: ACCENT, strokeWidth: 0 }}
                   activeDot={{ r: 5 }}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </Card>
         )}

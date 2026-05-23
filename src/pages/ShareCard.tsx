@@ -153,7 +153,7 @@ function Card() {
                 <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ width: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <SectionIcon
-                      sectionKey={s.key === 'skating' ? 'skate' : s.key === 'reading' ? 'books' : s.key === 'sleep' ? 'sleep' : s.key === 'cardio' ? 'cardio' : s.key}
+                      sectionKey={s.key === 'sports' ? 'basketball' : s.key === 'reading' ? 'books' : s.key === 'sleep' ? 'sleep' : s.key === 'cardio' ? 'cardio' : s.key}
                       size={14}
                       color={theme.accent}
                     />

@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router-dom'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
+import { ShieldIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const EFFECTIVE_DATE = 'May 19, 2026'
@@ -9,12 +9,19 @@ const CONTACT_EMAIL  = 'benthejamsimmons@gmail.com'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mb-6">
-      <p style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase', marginBottom: 8 }}>
-        {title}
-      </p>
-      <div style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.7 }}>
+    <div style={{
+      marginBottom: 16, borderRadius: 14,
+      background: 'var(--surface-1)', border: '1px solid var(--border-default)',
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        padding: '12px 16px', borderBottom: '1px solid var(--border-subtle)',
+      }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+          {title}
+        </p>
+      </div>
+      <div style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.65 }}>
         {children}
       </div>
     </div>
@@ -23,28 +30,33 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function Privacy() {
   usePageTitle('Privacy Policy')
-  const navigate = useNavigate()
 
   return (
     <>
-      <TopBar />
+      <TopBar title="Privacy Policy" back />
       <PageWrapper>
 
-        <button
-          onClick={() => navigate(-1)}
-          style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20, background: 'none',
-            border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
-        >
-          ← Back
-        </button>
-
-        <h1 style={{ fontSize: 26, fontWeight: 900,
-          color: 'var(--text-primary)', marginBottom: 4 }}>
-          Privacy Policy
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: 12, marginBottom: 28 }}>
-          Effective {EFFECTIVE_DATE}
-        </p>
+        {/* Hero */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 14,
+          padding: '18px 20px', borderRadius: 16, marginBottom: 20,
+          background: 'var(--surface-1)', border: '1px solid var(--border-default)',
+        }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+            background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <ShieldIcon size={24} color="var(--base-bg)" />
+          </div>
+          <div>
+            <p style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+              Privacy Policy
+            </p>
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+              {APP_NAME} · Effective {EFFECTIVE_DATE}
+            </p>
+          </div>
+        </div>
 
         <Section title="Overview">
           <p>
@@ -60,7 +72,7 @@ export function Privacy() {
             <li><strong style={{ color: 'var(--text-primary)' }}>Account info</strong> — your email address, used solely for authentication</li>
             <li><strong style={{ color: 'var(--text-primary)' }}>Activity data</strong> — workouts, cardio sessions, sleep logs, book logs, game stats, and any other entries you create</li>
             <li><strong style={{ color: 'var(--text-primary)' }}>Preferences</strong> — app settings, theme choices, and display name stored locally or in your account</li>
-            <li><strong style={{ color: 'var(--text-primary)' }}>Leaderboard profile</strong> — if you opt in, your chosen display name and total XP are shared on the public leaderboard. This is entirely opt-in and can be removed at any time from the Leaderboard page.</li>
+            <li><strong style={{ color: 'var(--text-primary)' }}>Leaderboard profile</strong> — if you opt in, your chosen display name and total XP are shared on the public leaderboard. This is entirely opt-in and can be removed at any time.</li>
           </ul>
           <p style={{ marginTop: 8 }}>
             We do <strong style={{ color: 'var(--text-primary)' }}>not</strong> collect location data,
@@ -109,21 +121,19 @@ export function Privacy() {
             </li>
             <li>
               <strong style={{ color: 'var(--text-primary)' }}>Vercel Analytics</strong> — privacy-first,
-              cookieless page-view analytics used solely to understand aggregate usage (e.g., which pages
-              are visited). No personal data or cross-site tracking. Subject to{' '}
+              cookieless page-view analytics used solely to understand aggregate usage. No personal data
+              or cross-site tracking. Subject to{' '}
               <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer"
                 style={{ color: 'var(--accent)' }}>
                 Vercel's Privacy Policy
               </a>
             </li>
             <li>
-              <strong style={{ color: 'var(--text-primary)' }}>Google Fonts</strong> — font delivery
-              only; no tracking
+              <strong style={{ color: 'var(--text-primary)' }}>Inter Variable font</strong> — bundled
+              at build time; no external font CDN requests
             </li>
           </ul>
-          <p style={{ marginTop: 8 }}>
-            No ad networks or data brokers are used.
-          </p>
+          <p style={{ marginTop: 8 }}>No ad networks or data brokers are used.</p>
         </Section>
 
         <Section title="Data Sharing">

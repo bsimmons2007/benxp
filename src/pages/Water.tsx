@@ -16,135 +16,124 @@ const QUICK_ADDS      = [8, 12, 16, 20, 24] // oz presets
 
 interface WaterEntry { id: string; oz: number; created_at: string }
 
-// ── Water cup SVG ─────────────────────────────────────────────────────────────
+// ── Water glass SVG ───────────────────────────────────────────────────────────
 
 function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
-  const fill   = Math.min(1, ozDrunk / goal)
-  const pct    = Math.round(fill * 100)
+  const fill = Math.min(1, ozDrunk / goal)
+  const pct  = Math.round(fill * 100)
 
-  // Cup geometry (SVG coords)
-  const CW = 140, CH = 200       // viewBox
-  const topL = 20, topR = 120    // top rim x coords
-  const botL = 30, botR = 110    // bottom x coords
-  const rimY = 22, botY = 185    // y coords
-  const cupH = botY - rimY       // 163px of cup interior
+  // Glass geometry — rounded rect, 120×180 interior
+  const W = 120, H = 220
+  const glassX = 10, glassY = 20
+  const glassW = 100, glassH = 170
+  const r = 14  // corner radius bottom
 
-  // Water fill: bottom of cup up to fill level
-  const waterTop = botY - cupH * fill
-  // Water polygon: trapezoid from bottom, clipped by fill level
-  // At waterTop, interpolate x coords using linear taper
-  const taper = (y: number) => {
-    const t = (y - rimY) / cupH  // 0 at rim, 1 at bottom
-    return { l: topL + (botL - topL) * t, r: topR + (botR - topR) * t }
-  }
-  const wt = taper(waterTop)
+  // Water top Y (higher fill = lower Y value)
+  const waterTopY = glassY + glassH * (1 - fill)
 
-  // Color based on fill
-  const waterColor = fill >= 1 ? '#00e5ff' : fill >= 0.6 ? '#29b6f6' : fill >= 0.3 ? '#4fc3f7' : '#81d4fa'
-  const glowColor  = fill >= 1 ? '#00e5ff' : '#29b6f6'
+  // Color ramp: low → mid → full
+  const waterColor = fill >= 1 ? '#22d3ee' : fill >= 0.6 ? '#38bdf8' : fill >= 0.3 ? '#60c8f5' : '#7dd3fc'
+  const borderColor = fill >= 1 ? '#22d3ee' : '#38bdf8'
+
+  // Clip path for the glass interior
+  const clipId = 'wc-clip'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-      <svg viewBox={`0 0 ${CW} ${CH}`} style={{ width: 160, height: 230, userSelect: 'none' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: 130, height: 210, userSelect: 'none', overflow: 'visible' }}>
         <defs>
-          {/* Water gradient */}
-          <linearGradient id="water-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={waterColor} stopOpacity={0.9} />
-            <stop offset="100%" stopColor={waterColor} stopOpacity={0.6} />
+          <linearGradient id="wc-water" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stopColor={waterColor} stopOpacity={0.85} />
+            <stop offset="100%" stopColor={waterColor} stopOpacity={0.55} />
           </linearGradient>
-          {/* Cup glass gradient */}
-          <linearGradient id="cup-grad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stopColor="rgba(255,255,255,0.12)" />
-            <stop offset="40%"  stopColor="rgba(255,255,255,0.04)" />
-            <stop offset="100%" stopColor="rgba(255,255,255,0.08)" />
+          {/* Glass inner fill — adapts to theme via opacity on a neutral mid-tone */}
+          <linearGradient id="wc-empty" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stopColor="#7dd3fc" stopOpacity={0.06} />
+            <stop offset="100%" stopColor="#7dd3fc" stopOpacity={0.03} />
           </linearGradient>
-          {/* Glow filter */}
-          <filter id="water-glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-          {/* Cup clip */}
-          <clipPath id="cup-clip">
-            <polygon points={`${topL},${rimY} ${topR},${rimY} ${botR},${botY} ${botL},${botY}`} />
+          {/* Clip to glass interior */}
+          <clipPath id={clipId}>
+            <rect x={glassX} y={glassY} width={glassW} height={glassH} rx={r} />
           </clipPath>
         </defs>
 
-        {/* Cup fill background (empty part) */}
-        <polygon
-          points={`${topL},${rimY} ${topR},${rimY} ${botR},${botY} ${botL},${botY}`}
-          fill="rgba(255,255,255,0.03)"
-          stroke="none"
+        {/* Glass body — empty fill */}
+        <rect
+          x={glassX} y={glassY} width={glassW} height={glassH} rx={r}
+          fill="url(#wc-empty)"
+          stroke="var(--border-strong)"
+          strokeWidth={1.5}
+          style={{ transition: 'stroke 0.4s' }}
         />
 
-        {/* Water fill */}
+        {/* Water fill (clipped inside glass) */}
         {fill > 0 && (
-          <polygon
-            points={`${wt.l},${waterTop} ${wt.r},${waterTop} ${botR},${botY} ${botL},${botY}`}
-            fill="url(#water-grad)"
-            clipPath="url(#cup-clip)"
-            filter={fill >= 0.5 ? 'url(#water-glow)' : undefined}
-            style={{ transition: 'all 0.5s cubic-bezier(0.22,1,0.36,1)' }}
+          <rect
+            x={glassX} y={waterTopY}
+            width={glassW} height={glassH - (waterTopY - glassY)}
+            fill="url(#wc-water)"
+            clipPath={`url(#${clipId})`}
+            rx={r}
+            style={{ transition: 'y 0.55s cubic-bezier(0.22,1,0.36,1), height 0.55s cubic-bezier(0.22,1,0.36,1)' }}
           />
         )}
 
-        {/* Water surface wave (simple horizontal line with slight curve label) */}
+        {/* Water surface shimmer line */}
         {fill > 0 && fill < 1 && (
           <line
-            x1={wt.l} y1={waterTop}
-            x2={wt.r} y2={waterTop}
-            stroke={waterColor} strokeWidth={2} strokeOpacity={0.7}
-            style={{ transition: 'all 0.5s cubic-bezier(0.22,1,0.36,1)' }}
+            x1={glassX + 2} y1={waterTopY}
+            x2={glassX + glassW - 2} y2={waterTopY}
+            stroke={waterColor} strokeWidth={1.5} strokeOpacity={0.6}
+            strokeLinecap="round"
+            style={{ transition: 'y1 0.55s cubic-bezier(0.22,1,0.36,1)' }}
           />
         )}
 
-        {/* Glass highlight (left edge) */}
-        <line x1={topL + 6} y1={rimY + 10} x2={botL + 4} y2={botY - 10}
-          stroke="rgba(255,255,255,0.18)" strokeWidth={3} strokeLinecap="round" />
-
-        {/* Cup outline */}
-        <polygon
-          points={`${topL},${rimY} ${topR},${rimY} ${botR},${botY} ${botL},${botY}`}
-          fill="url(#cup-grad)"
-          stroke={fill >= 1 ? glowColor : 'rgba(255,255,255,0.25)'}
-          strokeWidth={fill >= 1 ? 2 : 1.5}
-          style={{ transition: 'stroke 0.4s ease' }}
+        {/* Left highlight — glass shine (theme-agnostic via blue tint) */}
+        <rect
+          x={glassX + 8} y={glassY + 10}
+          width={6} height={glassH * 0.5}
+          rx={3}
+          fill={waterColor} fillOpacity={fill > 0 ? 0.18 : 0.1}
+          clipPath={`url(#${clipId})`}
         />
 
-        {/* Rim */}
-        <rect x={topL - 4} y={rimY - 6} width={topR - topL + 8} height={8}
-          rx={3} fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.2)" strokeWidth={1} />
+        {/* Glass border overlay (on top of water) */}
+        <rect
+          x={glassX} y={glassY} width={glassW} height={glassH} rx={r}
+          fill="none"
+          stroke={fill >= 1 ? borderColor : 'var(--border-strong)'}
+          strokeWidth={fill >= 1 ? 2 : 1.5}
+          style={{ transition: 'stroke 0.4s' }}
+        />
 
-        {/* Fill % text centered in cup */}
+        {/* Percentage text inside glass */}
         <text
-          x={CW / 2} y={fill > 0.15 ? waterTop + 22 : botY - 10}
-          textAnchor="middle" fontSize={fill >= 1 ? 20 : 15}
-          fontWeight="700" fill={fill > 0.18 ? '#fff' : 'rgba(255,255,255,0.4)'}
+          x={glassX + glassW / 2}
+          y={fill > 0.12 ? waterTopY + 20 : glassY + glassH - 16}
+          textAnchor="middle"
+          fontSize={14} fontWeight="800"
+          fill={fill > 0.15 ? '#fff' : 'var(--text-muted)'}
           fontFamily="Inter Variable, Inter, system-ui, sans-serif"
           style={{ transition: 'all 0.5s ease' }}
         >
           {pct}%
         </text>
-
-        {/* Goal line */}
-        {(() => {
-          const goalTaper = taper(rimY)
-          return (
-            <line x1={goalTaper.l} y1={rimY} x2={goalTaper.r} y2={rimY}
-              stroke={fill >= 1 ? glowColor : 'rgba(255,255,255,0.15)'}
-              strokeWidth={1.5} strokeDasharray="4 3" />
-          )
-        })()}
       </svg>
 
-      {/* oz label */}
+      {/* oz counter */}
       <div style={{ textAlign: 'center' }}>
-        <p style={{ fontSize: 28, fontWeight: 900, color: fill >= 1 ? glowColor : 'var(--text-primary)', lineHeight: 1,
-          textShadow: fill >= 1 ? `0 0 20px ${glowColor}` : 'none', transition: 'all 0.4s ease' }}>
-          {ozDrunk.toFixed(0)}<span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-tertiary)' }}>oz</span>
+        <p style={{
+          fontSize: 30, fontWeight: 900, lineHeight: 1,
+          color: fill >= 1 ? borderColor : 'var(--text-primary)',
+          transition: 'color 0.4s',
+        }}>
+          {ozDrunk.toFixed(0)}
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-tertiary)' }}>oz</span>
         </p>
-        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>of {goal}oz goal</p>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>of {goal}oz goal</p>
         {fill >= 1 && (
-          <p className="pop-in" style={{ fontSize: 12, color: glowColor, fontWeight: 700, marginTop: 4 }}>
+          <p className="pop-in" style={{ fontSize: 12, color: borderColor, fontWeight: 700, marginTop: 4 }}>
             Goal reached!
           </p>
         )}

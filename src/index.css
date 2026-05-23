@@ -136,6 +136,20 @@ button, a {
   touch-action: manipulation;
 }
 
+input[type="range"] {
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  background: var(--surface-2);
+  border-radius: 4px;
+  height: 4px;
+}
+input[type="range"]::-moz-range-track {
+  background: var(--surface-2);
+  border-radius: 4px;
+  height: 4px;
+}
+
 #root { position: relative; z-index: 1; }
 
 /* No orbs, no grid — clean flat background */

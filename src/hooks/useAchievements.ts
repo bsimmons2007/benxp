@@ -10,6 +10,7 @@ export interface Badge {
     | 'lifting' | 'skate' | 'books' | 'fortnite' | 'sleep' | 'general' | 'challenges'
     | 'basketball' | 'pickleball' | 'golf' | 'disc_golf' | 'hiking'
     | 'table_tennis' | 'chess' | 'pool' | 'volleyball' | 'spikeball' | 'cardio'
+    | 'consistency' | 'wellness' | 'multisport'
   earned: boolean
   earnedDate?: string
   secret?: boolean
@@ -34,6 +35,8 @@ interface RawData {
   vbRows:         { date: string; win: boolean; format: string; kills: number | null }[]
   sbRows:         { date: string; win: boolean }[]
   cardioRows:     { date: string; distance_miles: number; activity: string }[]
+  moodRows:       { date: string; mood?: number | null }[]
+  waterRows:      { date: string; oz: number }[]
   totalXP:        number
   level:          number
 }
@@ -44,6 +47,7 @@ function evaluate(data: RawData): Badge[] {
     gameRows, sleepRows, challengeRows, totalXP, level,
     bbRows, pbRows, golfRows, dgRows, hikeRows,
     ttRows, chessRows, poolRows, vbRows, sbRows, cardioRows,
+    moodRows, waterRows,
   } = data
 
   // ── Existing calculations ──────────────────────────────────────
@@ -185,6 +189,62 @@ function evaluate(data: RawData): Badge[] {
   const cardioTotal      = cardioRows.length
   const cardioTotalMiles = cardioRows.reduce((s, r) => s + (r.distance_miles ?? 0), 0)
   const cardioMaxSession = cardioRows.reduce((m, r) => Math.max(m, r.distance_miles ?? 0), 0)
+
+  // ── Consistency — all-activity streak ───────────────────────
+  const allActivityDates = [
+    ...liftingRows.map(r => r.date),
+    ...skateRows.map(r => r.date),
+    ...bookRows.filter(r => r.date_finished).map(r => r.date_finished!),
+    ...gameRows.map(r => r.date),
+    ...sleepRows.map(r => r.date),
+    ...cardioRows.map(r => r.date),
+    ...bbRows.map(r => r.date),
+    ...pbRows.map(r => r.date),
+    ...golfRows.map(r => r.date),
+    ...dgRows.map(r => r.date),
+    ...hikeRows.map(r => r.date),
+    ...ttRows.map(r => r.date),
+    ...chessRows.map(r => r.date),
+    ...vbRows.map(r => r.date),
+    ...sbRows.map(r => r.date),
+    ...poolRows.map(r => r.date),
+    ...moodRows.map(r => r.date),
+  ]
+  const allActivityStreak = longestStreak(allActivityDates)
+
+  // ── Multi-sport wins ─────────────────────────────────────────
+  const sportsWithWin = [
+    pbRows.some(r => r.win),
+    golfRows.some(r => r.score <= r.par),
+    dgRows.some(r => r.score <= r.par),
+    ttRows.some(r => r.win),
+    chessRows.some(r => r.result === 'win'),
+    vbRows.some(r => r.win),
+    sbRows.some(r => r.win),
+    poolRows.some(r => r.win),
+    bbRows.length > 0,
+    hikeRows.length > 0,
+  ].filter(Boolean).length
+
+  const allSportsPlayed =
+    pbRows.length > 0 && golfRows.length > 0 && dgRows.length > 0 &&
+    ttRows.length > 0 && chessRows.length > 0 && vbRows.length > 0 &&
+    sbRows.length > 0 && poolRows.length > 0 && bbRows.length > 0 &&
+    hikeRows.length > 0
+
+  // ── Wellness — mood & water ──────────────────────────────────
+  const totalMoodLogs = moodRows.length
+  const today = new Date()
+  const thirtyAgoStr = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 30).toISOString().split('T')[0]
+  const recentMoodEntries = moodRows.filter(r => r.date >= thirtyAgoStr && r.mood != null) as { date: string; mood: number }[]
+  const moodAvg30badge = recentMoodEntries.length >= 10
+    ? recentMoodEntries.reduce((s, r) => s + r.mood, 0) / recentMoodEntries.length
+    : 0
+
+  const waterByDate: Record<string, number> = {}
+  for (const r of waterRows) { waterByDate[r.date] = (waterByDate[r.date] ?? 0) + Number(r.oz) }
+  const waterGoalDates = Object.keys(waterByDate).filter(d => waterByDate[d] >= 64)
+  const waterGoalStreak = longestStreak(waterGoalDates)
 
   return [
     // ── GENERAL — First Step & XP ────────────────────────────
@@ -433,6 +493,28 @@ function evaluate(data: RawData): Badge[] {
     { id: 'cardio_10k',      icon: 'Rocket',    name: '10K Runner',     description: 'Run 6.2+ miles in a single session.',          category: 'cardio', earned: cardioMaxSession >= 6.2 },
     { id: 'cardio_half',     icon: 'Crown',     name: 'Half Marathon',  description: 'Log 13.1+ miles in a single session.',         category: 'cardio', earned: cardioMaxSession >= 13.1, secret: true },
     { id: 'cardio_100mi',    icon: 'Trophy',    name: 'Century Miles',  description: 'Log 100 total cardio miles.',                  category: 'cardio', earned: cardioTotalMiles >= 100 },
+
+    // ── CONSISTENCY — cross-app daily streaks ────────────────
+    { id: 'log_streak_3',    icon: 'Cal',    name: 'Getting Consistent', description: 'Log any activity 3 days in a row.',           category: 'consistency', earned: allActivityStreak >= 3 },
+    { id: 'log_streak_7',    icon: 'Fire',   name: 'Disciplined',        description: 'Log any activity 7 days in a row.',           category: 'consistency', earned: allActivityStreak >= 7 },
+    { id: 'log_streak_14',   icon: 'Rocket', name: 'Two-Week Run',       description: 'Log any activity 14 days in a row.',          category: 'consistency', earned: allActivityStreak >= 14 },
+    { id: 'log_streak_30',   icon: 'Gem',    name: 'Iron Will',          description: 'Log any activity 30 days in a row.',          category: 'consistency', earned: allActivityStreak >= 30, secret: true },
+    { id: 'log_streak_100',  icon: 'Crown',  name: 'Unstoppable',        description: 'Log any activity 100 days in a row.',         category: 'consistency', earned: allActivityStreak >= 100, secret: true },
+
+    // ── MULTI-SPORT ──────────────────────────────────────────
+    { id: 'sports_triple',   icon: 'Trophy', name: 'Triple Threat',      description: 'Win or complete 3 different sports.',         category: 'multisport', earned: sportsWithWin >= 3 },
+    { id: 'sports_five',     icon: 'Shield', name: 'Pentathlon',         description: 'Win or complete 5 different sports.',         category: 'multisport', earned: sportsWithWin >= 5 },
+    { id: 'sports_eight',    icon: 'Gem',    name: 'All-Around',         description: 'Win or complete 8 different sports.',         category: 'multisport', earned: sportsWithWin >= 8, secret: true },
+    { id: 'sports_all',      icon: 'Crown',  name: 'Renaissance+',       description: 'Play every sport in the app.',                category: 'multisport', earned: allSportsPlayed, secret: true },
+
+    // ── WELLNESS — mood & water ───────────────────────────────
+    { id: 'mood_first',      icon: 'Brain',  name: 'Self-Aware',         description: 'Log your first mood entry.',                  category: 'wellness', earned: totalMoodLogs >= 1 },
+    { id: 'mood_14_logs',    icon: 'Brain',  name: 'Checking In',        description: 'Log mood 14 times.',                          category: 'wellness', earned: totalMoodLogs >= 14 },
+    { id: 'mood_30_logs',    icon: 'Star',   name: 'Mind Log Master',    description: 'Log mood 30 times.',                          category: 'wellness', earned: totalMoodLogs >= 30 },
+    { id: 'mood_100_logs',   icon: 'Gem',    name: 'Inner Observer',     description: 'Log mood 100 times.',                         category: 'wellness', earned: totalMoodLogs >= 100, secret: true },
+    { id: 'mood_avg_8',      icon: 'Rocket', name: 'Thriving',           description: 'Maintain a 30-day mood average of 8 or higher.', category: 'wellness', earned: moodAvg30badge >= 8 },
+    { id: 'water_streak_7',  icon: 'Zap',    name: 'Hydration Streak',   description: 'Hit the 64 oz water goal 7 days in a row.',   category: 'wellness', earned: waterGoalStreak >= 7 },
+    { id: 'water_streak_30', icon: 'Crown',  name: 'Hydration Master',   description: 'Hit the 64 oz water goal 30 days in a row.',  category: 'wellness', earned: waterGoalStreak >= 30, secret: true },
   ] as Badge[]
 }
 
@@ -493,6 +575,8 @@ export function useAchievements() {
       vbRows:        rawRows.vbRows,
       sbRows:        rawRows.sbRows,
       cardioRows:    rawRows.cardioRows,
+      moodRows:      rawRows.moodRows,
+      waterRows:     rawRows.waterRows ?? [],
       totalXP,
       level,
     })

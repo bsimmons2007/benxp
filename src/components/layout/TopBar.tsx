@@ -3,12 +3,13 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useUserName } from '../../hooks/useUserName'
 import { useNavStore } from '../../store/useNavStore'
 import { LogoMark } from './SideNav'
-import { DumbbellIcon, MoonIcon, BrainIcon, DropletIcon, type IconComponent } from '../ui/Icon'
+import { DumbbellIcon, MoonIcon, BrainIcon, DropletIcon, RunIcon, type IconComponent } from '../ui/Icon'
 
 const LOGO_ANIMATED_KEY = 'youxp-logo-animated'
 
 const LOG_MENU: { label: string; Icon: IconComponent; to: string }[] = [
   { label: 'Lifting', Icon: DumbbellIcon, to: '/lifting' },
+  { label: 'Cardio',  Icon: RunIcon,      to: '/cardio'  },
   { label: 'Sleep',   Icon: MoonIcon,     to: '/sleep'   },
   { label: 'Mind',    Icon: BrainIcon,    to: '/mood'    },
   { label: 'Water',   Icon: DropletIcon,  to: '/water'   },

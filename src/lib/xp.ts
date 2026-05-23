@@ -98,11 +98,11 @@ export const XP_RATES = {
 }
 
 export function calculateLevel(totalXP: number): number {
-  return Math.floor(1 + Math.sqrt(totalXP / 200))
+  return Math.floor(1 + Math.sqrt(totalXP / 150))
 }
 
 export function xpForLevel(level: number): number {
-  return (level - 1) ** 2 * 200
+  return (level - 1) ** 2 * 150
 }
 
 export function levelProgress(totalXP: number): number {
@@ -165,7 +165,8 @@ export interface RawActivityData {
   poolRows:      { date: string; win: boolean; break_and_run: boolean; game_type: string | null }[]
   vbRows:        { date: string; win: boolean; format: string; kills: number | null }[]
   sbRows:        { date: string; win: boolean }[]
-  moodRows:      { date: string }[]
+  moodRows:      { date: string; mood?: number | null }[]
+  waterRows:     { date: string; oz: number }[]
 }
 
 // ── localStorage cache (stale-while-revalidate) ──────────────────
@@ -209,7 +210,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     supabase.from('sleep_log').select('hours_slept, date').eq('is_nap', false),
     supabase.from('cardio_sessions').select('distance_miles, activity, date'),
     supabase.from('goals').select('xp_reward').eq('status', 'completed'),
-    supabase.from('mood_log').select('date, rating'),
+    supabase.from('mood_log').select('date, mood'),
     supabase.from('body_measurements').select('date, weight_lbs, body_fat_pct').order('date', { ascending: false }).limit(1),
     supabase.from('water_log').select('date, oz'),
     supabase.from('basketball_sessions').select('points, date, fg_made, fg_attempted'),
@@ -343,10 +344,10 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
   const thirtyAgo = new Date(); thirtyAgo.setDate(thirtyAgo.getDate() - 30)
   const thirtyAgoStr = localDateStr(thirtyAgo)
   const recentMoods = (moodLogs.data ?? []).filter(
-    (r: { rating: number; date: string }) => r.date >= thirtyAgoStr && r.rating != null
-  ) as { rating: number; date: string }[]
+    (r: { mood: number; date: string }) => r.date >= thirtyAgoStr && r.mood != null
+  ) as { mood: number; date: string }[]
   const moodAvg30 = recentMoods.length
-    ? Math.round((recentMoods.reduce((s, r) => s + r.rating, 0) / recentMoods.length) * 10) / 10
+    ? Math.round((recentMoods.reduce((s, r) => s + r.mood, 0) / recentMoods.length) * 10) / 10
     : null
 
   // Water: today's total oz
@@ -416,6 +417,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     vbRows:        (volleyball.data ?? []) as RawActivityData['vbRows'],
     sbRows:        (spikeball.data ?? []) as RawActivityData['sbRows'],
     moodRows:      (moodLogs.data ?? []) as RawActivityData['moodRows'],
+    waterRows:     (waterLog.data ?? []) as RawActivityData['waterRows'],
   }
 
   return { totalXP, stats, rawRows }
@@ -437,7 +439,7 @@ export function deriveActivityFromRawRows(rawRows: RawActivityData): ActivityEnt
       type: 'fortnite', label: `Fortnite — ${r.kills} kills${r.win ? ' · WIN' : ''}`, date: r.date, icon: 'game',
     })),
     ...rawRows.bbRows.slice(-2).map(r => ({
-      type: 'basketball', label: `Hoops — ${r.points} pts`, date: r.date, icon: 'basketball',
+      type: 'basketball', label: `Basketball — ${r.points} pts`, date: r.date, icon: 'basketball',
     })),
     ...rawRows.pbRows.slice(-2).map(r => ({
       type: 'pickleball',
