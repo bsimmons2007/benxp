@@ -67,9 +67,8 @@ export function TopBar({ title, hideSettings = false, back = false, backTo, logB
 
   return (
     <header
-      className="fixed top-0 right-0 flex items-center justify-between z-40 md:left-16"
+      className="fixed top-0 right-0 left-0 flex items-center justify-between z-40 md:left-16"
       style={{
-        left:        0,
         height:      'calc(52px + env(safe-area-inset-top))',
         paddingTop:  'env(safe-area-inset-top)',
         paddingLeft: '12px', paddingRight: '12px',
