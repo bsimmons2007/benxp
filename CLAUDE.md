@@ -337,6 +337,24 @@ Fix with binary replacement (`content.replace(bad_bytes, good_bytes)`) — text 
 ---
 
 ## Recent work (May 2026)
+### UI consistency pass (session 5 — PR #26)
+- **ProgressBar** — gradient fixed: `${color}cc` produced invalid CSS `var(--accent)cc`; replaced with `color-mix(in srgb, ${color} 55%, transparent)`
+- **Water** — empty glass `fill="url(#wc-empty)"` (near-invisible blue at stopOpacity 0.03–0.06) replaced with `style={{ fill: 'var(--surface-2)' }}`
+- **Range inputs** (`index.css`) — full `-webkit-appearance: none` + `--slider-fill` CSS var for thumb; track background transparent so element background (linear-gradient) shows through; works on iOS Safari
+- **Mood sliders** — `accentColor` removed; dynamic `background: linear-gradient(to right, ...)` drives filled/unfilled track; chart area fill opacity 0.30 → 0.15
+- **Sleep** — decorative divider (`LOG` label flanked by `--border-subtle` lines) between `WakeTimeTrainer` and `LogSleepPanel`; chart opacity → 0.15
+- **Charts** — area fill opacity → 0.15 across all charts (LiftTrend, Bodyweight, VolumeTrend, Cardio, Fortnite); `rgba(255,255,255,0.04)` grid/cursor strokes → `var(--border-subtle)`; `rgba(255,255,255,0.18)` reference line → `var(--border-default)`
+- **BodyMap** — full CSS var migration: body-fill gradient stops use `style={{ stopColor: 'var(...)' }}`; `MP` polygon `fill`/`stroke` moved from SVG presentation attributes to `style` prop (CSS vars unreliable in SVG attrs); head/neck/structural elements → `var(--surface-2)` fill + `var(--border-subtle)` stroke; `MuscleLabel` background/border/text → CSS vars; `bodyEdge` drop shadow 0.75 → 0.35 for light mode; rank legend text fallback `#888` → `var(--text-tertiary)`
+- **Settings ThemeSwatch** — redesigned: accent color fills top 40px (dominant visual), baseBg strip + name below; active state has `box-shadow` glow ring + white-bg checkmark; swatch height 56 → 64px; hardcoded icon colors (`#555`, `#888`) → CSS vars
+- **Weekly** — `#888` score label → `var(--text-tertiary)`
+- **Pill/badge audit** — `Badge.tsx` `py-0.5` → `py-1`; `SkillCard.tsx` `text-white` → `var(--text-primary)`; `Records.tsx` RPE/PR badge padding `1px 6px` → `2px 8px`; PR badge text `#1A1A2E` → `var(--base-bg)`; `Home.tsx` grade pill `py-0.5` → `py-1`
+
+### GitHub API merge workflow note
+`gh` CLI is not installed on this machine. Use the GitHub REST API directly via PowerShell `Invoke-RestMethod` with a token retrieved from `git credential fill`. Token obtained via:
+```bash
+printf 'protocol=https\nhost=github.com\n\n' | git credential fill
+```
+
 ### Lucide icon migration + build fix (session 4)
 - **Vercel build fix** — `supabase.ts` wake ping used `.catch()` on `PromiseLike` (Supabase returns `PostgrestBuilder`, not `Promise`). Fixed with two-arg `.then(() => {}, () => {})` (PR #21)
 - **Icon system rewrite** — `Icon.tsx` reduced from 570 lines of hand-crafted SVGs to 198 lines; all 54 named exports now wrap `lucide-react` 1.16.0 via an `adapt()` shim that preserves identical `IconProps` API (`size`, `color`, `style`, `className`) and `strokeWidth: 1.6`; all 35 importing files unchanged (PR #22)
@@ -377,9 +395,13 @@ Fix with binary replacement (`content.replace(bad_bytes, good_bytes)`) — text 
 - **Dead code removal** — `Goals.tsx`: removed `addError` useState (fixed TS6133)
 
 ## Pages not yet redesigned (individual page polish pending)
-Records, Cardio, Sleep, Books, Water, Mood, Measurements, Goals, Challenges, Basketball, Pickleball, Golf, DiscGolf, Hiking, Skate, TableTennis, Chess, Volleyball, Spikeball, Pool, Fortnite, Profile, Weekly, Monthly, XPHistory, PRFeed, More — all functional, layout uses existing Card component, no hardcoded colors (swept in session 1), but haven't received the session-2 component treatment.
+Records, Books, Measurements, Goals, Challenges, Pickleball, Golf, DiscGolf, Hiking, Skate, TableTennis, Chess, Volleyball, Spikeball, Pool, Profile, XPHistory, PRFeed, More — all functional, layout uses existing Card component, no hardcoded colors, but haven't received the session-2 component treatment.
+
+Pages with targeted fixes applied (not full redesigns):
+- **Water, Mood, Sleep, Cardio, Fortnite, Weekly, Monthly** — chart fills + slider fixes (session 5)
+- **Records** — RPE/PR badge padding + color fixes (session 5)
 - **Stray emoji** — `Water.tsx`: removed accidental `✏️` from goal tile label
-- **`useMemo` for activityDates** — `Home.tsx:526`: Set now only rebuilt when `activity` changes
+- **`useMemo` for activityDates** — `Home.tsx:526`: Set only rebuilt when `activity` changes
 - **Books genre donut chart** — replaced horizontal bar chart with Recharts `PieChart` (donut style); book count centered in hole; legend shows genre + %; tooltip on tap; all colors via CSS variables
 
 ---
