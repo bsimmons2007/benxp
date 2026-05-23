@@ -7,7 +7,7 @@ import {
   Trash2, Check, ChevronDown, ChevronRight, Plus, X, Flame, Zap,
   Bookmark, Bell, Star, Heart, ArrowUp, ArrowDown, Activity,
   Bike, Waves, Footprints, Search, Crown, Shield, Diamond, Rocket,
-  Mountain, Snowflake, Terminal, Volleyball, CircleDot, Flag,
+  Mountain, Snowflake, Terminal, Volleyball, Flag,
   Disc3, Sparkles, Grid3x3, Sun, Sprout, Bird,
   Orbit, Crosshair, Radio, Table2,
 } from 'lucide-react'
