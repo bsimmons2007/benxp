@@ -76,7 +76,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
     const xp = XP_RATES.chess_game
       + (data.result === 'win'  ? XP_RATES.chess_win  : 0)
       + (data.result === 'draw' ? XP_RATES.chess_draw : 0)
-    if (data.result === 'win')  { playPR();     setToast(`+${xp} XP — ♟️ Checkmate!`) }
+    if (data.result === 'win')  { playPR();     setToast(`+${xp} XP — Checkmate!`) }
     else if (data.result === 'draw') { playXPGain(); setToast(`+${xp} XP — Draw logged`) }
     else                        { playXPGain(); setToast(`+${xp} XP — Game logged`) }
     await refreshXP(); refreshActivity()
