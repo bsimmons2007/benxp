@@ -192,15 +192,15 @@ export function Mood() {
               <AreaChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="mood-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stopColor="#f472b6" stopOpacity={0.30} />
+                    <stop offset="0%"   stopColor="#f472b6" stopOpacity={0.15} />
                     <stop offset="100%" stopColor="#f472b6" stopOpacity={0.02} />
                   </linearGradient>
                   <linearGradient id="energy-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stopColor="#4ade80" stopOpacity={0.22} />
+                    <stop offset="0%"   stopColor="#4ade80" stopOpacity={0.15} />
                     <stop offset="100%" stopColor="#4ade80" stopOpacity={0.02} />
                   </linearGradient>
                   <linearGradient id="stress-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stopColor="#f87171" stopOpacity={0.22} />
+                    <stop offset="0%"   stopColor="#f87171" stopOpacity={0.15} />
                     <stop offset="100%" stopColor="#f87171" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
@@ -260,24 +260,30 @@ export function Mood() {
               { label: 'Mood',   name: 'mood'   as const, val: moodVal,   color: 'var(--accent)' },
               { label: 'Energy', name: 'energy' as const, val: energyVal, color: '#4ade80' },
               { label: 'Stress', name: 'stress' as const, val: parseInt(watch('stress') ?? '5'), color: '#f87171' },
-            ].map(({ label, name, val, color }) => (
-              <div key={name} className="flex flex-col gap-1">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <label style={{ color: 'var(--text-secondary)', fontSize: 15, fontWeight: 500 }}>
-                    {label}
-                  </label>
-                  <span style={{ color, fontWeight: 700, fontSize: 16, minWidth: 20, textAlign: 'right' }}>
-                    {val}
-                  </span>
+            ].map(({ label, name, val, color }) => {
+              const fillPct = ((val - 1) / 9) * 100
+              return (
+                <div key={name} className="flex flex-col gap-1">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={{ color: 'var(--text-secondary)', fontSize: 15, fontWeight: 500 }}>
+                      {label}
+                    </label>
+                    <span style={{ color, fontWeight: 700, fontSize: 16, minWidth: 20, textAlign: 'right' }}>
+                      {val}
+                    </span>
+                  </div>
+                  <input
+                    type="range" min="1" max="10" step="1"
+                    {...register(name)}
+                    style={{
+                      '--slider-fill': color,
+                      background: `linear-gradient(to right, ${color} 0%, ${color} ${fillPct}%, var(--surface-2) ${fillPct}%, var(--surface-2) 100%)`,
+                    } as React.CSSProperties}
+                    className="w-full"
+                  />
                 </div>
-                <input
-                  type="range" min="1" max="10" step="1"
-                  {...register(name)}
-                  style={{ accentColor: color } as React.CSSProperties}
-                  className="w-full"
-                />
-              </div>
-            ))}
+              )
+            })}
 
             <Input label="Activities" type="text" placeholder="Gym, reading, skating…" {...register('activities')} />
             <div className="flex flex-col gap-1">
@@ -359,7 +365,13 @@ export function Mood() {
                 <input type="range" min="1" max="10" step="1"
                   value={editVals[key]}
                   onChange={e => setEditVals(v => ({ ...v, [key]: e.target.value }))}
-                  style={{ accentColor: color } as React.CSSProperties}
+                  style={(() => {
+                    const fp = ((parseInt(editVals[key]) - 1) / 9) * 100
+                    return {
+                      '--slider-fill': color,
+                      background: `linear-gradient(to right, ${color} 0%, ${color} ${fp}%, var(--surface-2) ${fp}%, var(--surface-2) 100%)`,
+                    } as React.CSSProperties
+                  })()}
                   className="w-full"
                 />
               </div>

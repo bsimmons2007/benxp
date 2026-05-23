@@ -743,6 +743,11 @@ export function Sleep() {
         <WakeTimeTrainer logs={nightLogs} />
 
         {/* Log buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 14px' }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+          <span style={{ fontSize: 10, color: 'var(--text-disabled)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Log</span>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+        </div>
         <LogSleepPanel onLogged={load} />
         <LogNapPanel onLogged={load} />
 
@@ -777,7 +782,7 @@ export function Sleep() {
               <AreaChart data={sorted30.length >= 2 ? sorted30 : sorted} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="sleep-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#818cf8" stopOpacity={0.3} />
+                    <stop offset="0%" stopColor="#818cf8" stopOpacity={0.15} />
                     <stop offset="100%" stopColor="#818cf8" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>

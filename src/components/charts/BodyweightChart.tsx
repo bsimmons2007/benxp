@@ -149,11 +149,11 @@ export function BodyweightChart() {
         <AreaChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
           <defs>
             <linearGradient id="bw-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={areaColor} stopOpacity={0.28} />
+              <stop offset="0%" stopColor={areaColor} stopOpacity={0.15} />
               <stop offset="100%" stopColor={areaColor} stopOpacity={0.02} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
+          <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
@@ -174,7 +174,7 @@ export function BodyweightChart() {
             labelFormatter={(label: any) => (typeof label === 'string' ? formatDateTooltip(label) : label)}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter={(v: any) => [`${v} lbs`, 'Bodyweight']}
-            cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
+            cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }}
           />
           {goal && (
             <ReferenceLine

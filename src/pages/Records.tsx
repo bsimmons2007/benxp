@@ -1125,12 +1125,12 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
                           : isBWLift ? `${row.reps} reps` : `${row.sets}×${row.reps}`}
                       </span>
                       {row.rpe != null && (
-                        <span style={{ fontSize: 10, color: '#9B72CF', background: 'rgba(155,114,207,0.1)', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>
+                        <span style={{ fontSize: 10, color: '#9B72CF', background: 'rgba(155,114,207,0.12)', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>
                           RPE {row.rpe}
                         </span>
                       )}
                       {row.is_pr && (
-                        <span style={{ fontSize: 10, fontWeight: 700, color: '#1A1A2E', background: 'var(--accent)', padding: '1px 6px', borderRadius: 4 }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--base-bg)', background: 'var(--accent)', padding: '2px 8px', borderRadius: 4 }}>
                           PR
                         </span>
                       )}

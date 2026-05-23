@@ -102,30 +102,31 @@ function ThemeSwatch({ theme, active, onSelect }: { theme: Theme; active: boolea
       onClick={onSelect}
       title={theme.name}
       style={{
-        width: 64, height: 56,
+        width: 64, height: 64,
         background: theme.baseBg,
-        border: active ? `2px solid ${theme.accent}` : '1px solid rgba(128,128,128,0.2)',
-        borderRadius: 10,
+        border: active ? `2px solid ${theme.accent}` : '1px solid var(--border-subtle)',
+        borderRadius: 12,
         overflow: 'hidden',
         position: 'relative',
         cursor: 'pointer',
         padding: 0,
         flexShrink: 0,
-        transition: 'transform 0.12s ease, border-color 0.12s ease',
-        transform: active ? 'scale(1.06)' : 'scale(1)',
+        transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
+        transform: active ? 'scale(1.1)' : 'scale(1)',
+        boxShadow: active ? `0 0 0 1px ${theme.accent}66, 0 4px 14px ${theme.accent}44` : 'none',
       }}
     >
-      {/* Accent bottom strip */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 5, background: theme.accent }} />
-      {/* Theme name */}
-      <div style={{ padding: '8px 4px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ fontSize: 8, fontWeight: 700, color: active ? theme.accent : 'var(--text-tertiary)', textAlign: 'center', lineHeight: 1.3, letterSpacing: '0.03em' }}>{theme.name}</p>
+      {/* Accent dominant block */}
+      <div style={{ height: 40, background: theme.accent }} />
+      {/* Base bg strip + name */}
+      <div style={{ height: 24, background: theme.baseBg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px' }}>
+        <p style={{ fontSize: 7, fontWeight: 700, color: active ? theme.accent : 'rgba(128,128,128,0.75)', textAlign: 'center', lineHeight: 1.2, letterSpacing: '0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{theme.name}</p>
       </div>
       {/* Active checkmark */}
       {active && (
-        <div style={{ position: 'absolute', top: 4, right: 4, width: 13, height: 13, borderRadius: '50%', background: theme.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ position: 'absolute', top: 5, right: 5, width: 14, height: 14, borderRadius: '50%', background: 'rgba(255,255,255,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
-            <path d="M1 2.5L2.8 4.2L6 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M1 2.5L2.8 4.2L6 1" stroke={theme.accent} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
       )}
@@ -542,13 +543,16 @@ export function Settings() {
 
               {/* Volume */}
               <div className="flex items-center gap-3 py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
-                <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ActivityIcon size={16} color="#555" /></span>
+                <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ActivityIcon size={16} color="var(--text-tertiary)" /></span>
                 <div className="flex-1">
                   <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500, marginBottom: 4 }}>Volume</p>
                   <input
                     type="range" min={0} max={1} step={0.01} value={volume}
                     onChange={e => { const v = parseFloat(e.target.value); setVolumeState(v); setAmbientVolume(v) }}
-                    style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer' }}
+                    style={{
+                      width: '100%',
+                      background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${volume * 100}%, var(--surface-2) ${volume * 100}%, var(--surface-2) 100%)`,
+                    }}
                   />
                 </div>
                 <span style={{ color: 'var(--text-muted)', fontSize: 11, minWidth: 28, textAlign: 'right' }}>{Math.round(volume * 100)}%</span>
@@ -655,7 +659,7 @@ export function Settings() {
                 {notifEnabled && (
                   <div className="flex items-center justify-between py-2.5 pop-in" style={{ borderTop: '1px solid var(--border-faint)' }}>
                     <div className="flex items-center gap-3">
-                      <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CalendarIcon size={16} color="#888" /></span>
+                      <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CalendarIcon size={16} color="var(--text-muted)" /></span>
                       <div>
                         <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500 }}>Reminder time</p>
                         <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Open the app within 5 min to trigger it</p>
@@ -826,7 +830,7 @@ export function Settings() {
                 onClick={!exporting ? handleExportCSV : undefined}
               >
                 <div className="flex items-center gap-3">
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><ShareIcon size={16} color="#888" /></span>
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><ShareIcon size={16} color="var(--text-muted)" /></span>
                   <span style={{ color: "var(--text-primary)", fontSize: "0.875rem" }}>{exporting ? 'Exporting...' : 'Export data as CSV'}</span>
                 </div>
                 <span style={{ color: 'var(--text-muted)' }}>›</span>
@@ -838,7 +842,7 @@ export function Settings() {
                 onClick={() => { resetTutorial(); window.dispatchEvent(new Event('tutorial-reset')) }}
               >
                 <div className="flex items-center gap-3">
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><GamepadIcon size={16} color="#888" /></span>
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><GamepadIcon size={16} color="var(--text-muted)" /></span>
                   <span style={{ color: "var(--text-primary)", fontSize: "0.875rem" }}>Restart app tutorial</span>
                 </div>
                 <span style={{ color: 'var(--text-muted)' }}>›</span>

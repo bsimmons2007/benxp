@@ -473,7 +473,7 @@ export function Cardio() {
               <AreaChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="cardio-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.3} />
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.15} />
                     <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>

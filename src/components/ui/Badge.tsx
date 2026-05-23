@@ -16,7 +16,7 @@ export function Badge({ label, color }: BadgeProps) {
   const bg = color ?? categoryColors[label] ?? '#555'
   return (
     <span
-      className="text-xs font-semibold px-2 py-0.5 rounded-full"
+      className="text-xs font-semibold px-2 py-1 rounded-full"
       style={{ background: bg, color: 'var(--text-primary)' }}
     >
       {label}

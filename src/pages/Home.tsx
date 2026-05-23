@@ -323,7 +323,7 @@ function WellnessWidget() {
         <div className="flex items-baseline gap-1">
           <span style={{ fontSize: 22, fontWeight: 700, color: gradeColor }}>{w.total}</span>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>/100</span>
-          <span className="ml-1 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: gradeColor + '22', color: gradeColor }}>{grade}</span>
+          <span className="ml-1 text-xs font-bold px-2 py-1 rounded-full" style={{ background: gradeColor + '22', color: gradeColor }}>{grade}</span>
         </div>
       </div>
 

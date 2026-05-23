@@ -46,11 +46,6 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
             <stop offset="0%"   stopColor={waterColor} stopOpacity={0.85} />
             <stop offset="100%" stopColor={waterColor} stopOpacity={0.55} />
           </linearGradient>
-          {/* Glass inner fill — adapts to theme via opacity on a neutral mid-tone */}
-          <linearGradient id="wc-empty" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stopColor="#7dd3fc" stopOpacity={0.06} />
-            <stop offset="100%" stopColor="#7dd3fc" stopOpacity={0.03} />
-          </linearGradient>
           {/* Clip to glass interior */}
           <clipPath id={clipId}>
             <rect x={glassX} y={glassY} width={glassW} height={glassH} rx={r} />
@@ -60,10 +55,9 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
         {/* Glass body — empty fill */}
         <rect
           x={glassX} y={glassY} width={glassW} height={glassH} rx={r}
-          fill="url(#wc-empty)"
+          style={{ fill: 'var(--surface-2)', transition: 'fill 0.4s' }}
           stroke="var(--border-strong)"
           strokeWidth={1.5}
-          style={{ transition: 'stroke 0.4s' }}
         />
 
         {/* Water fill (clipped inside glass) */}

@@ -13,8 +13,8 @@ interface Props {
   imbalancedKeys?: Set<string>
 }
 
-const EMPTY_COLOR  = '#14143a'
-const EMPTY_BORDER = '#2a2a52'
+const EMPTY_COLOR  = 'var(--surface-2)'
+const EMPTY_BORDER = 'var(--border-default)'
 
 function getAccentHex(): string {
   const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
@@ -39,8 +39,8 @@ function SvgDefs({ accentHex }: { accentHex: string }) {
         )
       })}
       <linearGradient id="body-fill" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%"   stopColor="#161636" stopOpacity={1} />
-        <stop offset="100%" stopColor="#0a0a1e" stopOpacity={1} />
+        <stop offset="0%"   style={{ stopColor: 'var(--surface-2)' }} stopOpacity={1} />
+        <stop offset="100%" style={{ stopColor: 'var(--surface-1)' }} stopOpacity={1} />
       </linearGradient>
       <filter id="muscleGlow" x="-30%" y="-30%" width="160%" height="160%">
         <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur" />
@@ -51,7 +51,7 @@ function SvgDefs({ accentHex }: { accentHex: string }) {
         <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
       </filter>
       <filter id="bodyEdge" x="-6%" y="-2%" width="112%" height="104%">
-        <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#000" floodOpacity="0.75" />
+        <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#000" floodOpacity="0.35" />
       </filter>
     </defs>
   )
@@ -85,7 +85,7 @@ function MP({ muscleKey, points, scores, selected, hovered, onSelect, onHover, i
     : isImbalanced
       ? '#e07830'
       : isHovered
-        ? (glow !== 'none' ? `${glow}cc` : 'rgba(255,255,255,0.4)')
+        ? (glow !== 'none' ? `${glow}cc` : 'var(--border-strong)')
         : (rank?.border ?? EMPTY_BORDER)
 
   const filter = (isHovered && tier > 0) || tier >= 16
@@ -102,17 +102,17 @@ function MP({ muscleKey, points, scores, selected, hovered, onSelect, onHover, i
   return (
     <polygon
       points={points}
-      fill={fill}
-      stroke={stroke}
       strokeWidth={isSelected ? 2.6 : isImbalanced ? 2.0 : isHovered ? 1.8 : tier > 0 ? 1.0 : 0.5}
       filter={filter}
       style={{
         cursor: 'pointer',
-        transition: 'stroke 0.15s ease, stroke-width 0.15s ease',
+        fill,
+        stroke,
+        transition: 'fill 0.15s ease, stroke 0.15s ease, stroke-width 0.15s ease',
         transformBox: 'fill-box',
         transformOrigin: 'center',
         transform: isSelected ? 'scale(1.02)' : 'scale(1)',
-        ['--muscle-glow' as string]: glow !== 'none' ? glow : 'rgba(255,255,255,0.4)',
+        ['--muscle-glow' as string]: glow !== 'none' ? glow : 'var(--border-strong)',
       }}
       className={`${rankClass}${isSelected ? ' muscle-selected' : ''}`}
       onClick={() => onSelect(muscleKey)}
@@ -143,7 +143,7 @@ function RankLegend() {
             }} />
             <span style={{
               fontSize: 9, fontWeight: 700, whiteSpace: 'nowrap',
-              color: r.glow !== 'none' ? r.glow : '#888', letterSpacing: '0.03em',
+              color: r.glow !== 'none' ? r.glow : 'var(--text-tertiary)', letterSpacing: '0.03em',
             }}>
               {shortLabel}
             </span>
@@ -159,7 +159,7 @@ function RankLegend() {
 function MuscleLabel({ muscleKey, scores }: { muscleKey: string | null; scores: MuscleScoreResult[] }) {
   if (!muscleKey) {
     return (
-      <p style={{ textAlign: 'center', fontSize: 11, color: '#444', marginTop: 8, height: 30, lineHeight: '30px' }}>
+      <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-tertiary)', marginTop: 8, height: 30, lineHeight: '30px' }}>
         Tap a muscle to inspect
       </p>
     )
@@ -173,17 +173,17 @@ function MuscleLabel({ muscleKey, scores }: { muscleKey: string | null; scores: 
     <div className="pop-in" style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '7px 14px', marginTop: 8, borderRadius: 10, width: '100%',
-      background: tier > 0 ? `${result!.rank.color}cc` : 'rgba(255,255,255,0.03)',
-      border: `1px solid ${tier > 0 ? result!.rank.border : 'rgba(255,255,255,0.07)'}`,
+      background: tier > 0 ? `${result!.rank.color}cc` : 'var(--surface-2)',
+      border: `1px solid ${tier > 0 ? result!.rank.border : 'var(--border-subtle)'}`,
       boxShadow: tier > 0 && glow !== 'none' ? `0 0 12px ${glow}33` : 'none',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 10, color: '#555', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{muscle?.group}</span>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#e0e0f0' }}>{muscle?.name ?? muscleKey}</span>
+        <span style={{ fontSize: 10, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{muscle?.group}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{muscle?.name ?? muscleKey}</span>
       </div>
       {tier > 0 && result
-        ? <span style={{ fontSize: 11, color: glow !== 'none' ? glow : '#aaa', fontWeight: 700 }}>{result.rank.icon} {result.rank.label}</span>
-        : <span style={{ fontSize: 10, color: '#444' }}>Unranked</span>
+        ? <span style={{ fontSize: 11, color: glow !== 'none' ? glow : 'var(--text-secondary)', fontWeight: 700 }}>{result.rank.icon} {result.rank.label}</span>
+        : <span style={{ fontSize: 10, color: 'var(--text-disabled)' }}>Unranked</span>
       }
     </div>
   )
@@ -224,8 +224,8 @@ function FrontView({ scores, selected, hovered, onSelect, onHover, imbalancedKey
       <polygon points="104,328 136,330 138,384 106,390" fill="url(#body-fill)" stroke="none" />
 
       {/* Head + neck */}
-      <ellipse cx="100" cy="26" rx="20" ry="24" fill="#111128" stroke="#1e1e3a" strokeWidth="1" />
-      <polygon points="91,48 109,48 112,68 88,68" fill="#111128" stroke="#1a1a30" strokeWidth="0.8" />
+      <ellipse cx="100" cy="26" rx="20" ry="24" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      <polygon points="91,48 109,48 112,68 88,68" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.8" />
 
       {/* ── CHEST (shared exact boundaries, no overlap) ── */}
       {/* Upper: y68 → y90, slight inward taper */}
@@ -269,18 +269,18 @@ function FrontView({ scores, selected, hovered, onSelect, onHover, imbalancedKey
       {p('calves_gastro', '108,328 136,330 136,382 110,388', 'RF')}
 
       {/* ── Structural details ── */}
-      <ellipse cx="81"  cy="325" rx="14" ry="5" fill="#0d0d20" stroke="#1a1a32" strokeWidth="0.7" />
-      <ellipse cx="119" cy="325" rx="14" ry="5" fill="#0d0d20" stroke="#1a1a32" strokeWidth="0.7" />
-      <polygon points="76,180 124,180 128,196 72,196" fill="#0a0a1e" stroke="none" />
-      <polygon points="58,384 94,382 92,402 56,400" fill="#0d0d20" stroke="#181830" strokeWidth="1" />
-      <polygon points="106,382 142,384 144,400 108,402" fill="#0d0d20" stroke="#181830" strokeWidth="1" />
-      <polygon points="28,220 46,220 44,244 26,242" fill="#0d0d20" stroke="#181830" strokeWidth="1" />
-      <polygon points="154,220 172,220 174,242 156,244" fill="#0d0d20" stroke="#181830" strokeWidth="1" />
-      <line x1="88" y1="68" x2="58" y2="76" stroke="#1e1e38" strokeWidth="0.9" />
-      <line x1="112" y1="68" x2="142" y2="76" stroke="#1e1e38" strokeWidth="0.9" />
-      <line x1="100" y1="68" x2="100" y2="132" stroke="#18183a" strokeWidth="0.7" strokeDasharray="2 3" />
-      <line x1="100" y1="132" x2="100" y2="178" stroke="#18183a" strokeWidth="0.6" strokeDasharray="2 3" />
-      <line x1="82" y1="158" x2="118" y2="158" stroke="#18183a" strokeWidth="0.5" strokeDasharray="2 4" />
+      <ellipse cx="81"  cy="325" rx="14" ry="5" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.7" />
+      <ellipse cx="119" cy="325" rx="14" ry="5" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.7" />
+      <polygon points="76,180 124,180 128,196 72,196" style={{ fill: 'var(--surface-1)' }} stroke="none" />
+      <polygon points="58,384 94,382 92,402 56,400" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      <polygon points="106,382 142,384 144,400 108,402" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      <polygon points="28,220 46,220 44,244 26,242" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      <polygon points="154,220 172,220 174,242 156,244" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      <line x1="88" y1="68" x2="58" y2="76" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.9" />
+      <line x1="112" y1="68" x2="142" y2="76" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.9" />
+      <line x1="100" y1="68" x2="100" y2="132" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.7" strokeDasharray="2 3" />
+      <line x1="100" y1="132" x2="100" y2="178" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.6" strokeDasharray="2 3" />
+      <line x1="82" y1="158" x2="118" y2="158" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.5" strokeDasharray="2 4" />
     </svg>
   )
 }
@@ -305,8 +305,8 @@ function BackView({ scores, selected, hovered, onSelect, onHover, imbalancedKeys
       <polygon points="64,334 96,332 94,394 62,388" fill="url(#body-fill)" stroke="none" />
       <polygon points="104,332 136,334 138,388 106,394" fill="url(#body-fill)" stroke="none" />
 
-      <ellipse cx="100" cy="26" rx="20" ry="24" fill="#111128" stroke="#1e1e3a" strokeWidth="1" />
-      <polygon points="91,48 109,48 112,68 88,68" fill="#111128" stroke="#1a1a30" strokeWidth="0.8" />
+      <ellipse cx="100" cy="26" rx="20" ry="24" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      <polygon points="91,48 109,48 112,68 88,68" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.8" />
 
       {/* ── TRAPS — diamond from neck-base to mid-back ── */}
       {p('traps', '82,62 118,62 140,84 134,110 100,118 66,110 60,84')}
@@ -354,15 +354,15 @@ function BackView({ scores, selected, hovered, onSelect, onHover, imbalancedKeys
       {p('calves_soleus', '112,366 138,360 138,382 114,388', 'R')}
 
       {/* ── Structural ── */}
-      <ellipse cx="81"  cy="329" rx="13" ry="4" fill="#0c0c1e" stroke="#1a1a30" strokeWidth="0.7" />
-      <ellipse cx="119" cy="329" rx="13" ry="4" fill="#0c0c1e" stroke="#1a1a30" strokeWidth="0.7" />
-      <line x1="100" y1="68" x2="100" y2="198" stroke="#1a1a30" strokeWidth="1" strokeDasharray="3 4" />
-      <line x1="93"  y1="150" x2="93"  y2="199" stroke="#18183a" strokeWidth="0.6" strokeDasharray="2 4" />
-      <line x1="107" y1="150" x2="107" y2="199" stroke="#18183a" strokeWidth="0.6" strokeDasharray="2 4" />
-      <polygon points="58,390 94,388 92,406 56,404" fill="#0d0d20" stroke="#181830" strokeWidth="1" />
-      <polygon points="106,388 142,390 144,404 108,406" fill="#0d0d20" stroke="#181830" strokeWidth="1" />
-      <polygon points="17,222 33,222 31,248 15,246" fill="#0d0d20" stroke="#181830" strokeWidth="1" />
-      <polygon points="167,222 183,222 185,246 169,248" fill="#0d0d20" stroke="#181830" strokeWidth="1" />
+      <ellipse cx="81"  cy="329" rx="13" ry="4" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.7" />
+      <ellipse cx="119" cy="329" rx="13" ry="4" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.7" />
+      <line x1="100" y1="68" x2="100" y2="198" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="1" strokeDasharray="3 4" />
+      <line x1="93"  y1="150" x2="93"  y2="199" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.6" strokeDasharray="2 4" />
+      <line x1="107" y1="150" x2="107" y2="199" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.6" strokeDasharray="2 4" />
+      <polygon points="58,390 94,388 92,406 56,404" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      <polygon points="106,388 142,390 144,404 108,406" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      <polygon points="17,222 33,222 31,248 15,246" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      <polygon points="167,222 183,222 185,246 169,248" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
     </svg>
   )
 }
