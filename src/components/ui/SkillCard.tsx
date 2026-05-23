@@ -25,7 +25,7 @@ export function SkillCard({ skill }: SkillCardProps) {
         <div className="flex items-center gap-2">
           <SectionIcon sectionKey={def.icon} size={22} color="var(--accent)" />
           <div>
-            <p className="font-bold text-white text-sm" style={{ }}>{def.label}</p>
+            <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{def.label}</p>
             <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               {skill.title}
             </p>

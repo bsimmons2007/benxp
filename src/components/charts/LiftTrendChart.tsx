@@ -136,7 +136,7 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
         </div>
         <ResponsiveContainer width="100%" height={150}>
           <LineChart data={compareData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
             <XAxis
               dataKey="day"
               tickFormatter={(d: number) => `D${d}`}
@@ -157,7 +157,7 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
               labelFormatter={(l: number) => `Day ${l}`}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(v: any, name: string) => [`${Number(v).toFixed(1)} ${unit}`, name === 'current' ? 'Last 30d' : 'Prior 30d']}
-              cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
+              cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }}
             />
             <Line type="monotone" dataKey="current" stroke={color} strokeWidth={2.5} dot={false} activeDot={{ r: 4 }} connectNulls />
             <Line type="monotone" dataKey="prior" stroke="#94a3b8" strokeWidth={2} strokeDasharray="4 3" dot={false} activeDot={{ r: 4 }} connectNulls />
@@ -184,11 +184,11 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
         <AreaChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
           <defs>
             <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor={color} stopOpacity={0.28} />
+              <stop offset="0%"   stopColor={color} stopOpacity={0.15} />
               <stop offset="100%" stopColor={color} stopOpacity={0.02} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.04)" vertical={false} />
+          <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
           <XAxis
             dataKey="date"
             tickFormatter={(d: string) => formatDate(d)}
@@ -212,7 +212,7 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
               ? [`${Number(v)} reps`, 'Best set']
               : [`${Number(v).toFixed(1)} lbs`, 'Est 1RM']
             }
-            cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
+            cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }}
           />
           {isBWLift ? (
             <ReferenceLine

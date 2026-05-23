@@ -16,7 +16,7 @@ export function ProgressBar({ value, color = 'var(--accent)', height = 12, glow 
         className="h-full rounded-full progress-bar-fill relative overflow-hidden"
         style={{
           width: `${pct}%`,
-          background: `linear-gradient(90deg, ${color}cc 0%, ${color} 100%)`,
+          background: `linear-gradient(90deg, color-mix(in srgb, ${color} 55%, transparent) 0%, ${color} 100%)`,
           boxShadow: glow ? `0 0 10px ${color}, 0 0 20px ${color}55` : undefined,
           transition: 'width 0.9s cubic-bezier(0.22,1,0.36,1)',
           minWidth: pct > 0 ? 4 : 0,

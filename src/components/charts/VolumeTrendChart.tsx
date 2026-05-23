@@ -102,9 +102,9 @@ export function VolumeTrendChart() {
         <Tooltip
           contentStyle={TT_STYLE}
           formatter={(v: number) => [`${v.toLocaleString()} lbs`, 'Volume']}
-          cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+          cursor={{ fill: 'var(--border-subtle)' }}
         />
-        <ReferenceLine y={avgVol} stroke="rgba(255,255,255,0.18)" strokeDasharray="4 2" />
+        <ReferenceLine y={avgVol} stroke="var(--border-default)" strokeDasharray="4 2" />
         <Bar dataKey="volume" radius={[4, 4, 0, 0]} shape={(props: object) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const p = props as any

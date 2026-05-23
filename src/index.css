@@ -137,17 +137,48 @@ button, a {
 }
 
 input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
   cursor: pointer;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  outline: none;
 }
 input[type="range"]::-webkit-slider-runnable-track {
-  background: var(--surface-2);
-  border-radius: 4px;
-  height: 4px;
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--slider-fill, var(--accent));
+  cursor: pointer;
+  border: 2px solid var(--surface-1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: transform 0.1s ease;
+}
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.18);
 }
 input[type="range"]::-moz-range-track {
-  background: var(--surface-2);
-  border-radius: 4px;
-  height: 4px;
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-fill, var(--accent));
+  cursor: pointer;
+  border: 2px solid var(--surface-1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  appearance: none;
 }
 
 #root { position: relative; z-index: 1; }

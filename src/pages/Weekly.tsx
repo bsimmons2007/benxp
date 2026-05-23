@@ -311,7 +311,7 @@ export function Weekly() {
                     <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-tertiary)' }}>Weekly Score</p>
                     <div className="flex items-center gap-2">
                       <span style={{ fontSize: 28, fontWeight: 900, color: gradeColor, lineHeight: 1 }}>{grade}</span>
-                      <span style={{ color: '#888', fontSize: 12 }}>{score}/100</span>
+                      <span style={{ color: 'var(--text-tertiary)', fontSize: 12 }}>{score}/100</span>
                     </div>
                   </div>
                   <div style={{ height: 8, background: 'var(--surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 999, overflow: 'hidden' }}>

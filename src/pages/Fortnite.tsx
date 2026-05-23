@@ -111,7 +111,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
             <AreaChart data={cumulativeWins} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id={`${gradId}-cum`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={accent} stopOpacity={0.32} />
+                  <stop offset="0%" stopColor={accent} stopOpacity={0.15} />
                   <stop offset="100%" stopColor={accent} stopOpacity={0.02} />
                 </linearGradient>
               </defs>
@@ -151,7 +151,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
             <AreaChart data={killsData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id={`${gradId}-kills`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#7B2FBE" stopOpacity={0.28} />
+                  <stop offset="0%" stopColor="#7B2FBE" stopOpacity={0.15} />
                   <stop offset="100%" stopColor="#7B2FBE" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
@@ -174,7 +174,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
             <AreaChart data={accuracyData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id={`${gradId}-acc`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#2ECC71" stopOpacity={0.26} />
+                  <stop offset="0%" stopColor="#2ECC71" stopOpacity={0.15} />
                   <stop offset="100%" stopColor="#2ECC71" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
