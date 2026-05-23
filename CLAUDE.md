@@ -15,6 +15,7 @@ A personal life-tracking PWA for one user (Ben). Everything real-life earns XP �
 | Charts | Recharts |
 | Forms | react-hook-form |
 | Routing | react-router-dom v7 |
+| Icons | lucide-react 1.16.0 |
 | PWA | vite-plugin-pwa |
 | Hosting | Vercel (auto-deploys `main`) |
 
@@ -36,7 +37,7 @@ src/
 │   ├── BodyMap.tsx          # SVG muscle diagram — colored by rank/recency
 │   ├── StrengthTab.tsx      # Lifting log UI (sets table, PRs, trends)
 │   ├── layout/
-│   │   ├── TopBar.tsx       # Header: hamburger/back, logo → /monthly, + log menu, settings gear; md:left-16 for sidebar offset
+│   │   ├── TopBar.tsx       # Header: hamburger/back, logo → /monthly, + log menu (Lucide icon components, not emoji), settings gear; md:left-16 for sidebar offset
 │   │   ├── BottomNav.tsx    # Mobile tab bar; 60px + safe-area; pill bg on active tab; md:hidden
 │   │   ├── SideNav.tsx      # Desktop: persistent 64px icon strip (md:flex) + CSS fly-out labels; exports LogoMark; Mobile: slide-in drawer (md:hidden)
 │   │   └── PageWrapper.tsx  # Wraps every page; paddingBottom: calc(80px + safe-area); pageEnter animation on inner div
@@ -46,7 +47,7 @@ src/
 │   │   ├── Card.tsx
 │   │   ├── EditModal.tsx
 │   │   ├── EmptyState.tsx
-│   │   ├── Icon.tsx         # Full custom SVG icon library
+│   │   ├── Icon.tsx         # lucide-react wrappers — 54 named exports via adapt() shim; same IconProps API; 4 mapping fns (SectionIcon, ActivityIconComp, BadgeIcon, AmbientSceneIcon)
 │   │   ├── Input.tsx
 │   │   ├── LevelUpOverlay.tsx   # Full-screen level-up celebration (auto-dismiss 4s)
 │   │   ├── MilestoneOverlay.tsx # Strength milestone card (auto-dismiss 5s)
@@ -336,6 +337,18 @@ Fix with binary replacement (`content.replace(bad_bytes, good_bytes)`) — text 
 ---
 
 ## Recent work (May 2026)
+### Lucide icon migration + build fix (session 4)
+- **Vercel build fix** — `supabase.ts` wake ping used `.catch()` on `PromiseLike` (Supabase returns `PostgrestBuilder`, not `Promise`). Fixed with two-arg `.then(() => {}, () => {})` (PR #21)
+- **Icon system rewrite** — `Icon.tsx` reduced from 570 lines of hand-crafted SVGs to 198 lines; all 54 named exports now wrap `lucide-react` 1.16.0 via an `adapt()` shim that preserves identical `IconProps` API (`size`, `color`, `style`, `className`) and `strokeWidth: 1.6`; all 35 importing files unchanged (PR #22)
+- **Emoji purge** — 26 inline emoji characters removed across 8 files:
+  - `TopBar.tsx` LOG_MENU: emoji strings → `IconComponent` references
+  - `Profile.tsx` AVATAR_TIERS: emoji strings → Lucide icon components (Sprout/Sword/Shield/Flame/Zap/Waves/Bird/Star/Crown/Diamond) rendered at 36px in the tier orb
+  - `Settings.tsx` light/dark toggle: `☀️`/`🌙` → `<SunIcon>`/`<MoonIcon>`
+  - `Pool`, `Chess`, `TableTennis`, `Volleyball`: toast strings cleaned up
+  - `notifications.ts`: notification body strings cleaned up
+- **New icon exports** — `SunIcon`, `SproutIcon`, `BirdIcon` added to `Icon.tsx`
+- **lucide-react** added to `package.json` + `package-lock.json` (v1.16.0)
+
 ### Apple-modern redesign (session 2)
 - **Design token system** — `--surface-0/1/2/3`, text/border/shadow/radius scale in `index.css`; legacy aliases preserved; light mode default
 - **Inter Variable font** — `@fontsource-variable/inter/index.css` bundled at build time (no CDN); import as explicit `.css` path
