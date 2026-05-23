@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, BarChart, Bar, Cell,
 } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
