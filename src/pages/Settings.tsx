@@ -9,7 +9,7 @@ import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme, timeThemeEnabled, setTimeThemeEnabled, applyTimeOrSavedTheme, isLightMode, setLightMode, applyTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
 import { logAuditEvent } from '../lib/audit'
-import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon } from '../components/ui/Icon'
+import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, SunIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon } from '../components/ui/Icon'
 import { getNotifPrefs, saveNotifPrefs, requestPermission, permissionGranted, notificationsSupported } from '../lib/notifications'
 import { toRoman } from '../lib/utils'
 import {
@@ -406,8 +406,8 @@ export function Settings() {
           {/* Light / Dark mode toggle */}
           <div className="flex items-center justify-between py-2 mt-1">
             <div className="flex items-center gap-3">
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, fontSize: 16 }}>
-                {lightMode ? '☀️' : '🌙'}
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}>
+                {lightMode ? <SunIcon size={18} /> : <MoonIcon size={18} />}
               </span>
               <div>
                 <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>

@@ -257,7 +257,7 @@ export function Chess() {
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Peak {peakRating.toLocaleString()}</p>
             )}
             {peakRating && peakRating === currentRating && (
-              <p style={{ fontSize: 12, color: '#f59e0b', marginTop: 4 }}>⭐ Personal best</p>
+              <p style={{ fontSize: 12, color: '#f59e0b', marginTop: 4 }}>Personal best</p>
             )}
           </div>
         )}
@@ -282,7 +282,7 @@ export function Chess() {
           <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.2)' }}>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{games.length} games</span>
             {streak > 1 && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#34d399' }}>🏆 {streak} win streak</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#34d399' }}>{streak} win streak</span>
             )}
           </div>
         )}

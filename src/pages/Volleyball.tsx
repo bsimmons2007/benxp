@@ -65,7 +65,7 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — 🏐 Spike!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — Spike!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), sets_won: '', sets_lost: '', aces: '', kills: '', blocks: '', digs: '', assists: '', opponent: '', notes: '' })
@@ -155,7 +155,7 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — 🏐 Beach winner!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — Beach winner!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), my_score: '', opp_score: '', partner: '', opponent: '', notes: '' })
@@ -322,7 +322,7 @@ export function Volleyball() {
                 cursor: 'pointer', transition: 'all 0.15s',
               }}
             >
-              {t === 'Indoor' ? '🏐 Indoor' : '🏐 Sand'}
+              {t === 'Indoor' ? 'Indoor' : 'Sand'}
             </button>
           ))}
         </div>

@@ -3,14 +3,15 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useUserName } from '../../hooks/useUserName'
 import { useNavStore } from '../../store/useNavStore'
 import { LogoMark } from './SideNav'
+import { DumbbellIcon, MoonIcon, BrainIcon, DropletIcon, type IconComponent } from '../ui/Icon'
 
 const LOGO_ANIMATED_KEY = 'youxp-logo-animated'
 
-const LOG_MENU = [
-  { label: 'Lifting',  emoji: '🏋️', to: '/lifting' },
-  { label: 'Sleep',    emoji: '🌙', to: '/sleep'   },
-  { label: 'Mind',     emoji: '🧠', to: '/mood'    },
-  { label: 'Water',    emoji: '💧', to: '/water'   },
+const LOG_MENU: { label: string; Icon: IconComponent; to: string }[] = [
+  { label: 'Lifting', Icon: DumbbellIcon, to: '/lifting' },
+  { label: 'Sleep',   Icon: MoonIcon,     to: '/sleep'   },
+  { label: 'Mind',    Icon: BrainIcon,    to: '/mood'    },
+  { label: 'Water',   Icon: DropletIcon,  to: '/water'   },
 ]
 
 interface TopBarProps {
@@ -184,7 +185,7 @@ export function TopBar({ title, hideSettings = false, back = false, logButton = 
                   onMouseEnter={e => (e.currentTarget.style.background = 'var(--input-bg)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                 >
-                  <span style={{ fontSize: 18, lineHeight: 1 }}>{item.emoji}</span>
+                  <item.Icon size={18} />
                   {item.label}
                 </button>
               ))}

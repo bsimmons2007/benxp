@@ -1,456 +1,84 @@
-/**
- * Icon — lightweight SVG icon system.
- * All icons are 20×20 viewBox, stroke-based, consistent 1.5px stroke.
- * Import named exports: <Icon name="dumbbell" size={18} />
- */
+import type { CSSProperties, FC } from 'react'
+import {
+  type LucideProps,
+  Home, Dumbbell, BookOpen, Moon, Gamepad2, Sword, Brain,
+  PersonStanding, Droplets, Wind, User, Target, Ruler, Calendar,
+  LayoutGrid, Trophy, Share2, TrendingUp, MoreHorizontal, Pencil,
+  Trash2, Check, ChevronDown, ChevronRight, Plus, X, Flame, Zap,
+  Bookmark, Bell, Star, Heart, ArrowUp, ArrowDown, Activity,
+  Bike, Waves, Footprints, Search, Crown, Shield, Diamond, Rocket,
+  Mountain, Snowflake, Terminal, Volleyball, CircleDot, Flag,
+  Disc3, Sparkles, Grid3x3, Sun, Sprout, Bird,
+} from 'lucide-react'
 
-import type { CSSProperties } from 'react'
-
-interface IconProps {
-  size?:   number
-  color?:  string
-  style?:  CSSProperties
-  className?: string
-}
-
+export type IconProps = { size?: number; color?: string; style?: CSSProperties; className?: string }
 export type IconComponent = (props: IconProps) => React.ReactElement
 
-// ── Primitives ────────────────────────────────────────────────
+// Adapt Lucide's props to our IconProps interface
+function adapt(LucideIcon: FC<LucideProps>): IconComponent {
+  return ({ size = 20, color = 'currentColor', style, className }) => (
+    <LucideIcon size={size} color={color} style={{ display: 'block', flexShrink: 0, ...style }} className={className} strokeWidth={1.6} />
+  )
+}
 
-const base = (size: number, color: string, style?: CSSProperties, className?: string) => ({
-  width:   size,
-  height:  size,
-  viewBox: '0 0 20 20',
-  fill:    'none',
-  style:   { display: 'block', flexShrink: 0, ...style },
-  className,
-  stroke:        color,
-  strokeWidth:   1.6,
-  strokeLinecap: 'round'  as const,
-  strokeLinejoin:'round'  as const,
-})
-
-// ── Navigation icons ──────────────────────────────────────────
-
-export const HomeIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M3 9.5L10 3l7 6.5V17a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z" />
-    <path d="M7.5 18V12h5v6" />
-  </svg>
-)
-
-export const DumbbellIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M6.5 6.5v7M13.5 6.5v7" />
-    <path d="M4 8.5v3M16 8.5v3" />
-    <path d="M6.5 10h7" />
-    <rect x="3" y="8" width="2" height="4" rx="1" />
-    <rect x="15" y="8" width="2" height="4" rx="1" />
-    <rect x="5.5" y="6" width="2" height="8" rx="1" />
-    <rect x="12.5" y="6" width="2" height="8" rx="1" />
-  </svg>
-)
-
-export const BookIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M4 3h10a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
-    <path d="M7 3v14M7 3h9" />
-    <path d="M10 8h4M10 11h4M10 14h2" />
-  </svg>
-)
-
-export const MoonIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M17.5 12.5A7.5 7.5 0 1 1 7.5 2.5a5.5 5.5 0 0 0 10 10Z" />
-  </svg>
-)
-
-export const GamepadIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <rect x="2" y="6" width="16" height="10" rx="3" />
-    <path d="M6 11h4M8 9v4" />
-    <circle cx="13" cy="10" r="0.75" fill={color} stroke="none" />
-    <circle cx="15" cy="12" r="0.75" fill={color} stroke="none" />
-  </svg>
-)
-
-export const SwordIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M14.5 2L18 5.5l-9 9-3.5.5.5-3.5 9-9Z" />
-    <path d="M2 18l3-3M12 4l4 4" />
-  </svg>
-)
-
-export const BrainIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 4c0-1.1.9-2 2-2a2 2 0 0 1 2 2c1.1 0 2 .9 2 2s-.9 2-2 2v1c1.1 0 2 .9 2 2s-.9 2-2 2a2 2 0 0 1-2 2c0 1.1-.9 2-2 2" />
-    <path d="M10 4c0-1.1-.9-2-2-2a2 2 0 0 0-2 2c-1.1 0-2 .9-2 2s.9 2 2 2v1c-1.1 0-2 .9-2 2s.9 2 2 2a2 2 0 0 0 2 2c0 1.1.9 2 2 2" />
-    <line x1="10" y1="4" x2="10" y2="18" />
-  </svg>
-)
-
-export const RunIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="13" cy="3.5" r="1.5" />
-    <path d="M10 7l2 1.5 1 3.5H9.5L7 15" />
-    <path d="M12 8.5l2 2.5h3" />
-    <path d="M13.5 12l-1.5 4.5" />
-    <path d="M8 9l-2 1" />
-  </svg>
-)
-
-export const DropletIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 2L5 10a5 5 0 1 0 10 0L10 2Z" />
-  </svg>
-)
-
-export const SkateIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M3 13h10l2-5h-4l-2 5" />
-    <path d="M4 13l-1 3h12l1-3" />
-    <circle cx="6" cy="17" r="1.2" />
-    <circle cx="12" cy="17" r="1.2" />
-    <path d="M10 8 C10 8, 12 5, 16 6" />
-  </svg>
-)
-
-// ── Secondary nav icons ───────────────────────────────────────
-
-export const PersonIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="10" cy="7" r="3.5" />
-    <path d="M3 18c0-3.87 3.13-7 7-7s7 3.13 7 7" />
-  </svg>
-)
-
-export const TargetIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="10" cy="10" r="7.5" />
-    <circle cx="10" cy="10" r="4.5" />
-    <circle cx="10" cy="10" r="1.5" fill={color} stroke="none" />
-  </svg>
-)
-
-export const RulerIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <rect x="2" y="6" width="16" height="8" rx="1.5" />
-    <path d="M5 10V8M8 10V7M11 10V8M14 10V7" />
-  </svg>
-)
-
-export const CalendarIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <rect x="2.5" y="3.5" width="15" height="15" rx="2" />
-    <path d="M2.5 8.5h15" />
-    <path d="M6.5 2v3M13.5 2v3" />
-    <path d="M6 12h2M11 12h2M6 15.5h2M11 15.5h2" />
-  </svg>
-)
-
-export const GridIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <rect x="2.5" y="2.5" width="6" height="6" rx="1.5" />
-    <rect x="11.5" y="2.5" width="6" height="6" rx="1.5" />
-    <rect x="2.5" y="11.5" width="6" height="6" rx="1.5" />
-    <rect x="11.5" y="11.5" width="6" height="6" rx="1.5" />
-  </svg>
-)
-
-export const TrophyIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M6 3h8v6a4 4 0 0 1-8 0V3Z" />
-    <path d="M6 6H3.5a2.5 2.5 0 0 0 2.5 4" />
-    <path d="M14 6h2.5a2.5 2.5 0 0 1-2.5 4" />
-    <path d="M10 13v2.5M7 17h6" />
-  </svg>
-)
-
-export const ShareIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M4 10v6a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-6" />
-    <path d="M13 6l-3-3-3 3" />
-    <path d="M10 3v10" />
-  </svg>
-)
-
-export const TrendingIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M2 14l5-5 4 4 7-7" />
-    <path d="M14 6h4v4" />
-  </svg>
-)
-
-export const DotsIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="5" cy="10" r="1.5" fill={color} stroke="none" />
-    <circle cx="10" cy="10" r="1.5" fill={color} stroke="none" />
-    <circle cx="15" cy="10" r="1.5" fill={color} stroke="none" />
-  </svg>
-)
-
-// ── Action icons ──────────────────────────────────────────────
-
-export const EditIcon: IconComponent = ({ size = 14, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M14 3a1.414 1.414 0 0 1 2 2L5 16H3v-2L14 3Z" />
-    <path d="M12 5l2 2" />
-  </svg>
-)
-
-export const TrashIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M3.5 5.5h13M8.5 5.5V4a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1.5" />
-    <path d="M5 5.5l.75 10.5h8.5L15 5.5" />
-    <path d="M8 8.5v5M12 8.5v5" />
-  </svg>
-)
-
-export const CheckIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M3 10l5 5 9-9" />
-  </svg>
-)
-
-export const ChevronIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M5 7.5l5 5 5-5" />
-  </svg>
-)
-
-export const ChevronRightIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M7.5 5l5 5-5 5" />
-  </svg>
-)
-
-export const PlusIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 3v14M3 10h14" />
-  </svg>
-)
-
-export const CloseIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M4 4l12 12M16 4L4 16" />
-  </svg>
-)
-
-export const FlameIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 2C10 2 14 6 14 10a4 4 0 0 1-8 0C6 7 8 5 8 5S7 9 10 10c0 0-1-4 0-8Z" fill={color} stroke="none" />
-  </svg>
-)
-
-export const ZapIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M11 2L4 11h6l-1 7 7-9h-6l1-7Z" fill={color} stroke="none" />
-  </svg>
-)
-
-export const BookmarkIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M5 2h10a1 1 0 0 1 1 1v15l-6-4-6 4V3a1 1 0 0 1 1-1Z" />
-  </svg>
-)
-
-export const BellIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 2a6 6 0 0 0-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 0 0-6-6ZM8 18a2 2 0 0 0 4 0" />
-  </svg>
-)
-
-export const StarIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 2l2.4 5 5.6.8-4 3.9.9 5.3L10 14.4l-4.9 2.6.9-5.3L2 8.8l5.6-.8L10 2Z" />
-  </svg>
-)
-
-export const HeartIcon: IconComponent = ({ size = 16, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 16S3 11 3 6.5a4 4 0 0 1 7-2.65A4 4 0 0 1 17 6.5C17 11 10 16 10 16Z" />
-  </svg>
-)
-
-export const ArrowUpIcon: IconComponent = ({ size = 12, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 15V5M5 10l5-5 5 5" />
-  </svg>
-)
-
-export const ArrowDownIcon: IconComponent = ({ size = 12, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 5v10M5 10l5 5 5-5" />
-  </svg>
-)
-
-export const ActivityIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M2 10h3l2.5-6 3 12 2.5-9L15 10h3" />
-  </svg>
-)
-
-export const BikeIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="5.5" cy="13.5" r="3.5" />
-    <circle cx="14.5" cy="13.5" r="3.5" />
-    <path d="M5.5 13.5L9 6.5h4l2 3M9 6.5l3.5 7" />
-    <circle cx="13" cy="4.5" r="1.5" />
-  </svg>
-)
-
-export const SwimIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M3 13c2 0 2-2 4-2s2 2 4 2 2-2 4-2" />
-    <path d="M3 16.5c2 0 2-2 4-2s2 2 4 2 2-2 4-2" />
-    <circle cx="14" cy="5" r="1.5" />
-    <path d="M14 6.5l-5 4.5h3" />
-    <path d="M9 11l1.5 2.5" />
-  </svg>
-)
-
-export const WalkIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="11" cy="3.5" r="1.5" />
-    <path d="M10 6l2 3.5H8.5L7 13M12 9.5l1.5 4.5M7 13l-1.5 3.5M12 9.5L13 14" />
-    <path d="M8.5 9.5L7 8" />
-  </svg>
-)
-
-export const SearchIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="9" cy="9" r="5.5" />
-    <path d="M13.5 13.5l3.5 3.5" />
-  </svg>
-)
-
-export const CrownIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M3 16h14M3 16v-5l3-7 3 7 1-8 1 8 3-7 3 7v5" />
-  </svg>
-)
-
-export const ShieldIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 2l7 2.5V9c0 4.5-3.5 7.5-7 9-3.5-1.5-7-4.5-7-9V4.5L10 2Z" />
-  </svg>
-)
-
-export const DiamondIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M4 8l6-6 6 6-6 10-6-10Z" />
-    <path d="M4 8h12M7.5 3.5L4 8l6 10M12.5 3.5L16 8l-6 10" />
-  </svg>
-)
-
-export const RocketIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 2c-3 2-4 5-4 7v5h8v-5c0-2-1-5-4-7Z" />
-    <path d="M6 14l-2.5 4M14 14l2.5 4" />
-    <circle cx="10" cy="9.5" r="1.5" fill="none" />
-  </svg>
-)
-
-export const MountainIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M2 17L7.5 7l2.5 4 2.5-7L18 17" />
-    <path d="M2 17h16" />
-  </svg>
-)
-
-export const SnowflakeIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M10 2v16M2 10h16" />
-    <path d="M4.93 4.93l10.14 10.14M15.07 4.93L4.93 15.07" />
-    <path d="M7 7l-2-2M13 7l2-2M7 13l-2 2M13 13l2 2" />
-  </svg>
-)
-
-export const TerminalIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <rect x="2" y="3.5" width="16" height="13" rx="2" />
-    <path d="M6 9l3.5 3L6 15" />
-    <path d="M13 15h3" />
-  </svg>
-)
-
-export const VolleyballIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="10" cy="10" r="8" />
-    <path d="M2.5 7.5c2.5 1 4.5 4.5 7.5 4.5" />
-    <path d="M10 12c3 0 5.5-3 7.5-4.5" />
-    <path d="M6 17.5c1-3 1-6 4-7.5" />
-  </svg>
-)
-
-export const SpikeballIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <ellipse cx="10" cy="14" rx="7.5" ry="2.5" />
-    <circle cx="10" cy="6.5" r="3.5" />
-    <path d="M6.5 11.5 8.5 9M13.5 11.5 11.5 9" />
-  </svg>
-)
-
-export const PoolIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="7.5" cy="13" r="3.5" />
-    <circle cx="7.5" cy="13" r="1.2" />
-    <path d="M11 9.5 18.5 2.5" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)
-
-export const TableTennisIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="14" cy="6" r="3" />
-    <path d="M11.5 8.5 4 16a2 2 0 0 0 0 2.8 2 2 0 0 0 2.8 0l7.5-7.5" />
-    <path d="M9 11l2 2" />
-  </svg>
-)
-
-export const ChessIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M7 4h6M10 4v3M8 7h4" />
-    <path d="M7 7c0 3 1 4 3 5s3 2 3 5H7c0-3 1-4 3-5s3-2 3-5" />
-    <path d="M6 17h8M5 19h10" />
-  </svg>
-)
-
-export const GolfIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <path d="M6 18V4" />
-    <path d="M6 4l8 3-8 3" />
-    <circle cx="14" cy="17" r="2" fill="none" />
-    <path d="M6 17h6" />
-  </svg>
-)
-
-export const DiscIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <ellipse cx="10" cy="11" rx="8" ry="3.5" />
-    <path d="M2 11c0-2.5 3.6-5 8-5s8 2.5 8 5" />
-    <path d="M5.5 11.5q4.5-2 9 0" />
-  </svg>
-)
-
-export const BasketballIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="10" cy="10" r="8" />
-    <path d="M2 10h16" />
-    <path d="M10 2v16" />
-    <path d="M4.5 4.5c3 3 3 8.5 0 11" />
-    <path d="M15.5 4.5c-3 3-3 8.5 0 11" />
-  </svg>
-)
-
-export const HobbiesIcon: IconComponent = ({ size = 20, color = 'currentColor', style, className }) => (
-  <svg {...base(size, color, style, className)}>
-    <circle cx="10" cy="10" r="3" />
-    <path d="M6.5 3.5 10 7l3.5-3.5" strokeLinecap="round" />
-    <path d="M16.5 6.5 13 10l3.5 3.5" strokeLinecap="round" />
-    <path d="M13.5 16.5 10 13l-3.5 3.5" strokeLinecap="round" />
-    <path d="M3.5 13.5 7 10 3.5 6.5" strokeLinecap="round" />
-  </svg>
-)
+export const HomeIcon        = adapt(Home)
+export const DumbbellIcon    = adapt(Dumbbell)
+export const BookIcon        = adapt(BookOpen)
+export const MoonIcon        = adapt(Moon)
+export const GamepadIcon     = adapt(Gamepad2)
+export const SwordIcon       = adapt(Sword)
+export const BrainIcon       = adapt(Brain)
+export const RunIcon         = adapt(PersonStanding)
+export const DropletIcon     = adapt(Droplets)
+export const SkateIcon       = adapt(Wind)
+export const PersonIcon      = adapt(User)
+export const TargetIcon      = adapt(Target)
+export const RulerIcon       = adapt(Ruler)
+export const CalendarIcon    = adapt(Calendar)
+export const GridIcon        = adapt(LayoutGrid)
+export const TrophyIcon      = adapt(Trophy)
+export const ShareIcon       = adapt(Share2)
+export const TrendingIcon    = adapt(TrendingUp)
+export const DotsIcon        = adapt(MoreHorizontal)
+export const EditIcon        = adapt(Pencil)
+export const TrashIcon       = adapt(Trash2)
+export const CheckIcon       = adapt(Check)
+export const ChevronIcon     = adapt(ChevronDown)
+export const ChevronRightIcon = adapt(ChevronRight)
+export const PlusIcon        = adapt(Plus)
+export const CloseIcon       = adapt(X)
+export const FlameIcon       = adapt(Flame)
+export const ZapIcon         = adapt(Zap)
+export const BookmarkIcon    = adapt(Bookmark)
+export const BellIcon        = adapt(Bell)
+export const StarIcon        = adapt(Star)
+export const HeartIcon       = adapt(Heart)
+export const ArrowUpIcon     = adapt(ArrowUp)
+export const ArrowDownIcon   = adapt(ArrowDown)
+export const ActivityIcon    = adapt(Activity)
+export const BikeIcon        = adapt(Bike)
+export const SwimIcon        = adapt(Waves)
+export const WalkIcon        = adapt(Footprints)
+export const SearchIcon      = adapt(Search)
+export const CrownIcon       = adapt(Crown)
+export const ShieldIcon      = adapt(Shield)
+export const DiamondIcon     = adapt(Diamond)
+export const RocketIcon      = adapt(Rocket)
+export const MountainIcon    = adapt(Mountain)
+export const SnowflakeIcon   = adapt(Snowflake)
+export const TerminalIcon    = adapt(Terminal)
+export const VolleyballIcon  = adapt(Volleyball)
+export const SpikeballIcon   = adapt(CircleDot)
+export const PoolIcon        = adapt(CircleDot)
+export const TableTennisIcon = adapt(CircleDot)
+export const ChessIcon       = adapt(Grid3x3)
+export const GolfIcon        = adapt(Flag)
+export const DiscIcon        = adapt(Disc3)
+export const BasketballIcon  = adapt(CircleDot)
+export const HobbiesIcon     = adapt(Sparkles)
+export const SunIcon         = adapt(Sun)
+export const SproutIcon      = adapt(Sprout)
+export const BirdIcon        = adapt(Bird)
 
 // ── Map: section key → icon component ─────────────────────────
 

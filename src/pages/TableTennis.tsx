@@ -56,7 +56,7 @@ function LogTTPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.table_tennis_game + (isWin ? XP_RATES.table_tennis_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — 🏓 Game, set, match!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — Game, set, match!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), game_type: 'Singles', my_score: '', opp_score: '', opponent: '', notes: '' })
