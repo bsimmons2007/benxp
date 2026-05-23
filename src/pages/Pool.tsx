@@ -59,7 +59,7 @@ function LogPoolPanel({ onLogged }: { onLogged: () => void }) {
     const xp = XP_RATES.pool_game
       + (isWin       ? XP_RATES.pool_win           : 0)
       + (breakAndRun ? XP_RATES.pool_break_and_run : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — 🎱 Rack 'em!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — Rack 'em!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep shooting!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), game_type: '8-Ball', opponent: '', run_count: '', notes: '' })
@@ -268,7 +268,7 @@ export function Pool() {
                   <span style={{ marginLeft: 8, fontSize: 11, color: 'var(--text-muted)' }}>{g.game_type}</span>
                 </p>
                 {g.break_and_run && (
-                  <p style={{ fontSize: 10, color: '#fbbf24', marginTop: 1, fontWeight: 600 }}>✨ Break &amp; Run</p>
+                  <p style={{ fontSize: 10, color: '#fbbf24', marginTop: 1, fontWeight: 600 }}>Break &amp; Run</p>
                 )}
                 {g.opponent && !g.break_and_run && (
                   <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>vs {g.opponent}</p>

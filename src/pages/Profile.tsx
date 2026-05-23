@@ -21,8 +21,9 @@ import {
   TrendingIcon, GridIcon, HeartIcon,
   BasketballIcon, GolfIcon, DiscIcon, TableTennisIcon, ChessIcon,
   VolleyballIcon, SpikeballIcon, PoolIcon,
+  SwimIcon, SproutIcon, BirdIcon,
+  type IconComponent,
 } from '../components/ui/Icon'
-import type { IconComponent } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const CATEGORY_LABELS: Record<Badge['category'], string> = {
@@ -576,17 +577,17 @@ function useLifetimeStats() {
 }
 
 // ── Level avatar tiers ────────────────────────────────────────
-const AVATAR_TIERS = [
-  { minLevel:  1, emoji: '🌱', title: 'Seedling',     desc: 'Just starting out. Every rep counts.',    aura: '#4ade80' },
-  { minLevel:  6, emoji: '⚔️', title: 'Warrior',      desc: 'You fight for every gain.',               aura: '#94a3b8' },
-  { minLevel: 11, emoji: '🛡️', title: 'Knight',       desc: 'Discipline is your armor.',               aura: '#60a5fa' },
-  { minLevel: 21, emoji: '🔥', title: 'Blazer',       desc: 'Momentum catches fire.',                  aura: '#fb923c' },
-  { minLevel: 31, emoji: '⚡', title: 'Striker',      desc: 'You move with electric purpose.',         aura: '#facc15' },
-  { minLevel: 41, emoji: '🌊', title: 'Tidal',        desc: 'Unstoppable, consistent force.',          aura: '#38bdf8' },
-  { minLevel: 51, emoji: '🦅', title: 'Apex',         desc: 'Above the grind. Soaring.',               aura: '#a78bfa' },
-  { minLevel: 66, emoji: '🌟', title: 'Legend',       desc: 'Your name echoes in the gym.',            aura: '#fbbf24' },
-  { minLevel: 81, emoji: '👑', title: 'Sovereign',    desc: 'You rule your domain.',                   aura: '#f59e0b' },
-  { minLevel: 96, emoji: '💠', title: 'Godlike',      desc: 'Transcendent. Few reach this height.',    aura: '#e879f9' },
+const AVATAR_TIERS: { minLevel: number; Icon: IconComponent; title: string; desc: string; aura: string }[] = [
+  { minLevel:  1, Icon: SproutIcon,  title: 'Seedling',  desc: 'Just starting out. Every rep counts.',   aura: '#4ade80' },
+  { minLevel:  6, Icon: SwordIcon,   title: 'Warrior',   desc: 'You fight for every gain.',              aura: '#94a3b8' },
+  { minLevel: 11, Icon: ShieldIcon,  title: 'Knight',    desc: 'Discipline is your armor.',              aura: '#60a5fa' },
+  { minLevel: 21, Icon: FlameIcon,   title: 'Blazer',    desc: 'Momentum catches fire.',                 aura: '#fb923c' },
+  { minLevel: 31, Icon: ZapIcon,     title: 'Striker',   desc: 'You move with electric purpose.',        aura: '#facc15' },
+  { minLevel: 41, Icon: SwimIcon,    title: 'Tidal',     desc: 'Unstoppable, consistent force.',         aura: '#38bdf8' },
+  { minLevel: 51, Icon: BirdIcon,    title: 'Apex',      desc: 'Above the grind. Soaring.',              aura: '#a78bfa' },
+  { minLevel: 66, Icon: StarIcon,    title: 'Legend',    desc: 'Your name echoes in the gym.',           aura: '#fbbf24' },
+  { minLevel: 81, Icon: CrownIcon,   title: 'Sovereign', desc: 'You rule your domain.',                  aura: '#f59e0b' },
+  { minLevel: 96, Icon: DiamondIcon, title: 'Godlike',   desc: 'Transcendent. Few reach this height.',   aura: '#e879f9' },
 ]
 
 function getAvatarTier(level: number) {
@@ -617,7 +618,7 @@ function LevelAvatar({ level }: { level: number }) {
             boxShadow: `0 0 24px ${tier.aura}55`,
             animation: 'pulse 3s ease-in-out infinite',
           }} />
-          <span style={{ fontSize: 36, position: 'relative', zIndex: 1 }}>{tier.emoji}</span>
+          <tier.Icon size={36} color={tier.aura} style={{ position: 'relative', zIndex: 1 }} />
         </div>
 
         {/* Tier info */}
@@ -632,8 +633,8 @@ function LevelAvatar({ level }: { level: number }) {
               <div style={{ height: 3, borderRadius: 2, background: 'var(--input-bg)', overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${pctToNext}%`, background: tier.aura, borderRadius: 2, transition: 'width 0.8s ease' }} />
               </div>
-              <p style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 3 }}>
-                Lv {nextTier.minLevel} → {nextTier.emoji} {nextTier.title}
+              <p style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
+                Lv {nextTier.minLevel} → <nextTier.Icon size={10} /> {nextTier.title}
               </p>
             </>
           )}

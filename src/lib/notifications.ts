@@ -61,7 +61,7 @@ export function checkStreakBreakWarning(currentStreak: number, activeToday: bool
 
   localStorage.setItem(STREAK_WARN_KEY, today)
   try {
-    new Notification('YouXP — Streak at risk! 🔥', {
+    new Notification('YouXP — Streak at risk!', {
       body: `Your ${currentStreak}-day streak will reset at midnight. Log something to keep it alive!`,
       icon: '/favicon.svg',
       badge: '/favicon.svg',
@@ -94,7 +94,7 @@ export function checkDailyReminder(): void {
   localStorage.setItem(LAST_SHOWN_KEY, today)
   try {
     new Notification('YouXP', {
-      body: "Have you logged today? Keep your streak alive! 🔥",
+      body: "Have you logged today? Keep your streak alive!",
       icon: '/favicon.svg',
       badge: '/favicon.svg',
     })
