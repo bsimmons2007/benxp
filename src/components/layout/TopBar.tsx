@@ -95,13 +95,14 @@ export function TopBar({ title, hideSettings = false, back = false, backTo, logB
           className="flex items-center justify-center rounded-lg transition-colors"
           style={{
             width: 36, height: 36, flexShrink: 0,
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: showHint ? 'var(--accent)' : 'var(--text-secondary)',
+            background: back ? 'var(--surface-2)' : 'none',
+            border: 'none', cursor: 'pointer', borderRadius: 10,
+            color: back ? 'var(--text-primary)' : showHint ? 'var(--accent)' : 'var(--text-secondary)',
           }}
         >
           {back ? (
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M11 4L6 9L11 14" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 5L7 10L12 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           ) : (
             <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
