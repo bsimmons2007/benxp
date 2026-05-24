@@ -26,6 +26,7 @@ import type { Theme } from '../lib/theme'
 import type { SectionKey } from '../lib/sections'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { resetTutorial } from '../lib/tutorial'
+import { CHANGELOG, CURRENT_VERSION } from '../lib/changelog'
 
 const C = 'var(--text-muted)'
 const XP_BREAKDOWN: { label: string; icon: ReactNode; xp: string }[] = [
@@ -174,6 +175,7 @@ export function Settings() {
   const [notifEnabled, setNotifEnabled] = useState(() => getNotifPrefs().enabled)
   const [notifTime, setNotifTime]       = useState(() => getNotifPrefs().time)
   const [notifPerm, setNotifPerm]       = useState(() => permissionGranted())
+  const [changelogOpen, setChangelogOpen] = useState(false)
 
   async function saveName() {
     if (!nameInput.trim()) return
@@ -906,6 +908,64 @@ export function Settings() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+        </Card>
+
+        {/* ── Version history card ─────────────────────────────────── */}
+        <Card className="mb-2">
+          <button onClick={() => setChangelogOpen(o => !o)} className="w-full flex items-center justify-between py-2">
+            <div className="flex items-center gap-3">
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><StarIcon size={18} color="var(--text-secondary)" /></span>
+              <div className="text-left">
+                <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Version History</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>{CURRENT_VERSION} · {CHANGELOG.length} releases</p>
+              </div>
+            </div>
+            <Chevron open={changelogOpen} />
+          </button>
+          {changelogOpen && (
+            <div className="pb-2 pop-in" style={{ borderTop: '1px solid var(--border-faint)', paddingTop: 12 }}>
+              {CHANGELOG.map((entry, idx) => (
+                <div key={entry.version} style={{
+                  marginBottom: idx < CHANGELOG.length - 1 ? 16 : 0,
+                  paddingLeft: 12,
+                  borderLeft: idx === 0
+                    ? '2px solid var(--accent)'
+                    : '2px solid var(--border-subtle)',
+                }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span style={{
+                      fontSize: 12, fontWeight: 700,
+                      color: idx === 0 ? 'var(--accent)' : 'var(--text-primary)',
+                      letterSpacing: '0.02em',
+                    }}>{entry.version}</span>
+                    <span style={{
+                      fontSize: 10, fontWeight: 600, padding: '1px 7px', borderRadius: 999,
+                      background: idx === 0
+                        ? 'color-mix(in srgb, var(--accent) 14%, transparent)'
+                        : 'var(--surface-2)',
+                      color: idx === 0 ? 'var(--accent)' : 'var(--text-muted)',
+                      textTransform: 'uppercase', letterSpacing: '0.06em',
+                    }}>{entry.label}</span>
+                    {idx === 0 && (
+                      <span style={{
+                        fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 999,
+                        background: 'var(--accent)', color: 'var(--base-bg)',
+                        textTransform: 'uppercase', letterSpacing: '0.08em',
+                      }}>Current</span>
+                    )}
+                  </div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                    {entry.items.map(item => (
+                      <li key={item} className="flex items-start gap-1.5 mb-0.5">
+                        <span style={{ color: 'var(--text-tertiary)', fontSize: 11, marginTop: 1.5, flexShrink: 0 }}>·</span>
+                        <span style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           )}
         </Card>

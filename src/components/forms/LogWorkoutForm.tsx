@@ -1,4 +1,4 @@
-﻿import { useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { checkForPR } from '../../lib/xp'
@@ -11,14 +11,14 @@ import { useStore } from '../../store/useStore'
 import type { LiftType } from '../../types'
 
 interface WorkoutForm {
-  date: string
-  lift: LiftType
-  weight: string
-  sets: string
-  reps: string
-  bodyweight: string
-  equipment: string
-  grip: string
+  date:        string
+  lift:        LiftType
+  weight:      string
+  sets:        string
+  reps:        string
+  bodyweight:  string
+  equipment:   string
+  grip:        string
 }
 
 const LIFTS: LiftType[] = ['Bench', 'Squat', 'Deadlift', 'PullUps', 'PushUps']
@@ -41,39 +41,40 @@ function saveVariantsForLift(id: string, equipment: string, grip: string) {
   localStorage.setItem(LIFT_VARIANTS_KEY, JSON.stringify(m))
 }
 
+const labelStyle: React.CSSProperties = {
+  fontSize: 12, fontWeight: 600, color: 'var(--text-muted)',
+  textTransform: 'uppercase', letterSpacing: '0.06em',
+}
+const selectStyle: React.CSSProperties = {
+  padding: '10px 12px', borderRadius: 10, fontSize: 14,
+  background: 'var(--surface-2)', border: '1px solid var(--border-default)',
+  color: 'var(--text-primary)', outline: 'none', width: '100%',
+  appearance: 'none', WebkitAppearance: 'none',
+}
+
 export function LogWorkoutForm() {
   const { register, handleSubmit, watch, reset, setValue, formState: { errors, isSubmitting } } = useForm<WorkoutForm>({
     defaultValues: { date: today(), lift: 'Bench', sets: '', reps: '', weight: '', bodyweight: '', equipment: 'Barbell', grip: 'Standard' },
   })
-  const [toast,          setToast]          = useState<string | null>(null)
-  const [bwLoggedToday,  setBwLoggedToday]  = useState(false)   // already in bodyweight_log today
-  const [userId,         setUserId]         = useState<string | null>(null)
-  const [dupWarning,     setDupWarning]     = useState<string | null>(null)
+  const [toast,         setToast]         = useState<string | null>(null)
+  const [bwLoggedToday, setBwLoggedToday] = useState(false)
+  const [userId,        setUserId]        = useState<string | null>(null)
+  const [dupWarning,    setDupWarning]    = useState<string | null>(null)
   const refreshXP = useStore((s) => s.refreshXP)
   const lift = watch('lift')
   const isBodyweight = BODYWEIGHT_LIFTS.includes(lift)
   const showGrip = GRIP_LIFTS.includes(lift)
 
-  // Load today's bodyweight on mount
   useEffect(() => {
     async function loadBW() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       setUserId(user.id)
-
-      // Check bodyweight_log for today's entry
       const { data } = await supabase
-        .from('bodyweight_log')
-        .select('weight_lbs')
-        .eq('user_id', user.id)
-        .eq('date', today())
-        .order('created_at', { ascending: false })
-        .limit(1)
-
-      if (data?.[0]) {
-        setValue('bodyweight', String(data[0].weight_lbs))
-        setBwLoggedToday(true)
-      }
+        .from('bodyweight_log').select('weight_lbs')
+        .eq('user_id', user.id).eq('date', today())
+        .order('created_at', { ascending: false }).limit(1)
+      if (data?.[0]) { setValue('bodyweight', String(data[0].weight_lbs)); setBwLoggedToday(true) }
     }
     loadBW()
   }, [setValue])
@@ -87,7 +88,6 @@ export function LogWorkoutForm() {
     const weight = isBodyweight ? (parseFloat(data.bodyweight) || 0) : (parseFloat(data.weight) || 0)
     const est1rm = Math.round((1 + Math.min(reps, 12) / 30) * weight)
 
-    // Outlier detection — flag suspiciously large values
     const { data: prData } = await supabase
       .from('pr_history').select('est_1rm').eq('lift', data.lift).order('est_1rm', { ascending: false }).limit(1)
     const allTimePR = prData?.[0]?.est_1rm ?? 0
@@ -96,17 +96,11 @@ export function LogWorkoutForm() {
       return
     }
 
-    // Duplicate detection — check for same lift+date+weight+reps in last 2 minutes
     const { data: recent } = await supabase
-      .from('lifting_log')
-      .select('created_at, sets, reps, weight')
-      .eq('lift', data.lift)
-      .eq('date', data.date)
-      .gte('created_at', new Date(Date.now() - 120_000).toISOString())
-      .limit(5)
-    const dup = (recent ?? []).find(r =>
-      r.reps === reps && Math.abs((r.weight ?? 0) - weight) < 0.1
-    )
+      .from('lifting_log').select('created_at, sets, reps, weight')
+      .eq('lift', data.lift).eq('date', data.date)
+      .gte('created_at', new Date(Date.now() - 120_000).toISOString()).limit(5)
+    const dup = (recent ?? []).find(r => r.reps === reps && Math.abs((r.weight ?? 0) - weight) < 0.1)
     if (dup && !dupWarning) {
       setDupWarning(`Possible duplicate: ${data.lift} ${weight}lbs ×${reps} reps already logged recently. Log anyway?`)
       return
@@ -114,49 +108,29 @@ export function LogWorkoutForm() {
     setDupWarning(null)
 
     const { data: inserted, error } = await supabase
-      .from('lifting_log')
-      .insert({
-        user_id:    user.id,
-        date:       data.date,
-        lift:       data.lift,
-        weight:     isBodyweight ? null : weight,
-        sets,
-        reps,
-        est_1rm:    est1rm,
-        bodyweight: data.bodyweight ? parseFloat(data.bodyweight) : null,
-        is_pr:      false,
-      })
-      .select()
-      .single()
+      .from('lifting_log').insert({
+        user_id: user.id, date: data.date, lift: data.lift,
+        weight: isBodyweight ? null : weight, sets, reps, est_1rm: est1rm,
+        bodyweight: data.bodyweight ? parseFloat(data.bodyweight) : null, is_pr: false,
+      }).select().single()
 
-    if (error || !inserted) {
-      setToast(`Error: ${error?.message ?? 'Insert failed'}`)
-      return
-    }
+    if (error || !inserted) { setToast(`Error: ${error?.message ?? 'Insert failed'}`); return }
     saveVariantsForLift(inserted.id, data.equipment, data.grip)
 
-    // Save bodyweight to bodyweight_log (only once per day)
     if (data.bodyweight && parseFloat(data.bodyweight) > 0 && !bwLoggedToday) {
-      const bwEntry = parseFloat(data.bodyweight)
       const { error: bwErr } = await supabase.from('bodyweight_log').insert({
-        user_id: userId ?? user.id,
-        date: data.date,
-        weight_lbs: bwEntry,
+        user_id: userId ?? user.id, date: data.date, weight_lbs: parseFloat(data.bodyweight),
       })
       if (!bwErr) setBwLoggedToday(true)
     }
 
     const isPR = await checkForPR(supabase, data.lift, est1rm, data.date, inserted.id, user.id)
-
-    if (isPR) {
-      await supabase.from('lifting_log').update({ is_pr: true }).eq('id', inserted.id)
-    }
+    if (isPR) await supabase.from('lifting_log').update({ is_pr: true }).eq('id', inserted.id)
 
     const xpEarned = sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0)
     setToast(`+${xpEarned} XP${isPR ? ' — New PR!' : ''}`)
     await refreshXP()
 
-    // Keep bodyweight and equipment pre-filled across entries
     const savedBW = data.bodyweight
     reset({ date: today(), lift: data.lift, sets: '', reps: '', weight: '', bodyweight: savedBW, equipment: data.equipment, grip: 'Standard' })
   }
@@ -165,37 +139,26 @@ export function LogWorkoutForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <Input label="Date" type="date" {...register('date', { required: true })} />
 
-      <div className="flex flex-col gap-1">
-        <label className="text-base font-medium" style={{ color: '#AAAAAA' }}>Lift</label>
-        <select
-          {...register('lift')}
-          className="px-3 py-2 rounded-lg text-white outline-none"
-          style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-        >
+      {/* Lift */}
+      <div className="flex flex-col gap-1.5">
+        <label style={labelStyle}>Lift</label>
+        <select {...register('lift')} style={selectStyle}>
           {LIFTS.map((l) => <option key={l} value={l}>{l}</option>)}
         </select>
       </div>
 
-      {/* Equipment + Grip row */}
+      {/* Equipment + Grip */}
       <div className="flex gap-3">
-        <div className="flex flex-col gap-1 flex-1">
-          <label className="text-sm font-medium" style={{ color: '#AAAAAA' }}>Equipment</label>
-          <select
-            {...register('equipment')}
-            className="px-3 py-2 rounded-lg text-white outline-none text-sm"
-            style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-          >
+        <div className="flex flex-col gap-1.5 flex-1">
+          <label style={labelStyle}>Equipment</label>
+          <select {...register('equipment')} style={selectStyle}>
             {EQUIPMENT_TYPES.map(e => <option key={e} value={e}>{e}</option>)}
           </select>
         </div>
         {showGrip && (
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-sm font-medium" style={{ color: '#AAAAAA' }}>Grip</label>
-            <select
-              {...register('grip')}
-              className="px-3 py-2 rounded-lg text-white outline-none text-sm"
-              style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-            >
+          <div className="flex flex-col gap-1.5 flex-1">
+            <label style={labelStyle}>Grip</label>
+            <select {...register('grip')} style={selectStyle}>
               {GRIP_WIDTHS.map(g => <option key={g} value={g}>{g}</option>)}
             </select>
           </div>
@@ -203,72 +166,63 @@ export function LogWorkoutForm() {
       </div>
 
       {!isBodyweight && (
-        <Input
-          label="Weight (lbs)"
-          type="number"
-          step="2.5"
-          placeholder="135"
+        <Input label="Weight (lbs)" type="number" step="2.5" placeholder="135"
           {...register('weight', { required: !isBodyweight })}
           error={errors.weight ? 'Required' : undefined}
         />
       )}
 
       <div className="flex gap-3">
-        <Input
-          label="Sets"
-          type="number"
-          placeholder="3"
-          className="flex-1"
+        <Input label="Sets" type="number" placeholder="3" className="flex-1"
           {...register('sets', { required: true, min: 1, max: 100 })}
           error={errors.sets ? 'Required' : undefined}
         />
-        <Input
-          label="Reps"
-          type="number"
-          placeholder="8"
-          className="flex-1"
+        <Input label="Reps" type="number" placeholder="8" className="flex-1"
           {...register('reps', { required: true, min: 1, max: 500 })}
           error={errors.reps ? 'Required' : undefined}
         />
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#AAAAAA' }}>
+      {/* Bodyweight */}
+      <div className="flex flex-col gap-1.5">
+        <label style={labelStyle}>
           Bodyweight (lbs)
           {bwLoggedToday && (
-            <span style={{ marginLeft: 8, fontSize: 10, color: '#4caf50', fontWeight: 700 }}>✓ logged today</span>
+            <span style={{ marginLeft: 8, fontSize: 10, color: 'var(--green)', fontWeight: 700 }}>
+              ✓ logged today
+            </span>
           )}
         </label>
         <input
-          type="number"
-          step="0.1"
-          placeholder="150"
+          type="number" step="0.1" placeholder="150"
           {...register('bodyweight')}
           disabled={bwLoggedToday}
           style={{
-            padding: '8px 12px', borderRadius: 8, fontSize: 14,
-            background: 'var(--input-bg)',
-            border: `1px solid ${bwLoggedToday ? 'rgba(76,175,80,0.3)' : 'var(--border)'}`,
+            ...selectStyle,
+            border: `1px solid ${bwLoggedToday ? 'color-mix(in srgb, var(--green) 30%, transparent)' : 'var(--border-default)'}`,
             color: bwLoggedToday ? 'var(--text-muted)' : 'var(--text-primary)',
-            outline: 'none', width: '100%', boxSizing: 'border-box',
           }}
         />
         {!bwLoggedToday && (
-          <p style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
+          <p style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
             Only asked once per day — updates your weight graph
           </p>
         )}
       </div>
 
+      {/* Duplicate warning */}
       {dupWarning && (
-        <div className="rounded-xl px-3 py-2.5 flex flex-col gap-2" style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.25)' }}>
-          <p style={{ fontSize: 11, color: '#f87171', lineHeight: 1.5 }}>{dupWarning}</p>
+        <div style={{
+          borderRadius: 12, padding: '10px 12px',
+          background: 'color-mix(in srgb, var(--red) 8%, transparent)',
+          border: '1px solid color-mix(in srgb, var(--red) 22%, transparent)',
+        }}>
+          <p style={{ fontSize: 12, color: 'var(--red)', lineHeight: 1.5, marginBottom: 8 }}>{dupWarning}</p>
           <div className="flex gap-2">
             <button
-              type="button"
-              onClick={() => setDupWarning(null)}
+              type="button" onClick={() => setDupWarning(null)}
               className="flex-1 py-1.5 rounded-lg text-xs font-semibold"
-              style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
+              style={{ background: 'var(--surface-2)', color: 'var(--text-muted)', border: '1px solid var(--border-default)', cursor: 'pointer' }}
             >
               Cancel
             </button>
