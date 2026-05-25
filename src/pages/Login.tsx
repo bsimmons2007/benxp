@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
 import { logAuditEvent } from '../lib/audit'
 import { DumbbellIcon, BookIcon, RunIcon, MoonIcon, SwordIcon, BrainIcon, GamepadIcon, TargetIcon } from '../components/ui/Icon'
+import { Wordmark } from '../components/brand/Wordmark'
 
 interface AuthForm {
   name:     string
@@ -315,16 +316,8 @@ export function Login() {
 
         {/* Brand */}
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <h1
-            className="glow-pulse"
-            style={{
-              color: 'var(--accent)',
-              fontSize: 52, fontWeight: 700, letterSpacing: '0.04em', lineHeight: 1, marginBottom: 10,
-            }}
-          >
-            YouXP
-          </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+          <Wordmark size={88} color="#f3efe6" accent="var(--color-coral)" showPulse={true} />
+          <p style={{ color: 'rgba(243,239,230,0.5)', fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 14 }}>
             Level up your life.
           </p>
         </div>
@@ -451,11 +444,9 @@ export function Login() {
         <div className="relative z-10 w-full" style={{ maxWidth: 380 }}>
 
           {/* Mobile-only logo */}
-          <div className="md:hidden text-center mb-8">
-            <h1 className="glow-pulse" style={{ color: 'var(--accent)', fontSize: 48, fontWeight: 700 }}>
-              YouXP
-            </h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 6 }}>
+          <div className="md:hidden text-center mb-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Wordmark size={48} color="var(--text-primary)" accent="var(--color-coral)" showPulse={true} />
+            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 8 }}>
               Level up your life.
             </p>
           </div>
