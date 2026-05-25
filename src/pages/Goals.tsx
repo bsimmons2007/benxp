@@ -417,7 +417,7 @@ export function Goals() {
         {/* Completed goals */}
         {completed.length > 0 && (
           <>
-            <p className="text-xs uppercase tracking-widest mt-4 mb-3 font-semibold" style={{ color: 'var(--text-tertiary)' }}>Completed</p>
+            <p className="text-xs uppercase tracking-widest font-mono mt-4 mb-3 font-semibold" style={{ color: 'var(--text-tertiary)' }}>Completed</p>
             {completed.map(g => (
               <div
                 key={g.id}

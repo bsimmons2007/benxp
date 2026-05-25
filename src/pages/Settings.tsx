@@ -557,7 +557,7 @@ export function Settings() {
 
               {/* Scene picker */}
               <div style={{ borderTop: '1px solid var(--border-faint)', paddingTop: 12 }}>
-                <p className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Atmosphere</p>
+                <p className="text-xs uppercase tracking-widest font-mono mb-2" style={{ color: 'var(--text-muted)' }}>Atmosphere</p>
                 <div className="flex flex-col gap-1.5">
                   {AMBIENT_SCENES.map(scene => {
                     const isActive = activeScene === scene.id
@@ -780,7 +780,7 @@ export function Settings() {
 
               {/* What's always private */}
               <div className="py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
-                <p className="text-xs font-bold mb-2" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Always private</p>
+                <p className="text-xs font-bold mb-2" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Always private</p>
                 {[
                   'Workout logs & personal records',
                   'Sleep, mood & water data',
@@ -946,13 +946,13 @@ export function Settings() {
                         ? 'color-mix(in srgb, var(--accent) 14%, transparent)'
                         : 'var(--surface-2)',
                       color: idx === 0 ? 'var(--accent)' : 'var(--text-muted)',
-                      textTransform: 'uppercase', letterSpacing: '0.06em',
+                      textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em',
                     }}>{entry.label}</span>
                     {idx === 0 && (
                       <span style={{
                         fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 999,
                         background: 'var(--accent)', color: 'var(--base-bg)',
-                        textTransform: 'uppercase', letterSpacing: '0.08em',
+                        textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em',
                       }}>Current</span>
                     )}
                   </div>

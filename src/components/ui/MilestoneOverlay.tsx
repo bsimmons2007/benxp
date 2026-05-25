@@ -64,7 +64,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
       >
         {/* Milestone tag */}
         <p style={{
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)',
           color: 'var(--accent)', marginBottom: 14,
         }}>
           <TrophyIcon size={11} color="var(--accent)" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 5 }} />Milestone Unlocked
@@ -81,7 +81,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
 
         {/* Name */}
         <p style={{
-          fontSize: 26, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 6, letterSpacing: '0.04em',
+          fontSize: 26, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6, letterSpacing: '0.04em',
           textShadow: '0 0 30px var(--accent)',
         }}>
           {milestone.name}

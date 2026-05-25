@@ -250,7 +250,7 @@ export function Chess() {
             border: '1px solid rgba(167,139,250,0.25)',
           }}>
             <p className="section-label mb-1">Current Rating</p>
-            <p style={{ fontSize: 52, fontWeight: 900, color: ACCENT, lineHeight: 1 }}>
+            <p style={{ fontSize: 52, fontWeight: 700, color: ACCENT, lineHeight: 1 }}>
               {currentRating.toLocaleString()}
             </p>
             {peakRating && peakRating > currentRating && (
@@ -363,7 +363,7 @@ export function Chess() {
             </div>
             <div className="flex items-center gap-3">
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 14, fontWeight: 800, color: resultColor(g.result) }}>{resultLabel(g.result)}</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: resultColor(g.result) }}>{resultLabel(g.result)}</p>
                 {g.rating_after && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{g.rating_after}</p>}
               </div>
               <button onClick={() => setEditing(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>

@@ -806,7 +806,7 @@ export function Profile() {
                 {userName ?? 'Player'}
               </h2>
               <p style={{ fontSize: 13, fontWeight: 700,
-                color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
+                color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: 4 }}>
                 {title}
               </p>
               {stats.memberSince && (
@@ -840,11 +840,11 @@ export function Profile() {
           <Card className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Consistency Score</p>
+                <p className="text-xs uppercase tracking-widest font-mono" style={{ color: 'var(--text-muted)' }}>Consistency Score</p>
                 <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{activeDays} active days in the last 30</p>
               </div>
               <span style={{
-                fontSize: 32, fontWeight: 900,
+                fontSize: 32, fontWeight: 700,
                 color: consistencyScore >= 70 ? '#4ade80' : consistencyScore >= 40 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1,
               }}>
                 {consistencyScore}%

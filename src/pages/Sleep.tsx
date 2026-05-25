@@ -448,14 +448,14 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
         {/* Current vs target */}
         <div className="flex items-center gap-3">
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 4 }}>
               {avgWakeMins !== null ? `Current avg (${wakeTimeLogs.length} nights)` : 'Current (estimated)'}
             </p>
             <p style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-serif)' }}>{fmtTime(currentWakeMins)}</p>
           </div>
           <div style={{ color: 'var(--text-muted)', fontSize: 22, fontWeight: 300 }}>→</div>
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.3)' }}>
-            <p style={{ color: 'var(--accent)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Goal</p>
+            <p style={{ color: 'var(--accent)', fontSize: 10, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', marginBottom: 4 }}>Goal</p>
             <p style={{ color: 'var(--accent)', fontSize: 22, fontWeight: 700 }}>{fmtTime(targetWakeMins)}</p>
           </div>
         </div>
@@ -463,7 +463,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
         {/* Settings */}
         <div className="flex flex-col gap-3">
           <div>
-            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Target Wake Time</label>
+            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 6 }}>Target Wake Time</label>
             <input
               type="time"
               value={targetWake}
@@ -474,7 +474,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
           <div className="flex gap-3">
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Sleep Duration (hrs)</label>
+              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 6 }}>Sleep Duration (hrs)</label>
               <input
                 type="number" step="0.5" min="5" max="10"
                 value={sleepHours}
@@ -483,7 +483,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Shift Speed</label>
+              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 6 }}>Shift Speed</label>
               <select
                 value={shiftMins}
                 onChange={e => setShiftMins(Number(e.target.value))}
@@ -517,7 +517,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               ].map(s => (
                 <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
                   <p style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700, lineHeight: 1 }}>{s.value}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 9, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.10em', fontWeight: 600 }}>{s.label}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 9, marginTop: 4, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.10em', fontWeight: 600 }}>{s.label}</p>
                 </div>
               ))}
             </div>
@@ -537,7 +537,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
             {/* Tonight callout */}
             <div className="rounded-lg p-3" style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.35)' }}>
-              <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>Tonight</p>
+              <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 4 }}>Tonight</p>
               <div className="flex justify-between items-center">
                 <div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Go to sleep by</p>
@@ -552,7 +552,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
             {/* Day-by-day schedule */}
             <div>
-              <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Full Schedule</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 8 }}>Full Schedule</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 280, overflowY: 'auto' }}>
                 {schedule.map((s, i) => {
                   const isToday    = s.date === todayStr
@@ -745,7 +745,7 @@ export function Sleep() {
         {/* Log buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 14px' }}>
           <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
-          <span style={{ fontSize: 10, color: 'var(--text-disabled)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Log</span>
+          <span style={{ fontSize: 10, color: 'var(--text-disabled)', fontWeight: 600, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }}>Log</span>
           <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
         </div>
         <LogSleepPanel onLogged={load} />

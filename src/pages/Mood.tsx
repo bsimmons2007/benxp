@@ -151,10 +151,10 @@ export function Mood() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 3 }}>{s.icon}</div>
-                <p style={{ color: s.color, fontSize: 24, fontWeight: 900, lineHeight: 1 }}>
+                <p style={{ color: s.color, fontSize: 24, fontWeight: 700, lineHeight: 1 }}>
                   {s.value}
                 </p>
-                <p style={{ color: 'var(--text-tertiary)', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <p style={{ color: 'var(--text-tertiary)', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
                   {s.label}
                 </p>
               </div>

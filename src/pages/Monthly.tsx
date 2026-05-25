@@ -174,7 +174,7 @@ export function Monthly() {
           <>
             {/* XP hero */}
             <Card className="mb-4 text-center" goldBorder>
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>XP Earned</p>
+              <p className="text-xs uppercase tracking-widest font-mono mb-1" style={{ color: 'var(--text-tertiary)' }}>XP Earned</p>
               <p className="text-5xl font-bold" style={{ color: 'var(--accent)' }}>
                 +{parseInt(animatedXP).toLocaleString()}
               </p>

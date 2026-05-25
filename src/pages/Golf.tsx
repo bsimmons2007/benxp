@@ -421,7 +421,7 @@ export function Golf() {
               </div>
               <div className="flex items-center gap-3">
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: 18, fontWeight: 800, color: vsParColor(diff), lineHeight: 1 }}>
+                  <p style={{ fontSize: 18, fontWeight: 700, color: vsParColor(diff), lineHeight: 1 }}>
                     {vsParLabel(diff)}
                   </p>
                   <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{r.score} / {r.par}</p>

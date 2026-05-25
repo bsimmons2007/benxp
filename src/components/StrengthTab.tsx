@@ -72,7 +72,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
     <div className="pop-in" style={{ padding: '16px 0 0' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <div>
-          <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>
+          <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', marginBottom: 2 }}>
             {muscle?.group}
           </p>
           <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 17 }}>
@@ -83,7 +83,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
-        <span style={{ fontSize: 28, fontWeight: 900, color: glow }}>
+        <span style={{ fontSize: 28, fontWeight: 700, color: glow }}>
           {result.score.toFixed(3)}
         </span>
         <span style={{ fontSize: 12, color: '#555' }}>strength score</span>
@@ -118,7 +118,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
 
       {result.contributions.length > 0 && (
         <div style={{ marginTop: 12 }}>
-          <p style={{ fontSize: 11, color: '#555', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+          <p style={{ fontSize: 11, color: '#555', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', marginBottom: 6 }}>
             Contributing exercises
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -171,7 +171,7 @@ function GroupRow({ group, results, selected, onSelect }: {
   const groupMuscles = MUSCLES.filter(m => m.group === group)
   return (
     <div style={{ marginBottom: 2 }}>
-      <p style={{ fontSize: 10, color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
+      <p style={{ fontSize: 10, color: '#555', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', marginBottom: 4 }}>
         {group}
       </p>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -212,7 +212,7 @@ function ImbalanceCard({ warnings }: { warnings: ReturnType<typeof detectImbalan
   if (warnings.length === 0) return null
   return (
     <Card style={{ border: '1px solid rgba(224,120,48,0.25)', background: 'rgba(224,120,48,0.05)' }}>
-      <p style={{ fontSize: 11, color: '#e07830', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8, fontWeight: 700 }}>
+      <p style={{ fontSize: 11, color: '#e07830', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', marginBottom: 8, fontWeight: 700 }}>
         ⚠ Muscle Imbalances Detected
       </p>
       {warnings.map((w, i) => (
@@ -251,7 +251,7 @@ function StrengthOrb({ sq }: { sq: number }) {
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         }}
       >
-        <span style={{ fontSize: 32, fontWeight: 900, color: glow, lineHeight: 1 }}>
+        <span style={{ fontSize: 32, fontWeight: 700, color: glow, lineHeight: 1 }}>
           {sq}
         </span>
         <span style={{ fontSize: 9, color: `${glow}aa`, letterSpacing: '0.14em' }}>SQ</span>

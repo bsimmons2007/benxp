@@ -287,7 +287,7 @@ export function TableTennis() {
             <div className="flex items-center gap-3">
               <div style={{ textAlign: 'right' }}>
                 {g.my_score != null && g.opp_score != null && (
-                  <p style={{ fontSize: 16, fontWeight: 800, color: g.win ? ACCENT : '#f87171' }}>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: g.win ? ACCENT : '#f87171' }}>
                     {g.my_score}—{g.opp_score}
                   </p>
                 )}

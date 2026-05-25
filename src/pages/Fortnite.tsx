@@ -499,7 +499,7 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
             <StarIcon size={14} color="#5c85d6" />
             <span style={{ fontSize: 13, fontWeight: 700, color: '#5c85d6' }}>Ranked Wins</span>
           </div>
-          <span style={{ fontSize: 20, fontWeight: 900, color: '#5c85d6' }}>{rankedWins}</span>
+          <span style={{ fontSize: 20, fontWeight: 700, color: '#5c85d6' }}>{rankedWins}</span>
         </div>
       )}
 

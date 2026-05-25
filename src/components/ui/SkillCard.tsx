@@ -26,7 +26,7 @@ export function SkillCard({ skill }: SkillCardProps) {
           <SectionIcon sectionKey={def.icon} size={22} color="var(--accent)" />
           <div>
             <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{def.label}</p>
-            <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
               {skill.title}
             </p>
           </div>

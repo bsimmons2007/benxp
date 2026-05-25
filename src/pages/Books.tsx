@@ -460,7 +460,7 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
                 { label: 'Finished', value: book.date_finished ? formatDate(book.date_finished) : '—' },
               ].map(item => (
                 <div key={item.label}>
-                  <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--text-tertiary)' }}>{item.label}</p>
+                  <p className="text-xs uppercase tracking-widest font-mono mb-1" style={{ color: 'var(--text-tertiary)' }}>{item.label}</p>
                   <p style={{ color: 'var(--text-primary)' }}>{item.value}</p>
                 </div>
               ))}
@@ -830,7 +830,7 @@ export function Books() {
         {/* Currently reading */}
         {reading.length > 0 && (
           <div className="mb-5">
-            <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: 'var(--accent)' }}>
+            <p className="text-xs uppercase tracking-widest font-mono font-semibold mb-3" style={{ color: 'var(--accent)' }}>
               Currently Reading ({reading.length})
             </p>
             {reading.map(book => (
@@ -851,7 +851,7 @@ export function Books() {
         {/* Genre filter */}
         {finished.length > 0 && (
           <>
-            <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: 'var(--text-tertiary)' }}>
+            <p className="text-xs uppercase tracking-widest font-mono font-semibold mb-3" style={{ color: 'var(--text-tertiary)' }}>
               Finished ({finished.length})
             </p>
             <div className="flex gap-2 overflow-x-auto pb-1 mb-3" style={{ scrollbarWidth: 'none' }}>

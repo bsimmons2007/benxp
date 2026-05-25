@@ -44,16 +44,23 @@
   --accent-tint:   rgba(45,155,240,0.05);
 
   /* Font */
-  --font-sans:  'Inter Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono:  'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
-  /* Redirect all former Cinzel / Cormorant references to Inter */
-  --font-serif: var(--font-sans);
+  --font-sans:    'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
   --font-display: var(--font-sans);
+  --font-serif:   var(--font-sans);
 
   /* Status */
   --green: #22c55e;
   --red:   #ef4444;
   --error: #ef4444;
+
+  /* Brand — fixed, never overridden by theme or mode */
+  --color-coral:    #e5443f;
+  --color-ink:      #0d0d1a;
+  --color-paper:    #f3efe6;
+  --color-coral-50: #fadcd9;
+  --color-ink-soft: #22222e;
+  --color-ash:      #6a6657;
 
   /* ── Legacy aliases — keep all existing components working ── */
   --base-bg:       var(--surface-0);
@@ -375,6 +382,7 @@ input:focus, select:focus, textarea:focus {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-tertiary);
+  font-family: var(--font-mono);
 }
 
 /* ─────────────────────────────────────────────────────────────

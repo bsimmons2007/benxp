@@ -178,7 +178,7 @@ function MuscleLabel({ muscleKey, scores }: { muscleKey: string | null; scores: 
       boxShadow: tier > 0 && glow !== 'none' ? `0 0 12px ${glow}33` : 'none',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 10, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{muscle?.group}</span>
+        <span style={{ fontSize: 10, color: 'var(--text-tertiary)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>{muscle?.group}</span>
         <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{muscle?.name ?? muscleKey}</span>
       </div>
       {tier > 0 && result

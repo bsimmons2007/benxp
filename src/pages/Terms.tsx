@@ -23,7 +23,7 @@ function Section({ num, title, children }: { num?: string; title: string; childr
           <span style={{
             width: 22, height: 22, borderRadius: 6, flexShrink: 0,
             background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 10, fontWeight: 800, color: 'var(--base-bg)',
+            fontSize: 10, fontWeight: 700, color: 'var(--base-bg)',
           }}>{num}</span>
         )}
         <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
@@ -59,7 +59,7 @@ export function Terms() {
             <ShieldIcon size={24} color="var(--base-bg)" />
           </div>
           <div>
-            <p style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+            <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
               Terms of Service
             </p>
             <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>

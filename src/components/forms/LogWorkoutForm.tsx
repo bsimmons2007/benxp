@@ -43,7 +43,7 @@ function saveVariantsForLift(id: string, equipment: string, grip: string) {
 
 const labelStyle: React.CSSProperties = {
   fontSize: 12, fontWeight: 600, color: 'var(--text-muted)',
-  textTransform: 'uppercase', letterSpacing: '0.06em',
+  textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'var(--font-mono)',
 }
 const selectStyle: React.CSSProperties = {
   padding: '10px 12px', borderRadius: 10, fontSize: 14,
