@@ -77,7 +77,7 @@ export function LogBookForm() {
       <Input label="Author" type="text" placeholder="Author name" {...register('author')} />
 
       <div className="flex flex-col gap-1">
-        <label className="text-base font-medium" style={{ color: '#AAAAAA' }}>Genre</label>
+        <label className="text-base font-medium" style={{ color: 'var(--text-muted)' }}>Genre</label>
         <select
           {...register('genre')}
           className="px-3 py-2 rounded-lg text-white outline-none"

@@ -44,6 +44,7 @@ const Volleyball   = lazy(() => import('./pages/Volleyball').then(m => ({ defaul
 const Spikeball    = lazy(() => import('./pages/Spikeball').then(m => ({ default: m.Spikeball })))
 const Pool         = lazy(() => import('./pages/Pool').then(m => ({ default: m.Pool })))
 const Leaderboard  = lazy(() => import('./pages/Leaderboard').then(m => ({ default: m.Leaderboard })))
+const Log          = lazy(() => import('./pages/Log').then(m => ({ default: m.Log })))
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
@@ -131,12 +132,12 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
         onClick={e => e.stopPropagation()}
         className="pop-in"
         style={{
-          background: 'rgba(12,16,36,0.98)', border: '1px solid var(--border)',
+          background: 'var(--surface-3)', border: '1px solid var(--border)',
           borderRadius: 16, padding: '20px 24px', minWidth: 220,
           boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
         }}
       >
-        <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 12 }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 12 }}>
           Keyboard Shortcuts
         </p>
         {SHORTCUTS.map(s => (
@@ -161,7 +162,7 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
         </div>
         <button
           onClick={onClose}
-          style={{ marginTop: 14, width: '100%', padding: '8px', borderRadius: 8, border: '1px solid var(--border-faint)', background: 'var(--input-bg)', color: '#888', cursor: 'pointer', fontSize: 12 }}
+          style={{ marginTop: 14, width: '100%', padding: '8px', borderRadius: 8, border: '1px solid var(--border-faint)', background: 'var(--input-bg)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 12 }}
         >
           Close (Esc)
         </button>
@@ -363,6 +364,8 @@ function AppInner() {
         <Route path="/spikeball"    element={<ProtectedRoute><Spikeball /></ProtectedRoute>} />
         <Route path="/pool"         element={<ProtectedRoute><Pool /></ProtectedRoute>} />
         <Route path="/leaderboard"  element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+        <Route path="/log"           element={<ProtectedRoute><Log /></ProtectedRoute>} />
+        <Route path="*"              element={<Navigate to="/" replace />} />
       </Routes>
       </Suspense>
       {showNav && <BottomNav />}

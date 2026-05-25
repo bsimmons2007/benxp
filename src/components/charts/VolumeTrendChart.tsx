@@ -50,6 +50,7 @@ function CustomBar(props: any) {
 
 export function VolumeTrendChart() {
   const [data, setData] = useState<WeekPoint[]>([])
+  const tickColor = () => getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#888'
 
   useEffect(() => {
     supabase
@@ -77,7 +78,7 @@ export function VolumeTrendChart() {
   }, [])
 
   if (data.length < 2) return (
-    <p style={{ color: '#888', fontSize: 13 }}>Need more sessions to show volume trend.</p>
+    <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Need more sessions to show volume trend.</p>
   )
 
   const maxVol = Math.max(...data.map(d => d.volume))
@@ -88,12 +89,12 @@ export function VolumeTrendChart() {
       <BarChart data={data} barSize={20} margin={{ left: -10, top: 4 }}>
         <XAxis
           dataKey="week"
-          tick={{ fill: '#666', fontSize: 9 }}
+          tick={{ fill: tickColor(), fontSize: 9 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: '#666', fontSize: 9 }}
+          tick={{ fill: tickColor(), fontSize: 9 }}
           axisLine={false}
           tickLine={false}
           width={44}

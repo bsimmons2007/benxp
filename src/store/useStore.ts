@@ -49,8 +49,9 @@ interface AppState {
   lastUpdated: number | null
 
   // Init state
-  initialized:   boolean
-  _initializing: boolean
+  initialized:    boolean
+  _initializing:  boolean
+  _refreshingXP:  boolean
 
   // Actions
   dismissLevelUp:          () => void
@@ -79,6 +80,7 @@ export const useStore = create<AppState>((set, get) => ({
   // (e.g. StrictMode double-mount) can't pass the guard while
   // the first load is still in-flight (P0-3 race condition fix)
   _initializing:  false,
+  _refreshingXP:  false,
 
   dismissLevelUp: () => {
     localStorage.setItem(LS_LEVEL_KEY, String(get().level))
@@ -99,6 +101,7 @@ export const useStore = create<AppState>((set, get) => ({
     lastUpdated:    null,
     initialized:    false,
     _initializing:  false,
+    _refreshingXP:  false,
   }),
 
   /** Full cold-start load — called once on boot. */
@@ -155,6 +158,8 @@ export const useStore = create<AppState>((set, get) => ({
 
   /** XP + stats refresh — called after logging any activity. */
   refreshXP: async () => {
+    if (get()._refreshingXP) return
+    set({ _refreshingXP: true })
     try {
       const { totalXP, stats, rawRows } = await fetchXPAndStats(supabase)
       setCachedXPData({ totalXP, stats })
@@ -170,9 +175,11 @@ export const useStore = create<AppState>((set, get) => ({
         recentActivity: deriveActivityFromRawRows(rawRows),
         lastUpdated:    Date.now(),
         ...(level > lastSeen ? { levelUpPending: level } : {}),
+        _refreshingXP: false,
       })
     } catch (err) {
       console.error('[useStore] refreshXP() failed:', err)
+      set({ _refreshingXP: false })
     }
   },
 

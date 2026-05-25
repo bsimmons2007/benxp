@@ -18,7 +18,7 @@ function AnimatedValue({ value, unit }: { value: string | number; unit?: string 
   return (
     <>
       {isNum ? display : value}
-      {unit && <span className="font-normal ml-0.5" style={{ color: '#888888', fontSize: 10 }}>{unit}</span>}
+      {unit && <span className="font-normal ml-0.5" style={{ color: 'var(--text-muted)', fontSize: 10 }}>{unit}</span>}
     </>
   )
 }
@@ -26,7 +26,7 @@ function AnimatedValue({ value, unit }: { value: string | number; unit?: string 
 export function StatCard({ label, value, unit, highlight, animate = false }: StatCardProps) {
   return (
     <Card className={`card-animate ${highlight ? 'pr-badge' : ''} !p-3`}>
-      <p className="font-medium mb-0.5 truncate" style={{ color: '#AAAAAA', fontSize: 11 }}>
+      <p className="font-medium mb-0.5 truncate" style={{ color: 'var(--text-muted)', fontSize: 11 }}>
         {label}
       </p>
       <p className="text-lg font-bold leading-tight" style={{ color: 'var(--accent)' }}>
@@ -34,7 +34,7 @@ export function StatCard({ label, value, unit, highlight, animate = false }: Sta
           ? <AnimatedValue value={value} unit={unit} />
           : <>
               {value}
-              {unit && <span className="font-normal ml-0.5" style={{ color: '#888888', fontSize: 10 }}>{unit}</span>}
+              {unit && <span className="font-normal ml-0.5" style={{ color: 'var(--text-muted)', fontSize: 10 }}>{unit}</span>}
             </>
         }
       </p>

@@ -12,7 +12,7 @@ export function Skeleton({ width = '100%', height = 16, borderRadius = 8, style 
     <div
       style={{
         width, height, borderRadius,
-        background: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%)',
+        background: 'linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%)',
         backgroundSize: '200% 100%',
         animation: 'shimmer 1.4s ease-in-out infinite',
         flexShrink: 0,
@@ -27,7 +27,7 @@ export function StatCardSkeleton() {
   return (
     <div style={{
       padding: '10px 12px', borderRadius: 12,
-      background: 'rgba(16,24,52,0.6)', border: '1px solid var(--border-faint)',
+      background: 'var(--surface-1)', border: '1px solid var(--border-faint)',
     }}>
       <Skeleton height={10} width="55%" borderRadius={4} style={{ marginBottom: 10 }} />
       <Skeleton height={20} width="70%" borderRadius={4} />
@@ -99,7 +99,7 @@ export function ChartSkeleton({ height = 150, title }: { height?: number; title?
                 flex: 1,
                 height: `${h}%`,
                 borderRadius: '4px 4px 0 0',
-                background: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%)',
+                background: 'linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%)',
                 backgroundSize: '200% 100%',
                 animation: `shimmer 1.4s ease-in-out infinite`,
                 animationDelay: `${i * 0.07}s`,

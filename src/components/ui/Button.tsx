@@ -39,14 +39,14 @@ export function Button({
     variant === 'primary'
       ? {
           background: 'var(--accent)',
-          color: '#1A1A2E',
+          color: 'var(--base-bg)',
           boxShadow: '0 2px 12px var(--accent-dim)',
         }
       : variant === 'secondary'
       ? {
           background: 'transparent',
           color: 'var(--accent)',
-          border: '1px solid rgba(245,166,35,0.35)',
+          border: '1px solid color-mix(in srgb, var(--accent) 35%, transparent)',
         }
       : {
           background: 'transparent',

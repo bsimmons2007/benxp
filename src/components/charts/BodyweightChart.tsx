@@ -21,23 +21,26 @@ const TT_STYLE = {
 
 const todayStr = localDateStr(new Date())
 
+const SUCCESS = 'var(--success, #4ade80)'
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomDot(props: any) {
   const { cx, cy, index, data } = props
   const isLast  = index === (data?.length ?? 0) - 1
   const isToday = isLast && data[index]?.date === todayStr
-  if (!isLast) return <circle cx={cx} cy={cy} r={3} fill="#34d399" fillOpacity={0.7} />
+  if (!isLast) return <circle cx={cx} cy={cy} r={3} fill={SUCCESS} fillOpacity={0.7} />
   return (
     <g>
-      {isToday && <circle cx={cx} cy={cy} r={10} fill="#34d399" fillOpacity={0.1} className="chart-today-pulse" />}
-      <circle cx={cx} cy={cy} r={8} fill="#34d399" fillOpacity={0.15} />
-      <circle cx={cx} cy={cy} r={4} fill="#34d399" />
+      {isToday && <circle cx={cx} cy={cy} r={10} fill={SUCCESS} fillOpacity={0.1} className="chart-today-pulse" />}
+      <circle cx={cx} cy={cy} r={8} fill={SUCCESS} fillOpacity={0.15} />
+      <circle cx={cx} cy={cy} r={4} fill={SUCCESS} />
     </g>
   )
 }
 
 export function BodyweightChart() {
   const [data, setData]       = useState<DataPoint[]>([])
+  const tickColor = () => getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#888'
   const [goal, setGoal]       = useState<number | null>(() => {
     const v = localStorage.getItem(BW_GOAL_KEY)
     return v ? parseFloat(v) : null
@@ -87,15 +90,12 @@ export function BodyweightChart() {
   const diff   = goal && latest ? (latest - goal).toFixed(1) : null
 
   if (data.length === 0) return (
-    <p style={{ color: '#888', fontSize: 13 }}>
+    <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
       No bodyweight logged yet — enter it when logging a set.
     </p>
   )
 
-  // Determine area color based on goal progress
-  const areaColor = goal && latest
-    ? (latest <= goal ? '#4ade80' : '#34d399')
-    : '#34d399'
+  const areaColor = SUCCESS
 
   return (
     <div>
@@ -104,15 +104,15 @@ export function BodyweightChart() {
         <div>
           {goal ? (
             <div className="flex items-center gap-2">
-              <span style={{ color: '#888', fontSize: 12 }}>Goal: <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{goal} lbs</span></span>
+              <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Goal: <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{goal} lbs</span></span>
               {diff && (
-                <span style={{ fontSize: 11, color: parseFloat(diff) <= 0 ? '#4ade80' : '#f97316' }}>
+                <span style={{ fontSize: 11, color: parseFloat(diff) <= 0 ? SUCCESS : 'var(--warning, #f97316)' }}>
                   ({parseFloat(diff) > 0 ? '+' : ''}{diff} lbs)
                 </span>
               )}
             </div>
           ) : (
-            <span style={{ color: '#555', fontSize: 12 }}>No goal set</span>
+            <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>No goal set</span>
           )}
         </div>
         <button
@@ -141,7 +141,7 @@ export function BodyweightChart() {
             }}
           />
           <button onClick={saveGoal} style={{ padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}>Save</button>
-          {goal && <button onClick={clearGoal} style={{ padding: '6px 10px', borderRadius: 8, fontSize: 12, color: '#888', background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>Clear</button>}
+          {goal && <button onClick={clearGoal} style={{ padding: '6px 10px', borderRadius: 8, fontSize: 12, color: 'var(--text-muted)', background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>Clear</button>}
         </div>
       )}
 
@@ -157,13 +157,13 @@ export function BodyweightChart() {
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
-            tick={{ fill: '#666', fontSize: 10 }}
+            tick={{ fill: tickColor(), fontSize: 10 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             domain={['auto', 'auto']}
-            tick={{ fill: '#666', fontSize: 10 }}
+            tick={{ fill: tickColor(), fontSize: 10 }}
             axisLine={false}
             tickLine={false}
             width={40}
@@ -179,10 +179,10 @@ export function BodyweightChart() {
           {goal && (
             <ReferenceLine
               y={goal}
-              stroke="#4ade80"
+              stroke={SUCCESS}
               strokeDasharray="5 3"
               strokeOpacity={0.7}
-              label={{ value: `Goal ${goal}`, fill: '#4ade80', fontSize: 9, position: 'insideTopRight' }}
+              label={{ value: `Goal ${goal}`, fill: SUCCESS, fontSize: 9, position: 'insideTopRight' }}
             />
           )}
           <Area
@@ -192,7 +192,7 @@ export function BodyweightChart() {
             strokeWidth={2.5}
             fill="url(#bw-grad)"
             dot={<CustomDot data={data} />}
-            activeDot={{ r: 5, fill: areaColor, stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }}
+            activeDot={{ r: 5, fill: areaColor, stroke: 'var(--surface-0)', strokeWidth: 2 }}
           />
         </AreaChart>
       </ResponsiveContainer>
