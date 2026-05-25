@@ -413,6 +413,25 @@ export function Home() {
   }, [streak.loading, streak.current, streak.activeToday])
 
   useEffect(() => {
+    const script = document.createElement('script')
+    script.type = 'application/ld+json'
+    script.id   = 'youxp-org-schema'
+    script.text = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'YouXP',
+      url: 'https://youxp.app',
+      description: 'Track every gym set, mile run, book finished, and game won. Real life earns real XP — turn your daily habits into a personal RPG.',
+      applicationCategory: 'HealthApplication',
+      operatingSystem: 'Any',
+      logo: 'https://youxp.app/favicon.svg',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    })
+    document.head.appendChild(script)
+    return () => { document.getElementById('youxp-org-schema')?.remove() }
+  }, [])
+
+  useEffect(() => {
     if (loading || widgetsAnimated.current || !widgetGridRef.current) return
     widgetsAnimated.current = true
     const cards = Array.from(widgetGridRef.current.children) as HTMLElement[]
