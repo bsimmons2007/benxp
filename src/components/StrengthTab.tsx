@@ -23,7 +23,7 @@ export function RankBadge({ rank, size = 'md' }: { rank: RankMeta; size?: 'sm' |
       style={{
         display: 'inline-block', padding: pad, borderRadius: 6,
         background: rank.color, border: `1px solid ${rank.border}`,
-        color: rank.glow !== 'none' ? rank.glow : '#aaa',
+        color: rank.glow !== 'none' ? rank.glow : 'var(--text-tertiary)',
         fontSize: sz, fontWeight: 700,
         letterSpacing: '0.04em',
         boxShadow: rank.glow !== 'none' ? `0 0 8px ${rank.glow}55` : 'none',
@@ -42,7 +42,7 @@ function RankProgressBar({ result }: { result: MuscleScoreResult }) {
   return (
     <div style={{ marginTop: 6 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-        <span style={{ fontSize: 10, color: '#444' }}>Progress to next rank</span>
+        <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>Progress to next rank</span>
         <span style={{ fontSize: 10, color: glow, fontWeight: 700 }}>{pct}%</span>
       </div>
       <div style={{ height: 6, borderRadius: 3, background: 'var(--input-bg)', overflow: 'hidden' }}>
@@ -66,13 +66,13 @@ function RankProgressBar({ result }: { result: MuscleScoreResult }) {
 function MuscleDetail({ result }: { result: MuscleScoreResult }) {
   const muscle  = MUSCLES.find(m => m.key === result.muscleKey)
   const nextRank = RANKS.find(r => r.tier === result.rank.tier + 1)
-  const glow    = result.rank.glow !== 'none' ? result.rank.glow : '#888'
+  const glow    = result.rank.glow !== 'none' ? result.rank.glow : 'var(--text-tertiary)'
 
   return (
     <div className="pop-in" style={{ padding: '16px 0 0' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <div>
-          <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', marginBottom: 2 }}>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: 11, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', marginBottom: 2 }}>
             {muscle?.group}
           </p>
           <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 17 }}>
@@ -86,7 +86,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
         <span style={{ fontSize: 28, fontWeight: 700, color: glow }}>
           {result.score.toFixed(3)}
         </span>
-        <span style={{ fontSize: 12, color: '#555' }}>strength score</span>
+        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>strength score</span>
         {result.isStale && (
           <span style={{ fontSize: 10, color: '#e07830', background: 'rgba(224,120,48,0.12)', border: '1px solid rgba(224,120,48,0.3)', padding: '2px 6px', borderRadius: 4 }}>
             ⚠ stale
@@ -103,13 +103,13 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
 
       {nextRank && result.rank.tier > 0 && (
         <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
-          <span style={{ fontSize: 11, color: '#555' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
             Need{' '}
-            <span style={{ color: nextRank.glow !== 'none' ? nextRank.glow : '#aaa', fontWeight: 700 }}>
+            <span style={{ color: nextRank.glow !== 'none' ? nextRank.glow : 'var(--text-tertiary)', fontWeight: 700 }}>
               +{(nextRank.minScore - result.score).toFixed(3)}
             </span>
             {' '}score for{' '}
-            <span style={{ color: nextRank.glow !== 'none' ? nextRank.glow : '#aaa' }}>
+            <span style={{ color: nextRank.glow !== 'none' ? nextRank.glow : 'var(--text-tertiary)' }}>
               {nextRank.icon} {nextRank.label}
             </span>
           </span>
@@ -118,7 +118,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
 
       {result.contributions.length > 0 && (
         <div style={{ marginTop: 12 }}>
-          <p style={{ fontSize: 11, color: '#555', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', marginBottom: 6 }}>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', marginBottom: 6 }}>
             Contributing exercises
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -128,7 +128,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-                      <span style={{ fontSize: 12, color: '#ccc', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {c.exerciseName}
                       </span>
                       <span style={{ fontSize: 11, color: glow, fontWeight: 700, flexShrink: 0, marginLeft: 4 }}>
@@ -140,7 +140,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
                     </div>
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <p style={{ fontSize: 11, color: '#888' }}>{c.oneRM.toFixed(0)} lbs</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{c.oneRM.toFixed(0)} lbs</p>
                     {c.isStale && <p style={{ fontSize: 9, color: '#e07830' }}>{c.daysAgo}d ago</p>}
                   </div>
                 </div>
@@ -151,9 +151,9 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
       )}
 
       {result.rank.tier === 0 && (
-        <p style={{ fontSize: 13, color: '#555', textAlign: 'center', marginTop: 12 }}>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', marginTop: 12 }}>
           No exercise data yet.<br />
-          <span style={{ color: '#888' }}>Log a lift that targets {muscle?.name ?? 'this muscle'}.</span>
+          <span style={{ color: 'var(--text-tertiary)' }}>Log a lift that targets {muscle?.name ?? 'this muscle'}.</span>
         </p>
       )}
     </div>
@@ -171,7 +171,7 @@ function GroupRow({ group, results, selected, onSelect }: {
   const groupMuscles = MUSCLES.filter(m => m.group === group)
   return (
     <div style={{ marginBottom: 2 }}>
-      <p style={{ fontSize: 10, color: '#555', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', marginBottom: 4 }}>
+      <p style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', marginBottom: 4 }}>
         {group}
       </p>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -187,7 +187,7 @@ function GroupRow({ group, results, selected, onSelect }: {
                 padding: '5px 10px', borderRadius: 8,
                 background: result?.rank.color ?? RANKS[0].color,
                 border: `1px solid ${isSelected ? (glow !== 'none' ? glow : 'var(--accent)') : (result?.rank.border ?? RANKS[0].border)}`,
-                color: glow !== 'none' ? glow : '#888',
+                color: glow !== 'none' ? glow : 'var(--text-tertiary)',
                 fontSize: 11, fontWeight: isSelected ? 700 : 500, cursor: 'pointer',
                 boxShadow: isSelected && glow !== 'none' ? `0 0 8px ${glow}66` : 'none',
                 transition: 'all 0.15s ease',
@@ -218,8 +218,8 @@ function ImbalanceCard({ warnings }: { warnings: ReturnType<typeof detectImbalan
       {warnings.map((w, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < warnings.length - 1 ? '1px solid var(--border-faint)' : 'none' }}>
           <div>
-            <p style={{ fontSize: 12, color: '#ddd', fontWeight: 600 }}>{w.label}</p>
-            <p style={{ fontSize: 10, color: '#888' }}>
+            <p style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 600 }}>{w.label}</p>
+            <p style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>
               {w.aName} (Tier {w.aTier}) vs {w.bName} (Tier {w.bTier})
             </p>
             <p style={{ fontSize: 10, color: '#e07830' }}>
@@ -238,7 +238,7 @@ function ImbalanceCard({ warnings }: { warnings: ReturnType<typeof detectImbalan
 function StrengthOrb({ sq }: { sq: number }) {
   const tier = sq >= 80 ? 'god' : sq >= 65 ? 'champion' : sq >= 50 ? 'elite' : sq >= 38 ? 'diamond3' : sq >= 28 ? 'platinum2' : sq >= 18 ? 'gold2' : sq >= 10 ? 'silver2' : 'bronze2'
   const rank = RANKS.find(r => r.id === tier) ?? RANKS[2]
-  const glow = rank.glow !== 'none' ? rank.glow : '#888'
+  const glow = rank.glow !== 'none' ? rank.glow : 'var(--text-tertiary)'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '12px 0' }}>
@@ -256,7 +256,7 @@ function StrengthOrb({ sq }: { sq: number }) {
         </span>
         <span style={{ fontSize: 9, color: `${glow}aa`, letterSpacing: '0.14em' }}>SQ</span>
       </div>
-      <p style={{ fontSize: 11, color: '#444', textAlign: 'center' }}>Strength Quotient</p>
+      <p style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'center' }}>Strength Quotient</p>
       <RankBadge rank={rank} size="sm" />
     </div>
   )
@@ -279,11 +279,11 @@ function RankDropdown() {
         }}
       >
         <span>Rank Tiers</span>
-        <span style={{ fontSize: 10, color: '#555' }}>▾ tap to expand</span>
+        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>▾ tap to expand</span>
       </summary>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 3, paddingTop: 10 }}>
         {ranked.map(rank => {
-          const glow = rank.glow !== 'none' ? rank.glow : '#aaa'
+          const glow = rank.glow !== 'none' ? rank.glow : 'var(--text-tertiary)'
           const isTop = rank.tier >= 16
           return (
             <div
@@ -409,7 +409,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
   if (!triggerLoad && !loaded) {
     return (
       <div style={{ padding: '40px 0', textAlign: 'center' }}>
-        <p style={{ color: '#444', fontSize: 13 }}>Loading strength data…</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Loading strength data…</p>
       </div>
     )
   }
@@ -417,7 +417,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }}>
-        <p style={{ color: '#444', fontSize: 13 }}>Computing strength scores…</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Computing strength scores…</p>
       </div>
     )
   }
@@ -438,8 +438,8 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
                   onClick={() => setView(v)}
                   style={{
                     padding: '5px 20px', borderRadius: 20, fontSize: 12, fontWeight: 700,
-                    background: view === v ? 'var(--accent)' : 'rgba(255,255,255,0.05)',
-                    color:      view === v ? 'var(--base-bg)' : '#888',
+                    background: view === v ? 'var(--accent)' : 'var(--surface-2)',
+                    color:      view === v ? 'var(--base-bg)' : 'var(--text-tertiary)',
                     border:     view === v ? '1px solid var(--accent)' : '1px solid var(--border-faint)',
                     cursor: 'pointer', transition: 'all 0.15s ease',
                     textTransform: 'capitalize',
@@ -458,7 +458,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
               </div>
             )}
             {!selected && (
-              <p style={{ textAlign: 'center', fontSize: 12, color: '#444', marginTop: 8 }}>
+              <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
                 Tap a muscle to see its rank &amp; contributors
               </p>
             )}
@@ -470,7 +470,7 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
           {/* Strength Quotient */}
           <Card style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 12 }}>
             <StrengthOrb sq={sq} />
-            <p style={{ fontSize: 12, color: '#555', textAlign: 'center', marginTop: 4 }}>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', marginTop: 4 }}>
               Based on {liftLog.length} logged sets across{' '}
               {new Set(liftLog.map(r => r.lift)).size} exercises
             </p>
