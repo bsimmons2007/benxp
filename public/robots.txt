@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /dev
 
-Sitemap: https://youxp.app/sitemap.xml
+Sitemap: https://you-xp.com/sitemap.xml
