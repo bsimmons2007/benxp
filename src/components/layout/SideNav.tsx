@@ -60,7 +60,7 @@ export function SideNav() {
   const location   = useLocation()
   const [order,  setOrder]  = useState(() => loadSectionOrder())
   const [hidden, setHidden] = useState(() => loadHiddenSections())
-  const { level, progress, userName } = useStore()
+  const { level, progress } = useStore()
   const isOpen   = useNavStore(s => s.navOpen)
   const closeNav = useNavStore(s => s.closeNav)
 
