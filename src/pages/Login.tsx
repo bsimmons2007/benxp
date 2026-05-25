@@ -203,7 +203,7 @@ export function Login() {
       // Always show generic response — never reveal whether email exists (COPPA/privacy)
       await supabase.auth.signUp({
         email: data.email, password: data.password,
-        options: { data: { name: data.name.trim() } },
+        options: { data: { name: (data.name ?? '').trim() } },
       })
       setSuccess(true)
       setResetMsg('Check your email to confirm your account and get started.')
@@ -255,8 +255,8 @@ export function Login() {
     setShowConfirm(false)
   }
 
-  const emailReg     = register('email',    { required: true })
-  const passwordReg  = register('password', { required: true, minLength: { value: 8, message: 'Password must be at least 8 characters' } })
+  const emailReg     = register('email',    { required: 'Email is required.' })
+  const passwordReg  = register('password', { required: 'Password is required.', minLength: { value: 8, message: 'Password must be at least 8 characters' } })
 
   // Password strength
   const pw = watch('password') ?? ''
@@ -443,12 +443,20 @@ export function Login() {
 
         <div className="relative z-10 w-full" style={{ maxWidth: 380 }}>
 
-          {/* Mobile-only logo */}
-          <div className="md:hidden text-center mb-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {/* Mobile-only logo + feature strip */}
+          <div className="md:hidden text-center mb-6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Wordmark size={48} color="var(--text-primary)" accent="var(--color-coral)" showPulse={true} />
-            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 8 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 8, marginBottom: 20 }}>
               Level up your life.
             </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 28px', width: '100%' }}>
+              {FEATURES.slice(0, 4).map(f => (
+                <div key={f.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{f.icon}</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.2 }}>{f.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Reset success message */}
@@ -487,24 +495,20 @@ export function Login() {
 
             <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-              {/* Name — animates in for signup */}
-              <div style={{
-                overflow:   'hidden',
-                maxHeight:  mode === 'signup' ? 72 : 0,
-                opacity:    mode === 'signup' ? 1 : 0,
-                transition: 'max-height 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease',
-              }}>
-                <FieldLabel>Your Name</FieldLabel>
-                <input
-                  type="text"
-                  placeholder="Ben"
-                  tabIndex={mode === 'signup' ? 0 : -1}
-                  {...register('name', { required: mode === 'signup', maxLength: 64 })}
-                  style={INPUT_BASE}
-                  onFocus={inputFocus}
-                  onBlur={inputBlur}
-                />
-              </div>
+              {/* Name — signup only */}
+              {mode === 'signup' && (
+                <div>
+                  <FieldLabel>Your Name</FieldLabel>
+                  <input
+                    type="text"
+                    placeholder="Ben"
+                    {...register('name', { required: 'Name is required.', maxLength: 64 })}
+                    style={INPUT_BASE}
+                    onFocus={inputFocus}
+                    onBlur={inputBlur}
+                  />
+                </div>
+              )}
 
               {/* Email */}
               <div>
@@ -720,7 +724,7 @@ export function Login() {
               )}
 
               {/* Error banner */}
-              {(error || errors.password) && lockedUntil <= Date.now() && (
+              {(error || errors.password?.message) && lockedUntil <= Date.now() && (
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 9,
                   padding: '10px 14px', borderRadius: 10,
