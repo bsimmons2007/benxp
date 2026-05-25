@@ -445,7 +445,7 @@ export function Login() {
 
           {/* Mobile-only logo */}
           <div className="md:hidden text-center mb-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Wordmark size={48} color="var(--text-primary)" accent="var(--color-coral)" showPulse={true} />
+            <Wordmark size={80} color="var(--text-primary)" accent="var(--color-coral)" showPulse={true} />
             <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 8 }}>
               Level up your life.
             </p>
@@ -475,7 +475,7 @@ export function Login() {
           >
             {/* Heading */}
             <div style={{ marginBottom: 24 }}>
-              <h2 style={{ color: 'var(--text-primary)', fontSize: 19, fontWeight: 700, margin: '0 0 5px' }}>
+              <h2 style={{ color: 'var(--text-primary)', fontSize: 19, fontWeight: 700, margin: '0 0 5px', fontFamily: 'var(--font-serif)' }}>
                 {mode === 'login' ? LOGIN_HEADINGS[headingIdx] : 'Create your account'}
               </h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: 0 }}>
