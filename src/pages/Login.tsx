@@ -445,7 +445,7 @@ export function Login() {
 
           {/* Mobile-only logo */}
           <div className="md:hidden text-center mb-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Wordmark size={80} color="var(--text-primary)" accent="var(--color-coral)" showPulse={true} />
+            <Wordmark size={48} color="var(--text-primary)" accent="var(--color-coral)" showPulse={true} />
             <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 8 }}>
               Level up your life.
             </p>
