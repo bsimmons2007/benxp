@@ -25,7 +25,7 @@ export function ProgressBar({ value, color = 'var(--accent)', height = 12, glow 
         {/* shimmer sweep */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+          background: 'linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--surface-1) 25%, transparent) 50%, transparent 100%)',
           backgroundSize: '200% 100%',
           animation: 'shimmer 2.2s ease-in-out infinite',
         }} />

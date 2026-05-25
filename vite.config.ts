@@ -9,27 +9,8 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons.svg'],
-      manifest: {
-        name: 'YouXP',
-        short_name: 'YouXP',
-        description: 'Gamified life tracker',
-        id: '/',
-        start_url: '/',
-        display: 'standalone',
-        background_color: '#1A1A2E',
-        theme_color: '#1A1A2E',
-        orientation: 'portrait',
-        categories: ['health', 'fitness', 'lifestyle'],
-        icons: [
-          {
-            src: '/favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any',
-          },
-        ],
-      },
+      manifest: false,
+      includeAssets: ['favicon.svg', 'icons.svg', 'favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,svg,png,woff2}'],
         runtimeCaching: [

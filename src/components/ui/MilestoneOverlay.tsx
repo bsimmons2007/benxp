@@ -50,7 +50,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
         onClick={e => e.stopPropagation()}
         style={{
           position: 'relative',
-          background: 'linear-gradient(135deg, rgba(18,18,32,0.98) 0%, rgba(10,10,22,0.99) 100%)',
+          background: 'var(--surface-3)',
           border: '1px solid var(--accent)',
           borderRadius: 24,
           padding: '36px 32px',
@@ -95,7 +95,7 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
         </p>
 
         {/* Description */}
-        <p style={{ fontSize: 13, color: '#888', lineHeight: 1.6, marginBottom: 24 }}>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 24 }}>
           {milestone.desc}
         </p>
 

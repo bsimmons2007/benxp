@@ -153,7 +153,7 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
           <div style={{ position: 'fixed', top: highlightRect.top, left: highlightRect.left + highlightRect.width, right: 0, height: highlightRect.height, background: 'rgba(0,0,0,0.78)' }} />
 
           {/* Highlight border */}
-          <div style={{ position: 'fixed', top: highlightRect.top, left: highlightRect.left, width: highlightRect.width, height: highlightRect.height, borderRadius: 12, boxShadow: '0 0 0 2px var(--accent), 0 0 24px 6px rgba(245,166,35,0.2)', pointerEvents: 'none', zIndex: 9002 }} />
+          <div style={{ position: 'fixed', top: highlightRect.top, left: highlightRect.left, width: highlightRect.width, height: highlightRect.height, borderRadius: 12, boxShadow: '0 0 0 2px var(--accent), 0 0 24px 6px var(--accent-dim)', pointerEvents: 'none', zIndex: 9002 }} />
 
           {/* Expanding pulse rings — skipped when user prefers reduced motion */}
           {!reduceMotion && [0, 0.6].map((delay, i) => (
@@ -194,15 +194,15 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
         {/* Caret — up-pointing when tooltip is below the highlight */}
         {showCaret && step.tooltipPosition === 'below' && (
           <>
-            <div style={{ position: 'absolute', top: -9, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderBottom: '9px solid rgba(255,255,255,0.12)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderBottom: '8px solid rgba(8,10,22,0.99)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: -9, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderBottom: '9px solid var(--border-subtle)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderBottom: '8px solid var(--surface-3)', pointerEvents: 'none' }} />
           </>
         )}
         {/* Caret — down-pointing when tooltip is above the highlight */}
         {showCaret && step.tooltipPosition === 'above' && (
           <>
-            <div style={{ position: 'absolute', bottom: -9, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderTop: '9px solid rgba(255,255,255,0.12)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid rgba(8,10,22,0.99)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: -9, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderTop: '9px solid var(--border-subtle)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid var(--surface-3)', pointerEvents: 'none' }} />
           </>
         )}
 
@@ -210,20 +210,20 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
         <div
           key={stepIndex}
           style={{
-            background:   'rgba(8,10,22,0.99)',
+            background:   'var(--surface-3)',
             border:       '1px solid var(--border)',
             borderRadius: 18,
             padding:      '20px 22px 18px',
-            boxShadow:    '0 28px 72px rgba(0,0,0,0.85), 0 0 0 1px rgba(245,166,35,0.08)',
+            boxShadow:    'var(--shadow-lg), 0 0 0 1px color-mix(in srgb, var(--accent) 8%, transparent)',
             animation:    'tutorialCardEnter 0.28s cubic-bezier(0.34,1.56,0.64,1) both',
           }}
         >
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <span style={{ fontSize: 10, color: '#4a4a5a', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
               {stepIndex + 1} of {totalSteps}
             </span>
-            <button onClick={finish} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4a4a5a', fontSize: 11, padding: '2px 4px' }}>
+            <button onClick={finish} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 11, padding: '2px 4px' }}>
               Skip tour
             </button>
           </div>
@@ -234,13 +234,13 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
           </p>
 
           {/* Body */}
-          <p style={{ fontSize: 13, color: '#bbb', lineHeight: 1.65, marginBottom: step.tip ? 12 : 18 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: step.tip ? 12 : 18 }}>
             {step.body}
           </p>
 
           {/* Tip callout */}
           {step.tip && (
-            <div style={{ background: 'rgba(245,166,35,0.07)', border: '1px solid rgba(245,166,35,0.2)', borderRadius: 9, padding: '8px 12px', marginBottom: 16, fontSize: 12, color: 'rgba(245,166,35,0.85)', lineHeight: 1.55 }}>
+            <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-subtle)', borderRadius: 9, padding: '8px 12px', marginBottom: 16, fontSize: 12, color: 'var(--accent)', lineHeight: 1.55 }}>
               {step.tip}
             </div>
           )}
@@ -253,7 +253,7 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
                 onClick={() => goTo(i)}
                 style={{
                   width: i === stepIndex ? 16 : 6, height: 6, borderRadius: 3,
-                  background: i === stepIndex ? 'var(--accent)' : i < stepIndex ? 'rgba(245,166,35,0.4)' : 'rgba(255,255,255,0.1)',
+                  background: i === stepIndex ? 'var(--accent)' : i < stepIndex ? 'var(--accent-subtle)' : 'var(--border-default)',
                   transition: 'all 0.2s ease',
                   cursor: 'pointer',
                 }}
@@ -266,14 +266,14 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
             {!isFirst && (
               <button
                 onClick={() => goTo(stepIndex - 1)}
-                style={{ flex: 1, padding: '9px 0', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--input-bg)', color: '#888', fontSize: 13, cursor: 'pointer', fontWeight: 500 }}
+                style={{ flex: 1, padding: '9px 0', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--input-bg)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontWeight: 500 }}
               >
                 ← Back
               </button>
             )}
             <button
               onClick={() => isLast ? finish() : goTo(stepIndex + 1)}
-              style={{ flex: 2, padding: '9px 0', borderRadius: 10, border: 'none', background: 'var(--accent)', color: '#0d0d1a', fontSize: 13, cursor: 'pointer', fontWeight: 700 }}
+              style={{ flex: 2, padding: '9px 0', borderRadius: 10, border: 'none', background: 'var(--accent)', color: 'var(--base-bg)', fontSize: 13, cursor: 'pointer', fontWeight: 700 }}
             >
               {isLast ? "Let's Go!" : 'Next →'}
             </button>

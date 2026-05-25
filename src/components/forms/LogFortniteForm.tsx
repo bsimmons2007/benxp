@@ -53,7 +53,7 @@ export function LogFortniteForm() {
       <Input label="Date" type="date" {...register('date', { required: true })} />
 
       <div className="flex flex-col gap-1">
-        <label className="text-base font-medium" style={{ color: '#AAAAAA' }}>Mode</label>
+        <label className="text-base font-medium" style={{ color: 'var(--text-muted)' }}>Mode</label>
         <select
           {...register('mode')}
           className="px-3 py-2 rounded-lg text-white outline-none"
@@ -77,7 +77,7 @@ export function LogFortniteForm() {
       <label className="flex items-center gap-3 cursor-pointer">
         <div
           className="w-12 h-6 rounded-full transition-colors relative"
-          style={{ background: win ? '#27AE60' : 'rgba(255,255,255,0.15)' }}
+          style={{ background: win ? 'var(--success, #27AE60)' : 'var(--surface-2)' }}
         >
           <div
             className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform"

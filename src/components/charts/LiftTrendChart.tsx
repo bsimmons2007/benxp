@@ -77,6 +77,7 @@ function buildCompareData(data: DataPoint[], dataKey: 'est_1rm' | 'reps'): Compa
 export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; pr: number; isBWLift?: boolean }) {
   const [data, setData]         = useState<DataPoint[]>([])
   const [compare, setCompare]   = useState(false)
+  const tickColor = () => getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#888'
 
   useEffect(() => {
     if (isBWLift) {
@@ -104,12 +105,12 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
     }
   }, [lift, isBWLift])
 
-  if (data.length < 2) return <p className="text-xs py-2" style={{ color: '#888' }}>Need more sessions to show trend.</p>
+  if (data.length < 2) return <p className="text-xs py-2" style={{ color: 'var(--text-muted)' }}>Need more sessions to show trend.</p>
 
   const gradId  = `lift-grad-${lift}`
   const dataKey = isBWLift ? 'reps' : 'est_1rm'
   const maxReps = isBWLift ? Math.max(...data.map(d => d.reps ?? 0)) : 0
-  const color   = isBWLift ? '#4ade80' : 'var(--accent)'
+  const color   = isBWLift ? 'var(--success, #4ade80)' : 'var(--accent)'
 
   const hasPriorData = data.some(d => {
     const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30)
@@ -124,7 +125,7 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
         <div className="flex items-center justify-between mb-2">
           <div className="flex gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
             <span style={{ color }}><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: color, marginRight: 4 }} />Last 30d</span>
-            <span style={{ color: '#94a3b8' }}><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#94a3b8', marginRight: 4 }} />Prior 30d</span>
+            <span style={{ color: 'var(--text-tertiary)' }}><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: 'var(--text-tertiary)', marginRight: 4 }} />Prior 30d</span>
           </div>
           <button
             onClick={() => setCompare(false)}
@@ -140,14 +141,14 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
             <XAxis
               dataKey="day"
               tickFormatter={(d: number) => `D${d}`}
-              tick={{ fill: '#666', fontSize: 9 }}
+              tick={{ fill: tickColor(), fontSize: 9 }}
               axisLine={false}
               tickLine={false}
               interval={4}
             />
             <YAxis
               domain={['auto', 'auto']}
-              tick={{ fill: '#666', fontSize: 9 }}
+              tick={{ fill: tickColor(), fontSize: 9 }}
               axisLine={false}
               tickLine={false}
               width={36}
@@ -160,7 +161,7 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
               cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }}
             />
             <Line type="monotone" dataKey="current" stroke={color} strokeWidth={2.5} dot={false} activeDot={{ r: 4 }} connectNulls />
-            <Line type="monotone" dataKey="prior" stroke="#94a3b8" strokeWidth={2} strokeDasharray="4 3" dot={false} activeDot={{ r: 4 }} connectNulls />
+            <Line type="monotone" dataKey="prior" stroke="var(--text-tertiary)" strokeWidth={2} strokeDasharray="4 3" dot={false} activeDot={{ r: 4 }} connectNulls />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -192,13 +193,13 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
           <XAxis
             dataKey="date"
             tickFormatter={(d: string) => formatDate(d)}
-            tick={{ fill: '#666', fontSize: 9 }}
+            tick={{ fill: tickColor(), fontSize: 9 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             domain={['auto', 'auto']}
-            tick={{ fill: '#666', fontSize: 9 }}
+            tick={{ fill: tickColor(), fontSize: 9 }}
             axisLine={false}
             tickLine={false}
             width={36}
@@ -238,7 +239,7 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
             strokeWidth={2.5}
             fill={`url(#${gradId})`}
             dot={<CustomDot data={data} />}
-            activeDot={{ r: 5, fill: color, stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }}
+            activeDot={{ r: 5, fill: color, stroke: 'var(--surface-0)', strokeWidth: 2 }}
           />
         </AreaChart>
       </ResponsiveContainer>

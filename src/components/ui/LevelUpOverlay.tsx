@@ -95,7 +95,7 @@ export function LevelUpOverlay() {
           style={{
             width: 200, height: 200, borderRadius: '50%',
             border: '2px solid var(--accent)',
-            boxShadow: '0 0 60px var(--accent), 0 0 120px rgba(245,166,35,0.3)',
+            boxShadow: '0 0 60px var(--accent), 0 0 120px color-mix(in srgb, var(--accent) 30%, transparent)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             position: 'relative',
             marginBottom: 24,
@@ -104,7 +104,7 @@ export function LevelUpOverlay() {
         >
           <div style={{
             position: 'absolute', inset: -8, borderRadius: '50%',
-            border: '1px solid rgba(245,166,35,0.3)',
+            border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)',
             animation: 'borderGlow 1.5s ease-in-out infinite',
           }} />
           <span
@@ -112,7 +112,7 @@ export function LevelUpOverlay() {
             style={{
               fontSize: 80, fontWeight: 700,
               color: 'var(--accent)',
-              textShadow: '0 0 40px var(--accent), 0 0 80px rgba(245,166,35,0.5)',
+              textShadow: '0 0 40px var(--accent), 0 0 80px color-mix(in srgb, var(--accent) 50%, transparent)',
               animation: 'glowPulse 2s ease-in-out infinite',
               lineHeight: 1,
               opacity: 0,
@@ -138,7 +138,7 @@ export function LevelUpOverlay() {
           style={{
             fontSize: 28, fontWeight: 700, letterSpacing: '0.1em',
             color: 'var(--text-primary)',
-            textShadow: '0 0 20px rgba(255,255,255,0.4)',
+            textShadow: '0 0 20px color-mix(in srgb, var(--text-primary) 40%, transparent)',
             marginBottom: 32, opacity: 0,
           }}
         >
@@ -148,7 +148,7 @@ export function LevelUpOverlay() {
         <p
           ref={hintRef}
           style={{
-            fontSize: 11, color: '#666', letterSpacing: '0.08em',
+            fontSize: 11, color: 'var(--text-muted)', letterSpacing: '0.08em',
             opacity: 0,
           }}
         >

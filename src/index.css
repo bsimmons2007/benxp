@@ -50,9 +50,11 @@
   --font-serif:   var(--font-sans);
 
   /* Status */
-  --green: #22c55e;
-  --red:   #ef4444;
-  --error: #ef4444;
+  --green:   #22c55e;
+  --red:     #ef4444;
+  --error:   #ef4444;
+  --success: #22c55e;
+  --warning: #f97316;
 
   /* Brand — fixed, never overridden by theme or mode */
   --color-coral:    #e5443f;
@@ -108,9 +110,11 @@ html[data-mode="dark"] {
   --shadow-md: 0 4px 8px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.30);
   --shadow-lg: 0 12px 24px rgba(0,0,0,0.55), 0 4px 8px rgba(0,0,0,0.40);
 
-  --green: #4ade80;
-  --red:   #f87171;
-  --error: #f87171;
+  --green:   #4ade80;
+  --red:     #f87171;
+  --error:   #f87171;
+  --success: #4ade80;
+  --warning: #fb923c;
 }
 
 /* ─────────────────────────────────────────────────────────────
