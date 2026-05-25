@@ -10,13 +10,14 @@ export interface WellnessScore {
   water:     number   // 0–10
   loading:   boolean
   hasSomeData: boolean
+  error:     string | null
 }
 
 let cache: { data: WellnessScore; ts: number } | null = null
 const TTL = 5 * 60 * 1000
 
 export function useWellnessScore(): WellnessScore {
-  const empty: WellnessScore = { total: 0, sleep: 0, activity: 0, mood: 0, water: 0, loading: true, hasSomeData: false }
+  const empty: WellnessScore = { total: 0, sleep: 0, activity: 0, mood: 0, water: 0, loading: true, hasSomeData: false, error: null }
   const [score, setScore] = useState<WellnessScore>(cache?.data ?? empty)
 
   useEffect(() => {
@@ -38,6 +39,12 @@ export function useWellnessScore(): WellnessScore {
         supabase.from('mood_log').select('mood, date').gte('date', weekStart),
         supabase.from('water_log').select('oz, date').gte('date', weekStart),
       ])
+
+      const firstErr = sleepRes.error?.message ?? liftRes.error?.message ?? moodRes.error?.message ?? waterRes.error?.message ?? null
+      if (firstErr) {
+        if (!cancelled) setScore({ ...empty, loading: false, error: firstErr })
+        return
+      }
 
       const sleepRows  = sleepRes.data  ?? []
       const liftRows   = liftRes.data   ?? []
@@ -73,13 +80,13 @@ export function useWellnessScore(): WellnessScore {
       const result: WellnessScore = {
         total, sleep: sleepScore, activity: activityScore,
         mood: moodScore, water: waterScore,
-        loading: false, hasSomeData,
+        loading: false, hasSomeData, error: null,
       }
       cache = { data: result, ts: Date.now() }
       if (!cancelled) setScore(result)
       } catch (err) {
         console.error('[useWellnessScore] failed:', err)
-        if (!cancelled) setScore({ ...empty, loading: false })
+        if (!cancelled) setScore({ ...empty, loading: false, error: String(err) })
       }
     }
     load()

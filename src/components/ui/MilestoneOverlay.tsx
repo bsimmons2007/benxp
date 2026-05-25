@@ -38,9 +38,9 @@ export function MilestoneOverlay({ milestone, liftName, onDismiss }: Props) {
     <div
       onClick={dismiss}
       style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
+        position: 'fixed', inset: 0, zIndex: 'var(--z-modal)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: `linear-gradient(160deg, rgba(245,166,35,0.08) 0%, rgba(0,0,0,0.78) 40%, rgba(0,0,0,0.78) 100%)`,
+        background: `linear-gradient(160deg, color-mix(in srgb, var(--accent) 8%, transparent) 0%, rgba(0,0,0,0.78) 40%, rgba(0,0,0,0.78) 100%)`,
         transition: 'opacity 0.35s ease',
         opacity: visible ? 1 : 0,
         padding: '0 32px',

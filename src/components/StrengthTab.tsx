@@ -88,7 +88,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
         </span>
         <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>strength score</span>
         {result.isStale && (
-          <span style={{ fontSize: 10, color: '#e07830', background: 'rgba(224,120,48,0.12)', border: '1px solid rgba(224,120,48,0.3)', padding: '2px 6px', borderRadius: 4 }}>
+          <span style={{ fontSize: 10, color: 'var(--warning)', background: 'color-mix(in srgb, var(--warning) 12%, transparent)', border: '1px solid color-mix(in srgb, var(--warning) 30%, transparent)', padding: '2px 6px', borderRadius: 4 }}>
             ⚠ stale
           </span>
         )}
@@ -141,7 +141,7 @@ function MuscleDetail({ result }: { result: MuscleScoreResult }) {
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
                     <p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{c.oneRM.toFixed(0)} lbs</p>
-                    {c.isStale && <p style={{ fontSize: 9, color: '#e07830' }}>{c.daysAgo}d ago</p>}
+                    {c.isStale && <p style={{ fontSize: 9, color: 'var(--warning)' }}>{c.daysAgo}d ago</p>}
                   </div>
                 </div>
               )
@@ -211,8 +211,8 @@ function GroupRow({ group, results, selected, onSelect }: {
 function ImbalanceCard({ warnings }: { warnings: ReturnType<typeof detectImbalances> }) {
   if (warnings.length === 0) return null
   return (
-    <Card style={{ border: '1px solid rgba(224,120,48,0.25)', background: 'rgba(224,120,48,0.05)' }}>
-      <p style={{ fontSize: 11, color: '#e07830', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', marginBottom: 8, fontWeight: 700 }}>
+    <Card style={{ border: '1px solid color-mix(in srgb, var(--warning) 25%, transparent)', background: 'color-mix(in srgb, var(--warning) 5%, transparent)' }}>
+      <p style={{ fontSize: 11, color: 'var(--warning)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', marginBottom: 8, fontWeight: 700 }}>
         ⚠ Muscle Imbalances Detected
       </p>
       {warnings.map((w, i) => (
@@ -222,11 +222,11 @@ function ImbalanceCard({ warnings }: { warnings: ReturnType<typeof detectImbalan
             <p style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>
               {w.aName} (Tier {w.aTier}) vs {w.bName} (Tier {w.bTier})
             </p>
-            <p style={{ fontSize: 10, color: '#e07830' }}>
+            <p style={{ fontSize: 10, color: 'var(--warning)' }}>
               {w.direction} is lagging by {w.delta} rank tiers
             </p>
           </div>
-          <div style={{ fontSize: 18, color: '#e07830' }}>△</div>
+          <div style={{ fontSize: 18, color: 'var(--warning)' }}>△</div>
         </div>
       ))}
     </Card>

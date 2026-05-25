@@ -45,6 +45,7 @@ const Spikeball    = lazy(() => import('./pages/Spikeball').then(m => ({ default
 const Pool         = lazy(() => import('./pages/Pool').then(m => ({ default: m.Pool })))
 const Leaderboard  = lazy(() => import('./pages/Leaderboard').then(m => ({ default: m.Leaderboard })))
 const Log          = lazy(() => import('./pages/Log').then(m => ({ default: m.Log })))
+const NotFound     = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })))
 import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
 import { applyTimeOrSavedTheme } from './lib/theme'
@@ -123,7 +124,7 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
     <div
       onClick={onClose}
       style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
+        position: 'fixed', inset: 0, zIndex: 'var(--z-modal)',
         background: 'rgba(0,0,0,0.6)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
@@ -181,7 +182,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 99999,
+      position: 'fixed', inset: 0, zIndex: 'var(--z-splash)',
       background: 'var(--base-bg)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       animation: 'splashFadeOut 0.9s ease forwards',
@@ -236,7 +237,7 @@ function OfflineBanner() {
 
   return (
     <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9997,
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 'var(--z-banner)',
       padding: '10px 16px',
       background: offline ? '#1a0a0a' : '#0a1a0a',
       borderBottom: `1px solid ${offline ? '#7f1d1d' : '#14532d'}`,
@@ -261,7 +262,7 @@ function TopLoadBar() {
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, height: 2,
-      zIndex: 9998, pointerEvents: 'none', overflow: 'hidden',
+      zIndex: 'var(--z-loadbar)', pointerEvents: 'none', overflow: 'hidden',
       opacity: loading ? 1 : 0,
       transition: 'opacity 0.4s ease',
     }}>
@@ -365,7 +366,7 @@ function AppInner() {
         <Route path="/pool"         element={<ProtectedRoute><Pool /></ProtectedRoute>} />
         <Route path="/leaderboard"  element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
         <Route path="/log"           element={<ProtectedRoute><Log /></ProtectedRoute>} />
-        <Route path="*"              element={<Navigate to="/" replace />} />
+        <Route path="*"              element={<NotFound />} />
       </Routes>
       </Suspense>
       {showNav && <BottomNav />}

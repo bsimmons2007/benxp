@@ -85,6 +85,30 @@
   --orb1: transparent;
   --orb2: transparent;
   --orb3: transparent;
+
+  /* Category palette — activity feeds, charts, badges (same in light + dark) */
+  --cat-cardio:   #3b82f6;
+  --cat-sleep:    #818cf8;
+  --cat-mood:     #f472b6;
+  --cat-wellness: #34d399;
+  --cat-books:    #fbbf24;
+  --cat-sports:   #f97316;
+  --cat-gaming:   #a78bfa;
+  --info:         #3b82f6;
+
+  /* Badge category colors */
+  --badge-gym:      #27ae60;
+  --badge-skate:    #1abc9c;
+  --badge-books:    #7b2fbe;
+  --badge-fortnite: #0f3460;
+  --badge-sleep:    #3498db;
+  --badge-habits:   #e67e22;
+
+  /* Z-index scale */
+  --z-banner:  9997;
+  --z-loadbar: 9998;
+  --z-modal:   9999;
+  --z-splash:  99999;
 }
 
 /* ─────────────────────────────────────────────────────────────
