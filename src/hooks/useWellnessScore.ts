@@ -24,6 +24,7 @@ export function useWellnessScore(): WellnessScore {
 
     let cancelled = false
     async function load() {
+      try {
       const now   = new Date()
       const dow   = now.getDay()
       const monOff = dow === 0 ? -6 : 1 - dow
@@ -76,6 +77,10 @@ export function useWellnessScore(): WellnessScore {
       }
       cache = { data: result, ts: Date.now() }
       if (!cancelled) setScore(result)
+      } catch (err) {
+        console.error('[useWellnessScore] failed:', err)
+        if (!cancelled) setScore({ ...empty, loading: false })
+      }
     }
     load()
     return () => { cancelled = true }
