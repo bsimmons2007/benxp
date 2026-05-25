@@ -4,12 +4,12 @@ interface BadgeProps {
 }
 
 const categoryColors: Record<string, string> = {
-  Gym: '#27AE60',
-  Skate: '#1ABC9C',
-  Books: '#7B2FBE',
-  Fortnite: '#0F3460',
-  Sleep: '#3498DB',
-  Habits: '#E67E22',
+  Gym:      'var(--badge-gym)',
+  Skate:    'var(--badge-skate)',
+  Books:    'var(--badge-books)',
+  Fortnite: 'var(--badge-fortnite)',
+  Sleep:    'var(--badge-sleep)',
+  Habits:   'var(--badge-habits)',
 }
 
 export function Badge({ label, color }: BadgeProps) {

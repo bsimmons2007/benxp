@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 
-const COLORS = ['#F5A623', '#4ade80', '#818cf8', '#f472b6', '#34d399', '#fbbf24', '#60a5fa']
 const COUNT  = 60
 
 interface Particle {
@@ -25,12 +24,23 @@ export function Confetti({ onDone }: { onDone?: () => void }) {
     canvas.width  = window.innerWidth
     canvas.height = window.innerHeight
 
+    const cs = getComputedStyle(document.documentElement)
+    const colors = [
+      cs.getPropertyValue('--accent').trim()       || '#F5A623',
+      cs.getPropertyValue('--success').trim()      || '#4ade80',
+      cs.getPropertyValue('--cat-gaming').trim()   || '#818cf8',
+      cs.getPropertyValue('--cat-mood').trim()     || '#f472b6',
+      cs.getPropertyValue('--cat-wellness').trim() || '#34d399',
+      cs.getPropertyValue('--cat-books').trim()    || '#fbbf24',
+      cs.getPropertyValue('--cat-cardio').trim()   || '#60a5fa',
+    ]
+
     const particles: Particle[] = Array.from({ length: COUNT }, () => ({
       x:        canvas.width  * (0.3 + Math.random() * 0.4),
       y:        canvas.height * 0.35,
       vx:       (Math.random() - 0.5) * 9,
       vy:       -(Math.random() * 8 + 4),
-      color:    COLORS[Math.floor(Math.random() * COLORS.length)],
+      color:    colors[Math.floor(Math.random() * colors.length)],
       rotation: Math.random() * Math.PI * 2,
       rotSpeed: (Math.random() - 0.5) * 0.25,
       size:     5 + Math.random() * 5,

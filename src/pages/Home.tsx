@@ -161,36 +161,36 @@ function WeekDotStrip({ streak }: {
 // ── Category colors ───────────────────────────────────────────
 const CAT_COLORS: Record<string, string> = {
   lifting:  'var(--accent)',
-  cardio:   '#3b82f6',
-  sleep:    '#818cf8',
-  mood:     '#f472b6',
-  wellness: '#34d399',
-  books:    '#fbbf24',
-  sports:   '#f97316',
-  gaming:   '#a78bfa',
+  cardio:   'var(--cat-cardio)',
+  sleep:    'var(--cat-sleep)',
+  mood:     'var(--cat-mood)',
+  wellness: 'var(--cat-wellness)',
+  books:    'var(--cat-books)',
+  sports:   'var(--cat-sports)',
+  gaming:   'var(--cat-gaming)',
 }
 
 // Activity icon key → accent color
 const ACTIVITY_COLORS: Record<string, string> = {
   lift:         'var(--accent)',
-  skate:        '#3b82f6',
-  book:         '#fbbf24',
-  game:         '#a78bfa',
-  fortnite:     '#a78bfa',
-  basketball:   '#f97316',
-  pickleball:   '#f97316',
-  golf:         '#34d399',
-  disc_golf:    '#34d399',
-  hiking:       '#34d399',
-  table_tennis: '#f97316',
-  chess:        '#f97316',
-  pool:         '#f97316',
-  volleyball:   '#f97316',
-  spikeball:    '#f97316',
-  run:          '#3b82f6',
-  bike:         '#3b82f6',
-  swim:         '#3b82f6',
-  walk:         '#3b82f6',
+  skate:        'var(--cat-cardio)',
+  book:         'var(--cat-books)',
+  game:         'var(--cat-gaming)',
+  fortnite:     'var(--cat-gaming)',
+  basketball:   'var(--cat-sports)',
+  pickleball:   'var(--cat-sports)',
+  golf:         'var(--cat-wellness)',
+  disc_golf:    'var(--cat-wellness)',
+  hiking:       'var(--cat-wellness)',
+  table_tennis: 'var(--cat-sports)',
+  chess:        'var(--cat-sports)',
+  pool:         'var(--cat-sports)',
+  volleyball:   'var(--cat-sports)',
+  spikeball:    'var(--cat-sports)',
+  run:          'var(--cat-cardio)',
+  bike:         'var(--cat-cardio)',
+  swim:         'var(--cat-cardio)',
+  walk:         'var(--cat-cardio)',
 }
 
 // ── Unified stat widget card ──────────────────────────────────
@@ -424,7 +424,9 @@ export function Home() {
     await refreshXP()
     refreshActivity()
   })
-  const levelStyle   = (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
+  const [levelStyle] = useState<'number' | 'roman'>(() =>
+    (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
+  )
   const displayLevel = loading ? '—' : levelStyle === 'roman' ? toRoman(level) : String(level)
   const title        = getLevelTitle(level)
   const { sq: strengthSQ } = useStrengthSnapshot()
