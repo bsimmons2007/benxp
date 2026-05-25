@@ -223,7 +223,7 @@ function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, 
         </span>
         {trendDir && trendDir !== 'flat' && <TrendArrow direction={trendDir} />}
       </div>
-      {unit && <p style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.10em', marginTop: 2 }}>{unit}</p>}
+      {unit && <p style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.10em', marginTop: 2 }}>{unit}</p>}
       {delta != null && (
         <p style={{ fontSize: 10, color: delta > 0 ? 'var(--green)' : 'var(--red)', marginTop: 4 }}>
           {delta > 0 ? `↑ ${delta} lbs` : `↓ ${Math.abs(delta)} lbs`}
@@ -283,7 +283,7 @@ function AddPanel({ picks, onAdd, onClose }: {
             <p style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', marginTop: 40 }}>All stats are added</p>
           ) : sections.map(section => (
             <div key={section} style={{ marginBottom: 20 }}>
-              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>{section}</p>
+              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginBottom: 8 }}>{section}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {STAT_DEFS.filter(d => d.section === section && !picks.includes(d.id)).map(def => (
                   <button
@@ -538,11 +538,11 @@ export function Home() {
                   style={{ transition: 'stroke-dasharray 1s ease' }}
                 />
                 <text x="50" y="46" textAnchor="middle" dominantBaseline="middle"
-                  fill="var(--accent)" fontFamily="Inter Variable, Inter, system-ui, sans-serif" fontSize="26" fontWeight="700">
+                  fill="var(--accent)" fontFamily="Space Grotesk, system-ui, sans-serif" fontSize="26" fontWeight="700">
                   {displayLevel}
                 </text>
                 <text x="50" y="63" textAnchor="middle" dominantBaseline="middle"
-                  fill="var(--text-muted)" fontSize="9" fontFamily="Inter, sans-serif"
+                  fill="var(--text-muted)" fontSize="9" fontFamily="Space Grotesk, system-ui, sans-serif"
                   fontWeight="600" letterSpacing="2">
                   LEVEL
                 </text>

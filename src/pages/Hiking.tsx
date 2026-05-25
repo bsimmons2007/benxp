@@ -273,7 +273,7 @@ export function Hiking() {
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 17, fontWeight: 800, color: ACCENT, lineHeight: 1 }}>
+                <p style={{ fontSize: 17, fontWeight: 700, color: ACCENT, lineHeight: 1 }}>
                   {Number(h.distance_miles).toFixed(1)}
                   <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 2 }}>mi</span>
                 </p>

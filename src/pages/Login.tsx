@@ -319,19 +319,19 @@ export function Login() {
             className="glow-pulse"
             style={{
               color: 'var(--accent)',
-              fontSize: 52, fontWeight: 900, letterSpacing: '0.04em', lineHeight: 1, marginBottom: 10,
+              fontSize: 52, fontWeight: 700, letterSpacing: '0.04em', lineHeight: 1, marginBottom: 10,
             }}
           >
             YouXP
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
             Level up your life.
           </p>
         </div>
 
         {/* Feature grid */}
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700, marginBottom: 20 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', fontWeight: 700, marginBottom: 20 }}>
             Everything you track
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 32px', marginBottom: 32 }}>
@@ -390,7 +390,7 @@ export function Login() {
               </div>
               <span style={{
                 color: 'var(--accent)',
-                fontSize: 15, fontWeight: 800, letterSpacing: '0.02em', flexShrink: 0, marginLeft: 12,
+                fontSize: 15, fontWeight: 700, letterSpacing: '0.02em', flexShrink: 0, marginLeft: 12,
               }}>
                 {DEMO_EVENTS[demoIdx].xp}
               </span>
@@ -452,10 +452,10 @@ export function Login() {
 
           {/* Mobile-only logo */}
           <div className="md:hidden text-center mb-8">
-            <h1 className="glow-pulse" style={{ color: 'var(--accent)', fontSize: 48, fontWeight: 900 }}>
+            <h1 className="glow-pulse" style={{ color: 'var(--accent)', fontSize: 48, fontWeight: 700 }}>
               YouXP
             </h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 6 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 6 }}>
               Level up your life.
             </p>
           </div>
@@ -828,7 +828,7 @@ function FieldLabel({ children, style }: { children: React.ReactNode; style?: Re
   return (
     <label style={{
       display: 'block', color: 'var(--text-muted)', fontSize: 11,
-      fontWeight: 700, letterSpacing: '0.08em',
+      fontWeight: 700, letterSpacing: '0.08em', fontFamily: 'var(--font-mono)',
       textTransform: 'uppercase', marginBottom: 6,
       ...style,
     }}>

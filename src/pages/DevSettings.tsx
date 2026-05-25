@@ -33,7 +33,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center" style={{ minHeight: '60vh', gap: 32 }}>
       <div>
-        <p className="text-xs uppercase tracking-widest text-center mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>Developer Access</p>
+        <p className="text-xs uppercase tracking-widest font-mono text-center mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>Developer Access</p>
         <p className="text-xl font-bold text-center" style={{ color: 'var(--accent)' }}>Enter PIN</p>
       </div>
 
@@ -214,7 +214,7 @@ function XPEngine() {
     <div>
       {/* Total + formula */}
       <Card className="mb-4" goldBorder>
-        <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#888' }}>Total XP</p>
+        <p className="text-xs uppercase tracking-widest font-mono mb-1" style={{ color: '#888' }}>Total XP</p>
         <p className="text-4xl font-bold mb-1" style={{ color: 'var(--accent)' }}>
           {data.total.toLocaleString()}
         </p>
@@ -244,7 +244,7 @@ function XPEngine() {
 
       {/* XP rates reference */}
       <Card className="mb-4">
-        <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>XP Rate Table</p>
+        <p className="text-xs uppercase tracking-widest font-mono mb-3" style={{ color: 'var(--text-muted)' }}>XP Rate Table</p>
         <div className="flex flex-col gap-1.5" style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>
           {Object.entries(XP_RATES).map(([k, v]) => (
             <div key={k} className="flex justify-between">
@@ -258,7 +258,7 @@ function XPEngine() {
       {/* Entry log */}
       <Card>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-xs uppercase tracking-widest font-mono" style={{ color: 'var(--text-muted)' }}>
             {filter ? `${filter} Entries` : 'All XP Entries'} ({visibleEntries.length})
           </p>
           {filter && (
@@ -318,7 +318,7 @@ export function DevSettings() {
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
               <div>
-                <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>// developer mode</p>
+                <p className="text-xs uppercase tracking-widest font-mono" style={{ color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>// developer mode</p>
                 <p className="font-bold text-white" style={{ }}>Settings</p>
               </div>
               <button

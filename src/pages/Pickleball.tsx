@@ -315,7 +315,7 @@ export function Pickleball() {
             <div className="flex items-center gap-3">
               <div style={{ textAlign: 'right' }}>
                 {(game.my_score != null && game.opp_score != null) && (
-                  <p style={{ fontSize: 16, fontWeight: 800, color: game.win ? ACCENT : '#f87171' }}>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: game.win ? ACCENT : '#f87171' }}>
                     {game.my_score}—{game.opp_score}
                   </p>
                 )}

@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState, useMemo } from 'react'
-import { useUserName } from '../../hooks/useUserName'
 import { useNavStore } from '../../store/useNavStore'
-import { LogoMark } from './SideNav'
+import { Wordmark } from '../brand/Wordmark'
 import { DumbbellIcon, MoonIcon, BrainIcon, DropletIcon, RunIcon, type IconComponent } from '../ui/Icon'
 
 const LOGO_ANIMATED_KEY = 'youxp-logo-animated'
@@ -25,9 +24,7 @@ interface TopBarProps {
 
 export function TopBar({ title, hideSettings = false, back = false, backTo, logButton = false }: TopBarProps) {
   const navigate      = useNavigate()
-  const userName      = useUserName()
   const toggleNav     = useNavStore(s => s.toggleNav)
-  const logoLabel     = title ?? (userName ? `${userName}XP` : 'YouXP')
   const logoClickable = !title
 
   const [showLogMenu,    setShowLogMenu]    = useState(false)
@@ -121,36 +118,35 @@ export function TopBar({ title, hideSettings = false, back = false, backTo, logB
           background: 'none', border: 'none', padding: 0,
           cursor: logoClickable ? 'pointer' : 'default',
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
-          display: 'flex', alignItems: 'center', gap: 7,
+          display: 'flex', alignItems: 'center',
         }}
       >
-        {/* Mark only on home/non-title, hidden on desktop (sidebar has it) */}
-        {!title && (
-          <span className="md:hidden">
-            <LogoMark size={20} />
+        {title ? (
+          <span style={{
+            color: 'var(--text-primary)', fontSize: 14, fontWeight: 700,
+            letterSpacing: '0.08em', whiteSpace: 'nowrap',
+          }}>
+            {title}
           </span>
+        ) : (
+          <>
+            {/* Mobile: full wordmark; desktop: sidebar already has the mark */}
+            <span
+              className="md:hidden"
+              style={{
+                ...(logoDrawIn ? { animation: 'splashLogoIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 1.8s both' } : {}),
+              }}
+              onMouseEnter={() => { setLogoShimmer(true); setLogoShimmerKey(k => k + 1) }}
+              onMouseLeave={() => setLogoShimmer(false)}
+            >
+              <Wordmark size={20} showPulse={false} />
+              {logoShimmer && <span key={logoShimmerKey} className="logo-shimmer-sweep" />}
+            </span>
+            <span className="hidden md:inline-block">
+              <Wordmark size={18} showPulse={false} color="var(--text-secondary)" />
+            </span>
+          </>
         )}
-        <span
-          style={{
-            color:         title ? 'var(--text-primary)' : 'var(--accent)',
-            fontSize:      title ? 14 : 17,
-            fontWeight:    700,
-            letterSpacing: title ? '0.08em' : '0.02em',
-            whiteSpace:    'nowrap',
-            transition:    'opacity 0.15s ease',
-            position:      'relative',
-            overflow:      'hidden',
-            display:       'inline-block',
-            ...(logoDrawIn && !title ? {
-              animation: 'splashLogoIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 1.8s both',
-            } : {}),
-          }}
-          onMouseEnter={() => { if (!logoClickable) return; setLogoShimmer(true); setLogoShimmerKey(k => k + 1) }}
-          onMouseLeave={() => setLogoShimmer(false)}
-        >
-          {logoLabel}
-          {logoShimmer && <span key={logoShimmerKey} className="logo-shimmer-sweep" />}
-        </span>
       </button>
 
       {/* Right */}

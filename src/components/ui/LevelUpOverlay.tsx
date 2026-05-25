@@ -110,7 +110,7 @@ export function LevelUpOverlay() {
           <span
             ref={levelNumRef}
             style={{
-              fontSize: 80, fontWeight: 900,
+              fontSize: 80, fontWeight: 700,
               color: 'var(--accent)',
               textShadow: '0 0 40px var(--accent), 0 0 80px rgba(245,166,35,0.5)',
               animation: 'glowPulse 2s ease-in-out infinite',

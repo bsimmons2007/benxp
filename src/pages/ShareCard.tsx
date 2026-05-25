@@ -96,12 +96,12 @@ function Card() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, position: 'relative' }}>
         <div>
-          <p style={{ color: theme.accent, fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 2 }}>YouXP</p>
-          <p style={{ color: 'var(--text-primary)', fontSize: 18, fontWeight: 800, margin: 0 }}>{userName || 'Player'}</p>
+          <p style={{ color: theme.accent, fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: 2 }}>YouXP</p>
+          <p style={{ color: 'var(--text-primary)', fontSize: 18, fontWeight: 700, margin: 0 }}>{userName || 'Player'}</p>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <p style={{ color: theme.accent, fontSize: 36, fontWeight: 900, lineHeight: 1, margin: 0, textShadow: `0 0 20px ${theme.accent}` }}>{displayLevel}</p>
-          <p style={{ color: theme.accent, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.85, margin: 0 }}>{title}</p>
+          <p style={{ color: theme.accent, fontSize: 36, fontWeight: 700, lineHeight: 1, margin: 0, textShadow: `0 0 20px ${theme.accent}` }}>{displayLevel}</p>
+          <p style={{ color: theme.accent, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', opacity: 0.85, margin: 0 }}>{title}</p>
         </div>
       </div>
 
@@ -136,8 +136,8 @@ function Card() {
             borderRadius: 10, padding: '8px 10px',
             border: '1px solid var(--border-faint)',
           }}>
-            <p style={{ color: theme.accent, fontSize: 16, fontWeight: 800, margin: 0, lineHeight: 1 }}>{s.value}</p>
-            <p style={{ color: '#888', fontSize: 9, margin: '3px 0 0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
+            <p style={{ color: theme.accent, fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1 }}>{s.value}</p>
+            <p style={{ color: '#888', fontSize: 9, margin: '3px 0 0', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>{s.label}</p>
           </div>
         ))}
       </div>
@@ -145,7 +145,7 @@ function Card() {
       {/* Top skills */}
       {topSkills.length > 0 && (
         <div style={{ marginBottom: 20 }}>
-          <p style={{ color: '#444', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 8, fontWeight: 700 }}>Skill Mastery</p>
+          <p style={{ color: '#444', fontSize: 9, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', marginBottom: 8, fontWeight: 700 }}>Skill Mastery</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {topSkills.map(s => {
               const pctS = Math.min(Math.max(s.progress * 100, 0), 100)
@@ -177,7 +177,7 @@ function Card() {
       {/* Badges */}
       {topBadges.length > 0 && (
         <div style={{ marginBottom: 20 }}>
-          <p style={{ color: '#444', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 8, fontWeight: 700 }}>Badges</p>
+          <p style={{ color: '#444', fontSize: 9, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', marginBottom: 8, fontWeight: 700 }}>Badges</p>
           <div style={{ display: 'flex', gap: 6 }}>
             {topBadges.map(b => (
               <div key={b.id} style={{
@@ -195,7 +195,7 @@ function Card() {
 
       {/* Footer */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, borderTop: '1px solid var(--border-faint)' }}>
-        <p style={{ color: '#444', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>youxp.app</p>
+        <p style={{ color: '#444', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', margin: 0 }}>youxp.app</p>
         <p style={{ color: '#444', fontSize: 9, margin: 0 }}>{new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
       </div>
     </div>
@@ -244,7 +244,7 @@ export function ShareCard() {
     <>
       <TopBar title="Share" />
       <PageWrapper>
-        <p className="text-xs uppercase tracking-widest text-center mb-6" style={{ color: '#555' }}>
+        <p className="text-xs uppercase tracking-widest font-mono text-center mb-6" style={{ color: '#555' }}>
           Your Progress Card
         </p>
 

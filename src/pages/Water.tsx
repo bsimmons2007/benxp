@@ -116,7 +116,7 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
           textAnchor="middle"
           fontSize={15} fontWeight="800"
           fill={fill > 0.18 ? '#fff' : 'var(--text-muted)'}
-          fontFamily="Inter Variable, Inter, system-ui, sans-serif"
+          fontFamily="Space Grotesk, system-ui, sans-serif"
           style={{ transition: 'all 0.5s ease' }}
         >
           {pct}%
@@ -126,7 +126,7 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
       {/* oz counter */}
       <div style={{ textAlign: 'center' }}>
         <p style={{
-          fontSize: 30, fontWeight: 900, lineHeight: 1,
+          fontSize: 30, fontWeight: 700, lineHeight: 1,
           color: fill >= 1 ? accentStroke : 'var(--text-primary)',
           transition: 'color 0.4s',
         }}>

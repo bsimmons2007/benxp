@@ -293,7 +293,7 @@ function ExerciseRow({
     }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+        <span style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
           Exercise {index + 1}
         </span>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -337,7 +337,7 @@ function ExerciseRow({
         {/* Weight — hidden for bodyweight & timed (bodyweight) */}
         {!entry.isBodyweight && !isTimed && (
           <div>
-            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Weight lbs</label>
+            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>Weight lbs</label>
             <input
               type="number" step="2.5" placeholder="135"
               value={entry.weight}
@@ -351,7 +351,7 @@ function ExerciseRow({
         {/* Bodyweight field */}
         {entry.isBodyweight && (
           <div>
-            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>BW lbs</label>
+            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>BW lbs</label>
             <input
               type="number" step="0.1" placeholder="160"
               value={entry.bodyweight}
@@ -364,7 +364,7 @@ function ExerciseRow({
 
         {/* Sets */}
         <div>
-          <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Sets</label>
+          <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'var(--font-mono)' }}>Sets</label>
           <input
             type="number" placeholder="3"
             value={entry.sets}
@@ -378,7 +378,7 @@ function ExerciseRow({
         {/* Reps or Duration */}
         {isTimed ? (
           <div>
-            <label style={{ display: 'block', color: 'var(--accent)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Duration</label>
+            <label style={{ display: 'block', color: 'var(--accent)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'var(--font-mono)' }}>Duration</label>
             <input
               type="text" placeholder="45s or 1:30"
               value={entry.duration}
@@ -391,7 +391,7 @@ function ExerciseRow({
           </div>
         ) : (
           <div>
-            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Reps</label>
+            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>Reps</label>
             <input
               type="number" placeholder="8"
               value={entry.reps}
@@ -404,7 +404,7 @@ function ExerciseRow({
 
         {/* RPE */}
         <div>
-          <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'var(--font-mono)' }}>
             RPE
             <span title="Rate of Perceived Exertion — how hard the set felt on a scale of 1–10. 6 = easy, 8 = 2 reps left in tank, 10 = absolute max effort."
               style={{ marginLeft: 5, cursor: 'help', color: 'var(--text-muted)', fontSize: 11, fontStyle: 'normal' }}>ⓘ</span>
@@ -912,7 +912,7 @@ function MiniStat({ label, value, color, wide }: { label: string; value: string;
         gap: wide ? 0 : 4,
       }}
     >
-      <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+      <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
         {label}
       </p>
       <p style={{ fontSize: wide ? 15 : 18, fontWeight: 700, color, lineHeight: 1 }}>{value}</p>
@@ -1041,18 +1041,18 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
         <div className="flex items-center gap-3 flex-shrink-0">
           <div style={{ textAlign: 'right' }}>
             {isTimedLift && bestDurSecs > 0 && (
-              <span style={{ fontWeight: 800, fontSize: 17, color: 'var(--accent)', letterSpacing: '-0.02em' }}>
+              <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--accent)', letterSpacing: '-0.02em' }}>
                 {fmtSecs(bestDurSecs)}
               </span>
             )}
             {isBWLift && maxReps > 0 && (
-              <span style={{ fontWeight: 800, fontSize: 17, color: 'var(--accent)', letterSpacing: '-0.02em' }}>
+              <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--accent)', letterSpacing: '-0.02em' }}>
                 {maxReps}
                 <span style={{ fontWeight: 400, fontSize: 11, color: 'var(--text-muted)', marginLeft: 3 }}>reps</span>
               </span>
             )}
             {!isTimedLift && !isBWLift && pr && (
-              <span style={{ fontWeight: 800, fontSize: 17, color: 'var(--accent)', letterSpacing: '-0.02em' }}>
+              <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--accent)', letterSpacing: '-0.02em' }}>
                 {pr.est_1rm.toFixed(0)}
                 <span style={{ fontWeight: 400, fontSize: 11, color: 'var(--text-muted)', marginLeft: 3 }}>lbs</span>
               </span>

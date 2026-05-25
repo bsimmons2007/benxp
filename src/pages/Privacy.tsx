@@ -49,7 +49,7 @@ export function Privacy() {
             <ShieldIcon size={24} color="var(--base-bg)" />
           </div>
           <div>
-            <p style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+            <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
               Privacy Policy
             </p>
             <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
@@ -129,8 +129,7 @@ export function Privacy() {
               </a>
             </li>
             <li>
-              <strong style={{ color: 'var(--text-primary)' }}>Inter Variable font</strong> — bundled
-              at build time; no external font CDN requests
+              <strong style={{ color: 'var(--text-primary)' }}>Space Grotesk + JetBrains Mono</strong> — loaded via Google Fonts CDN (fonts.googleapis.com)
             </li>
           </ul>
           <p style={{ marginTop: 8 }}>No ad networks or data brokers are used.</p>

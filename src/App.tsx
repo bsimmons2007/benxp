@@ -136,7 +136,7 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
           boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
         }}
       >
-        <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>
+        <p style={{ color: '#aaa', fontSize: 11, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 12 }}>
           Keyboard Shortcuts
         </p>
         {SHORTCUTS.map(s => (
@@ -192,7 +192,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
         background: 'radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
-      <p style={{ fontSize: 42, fontWeight: 900,
+      <p style={{ fontSize: 42, fontWeight: 700,
         color: 'var(--accent)', letterSpacing: '0.05em',
         animation: 'splashLogoIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
         marginBottom: 8,
@@ -200,7 +200,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
         YouXP
       </p>
       <p style={{ fontSize: 14,
-        color: 'var(--text-muted)', letterSpacing: '0.18em', textTransform: 'uppercase',
+        color: 'var(--text-muted)', letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)',
         animation: 'splashSubIn 0.6s ease both',
       }}>
         Level up your life

@@ -220,7 +220,7 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
         >
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <span style={{ fontSize: 10, color: '#4a4a5a', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 10, color: '#4a4a5a', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
               {stepIndex + 1} of {totalSteps}
             </span>
             <button onClick={finish} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4a4a5a', fontSize: 11, padding: '2px 4px' }}>
@@ -234,7 +234,7 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
           </p>
 
           {/* Body */}
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#bbb', lineHeight: 1.65, marginBottom: step.tip ? 12 : 18 }}>
+          <p style={{ fontSize: 13, color: '#bbb', lineHeight: 1.65, marginBottom: step.tip ? 12 : 18 }}>
             {step.body}
           </p>
 

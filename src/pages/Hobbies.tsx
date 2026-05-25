@@ -61,7 +61,7 @@ function HobbyCard({ icon, label, sub, path, statLabel, statValue, accentColor }
       {/* Quick stat */}
       {statValue !== undefined && (
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <p style={{ fontSize: 20, fontWeight: 900, color: accentColor, lineHeight: 1 }}>
+          <p style={{ fontSize: 20, fontWeight: 700, color: accentColor, lineHeight: 1 }}>
             {statValue}
           </p>
           <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{statLabel}</p>

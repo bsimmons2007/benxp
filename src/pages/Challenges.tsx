@@ -69,7 +69,7 @@ function ChallengeCard({
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <span
               className="font-bold"
-              style={{ color: 'var(--text-primary)', fontFamily: 'Inter Variable, Inter, system-ui, sans-serif', fontSize: isBoss ? 15 : 14 }}
+              style={{ color: 'var(--text-primary)', fontSize: isBoss ? 15 : 14 }}
             >
               {challenge.challenge_name}
             </span>

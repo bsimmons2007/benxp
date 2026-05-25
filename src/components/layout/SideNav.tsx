@@ -5,6 +5,8 @@ import { useStore } from '../../store/useStore'
 import { useNavStore } from '../../store/useNavStore'
 import { getLevelTitle } from '../../lib/xp'
 import { SectionIcon, HomeIcon, PersonIcon, TargetIcon, CalendarIcon, DotsIcon } from '../ui/Icon'
+import { Mark } from '../brand/Mark'
+import { Wordmark } from '../brand/Wordmark'
 
 const SECONDARY_LINKS = [
   { to: '/profile', label: 'Profile',  iconKey: '__person'   },
@@ -13,18 +15,6 @@ const SECONDARY_LINKS = [
   { to: '/more',    label: 'More',     iconKey: '__more'     },
 ]
 
-export function LogoMark({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-      <rect width="28" height="28" rx="7" fill="var(--accent)" />
-      <path
-        d="M9 7.5l5 6.5 5-6.5M14 14v6.5"
-        stroke="white" strokeWidth="2.2"
-        strokeLinecap="round" strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
 
 function NavIcon({ iconKey, color, size = 18 }: { iconKey: string; color: string; size?: number }) {
   if (iconKey === '__home')     return <HomeIcon     size={size} color={color} />
@@ -118,7 +108,7 @@ export function SideNav() {
             className="sidenav-icon-btn"
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
-            <LogoMark size={28} />
+            <Mark size={22} />
           </button>
           <span className="sidenav-flyout" style={{ fontWeight: 600 }}>
             Lv {level} · {getLevelTitle(level)}
@@ -198,11 +188,8 @@ export function SideNav() {
             borderBottom: '1px solid var(--border-faint)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <LogoMark size={24} />
-            <p style={{ color: 'var(--text-primary)', fontSize: 16, fontWeight: 700, lineHeight: 1, margin: 0 }}>
-              {userName ? `${userName}XP` : 'YouXP'}
-            </p>
+          <div style={{ marginBottom: 6 }}>
+            <Wordmark size={20} showPulse={false} />
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: 11, marginBottom: 6, letterSpacing: '0.04em' }}>
             Lv {level} · {getLevelTitle(level)}
