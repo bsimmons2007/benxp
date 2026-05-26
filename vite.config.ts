@@ -43,7 +43,7 @@ export default defineConfig({
           'vendor-charts':   ['recharts'],
           'vendor-form':     ['react-hook-form'],
           'vendor-state':    ['zustand'],
-          'sounds':          ['./src/lib/sounds.ts'],
+          'vendor-anime':    ['animejs'],
         },
       },
     },
