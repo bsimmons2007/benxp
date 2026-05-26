@@ -113,6 +113,15 @@
       #lxp-loader.lxp-dark #lxp-sub { color: rgba(255,255,255,0.2); }
       .lxp-blink { animation: lxp-blink 0.9s step-end infinite; }
       @keyframes lxp-blink { 50% { opacity: 0; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        #lxp-loader { transition: none; }
+        #lxp-loader.lxp-exit { transform: none; opacity: 0; }
+        #lxp-title .lxp-you,
+        #lxp-title .lxp-xp { transition: none; opacity: 1; transform: none; }
+        #lxp-bar { transition: none; }
+        .lxp-blink { animation: none; }
+      }
     </style>
   </head>
   <body>

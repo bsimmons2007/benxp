@@ -295,15 +295,18 @@ function AppInner() {
 
   const [showSplash,   setShowSplash]   = useState(() => {
     if (isAuthRoute) return false
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
     const seen = sessionStorage.getItem(SPLASH_KEY)
     if (!seen) { sessionStorage.setItem(SPLASH_KEY, '1'); return true }
     return false
   })
-  const [showTutorial, setShowTutorial] = useState(() => !isAuthRoute && !isTutorialDone())
+  const [showTutorial, setShowTutorial] = useState(
+    () => !isAuthRoute && !isTutorialDone() && location.pathname === '/'
+  )
 
   useEffect(() => {
     if (isAuthRoute) return
-    if (!isTutorialDone()) setShowTutorial(true)
+    if (!isTutorialDone() && location.pathname === '/') setShowTutorial(true)
     checkDailyReminder()
 
     function onReset() {
@@ -311,7 +314,7 @@ function AppInner() {
     }
     window.addEventListener('tutorial-reset', onReset)
     return () => window.removeEventListener('tutorial-reset', onReset)
-  }, [isAuthRoute])
+  }, [isAuthRoute]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

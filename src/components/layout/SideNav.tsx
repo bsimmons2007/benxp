@@ -31,6 +31,7 @@ function DesktopNavItem({ to, label, iconKey }: { to: string; label: string; ico
       <NavLink
         to={to}
         end={to === '/'}
+        aria-label={label}
         className="sidenav-icon-btn"
         style={({ isActive }) => ({
           color:      isActive ? 'var(--accent)' : 'var(--text-secondary)',
@@ -137,6 +138,7 @@ export function SideNav() {
         <div className="sidenav-item">
           <NavLink
             to="/settings"
+            aria-label="Settings"
             className="sidenav-icon-btn"
             style={({ isActive }) => ({
               color:      isActive ? 'var(--accent)' : 'var(--text-secondary)',
