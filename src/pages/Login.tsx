@@ -138,14 +138,6 @@ export function Login() {
   const location   = useLocation()
   const resetStore = useStore(s => s.reset)
 
-  // Prevent Google from indexing the login page and using it as the site snippet
-  useEffect(() => {
-    const tag = document.createElement('meta')
-    tag.name = 'robots'; tag.content = 'noindex, nofollow'
-    document.head.appendChild(tag)
-    return () => { document.head.removeChild(tag) }
-  }, [])
-
   // Pre-fill "password updated" message if redirected from reset flow
   useEffect(() => {
     const params = new URLSearchParams(location.search)
