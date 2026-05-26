@@ -486,10 +486,10 @@ export function Cardio() {
                   labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${Number(v).toFixed(2)} mi`, 'Distance']}
-                  cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
+                  cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }}
                 />
                 <ReferenceLine y={avgMiles} stroke="#3b82f6" strokeDasharray="4 2" strokeOpacity={0.4} />
-                <Area type="monotone" dataKey="miles" stroke="#3b82f6" strokeWidth={2.5} fill="url(#cardio-grad)" dot={{ fill: '#3b82f6', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#3b82f6', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+                <Area type="monotone" dataKey="miles" stroke="#3b82f6" strokeWidth={2.5} fill="url(#cardio-grad)" dot={{ fill: '#3b82f6', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#3b82f6', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           </Card>
