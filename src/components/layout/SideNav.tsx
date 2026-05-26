@@ -172,6 +172,7 @@ export function SideNav() {
       {/* ── MOBILE: slide-in drawer ──────────────────────────── */}
       <aside
         className="md:hidden"
+        aria-hidden={!isOpen}
         style={{
           position: 'fixed', top: 0, left: 0, height: '100%', width: 240,
           zIndex: 49, display: 'flex', flexDirection: 'column',

@@ -12,7 +12,7 @@ export default defineConfig({
       manifest: false,
       includeAssets: ['favicon.svg', 'icons.svg', 'favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       workbox: {
-        globPatterns: ['**/*.{css,html,ico,png,svg,woff2}', 'assets/index-*.js', 'assets/vendor-*.js'],
+        globPatterns: ['**/*.{css,html,ico,png,svg}', 'assets/index-*.js', 'assets/vendor-*.js'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
