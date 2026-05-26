@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /dev
+Disallow: /login
+Disallow: /reset-password
+Disallow: /auth/callback
 
 Sitemap: https://you-xp.com/sitemap.xml
