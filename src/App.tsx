@@ -239,18 +239,18 @@ function OfflineBanner() {
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 'var(--z-banner)',
       padding: '10px 16px',
-      background: offline ? '#1a0a0a' : '#0a1a0a',
-      borderBottom: `1px solid ${offline ? '#7f1d1d' : '#14532d'}`,
+      background: offline ? 'color-mix(in srgb, var(--red) 12%, var(--surface-1))' : 'color-mix(in srgb, var(--green) 12%, var(--surface-1))',
+      borderBottom: `1px solid ${offline ? 'color-mix(in srgb, var(--red) 35%, transparent)' : 'color-mix(in srgb, var(--green) 35%, transparent)'}`,
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
       transition: 'background 0.3s ease',
     }}>
       <div style={{
         width: 7, height: 7, borderRadius: '50%',
-        background: offline ? '#ef4444' : '#22c55e',
-        boxShadow: `0 0 8px ${offline ? '#ef4444' : '#22c55e'}`,
+        background: offline ? 'var(--red)' : 'var(--green)',
+        boxShadow: `0 0 8px ${offline ? 'var(--red)' : 'var(--green)'}`,
         flexShrink: 0,
       }} />
-      <p style={{ fontSize: 12, fontWeight: 600, color: offline ? '#fca5a5' : '#86efac', letterSpacing: '0.04em' }}>
+      <p style={{ fontSize: 12, fontWeight: 600, color: offline ? 'var(--red)' : 'var(--green)', letterSpacing: '0.04em' }}>
         {offline ? 'You\'re offline — changes will sync when reconnected' : 'Back online'}
       </p>
     </div>

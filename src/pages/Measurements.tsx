@@ -99,7 +99,7 @@ function MiniTrend({ data, color }: { data: { date: string; v: number }[]; color
         <XAxis dataKey="date" hide />
         <YAxis domain={['auto', 'auto']} hide />
         <Tooltip
-          contentStyle={{ background: 'rgba(0,0,0,0.8)', border: 'none', borderRadius: 8, fontSize: 11 }}
+          contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11, color: 'var(--text-primary)' }}
           labelFormatter={(l: string) => formatDateTooltip(l)}
           formatter={(v: number) => [v.toFixed(1), '']}
         />

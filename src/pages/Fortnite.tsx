@@ -118,8 +118,8 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
               <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={25} />
-              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [v as number, 'Total Wins']} />
-              <Area type="monotone" dataKey="wins" stroke={accent} strokeWidth={2.5} fill={`url(#${gradId}-cum)`} dot={false} activeDot={{ r: 5, fill: accent, stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [v as number, 'Total Wins']} />
+              <Area type="monotone" dataKey="wins" stroke={accent} strokeWidth={2.5} fill={`url(#${gradId}-cum)`} dot={false} activeDot={{ r: 5, fill: accent, stroke: 'var(--base-bg)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
         </Card>
@@ -158,9 +158,9 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
               <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
-              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [v as number, 'Kills']} />
+              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [v as number, 'Kills']} />
               <ReferenceLine y={avgKills} stroke={accent} strokeDasharray="4 2" strokeOpacity={0.4} />
-              <Area type="monotone" dataKey="kills" stroke="#7B2FBE" strokeWidth={2.5} fill={`url(#${gradId}-kills)`} dot={{ fill: '#7B2FBE', r: 3, fillOpacity: 0.7 }} activeDot={{ r: 5, fill: '#7B2FBE', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+              <Area type="monotone" dataKey="kills" stroke="#7B2FBE" strokeWidth={2.5} fill={`url(#${gradId}-kills)`} dot={{ fill: '#7B2FBE', r: 3, fillOpacity: 0.7 }} activeDot={{ r: 5, fill: '#7B2FBE', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
           <p className="text-xs mt-1" style={{ color: accent }}>── avg {avgKills}K</p>
@@ -181,8 +181,8 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
               <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
               <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
-              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [`${v}%`, 'Accuracy']} />
-              <Area type="monotone" dataKey="accuracy" stroke="#2ECC71" strokeWidth={2.5} fill={`url(#${gradId}-acc)`} dot={false} activeDot={{ r: 4, fill: '#2ECC71', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+              <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [`${v}%`, 'Accuracy']} />
+              <Area type="monotone" dataKey="accuracy" stroke="#2ECC71" strokeWidth={2.5} fill={`url(#${gradId}-acc)`} dot={false} activeDot={{ r: 4, fill: '#2ECC71', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
         </Card>
