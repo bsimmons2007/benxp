@@ -12,7 +12,7 @@ export default defineConfig({
       manifest: false,
       includeAssets: ['favicon.svg', 'icons.svg', 'favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,svg,png,woff2}'],
+        globPatterns: ['**/*.{css,html,ico,png,svg,woff2}', 'assets/index-*.js', 'assets/vendor-*.js'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
@@ -43,6 +43,7 @@ export default defineConfig({
           'vendor-charts':   ['recharts'],
           'vendor-form':     ['react-hook-form'],
           'vendor-state':    ['zustand'],
+          'sounds':          ['./src/lib/sounds.ts'],
         },
       },
     },
