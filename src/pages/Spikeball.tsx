@@ -56,7 +56,7 @@ function LogSBPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.spikeball_game + (isWin ? XP_RATES.spikeball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — 🟠 Spike!`) }
+    if (isWin) { playPR();     setToast(`+${xp} XP — Spike!`) }
     else        { playXPGain(); setToast(`+${xp} XP — Keep it up!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), my_score: '', opp_score: '', partner: '', opponents: '', notes: '' })

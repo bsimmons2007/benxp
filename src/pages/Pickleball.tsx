@@ -188,7 +188,9 @@ export function Pickleball() {
   const [formatFilter,  setFormatFilter]  = useState<'All' | 'Singles' | 'Doubles'>('All')
 
   async function load() {
-    const { data } = await supabase.from('pickleball_games').select('*').order('date', { ascending: false })
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data } = await supabase.from('pickleball_games').select('*').eq('user_id', user.id).order('date', { ascending: false })
     setGames(data ?? [])
   }
   useEffect(() => { load() }, [])
