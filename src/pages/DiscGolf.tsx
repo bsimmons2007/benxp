@@ -76,7 +76,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
     if (error) { setToast('Failed to save — try again'); return }
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.disc_golf_under_par : 0
     const xp = XP_RATES.disc_golf_round + underParBonus
-    if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} 🥏 Under par!`) }
+    if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} Under par!`) }
     else          { playXPGain(); setToast(`+${xp} XP — Round logged (${vsParLabel(diff)})`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), course: '', holes: '18', score: '', par: '54', notes: '' })
