@@ -800,7 +800,7 @@ export function Sleep() {
                 <Area type="monotone" dataKey="hours_slept" stroke="#818cf8" strokeWidth={2.5}
                   fill="url(#sleep-grad)"
                   dot={{ fill: '#818cf8', r: 3, fillOpacity: 0.8 }}
-                  activeDot={{ r: 5, fill: '#818cf8', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+                  activeDot={{ r: 5, fill: '#818cf8', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
             <div className="flex gap-4 mt-1">
