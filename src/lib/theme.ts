@@ -1,3 +1,5 @@
+import { getAmbientForTheme, ambientScene, setAmbientSceneId, ambientEnabled } from './sounds'
+
 export interface Theme {
   id: string
   name: string
@@ -904,12 +906,8 @@ export function applyTimeOrSavedTheme() {
 export function saveTheme(theme: Theme) {
   localStorage.setItem('youxp-theme', theme.id)
   applyTheme(theme)
-  // Auto-switch ambient scene to match theme (lazy import to avoid top-level side effects)
-  import('./sounds').then(({ getAmbientForTheme, ambientScene, setAmbientSceneId, ambientEnabled }) => {
-    const recommended = getAmbientForTheme(theme.id)
-    // Only auto-switch if user hasn't manually pinned a different scene (or always auto-switch)
-    if (ambientScene() !== recommended) {
-      setAmbientSceneId(recommended, ambientEnabled())
-    }
-  })
+  const recommended = getAmbientForTheme(theme.id)
+  if (ambientScene() !== recommended) {
+    setAmbientSceneId(recommended, ambientEnabled())
+  }
 }

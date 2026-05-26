@@ -46,8 +46,8 @@ const Pool         = lazy(() => import('./pages/Pool').then(m => ({ default: m.P
 const Leaderboard  = lazy(() => import('./pages/Leaderboard').then(m => ({ default: m.Leaderboard })))
 const Log          = lazy(() => import('./pages/Log').then(m => ({ default: m.Log })))
 const NotFound     = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })))
-import { LevelUpOverlay } from './components/ui/LevelUpOverlay'
-import { TutorialOverlay } from './components/ui/TutorialOverlay'
+const LevelUpOverlay  = lazy(() => import('./components/ui/LevelUpOverlay').then(m => ({ default: m.LevelUpOverlay })))
+const TutorialOverlay = lazy(() => import('./components/ui/TutorialOverlay').then(m => ({ default: m.TutorialOverlay })))
 import { applyTimeOrSavedTheme } from './lib/theme'
 import { setupOfflineQueue } from './lib/offlineQueue'
 import { isTutorialDone } from './lib/tutorial'
@@ -321,9 +321,11 @@ function AppInner() {
       {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
       <OfflineBanner />
       <TopLoadBar />
-      <LevelUpOverlay />
+      <Suspense fallback={null}><LevelUpOverlay /></Suspense>
       {showTutorial && !isAuthRoute && (
-        <TutorialOverlay onDone={() => setShowTutorial(false)} />
+        <Suspense fallback={null}>
+          <TutorialOverlay onDone={() => setShowTutorial(false)} />
+        </Suspense>
       )}
       {helpVisible && <ShortcutHelp onClose={() => setHelpVisible(false)} />}
       <Suspense fallback={<div style={{ background: 'var(--base-bg)', minHeight: '100dvh' }} />}>
