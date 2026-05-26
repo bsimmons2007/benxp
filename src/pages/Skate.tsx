@@ -206,10 +206,10 @@ export function Skate() {
                   labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${Number(v).toFixed(2)} mi`, 'Miles']}
-                  cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
+                  cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }}
                 />
                 <ReferenceLine y={avgMiles} stroke="var(--accent)" strokeDasharray="4 2" strokeOpacity={0.4} />
-                <Area type="monotone" dataKey="miles" stroke="var(--accent)" strokeWidth={2.5} fill="url(#skate-miles-grad)" dot={{ fill: 'var(--accent)', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: 'var(--accent)', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+                <Area type="monotone" dataKey="miles" stroke="var(--accent)" strokeWidth={2.5} fill="url(#skate-miles-grad)" dot={{ fill: 'var(--accent)', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: 'var(--accent)', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
             <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>── avg</p>
@@ -238,10 +238,10 @@ export function Skate() {
                   labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${Number(v).toFixed(2)} min/mi`, 'Fastest Mile']}
-                  cursor={{ stroke: 'rgba(255,255,255,0.12)', strokeWidth: 1 }}
+                  cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }}
                 />
                 {fastestMile && <ReferenceLine y={fastestMile} stroke="#2ECC71" strokeDasharray="4 2" strokeOpacity={0.55} />}
-                <Area type="monotone" dataKey="fastest_mile" stroke="#2ECC71" strokeWidth={2.5} fill="url(#skate-speed-grad)" dot={{ fill: '#2ECC71', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#2ECC71', stroke: 'rgba(255,255,255,0.3)', strokeWidth: 2 }} />
+                <Area type="monotone" dataKey="fastest_mile" stroke="#2ECC71" strokeWidth={2.5} fill="url(#skate-speed-grad)" dot={{ fill: '#2ECC71', r: 3, fillOpacity: 0.8 }} activeDot={{ r: 5, fill: '#2ECC71', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
             {fastestMile && <p className="text-xs mt-1" style={{ color: '#2ECC71' }}>── PR {fastestMile.toFixed(2)} min/mi</p>}

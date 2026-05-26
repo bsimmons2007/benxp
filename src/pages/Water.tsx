@@ -115,7 +115,7 @@ function WaterCup({ ozDrunk, goal }: { ozDrunk: number; goal: number }) {
           y={fill > 0.15 ? waterTop + 22 : botY - 14}
           textAnchor="middle"
           fontSize={15} fontWeight="800"
-          fill={fill > 0.18 ? '#fff' : 'var(--text-muted)'}
+          fill={fill > 0.18 ? 'var(--base-bg)' : 'var(--text-muted)'}
           fontFamily="Space Grotesk, system-ui, sans-serif"
           style={{ transition: 'all 0.5s ease' }}
         >
