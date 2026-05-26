@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useNavigation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { createContext, useContext, useEffect, useRef, useState, lazy, Suspense } from 'react'
 import type { ReactNode } from 'react'
 import { BottomNav } from './components/layout/BottomNav'
@@ -258,14 +258,12 @@ function OfflineBanner() {
 }
 
 function TopLoadBar() {
-  const loading    = useStore(s => s.loading)
-  const navigation = useNavigation()
-  const show       = loading || navigation.state === 'loading'
+  const loading = useStore(s => s.loading)
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, height: 2,
       zIndex: 'var(--z-loadbar)', pointerEvents: 'none', overflow: 'hidden',
-      opacity: show ? 1 : 0,
+      opacity: loading ? 1 : 0,
       transition: 'opacity 0.4s ease',
     }}>
       <div className="top-load-bar" style={{ height: '100%', background: 'var(--accent)' }} />
