@@ -451,20 +451,12 @@ export function Login() {
 
         <div className="relative z-10 w-full" style={{ maxWidth: 380 }}>
 
-          {/* Mobile-only logo + feature strip */}
+          {/* Mobile-only logo */}
           <div className="md:hidden text-center mb-6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Wordmark size={48} color="var(--text-primary)" accent="var(--color-coral)" showPulse={true} />
-            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 8, marginBottom: 20 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginTop: 8 }}>
               Level up your life.
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 28px', width: '100%' }}>
-              {FEATURES.slice(0, 4).map(f => (
-                <div key={f.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{f.icon}</span>
-                  <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.2 }}>{f.label}</span>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Reset success message */}
