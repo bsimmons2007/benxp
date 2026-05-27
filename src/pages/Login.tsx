@@ -72,14 +72,14 @@ const QUOTES = [
 ]
 
 const FEATURES: { icon: ReactNode; label: string; sub: string }[] = [
-  { icon: <DumbbellIcon size={20} color="var(--accent)" />, label: 'Strength & PRs',  sub: 'bench, squat, deadlift' },
-  { icon: <BookIcon     size={20} color="var(--accent)" />, label: 'Book Log',         sub: 'genre, rating, series'  },
-  { icon: <RunIcon      size={20} color="var(--accent)" />, label: 'Cardio Miles',     sub: 'run, bike, skate'       },
-  { icon: <MoonIcon     size={20} color="var(--accent)" />, label: 'Sleep Score',      sub: 'debt, quality, streak'  },
-  { icon: <SwordIcon    size={20} color="var(--accent)" />, label: 'Quests',           sub: 'weekly, monthly, boss'  },
-  { icon: <BrainIcon    size={20} color="var(--accent)" />, label: 'Mood Tracking',    sub: 'score, tags, trends'    },
-  { icon: <GamepadIcon  size={20} color="var(--accent)" />, label: 'Gaming Stats',     sub: 'wins, kills, rank'      },
-  { icon: <TargetIcon   size={20} color="var(--accent)" />, label: 'Goal Setting',     sub: 'progress, reminders'    },
+  { icon: <DumbbellIcon size={20} color="var(--color-coral)" />, label: 'Strength & PRs',  sub: 'bench, squat, deadlift' },
+  { icon: <BookIcon     size={20} color="var(--color-coral)" />, label: 'Book Log',         sub: 'genre, rating, series'  },
+  { icon: <RunIcon      size={20} color="var(--color-coral)" />, label: 'Cardio Miles',     sub: 'run, bike, skate'       },
+  { icon: <MoonIcon     size={20} color="var(--color-coral)" />, label: 'Sleep Score',      sub: 'debt, quality, streak'  },
+  { icon: <SwordIcon    size={20} color="var(--color-coral)" />, label: 'Quests',           sub: 'weekly, monthly, boss'  },
+  { icon: <BrainIcon    size={20} color="var(--color-coral)" />, label: 'Mood Tracking',    sub: 'score, tags, trends'    },
+  { icon: <GamepadIcon  size={20} color="var(--color-coral)" />, label: 'Gaming Stats',     sub: 'wins, kills, rank'      },
+  { icon: <TargetIcon   size={20} color="var(--color-coral)" />, label: 'Goal Setting',     sub: 'progress, reminders'    },
 ]
 
 const LOGIN_HEADINGS = [
@@ -282,7 +282,7 @@ export function Login() {
           padding:   '52px 56px',
           position:  'relative',
           overflow:  'hidden',
-          background: 'linear-gradient(155deg, rgba(22,18,48,0.98) 0%, rgba(8,10,22,1) 60%, rgba(14,10,32,0.97) 100%)',
+          background: 'linear-gradient(155deg, #1d100f 0%, #0d0d1a 55%, #1a0d0c 100%)',
         }}
       >
         {/* Diagonal clip — gives a slight angled edge on the right side */}
@@ -308,7 +308,7 @@ export function Login() {
         {/* XP bar texture — subtle horizontal lines */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(245,166,35,0.025) 28px, rgba(245,166,35,0.025) 29px)',
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(229,68,63,0.025) 28px, rgba(229,68,63,0.025) 29px)',
         }} />
 
         {/* Scanline sweep */}
@@ -324,7 +324,7 @@ export function Login() {
 
         {/* Feature grid */}
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', fontWeight: 700, marginBottom: 20 }}>
+          <p style={{ color: 'rgba(243,239,230,0.45)', fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', fontWeight: 700, marginBottom: 20 }}>
             Everything you track
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 32px', marginBottom: 32 }}>
@@ -339,8 +339,8 @@ export function Login() {
               >
                 <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{f.icon}</span>
                 <span>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.2 }}>{f.label}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 10, margin: '2px 0 0', lineHeight: 1 }}>{f.sub}</p>
+                  <p style={{ color: 'rgba(243,239,230,0.85)', fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.2 }}>{f.label}</p>
+                  <p style={{ color: 'rgba(243,239,230,0.4)', fontSize: 10, margin: '2px 0 0', lineHeight: 1 }}>{f.sub}</p>
                 </span>
               </div>
             ))}
@@ -349,16 +349,16 @@ export function Login() {
           {/* Rotating quote */}
           <div style={{
             padding: '18px 22px', borderRadius: 14,
-            background: 'rgba(245,166,35,0.05)',
-            border: '1px solid rgba(245,166,35,0.15)',
+            background: 'rgba(229,68,63,0.06)',
+            border: '1px solid rgba(229,68,63,0.18)',
             textAlign: 'center',
             transition: 'opacity 0.3s ease',
             opacity: quoteFade ? 1 : 0,
             marginBottom: 24,
           }}>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 14, fontStyle: 'italic', lineHeight: 1.7, margin: 0 }}>
+            <p style={{ color: 'rgba(243,239,230,0.75)', fontSize: 14, fontStyle: 'italic', lineHeight: 1.7, margin: 0 }}>
               "{quote.text}{' '}
-              <span style={{ color: 'var(--accent)', fontWeight: 700, fontStyle: 'normal' }}>{quote.highlight}</span>"
+              <span style={{ color: 'var(--color-coral)', fontWeight: 700, fontStyle: 'normal' }}>{quote.highlight}</span>"
             </p>
           </div>
 
@@ -374,15 +374,15 @@ export function Login() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>
+                <p style={{ margin: 0, color: 'rgba(243,239,230,0.85)', fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>
                   {DEMO_EVENTS[demoIdx].label}
                 </p>
-                <p style={{ margin: '2px 0 0', color: 'var(--text-muted)', fontSize: 11, lineHeight: 1 }}>
+                <p style={{ margin: '2px 0 0', color: 'rgba(243,239,230,0.45)', fontSize: 11, lineHeight: 1 }}>
                   {DEMO_EVENTS[demoIdx].detail}
                 </p>
               </div>
               <span style={{
-                color: 'var(--accent)',
+                color: 'var(--color-coral)',
                 fontSize: 15, fontWeight: 700, letterSpacing: '0.02em', flexShrink: 0, marginLeft: 12,
               }}>
                 {DEMO_EVENTS[demoIdx].xp}
@@ -391,7 +391,7 @@ export function Login() {
           </div>
 
           {/* Social proof */}
-          <p style={{ color: 'var(--text-muted)', fontSize: 11, textAlign: 'center', letterSpacing: '0.06em' }}>
+          <p style={{ color: 'rgba(243,239,230,0.35)', fontSize: 11, textAlign: 'center', letterSpacing: '0.06em' }}>
             All your personal data. Yours forever.
           </p>
         </div>
@@ -402,30 +402,30 @@ export function Login() {
             {/* Mini level ring */}
             <div style={{ position: 'relative', width: 48, height: 48, flexShrink: 0 }}>
               <svg width="48" height="48" style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}>
-                <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(245,166,35,0.15)" strokeWidth="3" />
-                <circle cx="24" cy="24" r="20" fill="none" stroke="var(--accent)" strokeWidth="3"
+                <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(229,68,63,0.2)" strokeWidth="3" />
+                <circle cx="24" cy="24" r="20" fill="none" stroke="var(--color-coral)" strokeWidth="3"
                   strokeDasharray="125.6" strokeDashoffset="113" strokeLinecap="round" />
               </svg>
               <span style={{
                 position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--accent)', fontSize: 18, fontWeight: 700,
+                color: 'var(--color-coral)', fontSize: 18, fontWeight: 700,
               }}>1</span>
             </div>
             <div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 13, fontWeight: 600, margin: 0 }}>Everyone starts at Level 1.</p>
-              <p style={{ color: 'var(--text-muted)', fontSize: 12, margin: '3px 0 0' }}>Where you go is up to you.</p>
+              <p style={{ color: 'rgba(243,239,230,0.85)', fontSize: 13, fontWeight: 600, margin: 0 }}>Everyone starts at Level 1.</p>
+              <p style={{ color: 'rgba(243,239,230,0.45)', fontSize: 12, margin: '3px 0 0' }}>Where you go is up to you.</p>
             </div>
           </div>
           <button
             onClick={() => switchMode('signup')}
             style={{
-              width: '100%', padding: '10px 0', borderRadius: 10, border: '1px solid rgba(245,166,35,0.3)',
-              background: 'rgba(245,166,35,0.07)', color: 'var(--accent)', fontSize: 13, fontWeight: 700,
+              width: '100%', padding: '10px 0', borderRadius: 10, border: '1px solid rgba(229,68,63,0.35)',
+              background: 'rgba(229,68,63,0.08)', color: 'var(--color-coral)', fontSize: 13, fontWeight: 700,
               cursor: 'pointer', letterSpacing: '0.04em',
               transition: 'background 0.15s ease',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,166,35,0.13)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,166,35,0.07)')}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(229,68,63,0.16)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(229,68,63,0.08)')}
           >
             Join today — it's free
           </button>
@@ -709,13 +709,13 @@ export function Login() {
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 9,
                   padding: '10px 14px', borderRadius: 10,
-                  background: 'rgba(245,158,11,0.10)',
-                  border: '1px solid rgba(245,158,11,0.25)',
+                  background: 'rgba(229,68,63,0.08)',
+                  border: '1px solid rgba(229,68,63,0.22)',
                 }}>
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#f59e0b" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="var(--color-coral)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                     <rect x="5" y="9" width="10" height="8" rx="1.5" /><path d="M7 9V6a3 3 0 0 1 6 0v3" />
                   </svg>
-                  <p style={{ color: '#f59e0b', fontSize: 13, margin: 0 }}>
+                  <p style={{ color: 'var(--color-coral)', fontSize: 13, margin: 0 }}>
                     Too many attempts. Try again in {Math.max(0, Math.ceil((lockedUntil - Date.now()) / 1000))}s.
                     {/* lockTick used to trigger re-render each second */}
                     <span style={{ display: 'none' }}>{lockTick}</span>
@@ -728,11 +728,11 @@ export function Login() {
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 9,
                   padding: '10px 14px', borderRadius: 10,
-                  background: 'rgba(233,69,96,0.10)',
-                  border: '1px solid rgba(233,69,96,0.22)',
+                  background: 'rgba(229,68,63,0.08)',
+                  border: '1px solid rgba(229,68,63,0.22)',
                 }}>
                   <WarningIcon />
-                  <p style={{ color: '#E94560', fontSize: 13, margin: 0 }}>
+                  <p style={{ color: 'var(--color-coral)', fontSize: 13, margin: 0 }}>
                     {errors.password?.message ?? error}
                   </p>
                 </div>
@@ -853,10 +853,10 @@ function EyeIcon({ open }: { open: boolean }) {
 
 function WarningIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#E94560" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="var(--color-coral)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
       <path d="M10 2L1.5 17h17L10 2Z" />
       <path d="M10 8v4" />
-      <circle cx="10" cy="14.5" r="0.75" fill="#E94560" stroke="none" />
+      <circle cx="10" cy="14.5" r="0.75" fill="var(--color-coral)" stroke="none" />
     </svg>
   )
 }

@@ -47,6 +47,24 @@ export function setLightMode(on: boolean) {
 
 export const THEMES: Theme[] = [
 
+  // ── YouXP Brand ───────────────────────────────────────────────────
+  {
+    id: 'coral',
+    name: 'Coral',
+    emoji: 'Coral',
+    accent: '#e5443f',
+    lightAccent: '#c0302b',
+    accentDim: 'rgba(229,68,63,0.2)',
+    orb1: 'rgba(229,68,63,0.22)',
+    orb2: 'rgba(160,40,20,0.16)',
+    orb3: 'rgba(229,68,63,0.06)',
+    cardBg: 'rgba(26,8,6,0.75)',
+    navBg: 'rgba(14,4,3,0.96)',
+    baseBg: '#1a0806',
+    bgMid: '#220a07',
+    bgDeep: '#130504',
+  },
+
   // ── Reds & Pinks ──────────────────────────────────────────────────
   {
     id: 'crimson',
@@ -816,18 +834,18 @@ export function applyTheme(theme: Theme, light = isLightMode()) {
     r.style.setProperty('--accent-dim',    hexToRgba(la, 0.14))
     r.style.setProperty('--accent-subtle', hexToRgba(la, 0.08))
     r.style.setProperty('--accent-tint',   hexToRgba(la, 0.05))
-    // Surfaces (new tokens)
-    r.style.setProperty('--surface-0', '#f5f5f7')
+    // Surfaces (new tokens) — warm Paper base per brand
+    r.style.setProperty('--surface-0', '#f3efe6')
     r.style.setProperty('--surface-1', '#ffffff')
-    r.style.setProperty('--surface-2', '#f0f0f5')
+    r.style.setProperty('--surface-2', '#ede8df')
     r.style.setProperty('--surface-3', '#ffffff')
     // Legacy aliases (still used by many components)
     r.style.setProperty('--card-bg',     '#ffffff')
     r.style.setProperty('--nav-bg',      '#ffffff')
-    r.style.setProperty('--base-bg',     '#f5f5f7')
-    r.style.setProperty('--bg-mid',      '#f0f0f5')
-    r.style.setProperty('--bg-deep',     '#eaeaed')
-    r.style.setProperty('--input-bg',    '#f0f0f5')
+    r.style.setProperty('--base-bg',     '#f3efe6')
+    r.style.setProperty('--bg-mid',      '#ede8df')
+    r.style.setProperty('--bg-deep',     '#e6e0d6')
+    r.style.setProperty('--input-bg',    '#ede8df')
     r.style.setProperty('--card-shadow', '0 1px 3px rgba(0,0,0,0.07), 0 2px 8px rgba(0,0,0,0.06)')
     r.style.setProperty('--orb1', 'transparent')
     r.style.setProperty('--orb2', 'transparent')
@@ -862,8 +880,8 @@ export function applyTheme(theme: Theme, light = isLightMode()) {
 
 export function loadTheme(): Theme {
   const saved = localStorage.getItem('youxp-theme')
-  // Default theme: cobalt (deep blue) looks great in both light and dark
-  return THEMES.find((t) => t.id === saved) ?? THEMES.find((t) => t.id === 'cobalt') ?? THEMES[0]
+  // Default theme: coral (YouXP brand color)
+  return THEMES.find((t) => t.id === saved) ?? THEMES.find((t) => t.id === 'coral') ?? THEMES[0]
 }
 
 // ── Time-of-day auto theme ─────────────────────────────────────

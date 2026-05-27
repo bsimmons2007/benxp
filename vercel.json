@@ -1,4 +1,5 @@
 {
+  "github": { "silent": true },
   "buildCommand": "vite build",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
