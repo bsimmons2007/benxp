@@ -9,6 +9,11 @@ import { initSentry } from './lib/sentry'
 
 initSentry()
 
+// Auto-reload on stale chunk errors (old bundle hash after a new deploy)
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload()
+})
+
 // Strip non-numeric characters (keep digits, minus, dot) when pasting into number inputs
 document.addEventListener('paste', (e) => {
   const target = e.target as HTMLInputElement
