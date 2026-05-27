@@ -86,22 +86,22 @@ function ChallengeCard({
     >
       {/* Header row */}
       <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
+        <div className="flex-1">
+          <p className="font-semibold text-sm leading-snug mb-1.5" style={{ color: 'var(--text-primary)' }}>
+            {challenge.challenge_name}
+          </p>
+          <div className="flex items-center gap-1.5 flex-wrap">
             {challenge.category && <Badge label={challenge.category} />}
             <span className="text-xs font-mono font-semibold" style={{ color: accentColor }}>
               +{challenge.xp_reward} XP
             </span>
             {isClaimed && (
-              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Claimed</span>
+              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>· Claimed</span>
             )}
             {isDone && !isClaimed && (
-              <span className="text-xs font-semibold" style={{ color: accentColor }}>Complete!</span>
+              <span className="text-xs font-semibold" style={{ color: accentColor }}>· Done!</span>
             )}
           </div>
-          <p className="font-semibold text-sm leading-snug" style={{ color: 'var(--text-primary)' }}>
-            {challenge.challenge_name}
-          </p>
         </div>
 
         {!isClaimed && (
@@ -239,19 +239,19 @@ function BossCard({ challenge }: { challenge: Challenge }) {
           >
             <SwordIcon size={17} color={BOSS_COLOR} />
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
+          <div className="flex-1">
+            <p className="font-semibold text-sm leading-snug mb-1.5" style={{ color: 'var(--text-primary)' }}>
+              {challenge.challenge_name}
+            </p>
+            <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-xs font-mono font-bold" style={{ color: BOSS_COLOR }}>
                 +{challenge.xp_reward} XP
               </span>
               {challenge.category && <Badge label={challenge.category} />}
               {isDone && (
-                <span className="text-xs font-semibold" style={{ color: BOSS_COLOR }}>Complete!</span>
+                <span className="text-xs font-semibold" style={{ color: BOSS_COLOR }}>· Conquered</span>
               )}
             </div>
-            <p className="font-semibold text-sm leading-snug" style={{ color: 'var(--text-primary)' }}>
-              {challenge.challenge_name}
-            </p>
           </div>
         </div>
 
@@ -666,7 +666,7 @@ export function Challenges() {
                     <div className="flex items-center gap-2">
                       <TrophyIcon size={17} color={BOSS_COLOR} />
                       <h2 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>
-                        Boss Challenges
+                        Boss Quests
                       </h2>
                     </div>
                     <span className="text-xs font-mono" style={{ color: BOSS_COLOR }}>
@@ -674,7 +674,7 @@ export function Challenges() {
                     </span>
                   </div>
                   <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-                    Long-haul milestones · Resets each January
+                    Epic long-haul quests · Resets each January
                   </p>
                 </div>
 
