@@ -17,7 +17,7 @@ export function Badge({ label, color }: BadgeProps) {
   return (
     <span
       className="text-xs font-semibold px-2 py-1 rounded-full"
-      style={{ background: bg, color: 'var(--text-primary)' }}
+      style={{ background: bg, color: 'var(--text-primary)', whiteSpace: 'nowrap', flexShrink: 0 }}
     >
       {label}
     </span>

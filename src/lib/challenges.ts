@@ -613,9 +613,29 @@ export async function syncBossChallenges(supabase: SupabaseClient, userId: strin
     .lt('created_at', sy + 'T00:00:00')
 
   const { data: all } = await supabase.from('challenges').select('*').eq('user_id', userId)
-  const rows = (all ?? []) as { id: string; tier: string; notes: string | null; status: string; completed_at: string | null; target: string | null }[]
+  const rows = (all ?? []) as { id: string; tier: string; notes: string | null; status: string; completed_at: string | null; target: string | null; created_at: string }[]
 
-  const activeBossKeys = new Set(rows.filter(c => c.tier === 'Boss' && c.status === 'active').map(c => c.notes))
+  // Deduplicate: if multiple active boss challenges share the same notes key, keep the newest, expire the rest
+  const activeBoss = rows.filter(c => c.tier === 'Boss' && c.status === 'active')
+  const seenBossKeys = new Set<string>()
+  const dupIds: string[] = []
+  for (const c of [...activeBoss].sort((a, b) => b.created_at.localeCompare(a.created_at))) {
+    const key = c.notes ?? ''
+    if (seenBossKeys.has(key)) {
+      dupIds.push(c.id)
+    } else {
+      seenBossKeys.add(key)
+    }
+  }
+  if (dupIds.length > 0) {
+    await supabase.from('challenges').update({ status: 'expired' }).in('id', dupIds)
+  }
+
+  const activeBossKeys = new Set(
+    rows
+      .filter(c => c.tier === 'Boss' && c.status === 'active' && !dupIds.includes(c.id))
+      .map(c => c.notes)
+  )
   for (const key of Object.keys(BOSS_CONFIGS) as BossKey[]) {
     if (activeBossKeys.has(key)) continue
 
