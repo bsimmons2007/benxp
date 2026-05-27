@@ -23,6 +23,7 @@ A personal life-tracking PWA for one user (Ben). Everything real-life earns XP �
 
 **GitHub**: https://github.com/bsimmons2007/benxp  
 - `main` → production  
+- **Deploy workflow**: push directly to `main` — no branches, no PRs. Vercel auto-deploys on every push. Solo personal app.  
 - `dev` → staging / in-progress
 
 ---
