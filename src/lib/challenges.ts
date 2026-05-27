@@ -37,6 +37,16 @@ export function daysUntilMonthEnd(): number {
   return last.getDate() - now.getDate()
 }
 
+export function startOfYearDate(): string {
+  return `${new Date().getFullYear()}-01-01`
+}
+
+export function daysUntilYearEnd(): number {
+  const now = new Date()
+  const yearEnd = new Date(now.getFullYear(), 11, 31)
+  return Math.max(0, Math.round((yearEnd.getTime() - now.getTime()) / (24 * 60 * 60 * 1000)))
+}
+
 export function getWeekKey(): string {
   const d = new Date()
   const jan1 = new Date(d.getFullYear(), 0, 1)
@@ -593,6 +603,15 @@ function bossXP(key: BossKey, target: number): number {
 }
 
 export async function syncBossChallenges(supabase: SupabaseClient, userId: string): Promise<void> {
+  // Expire boss challenges that started before this calendar year
+  const sy = startOfYearDate()
+  await supabase.from('challenges')
+    .update({ status: 'expired' })
+    .eq('user_id', userId)
+    .eq('tier', 'Boss')
+    .eq('status', 'active')
+    .lt('created_at', sy + 'T00:00:00')
+
   const { data: all } = await supabase.from('challenges').select('*').eq('user_id', userId)
   const rows = (all ?? []) as { id: string; tier: string; notes: string | null; status: string; completed_at: string | null; target: string | null }[]
 

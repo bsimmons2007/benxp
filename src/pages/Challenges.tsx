@@ -14,14 +14,21 @@ import {
   getRerollsRemaining,
   nextMondayLabel,
   daysUntilMonthEnd,
+  daysUntilYearEnd,
   syncBossChallenges,
   getBossProgress,
 } from '../lib/challenges'
 import { playGoalComplete } from '../lib/sounds'
 import type { Challenge } from '../types'
 import type { TutorialStep } from '../lib/challenges'
-import { CheckIcon, ZapIcon, RefreshCwIcon, SwordIcon } from '../components/ui/Icon'
+import { CheckIcon, ZapIcon, RefreshCwIcon, SwordIcon, TrophyIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
+
+// ── Tier color constants ───────────────────────────────────────────
+
+const WEEKLY_COLOR  = 'var(--accent)'
+const MONTHLY_COLOR = '#7c3aed'
+const BOSS_COLOR    = '#f5a623'
 
 // ── Skeleton ───────────────────────────────────────────────────────
 
@@ -39,7 +46,7 @@ function LoadingSkeleton() {
   )
 }
 
-// ── Challenge card ─────────────────────────────────────────────────
+// ── Challenge card (Weekly / Monthly) ─────────────────────────────
 
 interface ChallengeCardProps {
   challenge: Challenge
@@ -61,13 +68,11 @@ function ChallengeCard({
   onReroll,
 }: ChallengeCardProps) {
   const [showRerollConfirm, setShowRerollConfirm] = useState(false)
-  const isClaimed  = challenge.status === 'claimed'
-  const target     = parseFloat(challenge.target ?? '1') || 1
-  const pct        = Math.min((progress / target) * 100, 100)
-  const isDone     = pct >= 100
+  const isClaimed   = challenge.status === 'claimed'
+  const target      = parseFloat(challenge.target ?? '1') || 1
+  const pct         = Math.min((progress / target) * 100, 100)
+  const isDone      = pct >= 100
   const templateKey = challenge.notes ?? ''
-
-  const progressLabel = isDone ? 'Complete!' : 'Progress'
 
   return (
     <div
@@ -84,28 +89,21 @@ function ChallengeCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
             {challenge.category && <Badge label={challenge.category} />}
-            <span
-              className="text-xs font-mono font-semibold"
-              style={{ color: accentColor }}
-            >
+            <span className="text-xs font-mono font-semibold" style={{ color: accentColor }}>
               +{challenge.xp_reward} XP
             </span>
             {isClaimed && (
-              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                Claimed
-              </span>
+              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Claimed</span>
             )}
             {isDone && !isClaimed && (
-              <span className="text-xs font-semibold" style={{ color: accentColor }}>
-                Complete!
-              </span>
+              <span className="text-xs font-semibold" style={{ color: accentColor }}>Complete!</span>
             )}
           </div>
           <p className="font-semibold text-sm leading-snug" style={{ color: 'var(--text-primary)' }}>
             {challenge.challenge_name}
           </p>
         </div>
-        {/* Reroll button */}
+
         {!isClaimed && (
           <button
             onClick={() => setShowRerollConfirm(true)}
@@ -129,33 +127,25 @@ function ChallengeCard({
         <div className="mt-3">
           <div className="flex justify-between mb-1">
             <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-              {progressLabel}
+              {isDone ? 'Complete!' : 'Progress'}
             </span>
-            <span
-              className="text-xs font-mono"
-              style={{ color: isDone ? accentColor : 'var(--text-secondary)' }}
-            >
+            <span className="text-xs font-mono" style={{ color: isDone ? accentColor : 'var(--text-secondary)' }}>
               {progress} / {target}
             </span>
           </div>
-          <div
-            className="w-full rounded-full overflow-hidden"
-            style={{ height: 4, background: 'var(--surface-2)' }}
-          >
+          <div className="w-full rounded-full overflow-hidden" style={{ height: 4, background: 'var(--surface-2)' }}>
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${pct}%`,
-                background: isDone
-                  ? accentColor
-                  : `linear-gradient(90deg, ${accentColor}88, ${accentColor})`,
+                background: isDone ? accentColor : `linear-gradient(90deg, ${accentColor}88, ${accentColor})`,
               }}
             />
           </div>
         </div>
       )}
 
-      {/* Footer row */}
+      {/* Footer */}
       <div className="flex items-center justify-between mt-3">
         <span className="text-xs font-mono" style={{ color: 'var(--text-secondary)' }}>
           {resetLabel}
@@ -169,9 +159,7 @@ function ChallengeCard({
             Claim {challenge.xp_reward} XP
           </button>
         ) : !isClaimed ? (
-          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-            Complete to claim
-          </span>
+          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Complete to claim</span>
         ) : (
           <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
             <CheckIcon size={12} /> Claimed
@@ -212,68 +200,104 @@ function ChallengeCard({
 
 function BossCard({ challenge }: { challenge: Challenge }) {
   const [progress, setProgress] = useState<{ current: number; target: number } | null>(null)
-  const poolKey = challenge.notes ?? ''
-  const targetValue = parseFloat(challenge.target ?? '0')
+  const poolKey    = challenge.notes ?? ''
+  const targetVal  = parseFloat(challenge.target ?? '0')
+  const daysLeft   = daysUntilYearEnd()
 
   useEffect(() => {
-    if (!poolKey || !targetValue) return
+    if (!poolKey || !targetVal) return
     let cancelled = false
-    getBossProgress(supabase, poolKey, targetValue).then(r => { if (!cancelled) setProgress(r) })
+    getBossProgress(supabase, poolKey, targetVal).then(r => { if (!cancelled) setProgress(r) })
     return () => { cancelled = true }
-  }, [poolKey, targetValue])
+  }, [poolKey, targetVal])
 
   const pct    = progress ? Math.min((progress.current / progress.target) * 100, 100) : null
   const isDone = pct !== null && pct >= 100
 
+  // Adapt progress label to boss type
+  const progressLabel = poolKey === 'boss_skate' ? 'Total Miles' : 'Best 1RM'
+  const unit          = poolKey === 'boss_skate' ? 'mi' : 'lbs'
+
   return (
     <div
-      className="mb-3 rounded-xl p-4 transition-all"
+      className="mb-3 rounded-xl overflow-hidden transition-all"
       style={{
         background: 'var(--surface-1)',
-        border: `1px solid ${isDone ? 'var(--accent)' : 'var(--border)'}`,
-        boxShadow: isDone ? '0 0 16px var(--accent)22' : 'none',
+        border: `1px solid ${isDone ? BOSS_COLOR + '88' : 'var(--border)'}`,
+        boxShadow: isDone ? `0 0 20px ${BOSS_COLOR}28` : 'none',
       }}
     >
-      <div className="flex items-start gap-3 mb-2">
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: 'var(--accent)', color: 'var(--surface-0)' }}
-        >
-          <SwordIcon size={16} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <Badge label={challenge.category ?? 'Boss'} />
-            <span className="text-xs font-mono font-semibold" style={{ color: 'var(--accent)' }}>
-              +{challenge.xp_reward} XP
-            </span>
+      {/* Top accent strip */}
+      <div style={{ height: 3, background: `linear-gradient(90deg, ${BOSS_COLOR}55, ${BOSS_COLOR})` }} />
+
+      <div className="p-4">
+        {/* Header */}
+        <div className="flex items-start gap-3 mb-3">
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: `${BOSS_COLOR}1a`, border: `1px solid ${BOSS_COLOR}44` }}
+          >
+            <SwordIcon size={17} color={BOSS_COLOR} />
           </div>
-          <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
-            {challenge.challenge_name}
-          </p>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="text-xs font-mono font-bold" style={{ color: BOSS_COLOR }}>
+                +{challenge.xp_reward} XP
+              </span>
+              {challenge.category && <Badge label={challenge.category} />}
+              {isDone && (
+                <span className="text-xs font-semibold" style={{ color: BOSS_COLOR }}>Complete!</span>
+              )}
+            </div>
+            <p className="font-semibold text-sm leading-snug" style={{ color: 'var(--text-primary)' }}>
+              {challenge.challenge_name}
+            </p>
+          </div>
+        </div>
+
+        {/* Progress */}
+        {progress && (
+          <div className="mb-3">
+            <div className="flex justify-between mb-1.5">
+              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{progressLabel}</span>
+              <span className="text-xs font-mono" style={{ color: isDone ? BOSS_COLOR : 'var(--text-secondary)' }}>
+                {progress.current} {unit} / {progress.target} {unit}
+              </span>
+            </div>
+            <div className="w-full rounded-full overflow-hidden" style={{ height: 5, background: 'var(--surface-2)' }}>
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{
+                  width: `${pct ?? 0}%`,
+                  background: isDone
+                    ? BOSS_COLOR
+                    : `linear-gradient(90deg, ${BOSS_COLOR}55, ${BOSS_COLOR})`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-mono" style={{ color: 'var(--text-secondary)' }}>
+            Resets Jan 1 · {daysLeft} day{daysLeft === 1 ? '' : 's'} left
+          </span>
+          {isDone && (
+            <span
+              className="text-xs font-semibold px-2 py-0.5 rounded-full"
+              style={{ background: `${BOSS_COLOR}22`, color: BOSS_COLOR }}
+            >
+              Conquered
+            </span>
+          )}
         </div>
       </div>
-      {progress && (
-        <div className="mt-2">
-          <div className="flex justify-between mb-1">
-            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Current 1RM</span>
-            <span className="text-xs font-mono" style={{ color: isDone ? 'var(--accent)' : 'var(--text-secondary)' }}>
-              {progress.current} / {progress.target}
-            </span>
-          </div>
-          <div className="w-full rounded-full overflow-hidden" style={{ height: 4, background: 'var(--surface-2)' }}>
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${pct ?? 0}%`, background: 'var(--accent)' }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   )
 }
 
-// ── Section component ─────────────────────────────────────────────
+// ── Weekly / Monthly section ──────────────────────────────────────
 
 interface ChallengesSectionProps {
   label: string
@@ -303,25 +327,24 @@ function ChallengesSection({
 
   const claimableCount = active.filter(c => {
     const target = parseFloat(c.target ?? '1') || 1
-    const prog   = progressMap[c.id] ?? 0
-    return prog >= target
+    return (progressMap[c.id] ?? 0) >= target
   }).length
 
   if (challenges.length === 0) return null
 
   return (
     <section className="mb-6">
-      {/* Header */}
+      {/* Section header */}
       <div className="flex items-center justify-between mb-3">
         <div>
           <h2 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>
             {label} Quests
           </h2>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-xs mt-0.5 font-mono" style={{ color: 'var(--text-secondary)' }}>
             {resetLabel}
             {' · '}
             <span style={{ color: rerolls > 0 ? accentColor : 'var(--text-secondary)' }}>
-              {rerolls > 0 ? `${rerolls} rerolls left` : 'No rerolls left'}
+              {rerolls > 0 ? `${rerolls} reroll${rerolls === 1 ? '' : 's'} left` : 'No rerolls'}
             </span>
           </p>
         </div>
@@ -336,7 +359,7 @@ function ChallengesSection({
         )}
       </div>
 
-      {/* Progress pills */}
+      {/* Overall progress bar */}
       <div className="flex items-center gap-2 mb-3">
         <div className="flex-1 rounded-full overflow-hidden" style={{ height: 4, background: 'var(--surface-2)' }}>
           <div
@@ -352,7 +375,6 @@ function ChallengesSection({
         </span>
       </div>
 
-      {/* Active challenges */}
       {active.map(c => (
         <ChallengeCard
           key={c.id}
@@ -366,10 +388,12 @@ function ChallengesSection({
         />
       ))}
 
-      {/* Claimed challenges */}
       {claimed.length > 0 && (
         <>
-          <p className="text-xs font-semibold uppercase tracking-wide mb-2 mt-1" style={{ color: 'var(--text-secondary)', letterSpacing: '0.08em' }}>
+          <p
+            className="text-xs font-semibold uppercase tracking-wide mb-2 mt-1"
+            style={{ color: 'var(--text-secondary)', letterSpacing: '0.08em' }}
+          >
             Claimed
           </p>
           {claimed.map(c => (
@@ -406,7 +430,6 @@ function TutorialSection({ steps, onRefresh }: { steps: TutorialStep[]; onRefres
 
   return (
     <div>
-      {/* Header */}
       <div
         className="rounded-xl p-4 mb-4"
         style={{
@@ -445,7 +468,6 @@ function TutorialSection({ steps, onRefresh }: { steps: TutorialStep[]; onRefres
         )}
       </div>
 
-      {/* Steps */}
       {steps.map(step => (
         <Link
           key={step.key}
@@ -488,13 +510,13 @@ function TutorialSection({ steps, onRefresh }: { steps: TutorialStep[]; onRefres
 export function Challenges() {
   usePageTitle('Quests')
 
-  const [loading, setLoading]                   = useState(true)
-  const [challenges, setChallenges]             = useState<Challenge[]>([])
-  const [progressMap, setProgressMap]           = useState<Record<string, number>>({})
-  const [tutorialMode, setTutorialMode]         = useState(false)
-  const [tutorialSteps, setTutorialSteps]       = useState<TutorialStep[]>([])
-  const [weeklyRerolls, setWeeklyRerolls]       = useState(3)
-  const [monthlyRerolls, setMonthlyRerolls]     = useState(3)
+  const [loading, setLoading]             = useState(true)
+  const [challenges, setChallenges]       = useState<Challenge[]>([])
+  const [progressMap, setProgressMap]     = useState<Record<string, number>>({})
+  const [tutorialMode, setTutorialMode]   = useState(false)
+  const [tutorialSteps, setTutorialSteps] = useState<TutorialStep[]>([])
+  const [weeklyRerolls, setWeeklyRerolls] = useState(3)
+  const [monthlyRerolls, setMonthlyRerolls] = useState(3)
 
   const refreshXP = useStore(s => s.refreshXP)
 
@@ -519,7 +541,7 @@ export function Challenges() {
       setWeeklyRerolls(getRerollsRemaining('weekly'))
       setMonthlyRerolls(getRerollsRemaining('monthly'))
 
-      // Fetch progress for all active weekly/monthly challenges in parallel
+      // Fetch progress for active weekly/monthly challenges in parallel
       const active = rows.filter(c => c.status === 'active' && (c.tier === 'Weekly' || c.tier === 'Monthly') && c.notes)
       const entries = await Promise.all(
         active.map(async c => {
@@ -529,7 +551,6 @@ export function Challenges() {
       )
       setProgressMap(Object.fromEntries(entries))
 
-      // Tutorial mode
       const tutorial = await isTutorialMode(supabase)
       setTutorialMode(tutorial)
       if (tutorial) {
@@ -546,8 +567,7 @@ export function Challenges() {
   useEffect(() => { load() }, [])
 
   async function handleClaim(id: string, xp: number) {
-    await supabase
-      .from('challenges')
+    await supabase.from('challenges')
       .update({ status: 'claimed', completed_at: new Date().toISOString() })
       .eq('id', id)
     playGoalComplete()
@@ -558,13 +578,14 @@ export function Challenges() {
   async function handleClaimAll(tierChallenges: Challenge[]) {
     const claimable = tierChallenges.filter(c => {
       const target = parseFloat(c.target ?? '1') || 1
-      const prog   = progressMap[c.id] ?? 0
-      return c.status === 'active' && prog >= target
+      return c.status === 'active' && (progressMap[c.id] ?? 0) >= target
     })
     if (claimable.length === 0) return
     await Promise.all(
       claimable.map(c =>
-        supabase.from('challenges').update({ status: 'claimed', completed_at: new Date().toISOString() }).eq('id', c.id)
+        supabase.from('challenges')
+          .update({ status: 'claimed', completed_at: new Date().toISOString() })
+          .eq('id', c.id)
       )
     )
     playGoalComplete()
@@ -588,8 +609,7 @@ export function Challenges() {
   const boss    = challenges.filter(c => c.tier === 'Boss')
 
   const monthResetLabel = `Resets in ${daysUntilMonthEnd()} day${daysUntilMonthEnd() === 1 ? '' : 's'}`
-
-  const hasAnyContent = !tutorialMode && (weekly.length > 0 || monthly.length > 0 || boss.length > 0)
+  const hasAnyContent   = !tutorialMode && (weekly.length > 0 || monthly.length > 0 || boss.length > 0)
 
   return (
     <>
@@ -609,7 +629,7 @@ export function Challenges() {
 
             <ChallengesSection
               label="Weekly"
-              accentColor="var(--accent)"
+              accentColor={WEEKLY_COLOR}
               resetLabel={nextMondayLabel()}
               rerolls={weeklyRerolls}
               challenges={weekly}
@@ -621,7 +641,7 @@ export function Challenges() {
 
             <ChallengesSection
               label="Monthly"
-              accentColor="#7c3aed"
+              accentColor={MONTHLY_COLOR}
               resetLabel={monthResetLabel}
               rerolls={monthlyRerolls}
               challenges={monthly}
@@ -631,14 +651,33 @@ export function Challenges() {
               onClaimAll={() => handleClaimAll(monthly)}
             />
 
+            {/* Boss section — yearly, long-haul challenges */}
             {boss.length > 0 && (
               <section className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <SwordIcon size={16} color="var(--accent)" />
-                  <h2 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>
-                    Boss Challenges
-                  </h2>
+                {/* Boss header */}
+                <div
+                  className="rounded-xl px-4 py-3 mb-3"
+                  style={{
+                    background: `linear-gradient(135deg, ${BOSS_COLOR}14, ${BOSS_COLOR}05)`,
+                    border: `1px solid ${BOSS_COLOR}33`,
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <TrophyIcon size={17} color={BOSS_COLOR} />
+                      <h2 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>
+                        Boss Challenges
+                      </h2>
+                    </div>
+                    <span className="text-xs font-mono" style={{ color: BOSS_COLOR }}>
+                      {daysUntilYearEnd()} days left
+                    </span>
+                  </div>
+                  <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                    Long-haul milestones · Resets each January
+                  </p>
                 </div>
+
                 {boss.map(c => <BossCard key={c.id} challenge={c} />)}
               </section>
             )}
