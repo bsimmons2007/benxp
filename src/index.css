@@ -4,10 +4,10 @@
    DESIGN TOKENS  (light mode = default)
 ───────────────────────────────────────────────────────────── */
 :root {
-  /* Surfaces */
-  --surface-0: #f5f5f7;   /* page background   */
+  /* Surfaces — warm Paper base (YouXP brand) */
+  --surface-0: #f3efe6;   /* page background   */
   --surface-1: #ffffff;   /* card              */
-  --surface-2: #f0f0f5;   /* raised / input bg */
+  --surface-2: #ede8df;   /* raised / input bg */
   --surface-3: #ffffff;   /* overlay / modal   */
 
   /* Text */
