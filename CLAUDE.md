@@ -290,21 +290,14 @@ pool_games
 
 ---
 
-## Response format
-Only include a status footer when code has been built and pushed in that response:
-- Changes pushed but not yet merged: `(Merged n)`
-- After merging + Vercel check completes: `(Merged y · Vercel: [status])`
-  where status is the `conclusion` field from `get_check_runs` (e.g. `success`, `failure`, `timed_out`)
-- Pure conversation responses with no code changes: no footer needed
+## Deploy workflow
+Push directly to `main`. No PRs, no status reports, no footer needed.
 
-## Merge workflow (PR-based — required for Vercel status checks)
-Never push directly to `main`. Always:
-1. Commit changes to a feature branch (use existing `claude/…` branch or create one)
-2. `git push -u origin <branch>`
-3. `mcp__github__create_pull_request` — head: feature branch, base: `main`
-4. `mcp__github__merge_pull_request` — merge_method: `squash`
-5. Poll `mcp__github__pull_request_read` → `get_check_runs` on the PR number until Vercel check is done
-6. Report footer with Vercel status
+```bash
+git add <files>
+git commit -m "..."
+git push origin main
+```
 
 ---
 
