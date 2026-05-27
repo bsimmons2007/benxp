@@ -9,7 +9,7 @@ import {
   Bike, Waves, Footprints, Search, Crown, Shield, Diamond, Rocket,
   Mountain, Snowflake, Terminal, Volleyball, Flag,
   Disc3, Sparkles, Grid3x3, Sun, Sprout, Bird,
-  Orbit, Crosshair, Radio, Table2,
+  Orbit, Crosshair, Radio, Table2, RefreshCw,
 } from 'lucide-react'
 
 export type IconProps = { size?: number; color?: string; style?: CSSProperties; className?: string }
@@ -80,6 +80,7 @@ export const HobbiesIcon     = adapt(Sparkles)
 export const SunIcon         = adapt(Sun)
 export const SproutIcon      = adapt(Sprout)
 export const BirdIcon        = adapt(Bird)
+export const RefreshCwIcon   = adapt(RefreshCw)
 
 // ── Map: section key → icon component ─────────────────────────
 

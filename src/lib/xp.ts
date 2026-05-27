@@ -243,7 +243,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     const winXP   = r.win ? (isBlitz ? XP_RATES.fortnite_blitz_win : XP_RATES.fortnite_win) : 0
     return s + winXP + ((r.kills ?? 0) * XP_RATES.fortnite_kill)
   }, 0)
-  const challengeXP = (challenges.data ?? []).filter((r: { status: string }) => r.status === 'completed').reduce((s: number, r: { xp_reward: number }) => s + (r.xp_reward ?? 0), 0)
+  const challengeXP = (challenges.data ?? []).filter((r: { status: string }) => r.status === 'completed' || r.status === 'claimed').reduce((s: number, r: { xp_reward: number }) => s + (r.xp_reward ?? 0), 0)
   const sleepXP     = (sleepLogs.data ?? []).reduce(
     (s: number, r: { hours_slept: number | null }) =>
       s + XP_RATES.sleep_log + ((r.hours_slept ?? 0) >= 7 ? XP_RATES.sleep_quality_bonus : 0),

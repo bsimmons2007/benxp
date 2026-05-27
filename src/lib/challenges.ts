@@ -1,62 +1,568 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import {
+  CHALLENGE_TEMPLATES, PROGRESS_FNS, SECTION_DISPLAY,
+  type ActivitySection, type UserStats, type ChallengeTemplate,
+} from './challengeTemplates'
 
-// ── Types ────────────────────────────────────────────────────────
+// ── Date helpers ──────────────────────────────────────────────────
 
-export interface ChallengeTemplate {
-  key: string
-  name: string
-  category: string
-  xp: number
-  targetValue: number
+export function startOfWeekDate(): string {
+  const d = new Date()
+  const day = d.getDay()
+  const diff = day === 0 ? -6 : 1 - day // Monday
+  d.setDate(d.getDate() + diff)
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, '0'),
+    String(d.getDate()).padStart(2, '0'),
+  ].join('-')
 }
 
-// ── Challenge Pools ──────────────────────────────────────────────
+export function startOfMonthDate(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+}
 
-export const WEEKLY_POOL: ChallengeTemplate[] = [
-  { key: 'gym_3x_week',       name: 'Hit the gym 3x this week',        category: 'Workout', xp: 60,  targetValue: 3  },
-  { key: 'gym_4x_week',       name: 'Hit the gym 4x this week',        category: 'Workout', xp: 90,  targetValue: 4  },
-  { key: 'gym_5x_week',       name: 'Hit the gym 5x this week',        category: 'Workout', xp: 130, targetValue: 5  },
-  { key: 'sets_10_week',      name: 'Log 10 sets this week',           category: 'Workout', xp: 50,  targetValue: 10 },
-  { key: 'sets_15_week',      name: 'Log 15 sets this week',           category: 'Workout', xp: 75,  targetValue: 15 },
-  { key: 'sets_20_week',      name: 'Log 20 sets this week',           category: 'Workout', xp: 110, targetValue: 20 },
-  { key: 'skate_2x_week',     name: 'Skate 2x this week',              category: 'Skate',   xp: 50,  targetValue: 2  },
-  { key: 'skate_3x_week',     name: 'Skate 3x this week',              category: 'Skate',   xp: 80,  targetValue: 3  },
-  { key: 'skate_5mi_week',    name: 'Skate 5+ miles this week',        category: 'Skate',   xp: 40,  targetValue: 5  },
-  { key: 'skate_10mi_week',   name: 'Skate 10+ miles this week',       category: 'Skate',   xp: 80,  targetValue: 10 },
-  { key: 'skate_20mi_week',   name: 'Skate 20+ miles this week',       category: 'Skate',   xp: 150, targetValue: 20 },
-  { key: 'skate_30mi_week',   name: 'Skate 30+ miles this week',       category: 'Skate',   xp: 220, targetValue: 30 },
-  { key: 'book_1_week',       name: 'Finish a book this week',         category: 'Reading', xp: 150, targetValue: 1  },
-  { key: 'fortnite_win_week', name: 'Win a Fortnite game this week',   category: 'Gaming',  xp: 125, targetValue: 1  },
-  { key: 'sleep_5_week',      name: 'Log sleep 5 nights this week',    category: 'Sleep',   xp: 50,  targetValue: 5  },
-  { key: 'sleep_7_week',      name: 'Log all 7 nights this week',      category: 'Sleep',   xp: 100, targetValue: 7  },
-  { key: 'gym_bench_week',    name: 'Log a Bench session this week',   category: 'Workout', xp: 40,  targetValue: 1  },
-  { key: 'gym_squat_week',    name: 'Log a Squat session this week',   category: 'Workout', xp: 40,  targetValue: 1  },
-]
+export function nextMondayLabel(): string {
+  const today = new Date()
+  const day = today.getDay()
+  const daysUntil = day === 1 ? 7 : day === 0 ? 1 : 8 - day
+  if (daysUntil === 1) return 'Resets Monday'
+  return `Resets in ${daysUntil} days`
+}
 
-export const MONTHLY_POOL: ChallengeTemplate[] = [
-  { key: 'gym_8x_month',          name: 'Hit the gym 8x this month',          category: 'Workout', xp: 100, targetValue: 8  },
-  { key: 'gym_12x_month',         name: 'Hit the gym 12x this month',         category: 'Workout', xp: 150, targetValue: 12 },
-  { key: 'gym_16x_month',         name: 'Hit the gym 16x this month',         category: 'Workout', xp: 220, targetValue: 16 },
-  { key: 'sets_50_month',         name: 'Log 50 sets this month',             category: 'Workout', xp: 100, targetValue: 50 },
-  { key: 'sets_80_month',         name: 'Log 80 sets this month',             category: 'Workout', xp: 175, targetValue: 80 },
-  { key: 'pr_any_month',          name: 'Hit a new PR in any lift',           category: 'Workout', xp: 200, targetValue: 1  },
-  { key: 'pr_bench_month',        name: 'New Bench PR this month',            category: 'Workout', xp: 150, targetValue: 1  },
-  { key: 'pr_squat_month',        name: 'New Squat PR this month',            category: 'Workout', xp: 150, targetValue: 1  },
-  { key: 'pr_deadlift_month',     name: 'New Deadlift PR this month',         category: 'Workout', xp: 150, targetValue: 1  },
-  { key: 'skate_30mi_month',      name: 'Skate 30 miles this month',          category: 'Skate',   xp: 100, targetValue: 30 },
-  { key: 'skate_50mi_month',      name: 'Skate 50 miles this month',          category: 'Skate',   xp: 200, targetValue: 50 },
-  { key: 'skate_75mi_month',      name: 'Skate 75 miles this month',          category: 'Skate',   xp: 300, targetValue: 75 },
-  { key: 'book_1_month',          name: 'Finish 1 book this month',           category: 'Reading', xp: 150, targetValue: 1  },
-  { key: 'book_2_month',          name: 'Finish 2 books this month',          category: 'Reading', xp: 300, targetValue: 2  },
-  { key: 'fortnite_win_month',    name: 'Win a Fortnite game this month',     category: 'Gaming',  xp: 125, targetValue: 1  },
-  { key: 'fortnite_2wins_month',  name: 'Win 2 Fortnite games this month',    category: 'Gaming',  xp: 250, targetValue: 2  },
-  { key: 'fortnite_10k_month',    name: 'Get a 10-kill game this month',      category: 'Gaming',  xp: 100, targetValue: 10 },
-  { key: 'fortnite_15k_month',    name: 'Get a 15-kill game this month',      category: 'Gaming',  xp: 175, targetValue: 15 },
-  { key: 'sleep_15_month',        name: 'Log sleep 15 nights this month',     category: 'Sleep',   xp: 100, targetValue: 15 },
-  { key: 'sleep_20_month',        name: 'Log sleep 20 nights this month',     category: 'Sleep',   xp: 150, targetValue: 20 },
-]
+export function daysUntilMonthEnd(): number {
+  const now = new Date()
+  const last = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  return last.getDate() - now.getDate()
+}
 
-// ── Boss config ──────────────────────────────────────────────────
+export function getWeekKey(): string {
+  const d = new Date()
+  const jan1 = new Date(d.getFullYear(), 0, 1)
+  const week = Math.ceil(((d.getTime() - jan1.getTime()) / 86400000 + jan1.getDay() + 1) / 7)
+  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`
+}
+
+export function getMonthKey(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
+// ── Reroll localStorage helpers ───────────────────────────────────
+
+const MAX_REROLLS = 3
+
+function rerollStorageKey(period: 'weekly' | 'monthly'): string {
+  const cycleKey = period === 'weekly' ? getWeekKey() : getMonthKey()
+  return `youxp-rerolls-${period}-${cycleKey}`
+}
+
+export function getRerollsRemaining(period: 'weekly' | 'monthly'): number {
+  const key = rerollStorageKey(period)
+  const stored = localStorage.getItem(key)
+  if (stored === null) return MAX_REROLLS
+  const used = parseInt(stored, 10)
+  return isNaN(used) ? MAX_REROLLS : Math.max(0, MAX_REROLLS - used)
+}
+
+export function consumeReroll(period: 'weekly' | 'monthly'): boolean {
+  const remaining = getRerollsRemaining(period)
+  if (remaining <= 0) return false
+  const key = rerollStorageKey(period)
+  const stored = localStorage.getItem(key)
+  const used = stored ? parseInt(stored, 10) || 0 : 0
+  localStorage.setItem(key, String(used + 1))
+  return true
+}
+
+// ── Seen-template helpers ─────────────────────────────────────────
+
+const SEEN_MAX = 30
+
+function seenStorageKey(period: 'weekly' | 'monthly'): string {
+  return `youxp-seen-templates-${period}`
+}
+
+export function addSeen(period: 'weekly' | 'monthly', key: string): void {
+  const seen = getSeen(period)
+  const updated = [key, ...seen.filter(k => k !== key)].slice(0, SEEN_MAX)
+  localStorage.setItem(seenStorageKey(period), JSON.stringify(updated))
+}
+
+export function getSeen(period: 'weekly' | 'monthly'): string[] {
+  try {
+    const raw = localStorage.getItem(seenStorageKey(period))
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    if (Array.isArray(parsed)) return parsed as string[]
+  } catch { /* ignore */ }
+  return []
+}
+
+// ── Activity detection ────────────────────────────────────────────
+
+export async function detectActiveSections(supabase: SupabaseClient): Promise<Set<ActivitySection>> {
+  const checks: Array<[ActivitySection, () => Promise<number>]> = [
+    ['lifting',      () => supabase.from('lifting_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['run',          () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'run').then(r => r.count ?? 0)],
+    ['bike',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'bike').then(r => r.count ?? 0)],
+    ['swim',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'swim').then(r => r.count ?? 0)],
+    ['walk',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'walk').then(r => r.count ?? 0)],
+    ['skate',        () => supabase.from('skate_sessions').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['sleep',        () => supabase.from('sleep_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['water',        () => supabase.from('water_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['books',        () => supabase.from('books').select('id', { count: 'exact', head: true }).not('date_finished', 'is', null).then(r => r.count ?? 0)],
+    ['mood',         () => supabase.from('mood_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['chess',        () => supabase.from('chess_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['disc_golf',    () => supabase.from('disc_golf_rounds').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['fortnite',     () => supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['golf',         () => supabase.from('golf_rounds').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['hiking',       () => supabase.from('hiking_sessions').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['basketball',   () => supabase.from('basketball_sessions').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['pickleball',   () => supabase.from('pickleball_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['pool',         () => supabase.from('pool_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['spikeball',    () => supabase.from('spikeball_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['table_tennis', () => supabase.from('table_tennis_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['volleyball',   () => supabase.from('volleyball_sessions').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+  ]
+
+  const results = await Promise.all(checks.map(([, fn]) => fn().catch(() => 0)))
+  const active = new Set<ActivitySection>()
+  checks.forEach(([section], i) => { if (results[i] > 0) active.add(section) })
+  return active
+}
+
+// ── Stats computation ─────────────────────────────────────────────
+
+export async function fetchUserStats(supabase: SupabaseClient): Promise<UserStats> {
+  const [
+    liftingDates, liftingSets,
+    cardioAll,
+    skateSessions,
+    sleepLogs,
+    waterLogs,
+    books,
+    moodLogs,
+    chessGames,
+    discGolfRounds,
+    fortniteGames,
+    golfRounds,
+    hikingSessions,
+    basketballSessions,
+    pickleballGames,
+    poolGames,
+    spikeballGames,
+    tableTennisGames,
+    volleyballSessions,
+  ] = await Promise.all([
+    supabase.from('lifting_log').select('date').then(r => r.data ?? []),
+    supabase.from('lifting_log').select('date').then(r => r.data ?? []),
+    supabase.from('cardio_sessions').select('date, activity, distance_miles').then(r => r.data ?? []),
+    supabase.from('skate_sessions').select('date, miles').then(r => r.data ?? []),
+    supabase.from('sleep_log').select('date, hours_slept, is_nap').then(r => r.data ?? []),
+    supabase.from('water_log').select('date').then(r => r.data ?? []),
+    supabase.from('books').select('date_finished').not('date_finished', 'is', null).then(r => r.data ?? []),
+    supabase.from('mood_log').select('date, mood').then(r => r.data ?? []),
+    supabase.from('chess_games').select('date, result').then(r => r.data ?? []),
+    supabase.from('disc_golf_rounds').select('date').then(r => r.data ?? []),
+    supabase.from('fortnite_games').select('date, kills').then(r => r.data ?? []),
+    supabase.from('golf_rounds').select('date').then(r => r.data ?? []),
+    supabase.from('hiking_sessions').select('date, distance_miles').then(r => r.data ?? []),
+    supabase.from('basketball_sessions').select('date').then(r => r.data ?? []),
+    supabase.from('pickleball_games').select('date, win').then(r => r.data ?? []),
+    supabase.from('pool_games').select('date, win').then(r => r.data ?? []),
+    supabase.from('spikeball_games').select('date, win').then(r => r.data ?? []),
+    supabase.from('table_tennis_games').select('date, win').then(r => r.data ?? []),
+    supabase.from('volleyball_sessions').select('date, win').then(r => r.data ?? []),
+  ])
+
+  function weeksSpan(rows: { date: string }[]): number {
+    if (rows.length === 0) return 1
+    const dates = rows.map(r => new Date(r.date + 'T12:00:00').getTime())
+    const first = Math.min(...dates)
+    return Math.max(1, (Date.now() - first) / (7 * 24 * 60 * 60 * 1000))
+  }
+
+  function monthsSpan(rows: { date?: string; date_finished?: string | null }[]): number {
+    if (rows.length === 0) return 1
+    const dates = rows.map(r => new Date(((r.date ?? r.date_finished ?? '') + 'T12:00:00')).getTime()).filter(Boolean)
+    if (dates.length === 0) return 1
+    const first = Math.min(...dates)
+    return Math.max(1, (Date.now() - first) / (30 * 24 * 60 * 60 * 1000))
+  }
+
+  function winRate(rows: { win: boolean }[]): number {
+    if (rows.length === 0) return 0.5
+    return rows.filter(r => r.win).length / rows.length
+  }
+
+  // lifting
+  const liftWeeks = weeksSpan(liftingDates as { date: string }[])
+  const liftDistinctDates = new Set((liftingDates as { date: string }[]).map(r => r.date)).size
+  const liftAvgDays = liftDistinctDates / liftWeeks
+  const liftAvgSets = (liftingSets as { date: string }[]).length / liftWeeks
+
+  // cardio subsets
+  type CardioRow = { date: string; activity: string; distance_miles: number }
+  const runRows    = (cardioAll as CardioRow[]).filter(r => r.activity === 'run')
+  const bikeRows   = (cardioAll as CardioRow[]).filter(r => r.activity === 'bike')
+  const swimRows   = (cardioAll as CardioRow[]).filter(r => r.activity === 'swim')
+  const walkRows   = (cardioAll as CardioRow[]).filter(r => r.activity === 'walk')
+
+  const runWeeks  = weeksSpan(runRows)
+  const bikeWeeks = weeksSpan(bikeRows)
+  const swimWeeks = weeksSpan(swimRows)
+  const walkWeeks = weeksSpan(walkRows)
+
+  // skate
+  type SkateRow = { date: string; miles: number }
+  const skateWeeks = weeksSpan(skateSessions as { date: string }[])
+  const skateMiles = (skateSessions as SkateRow[]).reduce((s, r) => s + (r.miles ?? 0), 0)
+
+  // sleep
+  type SleepRow = { date: string; hours_slept: number | null; is_nap: boolean }
+  const sleepNights = (sleepLogs as SleepRow[]).filter(r => !r.is_nap)
+  const sleepWeeks  = weeksSpan(sleepNights)
+  const sleepHoursData = sleepNights.filter(r => r.hours_slept !== null)
+  const avgHours = sleepHoursData.length > 0 ? sleepHoursData.reduce((s, r) => s + (r.hours_slept ?? 0), 0) / sleepHoursData.length : 7
+
+  // water
+  const waterWeeks   = weeksSpan(waterLogs as { date: string }[])
+  const waterDaySet  = new Set((waterLogs as { date: string }[]).map(r => r.date)).size
+
+  // books
+  type BookRow = { date_finished: string | null }
+  const booksMonths  = monthsSpan((books as BookRow[]).map(r => ({ date: r.date_finished ?? '' })))
+
+  // mood
+  type MoodRow = { date: string; mood: number | null }
+  const moodWeeks   = weeksSpan(moodLogs as { date: string }[])
+  const moodWithVal = (moodLogs as MoodRow[]).filter(r => r.mood !== null)
+  const avgMood     = moodWithVal.length > 0 ? moodWithVal.reduce((s, r) => s + (r.mood ?? 0), 0) / moodWithVal.length : 7
+
+  // chess
+  type ChessRow = { date: string; result: string }
+  const chessWeeks = weeksSpan(chessGames as { date: string }[])
+  const chessWins  = (chessGames as ChessRow[]).filter(r => r.result === 'win').length
+
+  // fortnite
+  type FortniteRow = { date: string; kills: number }
+  const fnWeeks = weeksSpan(fortniteGames as { date: string }[])
+  const fnKills = fortniteGames.length > 0 ? (fortniteGames as FortniteRow[]).reduce((s, r) => s + (r.kills ?? 0), 0) / fortniteGames.length : 0
+
+  // hiking
+  type HikeRow = { date: string; distance_miles: number }
+  const hikeMonths = monthsSpan(hikingSessions as { date: string }[])
+  const hikeMiles  = (hikingSessions as HikeRow[]).reduce((s, r) => s + (r.distance_miles ?? 0), 0)
+
+  // sport rows with win
+  type WinRow = { date: string; win: boolean }
+
+  const bbWeeks  = weeksSpan(basketballSessions as { date: string }[])
+  const pbWeeks  = weeksSpan(pickleballGames as { date: string }[])
+  const poolWeeks = weeksSpan(poolGames as { date: string }[])
+  const spikeWeeks = weeksSpan(spikeballGames as { date: string }[])
+  const ttWeeks  = weeksSpan(tableTennisGames as { date: string }[])
+  const vbWeeks  = weeksSpan(volleyballSessions as { date: string }[])
+  const discMonths = monthsSpan(discGolfRounds as { date: string }[])
+  const golfMonths = monthsSpan(golfRounds as { date: string }[])
+
+  return {
+    lifting:      { avgDaysPerWeek: liftAvgDays, avgSetsPerWeek: liftAvgSets },
+    run:          { avgMilesPerWeek: runRows.reduce((s, r) => s + (r.distance_miles ?? 0), 0) / runWeeks, avgSessionsPerWeek: runRows.length / runWeeks },
+    bike:         { avgMilesPerWeek: bikeRows.reduce((s, r) => s + (r.distance_miles ?? 0), 0) / bikeWeeks, avgSessionsPerWeek: bikeRows.length / bikeWeeks },
+    swim:         { avgSessionsPerWeek: swimRows.length / swimWeeks },
+    walk:         { avgMilesPerWeek: walkRows.reduce((s, r) => s + (r.distance_miles ?? 0), 0) / walkWeeks, avgSessionsPerWeek: walkRows.length / walkWeeks },
+    skate:        { avgMilesPerWeek: skateMiles / skateWeeks, avgSessionsPerWeek: (skateSessions as { date: string }[]).length / skateWeeks },
+    sleep:        { avgHours, avgNightsPerWeek: sleepNights.length / sleepWeeks },
+    water:        { avgDaysPerWeek: waterDaySet / waterWeeks },
+    books:        { avgPerMonth: (books as BookRow[]).length / booksMonths },
+    mood:         { avgScore: avgMood, avgDaysPerWeek: (moodLogs as { date: string }[]).length / moodWeeks },
+    chess:        { avgPerWeek: (chessGames as { date: string }[]).length / chessWeeks, winRate: chessGames.length > 0 ? chessWins / chessGames.length : 0.5 },
+    disc_golf:    { avgPerMonth: (discGolfRounds as { date: string }[]).length / discMonths },
+    fortnite:     { avgPerWeek: (fortniteGames as { date: string }[]).length / fnWeeks, avgKills: fnKills },
+    golf:         { avgPerMonth: (golfRounds as { date: string }[]).length / golfMonths },
+    hiking:       { avgMilesPerMonth: hikeMiles / hikeMonths, avgSessionsPerMonth: (hikingSessions as { date: string }[]).length / hikeMonths },
+    basketball:   { avgPerWeek: (basketballSessions as { date: string }[]).length / bbWeeks },
+    pickleball:   { avgPerWeek: (pickleballGames as { date: string }[]).length / pbWeeks, winRate: winRate(pickleballGames as WinRow[]) },
+    pool:         { avgPerWeek: (poolGames as { date: string }[]).length / poolWeeks, winRate: winRate(poolGames as WinRow[]) },
+    spikeball:    { avgPerWeek: (spikeballGames as { date: string }[]).length / spikeWeeks, winRate: winRate(spikeballGames as WinRow[]) },
+    table_tennis: { avgPerWeek: (tableTennisGames as { date: string }[]).length / ttWeeks, winRate: winRate(tableTennisGames as WinRow[]) },
+    volleyball:   { avgPerWeek: (volleyballSessions as { date: string }[]).length / vbWeeks, winRate: winRate(volleyballSessions as WinRow[]) },
+  }
+}
+
+// ── Template picker ───────────────────────────────────────────────
+
+function pickTemplates(
+  activeSections: Set<ActivitySection>,
+  stats: UserStats,
+  period: 'weekly' | 'monthly',
+  existingTemplateKeys: Set<string>,
+  totalSlots: number,
+): Array<{ template: ChallengeTemplate; target: number; xp: number }> {
+  const seen = getSeen(period)
+  const seenSet = new Set(seen)
+
+  // Filter by period and active section
+  const eligible = CHALLENGE_TEMPLATES.filter(
+    t => t.period === period && activeSections.has(t.section) && !existingTemplateKeys.has(t.key)
+  )
+
+  // Prefer unseen templates; fallback to all eligible
+  const unseen = eligible.filter(t => !seenSet.has(t.key))
+  const pool = unseen.length >= totalSlots ? unseen : eligible
+
+  // Group by section
+  const bySection = new Map<ActivitySection, ChallengeTemplate[]>()
+  for (const t of pool) {
+    const arr = bySection.get(t.section) ?? []
+    arr.push(t)
+    bySection.set(t.section, arr)
+  }
+
+  // Shuffle section order
+  const sections = Array.from(bySection.keys())
+  for (let i = sections.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[sections[i], sections[j]] = [sections[j], sections[i]]
+  }
+
+  // Round-robin pick
+  const result: Array<{ template: ChallengeTemplate; target: number; xp: number }> = []
+  let round = 0
+  while (result.length < totalSlots) {
+    let picked = false
+    for (const section of sections) {
+      if (result.length >= totalSlots) break
+      const templates = bySection.get(section) ?? []
+      if (templates.length > 0) {
+        // Rotate within section each round
+        const idx = round % templates.length
+        const template = templates[idx]
+        const target = Math.max(1, template.scaleTarget(stats))
+        const xp = template.xpForTarget(target)
+        result.push({ template, target, xp })
+        picked = true
+      }
+    }
+    round++
+    // Safety break if no templates left
+    if (!picked || round > 20) break
+  }
+
+  return result
+}
+
+// ── Main sync ─────────────────────────────────────────────────────
+
+export async function syncUserChallenges(supabase: SupabaseClient, userId: string): Promise<void> {
+  const activeSections = await detectActiveSections(supabase)
+
+  if (activeSections.size === 0) {
+    localStorage.setItem('youxp-needs-tutorial', 'true')
+    return
+  }
+  localStorage.removeItem('youxp-needs-tutorial')
+
+  const sw = startOfWeekDate()
+  const sm = startOfMonthDate()
+
+  // Expire stale challenges
+  await Promise.all([
+    supabase.from('challenges').update({ status: 'expired' })
+      .eq('user_id', userId).eq('tier', 'Weekly').eq('status', 'active').lt('created_at', sw + 'T00:00:00'),
+    supabase.from('challenges').update({ status: 'expired' })
+      .eq('user_id', userId).eq('tier', 'Monthly').eq('status', 'active').lt('created_at', sm + 'T00:00:00'),
+  ])
+
+  // Load current active challenges
+  const { data: currentData } = await supabase.from('challenges')
+    .select('*')
+    .eq('user_id', userId)
+    .in('status', ['active', 'claimed'])
+    .in('tier', ['Weekly', 'Monthly'])
+
+  const current = (currentData ?? []) as { id: string; tier: string; notes: string | null }[]
+  const activeWeekly  = current.filter(c => c.tier === 'Weekly')
+  const activeMonthly = current.filter(c => c.tier === 'Monthly')
+
+  const weeklySlots  = Math.min(10, Math.max(5, activeSections.size))
+  const monthlySlots = Math.min(6, Math.max(3, Math.ceil(activeSections.size / 2)))
+
+  const weeklyNeeded  = weeklySlots  - activeWeekly.length
+  const monthlyNeeded = monthlySlots - activeMonthly.length
+
+  if (weeklyNeeded <= 0 && monthlyNeeded <= 0) return
+
+  const stats = await fetchUserStats(supabase)
+
+  if (weeklyNeeded > 0) {
+    const usedKeys = new Set(activeWeekly.map(c => c.notes ?? ''))
+    const picks = pickTemplates(activeSections, stats, 'weekly', usedKeys, weeklyNeeded)
+    if (picks.length > 0) {
+      await supabase.from('challenges').insert(picks.map(({ template, target, xp }) => ({
+        user_id: userId,
+        tier: 'Weekly',
+        challenge_name: template.name(target),
+        category: SECTION_DISPLAY[template.section],
+        xp_reward: xp,
+        status: 'active',
+        auto_verified: true,
+        notes: template.key,
+        target: String(target),
+      })))
+      for (const { template } of picks) addSeen('weekly', template.key)
+    }
+  }
+
+  if (monthlyNeeded > 0) {
+    const usedKeys = new Set(activeMonthly.map(c => c.notes ?? ''))
+    const picks = pickTemplates(activeSections, stats, 'monthly', usedKeys, monthlyNeeded)
+    if (picks.length > 0) {
+      await supabase.from('challenges').insert(picks.map(({ template, target, xp }) => ({
+        user_id: userId,
+        tier: 'Monthly',
+        challenge_name: template.name(target),
+        category: SECTION_DISPLAY[template.section],
+        xp_reward: xp,
+        status: 'active',
+        auto_verified: true,
+        notes: template.key,
+        target: String(target),
+      })))
+      for (const { template } of picks) addSeen('monthly', template.key)
+    }
+  }
+}
+
+// ── Progress getter ───────────────────────────────────────────────
+
+export async function getProgress(
+  supabase: SupabaseClient,
+  templateKey: string,
+  tier: 'Weekly' | 'Monthly',
+): Promise<number> {
+  const template = CHALLENGE_TEMPLATES.find(t => t.key === templateKey)
+  if (!template) return 0
+  const fn = PROGRESS_FNS[template.progressKey]
+  if (!fn) return 0
+  const since = tier === 'Weekly' ? startOfWeekDate() : startOfMonthDate()
+  return fn(supabase, since).catch(() => 0)
+}
+
+// ── Reroll ────────────────────────────────────────────────────────
+
+export async function rerollChallenge(
+  supabase: SupabaseClient,
+  userId: string,
+  challengeId: string,
+  period: 'weekly' | 'monthly',
+  currentTemplateKey: string,
+): Promise<boolean> {
+  if (!consumeReroll(period)) return false
+
+  const activeSections = await detectActiveSections(supabase)
+  const stats = await fetchUserStats(supabase)
+
+  const currentTemplate = CHALLENGE_TEMPLATES.find(t => t.key === currentTemplateKey)
+  const section = currentTemplate?.section
+
+  // Load existing active template keys for this period
+  const { data: existing } = await supabase.from('challenges')
+    .select('notes')
+    .eq('user_id', userId)
+    .in('status', ['active', 'claimed'])
+    .eq('tier', period === 'weekly' ? 'Weekly' : 'Monthly')
+
+  const existingKeys = new Set([
+    ...(existing ?? []).map((c: { notes: string | null }) => c.notes ?? ''),
+    currentTemplateKey,
+  ])
+
+  // Find a template from the same section
+  let candidates = section
+    ? CHALLENGE_TEMPLATES.filter(
+        t => t.period === period && t.section === section && !existingKeys.has(t.key)
+      )
+    : []
+
+  // Fallback: allow any from same section (exhausted pool)
+  if (candidates.length === 0 && section) {
+    candidates = CHALLENGE_TEMPLATES.filter(
+      t => t.period === period && t.section === section && t.key !== currentTemplateKey
+    )
+  }
+
+  // Fallback: any template
+  if (candidates.length === 0) {
+    candidates = CHALLENGE_TEMPLATES.filter(t => t.period === period)
+  }
+
+  if (candidates.length === 0) return false
+
+  const newTemplate = candidates[Math.floor(Math.random() * candidates.length)]
+  const target = Math.max(1, newTemplate.scaleTarget(stats))
+  const xp = newTemplate.xpForTarget(target)
+
+  // Mark old challenge expired and insert new one
+  await supabase.from('challenges').update({ status: 'expired' }).eq('id', challengeId)
+  await supabase.from('challenges').insert({
+    user_id: userId,
+    tier: period === 'weekly' ? 'Weekly' : 'Monthly',
+    challenge_name: newTemplate.name(target),
+    category: SECTION_DISPLAY[newTemplate.section],
+    xp_reward: xp,
+    status: 'active',
+    auto_verified: true,
+    notes: newTemplate.key,
+    target: String(target),
+  })
+
+  addSeen(period, newTemplate.key)
+  return true
+}
+
+// ── Tutorial helpers ──────────────────────────────────────────────
+
+export async function isTutorialMode(supabase: SupabaseClient): Promise<boolean> {
+  const [lifting, mood, water, sleep, books] = await Promise.all([
+    supabase.from('lifting_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0),
+    supabase.from('mood_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0),
+    supabase.from('water_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0),
+    supabase.from('sleep_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0),
+    supabase.from('books').select('id', { count: 'exact', head: true }).not('date_finished', 'is', null).then(r => r.count ?? 0),
+  ])
+  return lifting === 0 && mood === 0 && water === 0 && sleep === 0 && books === 0
+}
+
+export interface TutorialStep {
+  key: string
+  name: string
+  description: string
+  done: boolean
+  path: string
+}
+
+export async function getTutorialSteps(supabase: SupabaseClient): Promise<TutorialStep[]> {
+  const theme = localStorage.getItem('youxp-theme')
+  const [lifting, mood, water, sleep] = await Promise.all([
+    supabase.from('lifting_log').select('id', { count: 'exact', head: true }).then(r => (r.count ?? 0) > 0),
+    supabase.from('mood_log').select('id', { count: 'exact', head: true }).then(r => (r.count ?? 0) > 0),
+    supabase.from('water_log').select('id', { count: 'exact', head: true }).then(r => (r.count ?? 0) > 0),
+    supabase.from('sleep_log').select('id', { count: 'exact', head: true }).then(r => (r.count ?? 0) > 0),
+  ])
+  return [
+    { key: 'theme',   name: 'Change your theme',          description: 'Head to Settings and pick a theme that fits your style.', done: theme !== null && theme !== 'coral',  path: '/settings' },
+    { key: 'workout', name: 'Log your first workout',     description: 'Head to Lifting and log a set.',                           done: lifting,                               path: '/records'  },
+    { key: 'mood',    name: 'Log your first mood',        description: 'Head to Mood and rate how you feel today.',                done: mood,                                  path: '/mood'     },
+    { key: 'water',   name: 'Log your first water intake',description: 'Head to Water and log today\'s hydration.',               done: water,                                 path: '/water'    },
+    { key: 'sleep',   name: 'Log your first sleep',       description: 'Head to Sleep and log last night\'s rest.',               done: sleep,                                 path: '/sleep'    },
+  ]
+}
+
+// ── Boss challenges (kept for backward compat) ────────────────────
 
 export type BossKey = 'boss_bench' | 'boss_squat' | 'boss_deadlift' | 'boss_skate'
 
@@ -86,140 +592,30 @@ function bossXP(key: BossKey, target: number): number {
   return Math.round((target / 150) * BOSS_CONFIGS[key].baseXP)
 }
 
-// ── Date helpers ─────────────────────────────────────────────────
+export async function syncBossChallenges(supabase: SupabaseClient, userId: string): Promise<void> {
+  const { data: all } = await supabase.from('challenges').select('*').eq('user_id', userId)
+  const rows = (all ?? []) as { id: string; tier: string; notes: string | null; status: string; completed_at: string | null; target: string | null }[]
 
-function startOfWeekISO(): string {
-  const d = new Date()
-  d.setDate(d.getDate() - d.getDay())
-  d.setHours(0, 0, 0, 0)
-  return d.toISOString()
-}
-
-function startOfMonthISO(): string {
-  const d = new Date()
-  d.setDate(1)
-  d.setHours(0, 0, 0, 0)
-  return d.toISOString()
-}
-
-export function startOfWeekDate(): string {
-  const d = new Date()
-  d.setDate(d.getDate() - d.getDay())
-  return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, '0'),
-    String(d.getDate()).padStart(2, '0'),
-  ].join('-')
-}
-
-export function startOfMonthDate(): string {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
-}
-
-// ── Seeded shuffle (consistent within same week/month) ───────────
-
-function seededShuffle<T>(arr: T[], seed: number): T[] {
-  const a = [...arr]
-  let s = seed
-  for (let i = a.length - 1; i > 0; i--) {
-    s = ((s * 1664525) + 1013904223) & 0x7fffffff
-    const j = s % (i + 1)
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
-
-function weekSeed(): number {
-  return Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000))
-}
-
-function monthSeed(): number {
-  const d = new Date()
-  return d.getFullYear() * 100 + d.getMonth()
-}
-
-// ── Slot counts ──────────────────────────────────────────────────
-
-const WEEKLY_SLOTS = 6
-const MONTHLY_SLOTS = 6
-
-// ── Main sync function ───────────────────────────────────────────
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function syncChallenges(supabase: SupabaseClient, userId: string): Promise<void> {
-  const swISO = startOfWeekISO()
-  const smISO = startOfMonthISO()
-
-  // Expire stale active challenges
-  await supabase.from('challenges').update({ status: 'expired' })
-    .eq('user_id', userId).eq('tier', 'Weekly').eq('status', 'active').lt('created_at', swISO)
-  await supabase.from('challenges').update({ status: 'expired' })
-    .eq('user_id', userId).eq('tier', 'Monthly').eq('status', 'active').lt('created_at', smISO)
-
-  // Load current state
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: all } = await supabase.from('challenges').select('*').eq('user_id', userId) as { data: any[] | null }
-  const rows = all ?? []
-
-  // ── Weekly ──
-  const activeWeekly = rows.filter(c => c.tier === 'Weekly' && c.status === 'active')
-  const usedWeeklyKeys = new Set([
-    ...activeWeekly.map(c => c.notes),
-    ...rows.filter(c => c.tier === 'Weekly' && c.status === 'completed' && (c.completed_at ?? '') >= swISO).map(c => c.notes),
-  ])
-  const weeklyNeeded = WEEKLY_SLOTS - activeWeekly.length
-  if (weeklyNeeded > 0) {
-    const picks = seededShuffle(WEEKLY_POOL.filter(t => !usedWeeklyKeys.has(t.key)), weekSeed()).slice(0, weeklyNeeded)
-    if (picks.length > 0) {
-      await supabase.from('challenges').insert(picks.map(t => ({
-        user_id: userId, tier: 'Weekly', challenge_name: t.name, category: t.category,
-        xp_reward: t.xp, status: 'active', auto_verified: true, notes: t.key, target: String(t.targetValue),
-      })))
-    }
-  }
-
-  // ── Monthly ──
-  const activeMonthly = rows.filter(c => c.tier === 'Monthly' && c.status === 'active')
-  const usedMonthlyKeys = new Set([
-    ...activeMonthly.map(c => c.notes),
-    ...rows.filter(c => c.tier === 'Monthly' && c.status === 'completed' && (c.completed_at ?? '') >= smISO).map(c => c.notes),
-  ])
-  const monthlyNeeded = MONTHLY_SLOTS - activeMonthly.length
-  if (monthlyNeeded > 0) {
-    const picks = seededShuffle(MONTHLY_POOL.filter(t => !usedMonthlyKeys.has(t.key)), monthSeed()).slice(0, monthlyNeeded)
-    if (picks.length > 0) {
-      await supabase.from('challenges').insert(picks.map(t => ({
-        user_id: userId, tier: 'Monthly', challenge_name: t.name, category: t.category,
-        xp_reward: t.xp, status: 'active', auto_verified: true, notes: t.key, target: String(t.targetValue),
-      })))
-    }
-  }
-
-  // ── Boss ──
   const activeBossKeys = new Set(rows.filter(c => c.tier === 'Boss' && c.status === 'active').map(c => c.notes))
   for (const key of Object.keys(BOSS_CONFIGS) as BossKey[]) {
     if (activeBossKeys.has(key)) continue
 
     const completed = rows
-      .filter(c => c.tier === 'Boss' && c.notes === key && c.status === 'completed')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .sort((a: any, b: any) => (b.completed_at ?? '').localeCompare(a.completed_at ?? ''))
+      .filter(c => c.tier === 'Boss' && c.notes === key && (c.status === 'completed' || c.status === 'claimed'))
+      .sort((a, b) => (b.completed_at ?? '').localeCompare(a.completed_at ?? ''))
 
     let target: number | null = null
     if (completed.length > 0) {
       target = nextBossTarget(key, parseFloat(completed[0].target ?? '0'))
     } else {
-      // Generate initial target from current stats
       if (key === 'boss_skate') {
         const { data } = await supabase.from('skate_sessions').select('miles')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const total = data?.reduce((s: number, r: any) => s + r.miles, 0) ?? 0
+        const total = (data ?? []).reduce((s: number, r: { miles: number }) => s + r.miles, 0)
         target = Math.ceil(Math.max(total, 1) / 100) * 100
       } else {
         const lift = BOSS_CONFIGS[key].lift!
         const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', lift).order('est_1rm', { ascending: false }).limit(1)
-        const pr = data?.[0]?.est_1rm
+        const pr = (data as { est_1rm: number }[] | null)?.[0]?.est_1rm
         if (pr) target = roundToNearest5(pr * 1.1)
       }
     }
@@ -236,135 +632,28 @@ export async function syncChallenges(supabase: SupabaseClient, userId: string): 
   }
 }
 
-// ── Auto-progress per pool key ───────────────────────────────────
-
-export async function getAutoProgress(
+export async function getBossProgress(
   supabase: SupabaseClient,
   poolKey: string,
-  targetValue: number
+  targetValue: number,
 ): Promise<{ current: number; target: number }> {
-  const sw = startOfWeekDate()
-  const sm = startOfMonthDate()
   const t = targetValue
-
-  // Weekly gym days
-  if (['gym_3x_week','gym_4x_week','gym_5x_week'].includes(poolKey)) {
-    const { data } = await supabase.from('lifting_log').select('date').gte('date', sw)
-    return { current: new Set(data?.map((r: { date: string }) => r.date)).size, target: t }
-  }
-  // Weekly bench/squat session
-  if (poolKey === 'gym_bench_week') {
-    const { count } = await supabase.from('lifting_log').select('id', { count: 'exact', head: true }).eq('lift', 'Bench').gte('date', sw)
-    return { current: count ?? 0, target: t }
-  }
-  if (poolKey === 'gym_squat_week') {
-    const { count } = await supabase.from('lifting_log').select('id', { count: 'exact', head: true }).eq('lift', 'Squat').gte('date', sw)
-    return { current: count ?? 0, target: t }
-  }
-  // Weekly sets
-  if (['sets_10_week','sets_15_week','sets_20_week'].includes(poolKey)) {
-    const { count } = await supabase.from('lifting_log').select('id', { count: 'exact', head: true }).gte('date', sw)
-    return { current: count ?? 0, target: t }
-  }
-  // Weekly skate sessions
-  if (['skate_2x_week','skate_3x_week'].includes(poolKey)) {
-    const { count } = await supabase.from('skate_sessions').select('id', { count: 'exact', head: true }).gte('date', sw)
-    return { current: count ?? 0, target: t }
-  }
-  // Weekly skate miles
-  if (['skate_5mi_week','skate_10mi_week','skate_20mi_week','skate_30mi_week'].includes(poolKey)) {
-    const { data } = await supabase.from('skate_sessions').select('miles').gte('date', sw)
-    const total = data?.reduce((s: number, r: { miles: number }) => s + r.miles, 0) ?? 0
-    return { current: Math.round(total * 10) / 10, target: t }
-  }
-  // Weekly book
-  if (poolKey === 'book_1_week') {
-    const { count } = await supabase.from('books').select('id', { count: 'exact', head: true }).gte('date_finished', sw).not('date_finished', 'is', null)
-    return { current: count ?? 0, target: t }
-  }
-  // Weekly fortnite win
-  if (poolKey === 'fortnite_win_week') {
-    const { count } = await supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('win', true).gte('date', sw)
-    return { current: count ?? 0, target: t }
-  }
-  // Weekly sleep
-  if (['sleep_5_week','sleep_7_week'].includes(poolKey)) {
-    const { count } = await supabase.from('sleep_log').select('id', { count: 'exact', head: true }).gte('date', sw)
-    return { current: count ?? 0, target: t }
-  }
-
-  // Monthly gym days
-  if (['gym_8x_month','gym_12x_month','gym_16x_month'].includes(poolKey)) {
-    const { data } = await supabase.from('lifting_log').select('date').gte('date', sm)
-    return { current: new Set(data?.map((r: { date: string }) => r.date)).size, target: t }
-  }
-  // Monthly sets
-  if (['sets_50_month','sets_80_month'].includes(poolKey)) {
-    const { count } = await supabase.from('lifting_log').select('id', { count: 'exact', head: true }).gte('date', sm)
-    return { current: count ?? 0, target: t }
-  }
-  // Monthly PRs
-  if (poolKey === 'pr_any_month') {
-    const { count } = await supabase.from('pr_history').select('id', { count: 'exact', head: true }).gte('date', sm)
-    return { current: count ?? 0, target: t }
-  }
-  if (poolKey === 'pr_bench_month') {
-    const { count } = await supabase.from('pr_history').select('id', { count: 'exact', head: true }).eq('lift', 'Bench').gte('date', sm)
-    return { current: count ?? 0, target: t }
-  }
-  if (poolKey === 'pr_squat_month') {
-    const { count } = await supabase.from('pr_history').select('id', { count: 'exact', head: true }).eq('lift', 'Squat').gte('date', sm)
-    return { current: count ?? 0, target: t }
-  }
-  if (poolKey === 'pr_deadlift_month') {
-    const { count } = await supabase.from('pr_history').select('id', { count: 'exact', head: true }).eq('lift', 'Deadlift').gte('date', sm)
-    return { current: count ?? 0, target: t }
-  }
-  // Monthly skate miles
-  if (['skate_30mi_month','skate_50mi_month','skate_75mi_month'].includes(poolKey)) {
-    const { data } = await supabase.from('skate_sessions').select('miles').gte('date', sm)
-    const total = data?.reduce((s: number, r: { miles: number }) => s + r.miles, 0) ?? 0
-    return { current: Math.round(total * 10) / 10, target: t }
-  }
-  // Monthly books
-  if (['book_1_month','book_2_month'].includes(poolKey)) {
-    const { count } = await supabase.from('books').select('id', { count: 'exact', head: true }).gte('date_finished', sm).not('date_finished', 'is', null)
-    return { current: count ?? 0, target: t }
-  }
-  // Monthly fortnite wins
-  if (['fortnite_win_month','fortnite_2wins_month'].includes(poolKey)) {
-    const { count } = await supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('win', true).gte('date', sm)
-    return { current: count ?? 0, target: t }
-  }
-  // Monthly fortnite kills
-  if (['fortnite_10k_month','fortnite_15k_month'].includes(poolKey)) {
-    const { data } = await supabase.from('fortnite_games').select('kills').gte('date', sm).order('kills', { ascending: false }).limit(1)
-    return { current: data?.[0]?.kills ?? 0, target: t }
-  }
-  // Monthly sleep
-  if (['sleep_15_month','sleep_20_month'].includes(poolKey)) {
-    const { count } = await supabase.from('sleep_log').select('id', { count: 'exact', head: true }).gte('date', sm)
-    return { current: count ?? 0, target: t }
-  }
-
-  // Boss
   if (poolKey === 'boss_bench') {
     const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', 'Bench').order('est_1rm', { ascending: false }).limit(1)
-    return { current: Math.round((data?.[0]?.est_1rm ?? 0) * 10) / 10, target: t }
+    return { current: Math.round(((data as { est_1rm: number }[] | null)?.[0]?.est_1rm ?? 0) * 10) / 10, target: t }
   }
   if (poolKey === 'boss_squat') {
     const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', 'Squat').order('est_1rm', { ascending: false }).limit(1)
-    return { current: Math.round((data?.[0]?.est_1rm ?? 0) * 10) / 10, target: t }
+    return { current: Math.round(((data as { est_1rm: number }[] | null)?.[0]?.est_1rm ?? 0) * 10) / 10, target: t }
   }
   if (poolKey === 'boss_deadlift') {
     const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', 'Deadlift').order('est_1rm', { ascending: false }).limit(1)
-    return { current: Math.round((data?.[0]?.est_1rm ?? 0) * 10) / 10, target: t }
+    return { current: Math.round(((data as { est_1rm: number }[] | null)?.[0]?.est_1rm ?? 0) * 10) / 10, target: t }
   }
   if (poolKey === 'boss_skate') {
     const { data } = await supabase.from('skate_sessions').select('miles')
-    const total = data?.reduce((s: number, r: { miles: number }) => s + r.miles, 0) ?? 0
+    const total = (data ?? []).reduce((s: number, r: { miles: number }) => s + r.miles, 0)
     return { current: Math.round(total * 10) / 10, target: t }
   }
-
   return { current: 0, target: t }
 }
