@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useStore } from '../store/useStore'
+import { localDateStr } from '../lib/utils'
 
 export interface Badge {
   id: string
@@ -235,7 +236,7 @@ function evaluate(data: RawData): Badge[] {
   // ── Wellness — mood & water ──────────────────────────────────
   const totalMoodLogs = moodRows.length
   const today = new Date()
-  const thirtyAgoStr = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 30).toISOString().split('T')[0]
+  const thirtyAgoStr = localDateStr(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 30))
   const recentMoodEntries = moodRows.filter(r => r.date >= thirtyAgoStr && r.mood != null) as { date: string; mood: number }[]
   const moodAvg30badge = recentMoodEntries.length >= 10
     ? recentMoodEntries.reduce((s, r) => s + r.mood, 0) / recentMoodEntries.length

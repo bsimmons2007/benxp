@@ -73,7 +73,7 @@ export async function fetchSkillXP(supabase: SupabaseClient): Promise<Record<Ski
     supabase.from('lifting_log').select('date'),
     supabase.from('books').select('id').not('date_finished', 'is', null),
     supabase.from('fortnite_games').select('kills, win'),
-    supabase.from('sleep_log').select('hours_slept'),
+    supabase.from('sleep_log').select('hours_slept').eq('is_nap', false),
     supabase.from('cardio_sessions').select('distance_miles'),
     supabase.from('basketball_sessions').select('points'),
     supabase.from('pickleball_games').select('win'),

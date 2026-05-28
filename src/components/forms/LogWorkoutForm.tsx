@@ -89,7 +89,7 @@ export function LogWorkoutForm() {
     const est1rm = Math.round((1 + Math.min(reps, 12) / 30) * weight)
 
     const { data: prData } = await supabase
-      .from('pr_history').select('est_1rm').eq('lift', data.lift).order('est_1rm', { ascending: false }).limit(1)
+      .from('pr_history').select('est_1rm').eq('user_id', user.id).eq('lift', data.lift).order('est_1rm', { ascending: false }).limit(1)
     const allTimePR = prData?.[0]?.est_1rm ?? 0
     if (allTimePR > 0 && est1rm > allTimePR * 2.2) {
       setToast(`⚠️ Heads up: ${data.lift} ${weight}lbs looks unusually heavy. Check the value before logging.`)
@@ -98,7 +98,7 @@ export function LogWorkoutForm() {
 
     const { data: recent } = await supabase
       .from('lifting_log').select('created_at, sets, reps, weight')
-      .eq('lift', data.lift).eq('date', data.date)
+      .eq('user_id', user.id).eq('lift', data.lift).eq('date', data.date)
       .gte('created_at', new Date(Date.now() - 120_000).toISOString()).limit(5)
     const dup = (recent ?? []).find(r => r.reps === reps && Math.abs((r.weight ?? 0) - weight) < 0.1)
     if (dup && !dupWarning) {
@@ -127,8 +127,13 @@ export function LogWorkoutForm() {
     const isPR = await checkForPR(supabase, data.lift, est1rm, data.date, inserted.id, user.id)
     if (isPR) await supabase.from('lifting_log').update({ is_pr: true }).eq('id', inserted.id)
 
-    const xpEarned = sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0)
-    setToast(`+${xpEarned} XP${isPR ? ' — New PR!' : ''}`)
+    // Check if this was the first set of the day (to include workout_day bonus in toast)
+    const { count: prevTodaySets } = await supabase
+      .from('lifting_log').select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id).eq('date', data.date).neq('id', inserted.id)
+    const isFirstSetToday = (prevTodaySets ?? 0) === 0
+    const xpEarned = sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0) + (isFirstSetToday ? XP_RATES.workout_day : 0)
+    setToast(`+${xpEarned} XP${isPR ? ' — New PR!' : ''}${isFirstSetToday ? ' 🏋️' : ''}`)
     await refreshXP()
 
     const savedBW = data.bodyweight

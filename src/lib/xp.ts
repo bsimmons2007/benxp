@@ -614,6 +614,7 @@ export async function checkForPR(
   const { data: existing } = await supabase
     .from('lifting_log')
     .select('est_1rm')
+    .eq('user_id', userId)
     .eq('lift', lift)
     .neq('id', currentRowId)
     .order('est_1rm', { ascending: false })
