@@ -72,6 +72,7 @@ export function LevelUpOverlay() {
         {/* YouXP wordmark — brand stamp at top */}
         <div style={{
           position: 'absolute', top: 48,
+          left: '50%', transform: 'translateX(-50%)',
           opacity: 0.7,
           animation: 'bossTextIn 0.6s ease 0.1s both',
         }}>

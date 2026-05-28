@@ -282,31 +282,36 @@ function BossCard({
               </span>
               {challenge.category && <Badge label={challenge.category} />}
               {isClaimed && (
-                <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: BOSS_COLOR }}>
-                  <CheckIcon size={11} /> Conquered
+                <span
+                  className="flex items-center gap-1 text-xs font-semibold rounded-full px-2 py-0.5"
+                  style={{ color: BOSS_COLOR, background: `${BOSS_COLOR}18`, border: `1px solid ${BOSS_COLOR}44` }}
+                >
+                  <TrophyIcon size={11} color={BOSS_COLOR} /> Conquered
                 </span>
               )}
             </div>
           </div>
         </div>
 
-        {/* Progress */}
-        {progress && !isClaimed && (
-          <div className="mb-4">
+        {/* Progress — always show when data loaded */}
+        {progress && (
+          <div className="mb-4" style={{ opacity: isClaimed ? 0.7 : 1 }}>
             <div className="flex items-baseline justify-between mb-2">
               <span className="section-label">{progressLabel}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: isDone ? BOSS_COLOR : 'var(--text-secondary)' }}>
-                {progress.current}
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: isClaimed || isDone ? BOSS_COLOR : 'var(--text-secondary)' }}>
+                {isClaimed ? progress.target : progress.current}
                 <span style={{ color: 'var(--text-tertiary)', fontSize: 11, marginLeft: 2 }}>{unit}</span>
-                <span style={{ color: 'var(--text-tertiary)', fontSize: 11, fontWeight: 400 }}> / {progress.target} {unit}</span>
+                {!isClaimed && (
+                  <span style={{ color: 'var(--text-tertiary)', fontSize: 11, fontWeight: 400 }}> / {progress.target} {unit}</span>
+                )}
               </span>
             </div>
             <div className="w-full rounded-full overflow-hidden" style={{ height: 6, background: 'var(--surface-2)' }}>
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
-                  width: `${pct ?? 0}%`,
-                  background: isDone ? BOSS_COLOR : `linear-gradient(90deg, ${BOSS_COLOR}66, ${BOSS_COLOR})`,
+                  width: isClaimed ? '100%' : `${pct ?? 0}%`,
+                  background: isClaimed || isDone ? BOSS_COLOR : `linear-gradient(90deg, ${BOSS_COLOR}66, ${BOSS_COLOR})`,
                 }}
               />
             </div>
@@ -318,13 +323,16 @@ function BossCard({
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>
             Resets Jan 1 · {daysLeft} day{daysLeft === 1 ? '' : 's'} left
           </span>
-          {isClaimed && (
-            <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: BOSS_COLOR }}>
-              <TrophyIcon size={12} /> Conquered
+          {isClaimed && challenge.completed_at && (
+            <span className="text-xs font-mono" style={{ color: 'var(--text-tertiary)' }}>
+              Slain {new Date(challenge.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           )}
           {!isDone && !isClaimed && (
             <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>In progress</span>
+          )}
+          {isDone && !isClaimed && (
+            <span className="text-xs font-semibold" style={{ color: BOSS_COLOR }}>Ready to conquer!</span>
           )}
         </div>
 
