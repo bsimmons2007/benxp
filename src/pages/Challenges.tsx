@@ -150,46 +150,59 @@ function ChallengeCard({
         <span className="text-xs font-mono" style={{ color: 'var(--text-secondary)' }}>
           {resetLabel}
         </span>
-        {!isClaimed && isDone ? (
-          <button
-            onClick={() => onClaim(challenge.id, challenge.xp_reward)}
-            className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all active:scale-95"
-            style={{ background: accentColor, color: 'var(--surface-0)' }}
-          >
-            Claim {challenge.xp_reward} XP
-          </button>
-        ) : !isClaimed ? (
-          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Complete to claim</span>
-        ) : (
+        {isClaimed ? (
           <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
             <CheckIcon size={12} /> Claimed
           </span>
-        )}
+        ) : !isDone ? (
+          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Complete to claim</span>
+        ) : null}
       </div>
+
+      {/* Claim button — full-width, prominent */}
+      {!isClaimed && isDone && (
+        <button
+          onClick={() => onClaim(challenge.id, challenge.xp_reward)}
+          className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl font-bold transition-all active:scale-[0.98]"
+          style={{
+            padding: '13px 0',
+            background: accentColor,
+            color: '#1A1A2E',
+            fontSize: 15,
+            boxShadow: `0 4px 20px ${accentColor}44`,
+            letterSpacing: '0.01em',
+          }}
+        >
+          <ZapIcon size={16} color="#1A1A2E" />
+          Claim {challenge.xp_reward} XP
+        </button>
+      )}
 
       {/* Reroll confirm inline */}
       {showRerollConfirm && (
         <div
-          className="mt-2 rounded-lg p-3 flex items-center gap-3"
-          style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+          className="mt-3 rounded-xl p-3 flex flex-col gap-2.5"
+          style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}
         >
-          <span className="text-xs flex-1" style={{ color: 'var(--text-primary)' }}>
+          <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
             Reroll this challenge?
           </span>
-          <button
-            onClick={() => { onReroll(challenge.id, templateKey); setShowRerollConfirm(false) }}
-            className="text-xs px-2 py-1 rounded-md font-semibold"
-            style={{ background: accentColor, color: 'var(--surface-0)' }}
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => setShowRerollConfirm(false)}
-            className="text-xs px-2 py-1 rounded-md"
-            style={{ background: 'var(--surface-3)', color: 'var(--text-secondary)' }}
-          >
-            Cancel
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => { onReroll(challenge.id, templateKey); setShowRerollConfirm(false) }}
+              className="flex-1 rounded-xl font-bold transition-all active:scale-95"
+              style={{ padding: '10px 0', background: accentColor, color: '#1A1A2E', fontSize: 13 }}
+            >
+              Yes, reroll
+            </button>
+            <button
+              onClick={() => setShowRerollConfirm(false)}
+              className="flex-1 rounded-xl font-semibold transition-all active:scale-95"
+              style={{ padding: '10px 0', background: 'var(--surface-3)', color: 'var(--text-secondary)', fontSize: 13 }}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
     </div>

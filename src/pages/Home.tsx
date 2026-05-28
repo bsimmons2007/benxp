@@ -11,11 +11,13 @@ import { useCountUp } from '../hooks/useCountUp'
 import { useStreak } from '../hooks/useStreak'
 import { useStore } from '../store/useStore'
 import { formatDate, toRoman, localDateStr, today as appToday } from '../lib/utils'
-import { ArrowUpIcon, ArrowDownIcon, ActivityIconComp } from '../components/ui/Icon'
+import { ArrowUpIcon, ArrowDownIcon, ActivityIconComp, ZapIcon } from '../components/ui/Icon'
 import { SecondaryStatSkeleton, ActivityRowSkeleton } from '../components/ui/Skeleton'
 import { xpForLevel, getLevelTitle, XP_RATES, deriveTrendsFromRawRows } from '../lib/xp'
 import type { TrendResult } from '../lib/xp'
 import { checkStreakBreakWarning } from '../lib/notifications'
+import { supabase } from '../lib/supabase'
+import { getProgress } from '../lib/challenges'
 import { useStrengthSnapshot } from '../components/StrengthTab'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
@@ -387,6 +389,7 @@ export function Home() {
   const widgetsAnimated = useRef(false)
   const [showBreakdown,  setShowBreakdown]  = useState(false)
   const [showUpdatedChip, setShowUpdatedChip] = useState(false)
+  const [claimableCount, setClaimableCount]   = useState(0)
 
   // Show auto-dismiss "Data updated" chip after background refresh
   const isFirstUpdate = useRef(true)
@@ -437,6 +440,31 @@ export function Home() {
     const cards = Array.from(widgetGridRef.current.children) as HTMLElement[]
     animateWidgets(cards)
   }, [loading])
+
+  useEffect(() => {
+    async function checkClaimable() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data: challenges } = await supabase
+        .from('challenges')
+        .select('notes, tier, target')
+        .eq('user_id', user.id)
+        .in('tier', ['Weekly', 'Monthly'])
+        .eq('status', 'active')
+      if (!challenges?.length) return
+      const progresses = await Promise.all(
+        challenges.map((c: { notes: string | null; tier: string }) =>
+          getProgress(supabase, c.notes ?? '', c.tier as 'Weekly' | 'Monthly')
+        )
+      )
+      const count = challenges.filter((c: { target: string | null }, i: number) => {
+        const target = parseFloat(c.target ?? '1') || 1
+        return progresses[i] >= target
+      }).length
+      setClaimableCount(count)
+    }
+    checkClaimable()
+  }, [])
 
   const toNext       = xpForLevel(level + 1) - totalXP
   const { refreshing, pullDistance, threshold } = usePullToRefresh(async () => {
@@ -543,6 +571,34 @@ export function Home() {
             ✓ Data updated
           </div>
         </div>
+
+        {/* ── Claimable challenges banner ── */}
+        {claimableCount > 0 && (
+          <Link to="/challenges" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '12px 16px', borderRadius: 14,
+              background: 'linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, var(--surface-1)), color-mix(in srgb, var(--accent) 8%, var(--surface-1)))',
+              border: '1px solid color-mix(in srgb, var(--accent) 40%, transparent)',
+              boxShadow: '0 2px 14px color-mix(in srgb, var(--accent) 18%, transparent)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: 'color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <ZapIcon size={17} color="var(--accent)" />
+                </div>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+                    {claimableCount} challenge{claimableCount !== 1 ? 's' : ''} ready to claim
+                  </p>
+                  <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Tap to collect your XP</p>
+                </div>
+              </div>
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M1 1l5 5-5 5" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </Link>
+        )}
 
         {/* ── XP Hero Card ── */}
         <div className="rounded-2xl mb-5" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
