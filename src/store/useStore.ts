@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { calculateLevel, levelProgress, fetchXPAndStats, getCachedXPData, setCachedXPData, getCachedXPTimestamp, deriveActivityFromRawRows } from '../lib/xp'
 import type { AppStats, RawActivityData, ActivityEntry } from '../lib/xp'
 import { supabase } from '../lib/supabase'
-import { invalidateStreakCache } from '../hooks/useStreak'
 import { invalidateBadgeCache } from '../hooks/useAchievements'
 
 export type { AppStats, RawActivityData, ActivityEntry }
@@ -192,7 +191,6 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   refreshActivity: () => {
-    invalidateStreakCache()
     invalidateBadgeCache()
     const rawRows = get().rawRows
     if (rawRows) set({ recentActivity: deriveActivityFromRawRows(rawRows) })

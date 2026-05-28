@@ -20,10 +20,6 @@ export function formatDateTooltip(iso: string): string {
   return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 }
 
-export function formatNumber(n: number, decimals = 1): string {
-  return n.toFixed(decimals)
-}
-
 /** Formats a Date as YYYY-MM-DD using the browser's local timezone. */
 export function localDateStr(d: Date): string {
   return [

@@ -16,9 +16,6 @@ export interface StreakData {
   cardioLongest: number
 }
 
-/** No-op kept for call-sites that invalidate after logging. */
-export function invalidateStreakCache() {}
-
 function prevDay(dateStr: string): string {
   const d = new Date(dateStr + 'T12:00:00')
   d.setDate(d.getDate() - 1)

@@ -28,14 +28,9 @@
   --radius-xl: 24px;
 
   /* Shadow — neutral, depth only */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 8px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
   --shadow-lg: 0 12px 24px rgba(0,0,0,0.09), 0 4px 8px rgba(0,0,0,0.05);
-
-  /* Spacing — 4px grid */
-  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
-  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
 
   /* Accent — overridden at runtime by applyTheme() */
   --accent:        #2D9BF0;
@@ -46,7 +41,6 @@
   /* Font */
   --font-sans:    'Space Grotesk', system-ui, -apple-system, sans-serif;
   --font-mono:    'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
-  --font-display: var(--font-sans);
   --font-serif:   var(--font-sans);
 
   /* Status */
@@ -60,9 +54,6 @@
   --color-coral:    #e5443f;
   --color-ink:      #0d0d1a;
   --color-paper:    #f3efe6;
-  --color-coral-50: #fadcd9;
-  --color-ink-soft: #22222e;
-  --color-ash:      #6a6657;
 
   /* ── Legacy aliases — keep all existing components working ── */
   --base-bg:       var(--surface-0);
@@ -77,10 +68,6 @@
   --card-shadow:   var(--shadow-md);
   --text-muted:    var(--text-tertiary);
   --text-dim:      var(--text-disabled);
-  --r-sm: var(--radius-sm);
-  --r-md: var(--radius-md);
-  --r-lg: var(--radius-lg);
-  --r-xl: var(--radius-xl);
   /* Orb vars — kept as no-op so theme.ts setProperty calls don't error */
   --orb1: transparent;
   --orb2: transparent;
@@ -94,7 +81,6 @@
   --cat-books:    #fbbf24;
   --cat-sports:   #f97316;
   --cat-gaming:   #a78bfa;
-  --info:         #3b82f6;
 
   /* Badge category colors */
   --badge-gym:      #27ae60;
@@ -129,7 +115,6 @@ html[data-mode="dark"] {
   --border-default: rgba(255,255,255,0.10);
   --border-strong:  rgba(255,255,255,0.18);
 
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.35);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.30);
   --shadow-md: 0 4px 8px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.30);
   --shadow-lg: 0 12px 24px rgba(0,0,0,0.55), 0 4px 8px rgba(0,0,0,0.40);
@@ -141,12 +126,7 @@ html[data-mode="dark"] {
   --warning: #fb923c;
 }
 
-/* ─────────────────────────────────────────────────────────────
-   LIGHT MODE  (explicit, for components using old data-mode="light")
-───────────────────────────────────────────────────────────── */
-html[data-mode="light"] {
-  /* surface/text/border already handled by :root defaults above */
-}
+
 
 /* ─────────────────────────────────────────────────────────────
    RESET & BASE
@@ -348,9 +328,6 @@ input[type="range"]::-moz-range-thumb {
 
 /* Keep legacy class names that components still reference */
 .star-fill        { animation: countUp 0.2s ease both; }
-.glow-pulse       { /* no-op — glow removed */ }
-.pr-badge         { /* no-op */ }
-.border-glow      { /* no-op */ }
 .orb-float        { /* no-op */ }
 .top-load-bar     { animation: progressFill 1.8s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
 .nav-active-dot {
