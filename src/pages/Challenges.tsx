@@ -17,7 +17,10 @@ import {
   daysUntilYearEnd,
   syncBossChallenges,
   getBossProgress,
+  nextBossTarget,
+  bossChallengeName,
 } from '../lib/challenges'
+import type { BossKey } from '../lib/challenges'
 import { playGoalComplete } from '../lib/sounds'
 import type { Challenge } from '../types'
 import type { TutorialStep } from '../lib/challenges'
@@ -211,11 +214,19 @@ function ChallengeCard({
 
 // ── Boss card ─────────────────────────────────────────────────────
 
-function BossCard({ challenge }: { challenge: Challenge }) {
+function BossCard({
+  challenge,
+  onClaim,
+}: {
+  challenge: Challenge
+  onClaim: (id: string, xp: number) => Promise<void>
+}) {
   const [progress, setProgress] = useState<{ current: number; target: number } | null>(null)
-  const poolKey    = challenge.notes ?? ''
-  const targetVal  = parseFloat(challenge.target ?? '0')
-  const daysLeft   = daysUntilYearEnd()
+  const [claiming, setClaiming] = useState(false)
+  const poolKey   = challenge.notes ?? ''
+  const targetVal = parseFloat(challenge.target ?? '0')
+  const daysLeft  = daysUntilYearEnd()
+  const isClaimed = challenge.status === 'claimed'
 
   useEffect(() => {
     if (!poolKey || !targetVal) return
@@ -227,64 +238,74 @@ function BossCard({ challenge }: { challenge: Challenge }) {
   const pct    = progress ? Math.min((progress.current / progress.target) * 100, 100) : null
   const isDone = pct !== null && pct >= 100
 
-  // Adapt progress label to boss type
   const progressLabel = poolKey === 'boss_skate' ? 'Total Miles' : 'Best 1RM'
   const unit          = poolKey === 'boss_skate' ? 'mi' : 'lbs'
+  const nextTarget    = nextBossTarget(poolKey as BossKey, targetVal)
+  const nextName      = bossChallengeName(poolKey as BossKey, nextTarget)
+
+  async function handleClaim() {
+    setClaiming(true)
+    await onClaim(challenge.id, challenge.xp_reward)
+    setClaiming(false)
+  }
 
   return (
     <div
-      className="mb-3 rounded-xl overflow-hidden transition-all"
+      className="mb-4 rounded-2xl overflow-hidden transition-all"
       style={{
         background: 'var(--surface-1)',
-        border: `1px solid ${isDone ? BOSS_COLOR + '88' : 'var(--border)'}`,
-        boxShadow: isDone ? `0 0 20px ${BOSS_COLOR}28` : 'none',
+        border: `1px solid ${isDone && !isClaimed ? BOSS_COLOR + '99' : 'var(--border-subtle)'}`,
+        boxShadow: isDone && !isClaimed ? `0 4px 24px ${BOSS_COLOR}28` : 'none',
+        opacity: isClaimed ? 0.65 : 1,
       }}
     >
       {/* Top accent strip */}
-      <div style={{ height: 3, background: `linear-gradient(90deg, ${BOSS_COLOR}55, ${BOSS_COLOR})` }} />
+      <div style={{ height: 3, background: `linear-gradient(90deg, ${BOSS_COLOR}44, ${BOSS_COLOR}, ${BOSS_COLOR}44)` }} />
 
       <div className="p-4">
         {/* Header */}
-        <div className="flex items-start gap-3 mb-3">
+        <div className="flex items-start gap-3 mb-4">
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: `${BOSS_COLOR}1a`, border: `1px solid ${BOSS_COLOR}44` }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: `${BOSS_COLOR}18`, border: `1px solid ${BOSS_COLOR}44` }}
           >
-            <SwordIcon size={17} color={BOSS_COLOR} />
+            <SwordIcon size={18} color={BOSS_COLOR} />
           </div>
-          <div className="flex-1">
-            <p className="font-semibold text-sm leading-snug mb-1.5" style={{ color: 'var(--text-primary)' }}>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold leading-snug mb-2" style={{ color: 'var(--text-primary)', fontSize: 15 }}>
               {challenge.challenge_name}
             </p>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-xs font-mono font-bold" style={{ color: BOSS_COLOR }}>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-mono font-bold text-xs" style={{ color: BOSS_COLOR }}>
                 +{challenge.xp_reward} XP
               </span>
               {challenge.category && <Badge label={challenge.category} />}
-              {isDone && (
-                <span className="text-xs font-semibold" style={{ color: BOSS_COLOR }}>· Conquered</span>
+              {isClaimed && (
+                <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: BOSS_COLOR }}>
+                  <CheckIcon size={11} /> Conquered
+                </span>
               )}
             </div>
           </div>
         </div>
 
         {/* Progress */}
-        {progress && (
-          <div className="mb-3">
-            <div className="flex justify-between mb-1.5">
-              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{progressLabel}</span>
-              <span className="text-xs font-mono" style={{ color: isDone ? BOSS_COLOR : 'var(--text-secondary)' }}>
-                {progress.current} {unit} / {progress.target} {unit}
+        {progress && !isClaimed && (
+          <div className="mb-4">
+            <div className="flex items-baseline justify-between mb-2">
+              <span className="section-label">{progressLabel}</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: isDone ? BOSS_COLOR : 'var(--text-secondary)' }}>
+                {progress.current}
+                <span style={{ color: 'var(--text-tertiary)', fontSize: 11, marginLeft: 2 }}>{unit}</span>
+                <span style={{ color: 'var(--text-tertiary)', fontSize: 11, fontWeight: 400 }}> / {progress.target} {unit}</span>
               </span>
             </div>
-            <div className="w-full rounded-full overflow-hidden" style={{ height: 5, background: 'var(--surface-2)' }}>
+            <div className="w-full rounded-full overflow-hidden" style={{ height: 6, background: 'var(--surface-2)' }}>
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${pct ?? 0}%`,
-                  background: isDone
-                    ? BOSS_COLOR
-                    : `linear-gradient(90deg, ${BOSS_COLOR}55, ${BOSS_COLOR})`,
+                  background: isDone ? BOSS_COLOR : `linear-gradient(90deg, ${BOSS_COLOR}66, ${BOSS_COLOR})`,
                 }}
               />
             </div>
@@ -293,18 +314,57 @@ function BossCard({ challenge }: { challenge: Challenge }) {
 
         {/* Footer */}
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono" style={{ color: 'var(--text-secondary)' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>
             Resets Jan 1 · {daysLeft} day{daysLeft === 1 ? '' : 's'} left
           </span>
-          {isDone && (
-            <span
-              className="text-xs font-semibold px-2 py-0.5 rounded-full"
-              style={{ background: `${BOSS_COLOR}22`, color: BOSS_COLOR }}
-            >
-              Conquered
+          {isClaimed && (
+            <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: BOSS_COLOR }}>
+              <TrophyIcon size={12} /> Conquered
             </span>
           )}
+          {!isDone && !isClaimed && (
+            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>In progress</span>
+          )}
         </div>
+
+        {/* Claim section — only shows when conquered */}
+        {isDone && !isClaimed && (
+          <div className="mt-4">
+            {/* Next tier preview */}
+            <div
+              className="flex items-center gap-2.5 rounded-xl p-3 mb-3"
+              style={{ background: `${BOSS_COLOR}0d`, border: `1px solid ${BOSS_COLOR}2a` }}
+            >
+              <ZapIcon size={14} color={BOSS_COLOR} />
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: BOSS_COLOR, textTransform: 'uppercase', letterSpacing: '0.06em', lineHeight: 1.2 }}>
+                  Next tier unlocks after claiming
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
+                  {nextName}
+                </p>
+              </div>
+            </div>
+
+            {/* Claim button */}
+            <button
+              onClick={handleClaim}
+              disabled={claiming}
+              className="w-full flex items-center justify-center gap-2 rounded-xl font-bold transition-all active:scale-[0.97]"
+              style={{
+                padding: '15px 0',
+                background: `linear-gradient(135deg, ${BOSS_COLOR}ee, ${BOSS_COLOR})`,
+                color: '#1A1A2E',
+                fontSize: 16,
+                boxShadow: `0 6px 28px ${BOSS_COLOR}55`,
+                letterSpacing: '0.02em',
+              }}
+            >
+              <TrophyIcon size={18} color="#1A1A2E" />
+              {claiming ? 'Claiming…' : `Conquer — ${challenge.xp_reward} XP`}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -588,6 +648,11 @@ export function Challenges() {
     await load()
   }
 
+  // Separate wrapper so BossCard gets a typed async fn with the right signature
+  async function handleBossClaim(id: string, xp: number): Promise<void> {
+    await handleClaim(id, xp)
+  }
+
   async function handleClaimAll(tierChallenges: Challenge[]) {
     const claimable = tierChallenges.filter(c => {
       const target = parseFloat(c.target ?? '1') || 1
@@ -691,7 +756,7 @@ export function Challenges() {
                   </p>
                 </div>
 
-                {boss.map(c => <BossCard key={c.id} challenge={c} />)}
+                {boss.map(c => <BossCard key={c.id} challenge={c} onClaim={handleBossClaim} />)}
               </section>
             )}
           </>
