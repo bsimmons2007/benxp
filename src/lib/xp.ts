@@ -71,7 +71,7 @@ export const XP_RATES = {
   cardio_swim_per_mile: 25,   // ~30-40 min/mile, highest effort per distance
   cardio_walk_per_mile:  4,   // ~15-20 min/mile, low intensity
   mood_log:             15,   // daily mental health tracking
-  measurement_log:      25,   // body tracking
+  measurement_log:       5,   // body tracking — minimal, one per day enforced
   water_goal_reached:   50,   // daily 64oz goal hit
   basketball_session:   25,   // per hoops session
   basketball_per_point:  1,   // each point scored
@@ -211,7 +211,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ total
     supabase.from('cardio_sessions').select('distance_miles, activity, date'),
     supabase.from('goals').select('xp_reward').eq('status', 'completed'),
     supabase.from('mood_log').select('date, mood'),
-    supabase.from('body_measurements').select('date, weight_lbs, body_fat_pct').order('date', { ascending: false }).limit(1),
+    supabase.from('body_measurements').select('date, weight_lbs, body_fat_pct').order('date', { ascending: false }),
     supabase.from('water_log').select('date, oz'),
     supabase.from('basketball_sessions').select('points, date, fg_made, fg_attempted'),
     supabase.from('pickleball_games').select('win, date, my_score, opp_score'),

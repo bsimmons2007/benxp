@@ -159,11 +159,10 @@ export function Measurements() {
   useEffect(() => { load() }, [])
 
   async function onSubmit(form: MeasureForm) {
-    // Require every numeric field to be filled before saving
     const numericKeys = Object.keys(form).filter(k => k !== 'date' && k !== 'notes') as (keyof MeasureForm)[]
-    const missing = numericKeys.filter(k => form[k].trim() === '' || isNaN(parseFloat(form[k])))
-    if (missing.length > 0) {
-      setToast('Fill in all measurements before saving')
+    const filled = numericKeys.filter(k => form[k].trim() !== '' && !isNaN(parseFloat(form[k])))
+    if (filled.length === 0) {
+      setToast('Enter at least one measurement')
       return
     }
 
@@ -172,16 +171,37 @@ export function Measurements() {
     if (!user) { setSaving(false); return }
 
     const payload: Record<string, unknown> = { user_id: user.id, date: form.date }
-    for (const k of numericKeys) {
-      payload[k] = parseFloat(form[k])
-    }
+    for (const k of filled) payload[k] = parseFloat(form[k])
     if (form.notes.trim()) payload['notes'] = form.notes.trim()
 
-    const { error } = await supabase.from('body_measurements').insert(payload)
+    // One entry per day — update if date already exists, insert otherwise
+    const { data: existing } = await supabase
+      .from('body_measurements')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('date', form.date)
+      .limit(1)
+
+    const existingRow = existing?.[0] as { id: string } | undefined
+    let error: unknown
+    let isUpdate = false
+
+    if (existingRow) {
+      isUpdate = true
+      const { error: e } = await supabase.from('body_measurements').update(payload).eq('id', existingRow.id)
+      error = e
+    } else {
+      const { error: e } = await supabase.from('body_measurements').insert(payload)
+      error = e
+    }
+
     if (error) { setToast('Failed to save — try again'); setSaving(false); return }
     reset({ date: today() })
     setShowForm(false)
-    setToast(`+${XP_RATES.measurement_log} XP — Measurements saved!`)
+    setToast(isUpdate
+      ? 'Measurements updated'
+      : `+${XP_RATES.measurement_log} XP — Measurements logged!`
+    )
     load()
     setSaving(false)
   }
@@ -296,7 +316,7 @@ export function Measurements() {
                     className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
                     style={{
                       background: activeChart === o.key ? 'var(--accent)' : 'var(--surface-2)',
-                      color:      activeChart === o.key ? 'var(--base-bg)' : 'var(--text-muted)',
+                      color:      activeChart === o.key ? '#1A1A2E' : 'var(--text-muted)',
                     }}
                   >
                     {o.label}
