@@ -293,10 +293,6 @@ export function Login() {
           zIndex: 10,
         }} />
 
-        {/* Ambient orbs */}
-        <div className="orb-float" style={{ position: 'absolute', top: -60, right: 60, width: 440, height: 440, borderRadius: '50%', background: 'var(--orb1)', filter: 'blur(110px)', opacity: 0.35 }} />
-        <div className="orb-float" style={{ position: 'absolute', bottom: -50, left: -20, width: 320, height: 320, borderRadius: '50%', background: 'var(--orb2)', filter: 'blur(90px)', opacity: 0.28, animationDelay: '3s' }} />
-
         {/* Grid texture */}
         <div style={{
           position: 'absolute', inset: 0,
@@ -437,10 +433,6 @@ export function Login() {
         className="flex-1 flex flex-col items-center justify-center px-6 relative overflow-hidden"
         style={{ minHeight: '100vh' }}
       >
-        {/* Mobile-only orbs */}
-        <div className="md:hidden orb-float" style={{ position: 'absolute', top: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'var(--orb1)', filter: 'blur(60px)', opacity: 0.3 }} />
-        <div className="md:hidden orb-float" style={{ position: 'absolute', bottom: -60, right: -60, width: 250, height: 250, borderRadius: '50%', background: 'var(--orb2)', filter: 'blur(50px)', opacity: 0.25, animationDelay: '2s' }} />
-
         <div className="relative z-10 w-full" style={{ maxWidth: 380 }}>
 
           {/* Mobile-only logo */}

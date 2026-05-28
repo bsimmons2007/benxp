@@ -338,10 +338,6 @@ export const PROGRESS_FNS: Record<string, (sb: SupabaseClient, since: string) =>
     const { count } = await sb.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'swim').gte('date', since)
     return count ?? 0
   },
-  swim_days: async (sb, since) => {
-    const { data } = await sb.from('cardio_sessions').select('date').eq('activity', 'swim').gte('date', since)
-    return new Set((data ?? []).map((r: { date: string }) => r.date)).size
-  },
   walk_miles: async (sb, since) => {
     const { data } = await sb.from('cardio_sessions').select('distance_miles').eq('activity', 'walk').gte('date', since)
     return Math.round(((data ?? []).reduce((s: number, r: { distance_miles: number }) => s + (r.distance_miles ?? 0), 0)) * 10) / 10

@@ -57,8 +57,6 @@
 
   /* ── Legacy aliases — keep all existing components working ── */
   --base-bg:       var(--surface-0);
-  --bg-mid:        var(--surface-2);
-  --bg-deep:       var(--surface-0);
   --card-bg:       var(--surface-1);
   --nav-bg:        var(--surface-1);
   --input-bg:      var(--surface-2);
@@ -68,10 +66,6 @@
   --card-shadow:   var(--shadow-md);
   --text-muted:    var(--text-tertiary);
   --text-dim:      var(--text-disabled);
-  /* Orb vars — kept as no-op so theme.ts setProperty calls don't error */
-  --orb1: transparent;
-  --orb2: transparent;
-  --orb3: transparent;
 
   /* Category palette — activity feeds, charts, badges (same in light + dark) */
   --cat-cardio:   #3b82f6;
@@ -328,7 +322,6 @@ input[type="range"]::-moz-range-thumb {
 
 /* Keep legacy class names that components still reference */
 .star-fill        { animation: countUp 0.2s ease both; }
-.orb-float        { /* no-op */ }
 .top-load-bar     { animation: progressFill 1.8s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
 .nav-active-dot {
   width: 20px; height: 3px; border-radius: 2px;

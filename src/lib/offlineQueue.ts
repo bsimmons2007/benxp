@@ -20,16 +20,6 @@ function writeQueue(q: QueuedInsert[]) {
   localStorage.setItem(QUEUE_KEY, JSON.stringify(q))
 }
 
-export function queueInsert(table: string, payload: Record<string, unknown>) {
-  const q = readQueue()
-  q.push({ id: crypto.randomUUID(), table, payload, timestamp: Date.now() })
-  writeQueue(q)
-}
-
-export function queueLength(): number {
-  return readQueue().length
-}
-
 export async function flushQueue(): Promise<void> {
   const q = readQueue()
   if (!q.length) return
