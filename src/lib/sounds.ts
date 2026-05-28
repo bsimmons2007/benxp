@@ -80,6 +80,30 @@ export function playGoalComplete() {
   notes.forEach((freq, i) => tone(ac, freq, t + i * 0.07, 0.45, 0.14))
 }
 
+export function playBossConquered() {
+  if (!sfxEnabled()) return
+  const ac = getCtx()
+  const t  = ac.currentTime
+  // Thunderous low impact
+  tone(ac, 65.41,  t,        0.30, 0.28, 'sawtooth')
+  tone(ac, 130.81, t,        0.30, 0.20, 'sawtooth')
+  // Rising power chords
+  tone(ac, 174.61, t + 0.12, 0.40, 0.16, 'sawtooth')
+  tone(ac, 261.63, t + 0.12, 0.40, 0.14, 'sawtooth')
+  tone(ac, 261.63, t + 0.30, 0.45, 0.14, 'sawtooth')
+  tone(ac, 392.00, t + 0.30, 0.45, 0.12, 'sawtooth')
+  // Triumphant ascent
+  tone(ac, 392.00, t + 0.48, 0.55, 0.17)
+  tone(ac, 523.25, t + 0.62, 0.60, 0.16)
+  tone(ac, 659.25, t + 0.76, 0.65, 0.15)
+  tone(ac, 783.99, t + 0.90, 0.70, 0.14)
+  tone(ac, 1046.50,t + 1.04, 0.75, 0.15)
+  // Victory shimmer
+  tone(ac, 1318.51,t + 1.18, 0.60, 0.11)
+  tone(ac, 1567.98,t + 1.32, 0.70, 0.09)
+  tone(ac, 2093.00,t + 1.46, 0.55, 0.07)
+}
+
 export function playRankUp() {
   if (!sfxEnabled()) return
   const ac = getCtx()

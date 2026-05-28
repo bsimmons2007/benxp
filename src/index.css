@@ -504,6 +504,32 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   BOSS CONQUERED OVERLAY
+───────────────────────────────────────────────────────────── */
+@keyframes bossParticle {
+  0%   { transform: translate(-50%,-50%) rotate(var(--a)) translateX(0px) scale(1); opacity: 1; }
+  100% { transform: translate(-50%,-50%) rotate(var(--a)) translateX(var(--d)) scale(0.15); opacity: 0; }
+}
+@keyframes bossTrophyIn {
+  0%   { transform: scale(0) rotate(-14deg); opacity: 0; }
+  60%  { transform: scale(1.22) rotate(5deg);  opacity: 1; }
+  80%  { transform: scale(0.93) rotate(-2deg); }
+  100% { transform: scale(1)    rotate(0deg);  opacity: 1; }
+}
+@keyframes bossGlowPulse {
+  0%, 100% { box-shadow: 0 0 28px #f5a62344, 0 0 60px #f5a62218; }
+  50%       { box-shadow: 0 0 64px #f5a623bb, 0 0 120px #f5a62355; }
+}
+@keyframes bossTextIn {
+  0%   { opacity: 0; transform: translateY(18px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes bossLabelIn {
+  0%   { opacity: 0; letter-spacing: 0.6em; }
+  100% { opacity: 1; letter-spacing: 0.32em; }
+}
+
+/* ─────────────────────────────────────────────────────────────
    TUTORIAL
 ───────────────────────────────────────────────────────────── */
 .tutorial-card-enter { animation: tutorialCardEnter 0.22s cubic-bezier(0.22,1,0.36,1) both; }

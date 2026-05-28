@@ -25,6 +25,7 @@ import { playGoalComplete } from '../lib/sounds'
 import type { Challenge } from '../types'
 import type { TutorialStep } from '../lib/challenges'
 import { CheckIcon, ZapIcon, RefreshCwIcon, SwordIcon, TrophyIcon } from '../components/ui/Icon'
+import { BossConqueredOverlay } from '../components/ui/BossConqueredOverlay'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Tier color constants ───────────────────────────────────────────
@@ -590,6 +591,7 @@ export function Challenges() {
   const [tutorialSteps, setTutorialSteps] = useState<TutorialStep[]>([])
   const [weeklyRerolls, setWeeklyRerolls] = useState(3)
   const [monthlyRerolls, setMonthlyRerolls] = useState(3)
+  const [conqueredBoss, setConqueredBoss] = useState<{ name: string; xp: number; nextName: string } | null>(null)
 
   const refreshXP = useStore(s => s.refreshXP)
 
@@ -648,9 +650,17 @@ export function Challenges() {
     await load()
   }
 
-  // Separate wrapper so BossCard gets a typed async fn with the right signature
+  // Separate wrapper — triggers the conquest overlay after claiming
   async function handleBossClaim(id: string, xp: number): Promise<void> {
+    const c = challenges.find(ch => ch.id === id)
     await handleClaim(id, xp)
+    if (c) {
+      const poolKey    = c.notes ?? ''
+      const targetVal  = parseFloat(c.target ?? '0')
+      const nextTarget = nextBossTarget(poolKey as BossKey, targetVal)
+      const nextName   = bossChallengeName(poolKey as BossKey, nextTarget)
+      setConqueredBoss({ name: c.challenge_name, xp, nextName })
+    }
   }
 
   async function handleClaimAll(tierChallenges: Challenge[]) {
@@ -691,6 +701,14 @@ export function Challenges() {
 
   return (
     <>
+      {conqueredBoss && (
+        <BossConqueredOverlay
+          bossName={conqueredBoss.name}
+          xp={conqueredBoss.xp}
+          nextName={conqueredBoss.nextName}
+          onDone={() => setConqueredBoss(null)}
+        />
+      )}
       <TopBar title="Quests" />
       <PageWrapper>
         {loading ? (
