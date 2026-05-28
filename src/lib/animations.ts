@@ -40,14 +40,13 @@ export function animateWidgets(widgets: HTMLElement[]): void {
 
 // Level-up overlay: full sequenced timeline.
 export function animateLevelUpOverlay(els: {
-  ring:      HTMLElement
-  levelNum:  HTMLElement
-  particles: HTMLElement[]
-  label:     HTMLElement
-  title:     HTMLElement
-  hint:      HTMLElement
+  ring:     HTMLElement
+  levelNum: HTMLElement
+  label:    HTMLElement
+  title:    HTMLElement
+  hint:     HTMLElement
 }): void {
-  const { ring, levelNum, particles, label, title, hint } = els
+  const { ring, levelNum, label, title, hint } = els
 
   createTimeline()
     // Ring pops in with rotation spring
@@ -65,21 +64,13 @@ export function animateLevelUpOverlay(els: {
       duration: 520,
       ease:    'outBack(2.8)',
     }, '-=500')
-    // Particles burst from center, staggered
-    .add(particles, {
-      scale:   [0, 1],
-      opacity: [0, 1],
-      duration: 420,
-      delay:   stagger(22),
-      ease:    'outQuart',
-    }, '-=350')
     // "LEVEL UP" label slides up
     .add(label, {
       translateY: [14, 0],
       opacity:    [0, 1],
       duration:   340,
       ease:       'outCubic',
-    }, '-=200')
+    }, '-=100')
     // Title slides up slightly after
     .add(title, {
       translateY: [16, 0],

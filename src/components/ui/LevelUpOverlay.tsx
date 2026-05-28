@@ -16,7 +16,6 @@ export function LevelUpOverlay() {
   const labelRef     = useRef<HTMLParagraphElement>(null)
   const titleRef     = useRef<HTMLParagraphElement>(null)
   const hintRef      = useRef<HTMLParagraphElement>(null)
-  const particleRefs = useRef<HTMLDivElement[]>([])
 
   useEffect(() => {
     if (!levelUpPending) return
@@ -30,12 +29,11 @@ export function LevelUpOverlay() {
         labelRef.current && titleRef.current && hintRef.current
       ) {
         animateLevelUpOverlay({
-          ring:      ringRef.current,
-          levelNum:  levelNumRef.current,
-          particles: particleRefs.current.filter(Boolean),
-          label:     labelRef.current,
-          title:     titleRef.current,
-          hint:      hintRef.current,
+          ring:     ringRef.current,
+          levelNum: levelNumRef.current,
+          label:    labelRef.current,
+          title:    titleRef.current,
+          hint:     hintRef.current,
         })
       }
     })
@@ -77,27 +75,6 @@ export function LevelUpOverlay() {
           animation: 'bossTextIn 0.6s ease 0.1s both',
         }}>
           <Wordmark size={22} color="var(--text-secondary)" accent="var(--accent)" showPulse />
-        </div>
-
-        {/* Particle ring — same refs, animejs drives them */}
-        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div
-              key={i}
-              ref={el => { if (el) particleRefs.current[i] = el }}
-              style={{
-                position: 'absolute',
-                top: '50%', left: '50%',
-                width:  i % 3 === 0 ? 9 : 6,
-                height: i % 3 === 0 ? 9 : 6,
-                borderRadius: '50%',
-                background: i % 2 === 0 ? 'var(--accent)' : 'var(--text-primary)',
-                boxShadow: `0 0 12px var(--accent)`,
-                transform: `rotate(${i * (360 / 18)}deg) translateX(${110 + (i % 4) * 22}px)`,
-                opacity: 0,
-              }}
-            />
-          ))}
         </div>
 
         {/* Glow ring — borderGlow now defined in CSS */}
