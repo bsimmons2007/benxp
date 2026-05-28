@@ -497,10 +497,39 @@ input:focus, select:focus, textarea:focus {
 ::-webkit-scrollbar { display: none; }
 
 /* ─────────────────────────────────────────────────────────────
-   LEVEL-UP OVERLAY  (keeps functioning without glow)
+   LEVEL-UP OVERLAY
 ───────────────────────────────────────────────────────────── */
+/* Mode-aware radial spotlight — accent tints the center,
+   surface-0 is the base so dark/light mode both work    */
 .level-up-bg {
-  background: var(--surface-0);
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    color-mix(in srgb, var(--accent) 22%, var(--surface-0)) 0%,
+    var(--surface-0) 68%
+  );
+}
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 22%, transparent),
+                0 0 60px color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+  50% {
+    border-color: color-mix(in srgb, var(--accent) 85%, transparent);
+    box-shadow: 0 0 50px color-mix(in srgb, var(--accent) 55%, transparent),
+                0 0 110px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+}
+@keyframes glowPulse {
+  0%, 100% {
+    text-shadow: 0 0 28px var(--accent),
+                 0 0 56px color-mix(in srgb, var(--accent) 50%, transparent);
+  }
+  50% {
+    text-shadow: 0 0 55px var(--accent),
+                 0 0 100px color-mix(in srgb, var(--accent) 65%, transparent),
+                 0 0 150px color-mix(in srgb, var(--accent) 30%, transparent);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────
