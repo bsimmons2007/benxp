@@ -124,11 +124,18 @@ export const useStore = create<AppState>((set, get) => ({
       })
     }
 
+    // Safety net: if the network fetch hangs indefinitely, stop showing
+    // the loading bar after 10s so the UI doesn't loop forever
+    const safetyTimer = setTimeout(() => {
+      if (get().loading) set({ loading: false, _initializing: false })
+    }, 10_000)
+
     try {
       const [userData, { totalXP, stats, rawRows }] = await Promise.all([
         fetchUser(),
         fetchXPAndStats(supabase),
       ])
+      clearTimeout(safetyTimer)
       setCachedXPData({ totalXP, stats })
       const now = Date.now()
 
@@ -150,6 +157,7 @@ export const useStore = create<AppState>((set, get) => ({
         ...userData,
       })
     } catch (err) {
+      clearTimeout(safetyTimer)
       console.error('[useStore] init() failed:', err)
       // Reset initializing flag so a retry is possible (e.g. on reconnect)
       set({ loading: false, _initializing: false })

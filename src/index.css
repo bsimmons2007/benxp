@@ -352,7 +352,7 @@ input[type="range"]::-moz-range-thumb {
 .pr-badge         { /* no-op */ }
 .border-glow      { /* no-op */ }
 .orb-float        { /* no-op */ }
-.top-load-bar     { animation: progressFill 1.2s linear infinite; }
+.top-load-bar     { animation: progressFill 1.8s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
 .nav-active-dot {
   width: 20px; height: 3px; border-radius: 2px;
   background: var(--accent);
