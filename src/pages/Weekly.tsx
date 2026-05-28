@@ -227,9 +227,9 @@ export function Weekly() {
               {/* Lifting */}
               {data.workoutDays > 0 && (
                 <Card>
-                  <p className="text-xs uppercase tracking-widest font-mono mb-1" style={{ color: 'var(--text-tertiary)' }}>Lifting</p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{data.workoutDays}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>workout days</p>
+                  <p className="section-label mb-1">Lifting</p>
+                  <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{data.workoutDays}</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 11, marginTop: 2 }}>workout days</p>
                   <p className="mt-1" style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{data.totalSets} sets total</p>
                   {data.newPRs > 0 && (
                     <p style={{ color: '#4ade80', fontSize: 11 }}>{data.newPRs} new PR{data.newPRs > 1 ? 's' : ''}</p>
@@ -245,9 +245,9 @@ export function Weekly() {
               {/* Skate */}
               {data.skateSessions > 0 && (
                 <Card>
-                  <p className="text-xs uppercase tracking-widest font-mono mb-1" style={{ color: 'var(--text-tertiary)' }}>Skating</p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{data.milesSkated.toFixed(1)}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>miles</p>
+                  <p className="section-label mb-1">Skating</p>
+                  <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{data.milesSkated.toFixed(1)}</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 11, marginTop: 2 }}>miles</p>
                   <p className="mt-1" style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{data.skateSessions} session{data.skateSessions > 1 ? 's' : ''}</p>
                 </Card>
               )}
@@ -255,9 +255,9 @@ export function Weekly() {
               {/* Fortnite */}
               {(data.wins > 0 || data.kills > 0) && (
                 <Card>
-                  <p className="text-xs uppercase tracking-widest font-mono mb-1" style={{ color: 'var(--text-tertiary)' }}>Fortnite</p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{data.wins}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>wins</p>
+                  <p className="section-label mb-1">Fortnite</p>
+                  <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{data.wins}</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 11, marginTop: 2 }}>wins</p>
                   {data.kills > 0 && <p className="mt-1" style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{data.kills} kills</p>}
                 </Card>
               )}
@@ -265,9 +265,9 @@ export function Weekly() {
               {/* Sleep */}
               {data.sleepNights > 0 && (
                 <Card>
-                  <p className="text-xs uppercase tracking-widest font-mono mb-1" style={{ color: 'var(--text-tertiary)' }}>Sleep</p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{data.avgSleep.toFixed(1)}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>avg hours/night</p>
+                  <p className="section-label mb-1">Sleep</p>
+                  <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{data.avgSleep.toFixed(1)}</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 11, marginTop: 2 }}>avg hours/night</p>
                   <p className="mt-1" style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{data.sleepNights} nights logged</p>
                   {data.goodSleepNights > 0 && (
                     <p style={{ color: '#4ade80', fontSize: 11 }}>{data.goodSleepNights} good night{data.goodSleepNights > 1 ? 's' : ''}</p>

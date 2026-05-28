@@ -65,7 +65,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
         {open ? '✕ Cancel' : '+ Log a Session'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
             <Input label="Miles" type="number" step="0.01" placeholder="5.5" {...register('miles', { required: true })} />
@@ -164,7 +164,7 @@ export function Skate() {
             { label: 'Sessions', value: sessions.length },
             { label: 'Fastest Mile', value: fastestMile ? fastestMile.toFixed(2) : '—', unit: fastestMile ? 'min' : '' },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl p-3" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+            <div key={s.label} className="rounded-xl p-3" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
               <p className="section-label">{s.label}</p>
               <p className="text-lg font-bold" style={{ color: 'var(--accent)' }}>
                 {s.value}
@@ -201,7 +201,7 @@ export function Skate() {
                 <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis domain={['auto', 'auto']} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
                 <Tooltip
-                  contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
+                  contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -233,7 +233,7 @@ export function Skate() {
                 <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis domain={['auto', 'auto']} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={35} />
                 <Tooltip
-                  contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
+                  contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any

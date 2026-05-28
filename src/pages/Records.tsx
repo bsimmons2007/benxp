@@ -112,9 +112,9 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
         <div
           style={{
             position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
-            background: 'var(--card-bg)', border: '1px solid var(--border)',
+            background: 'var(--surface-2)', border: '1px solid var(--border-subtle)',
             borderRadius: 12, marginTop: 4, maxHeight: 280, overflowY: 'auto',
-            boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
+            boxShadow: 'var(--shadow-lg)',
           }}
         >
           {/* Group filter chips */}
@@ -128,12 +128,12 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
                   style={{
                     padding: '3px 10px', borderRadius: 12, fontSize: 11, cursor: 'pointer',
                     background: activeGrp === g ? 'var(--accent)' : 'var(--input-bg)',
-                    color: activeGrp === g ? 'var(--base-bg)' : 'var(--text-muted)',
+                    color: activeGrp === g ? '#1A1A2E' : 'var(--text-muted)',
                     border: 'none',
                     fontWeight: activeGrp === g ? 700 : 400,
                   }}
                 >
-                  <MuscleGroupIcon group={g} color={activeGrp === g ? 'var(--base-bg)' : 'var(--text-muted)'} /> {g}
+                  <MuscleGroupIcon group={g} color={activeGrp === g ? '#1A1A2E' : 'var(--text-muted)'} /> {g}
                 </button>
               ))}
             </div>
@@ -288,7 +288,7 @@ function ExerciseRow({
 
   return (
     <div className="pop-in" style={{
-      background: 'var(--input-bg)', border: '1px solid var(--border-faint)',
+      background: 'var(--surface-2)', border: '1px solid var(--border-subtle)',
       borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10,
     }}>
       {/* Header */}
@@ -652,7 +652,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       {tmplOpen && !open && (
         <div className="pop-in" style={{
           marginBottom: 12, borderRadius: 14,
-          background: 'var(--card-bg)', border: '1px solid var(--accent-dim)', overflow: 'hidden',
+          background: 'var(--surface-1)', border: '1px solid color-mix(in srgb, var(--accent) 25%, transparent)', overflow: 'hidden',
         }}>
           <p className="section-label" style={{ padding: '12px 14px 8px', borderBottom: '1px solid var(--border-faint)' }}>
             Saved Templates
@@ -903,7 +903,7 @@ function MiniStat({ label, value, color, wide }: { label: string; value: string;
       style={{
         padding: '10px 14px',
         borderRadius: 10,
-        background: 'var(--input-bg)', border: '1px solid var(--border-faint)',
+        background: 'var(--surface-2)', border: '1px solid var(--border-subtle)',
         gridColumn: wide ? '1 / -1' : undefined,
         display: 'flex',
         flexDirection: wide ? 'row' : 'column',
@@ -912,10 +912,8 @@ function MiniStat({ label, value, color, wide }: { label: string; value: string;
         gap: wide ? 0 : 4,
       }}
     >
-      <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
-        {label}
-      </p>
-      <p style={{ fontSize: wide ? 15 : 18, fontWeight: 700, color, lineHeight: 1 }}>{value}</p>
+      <p className="section-label">{label}</p>
+      <p style={{ fontSize: wide ? 15 : 18, fontWeight: 700, color, lineHeight: 1, fontFamily: 'var(--font-mono)' }}>{value}</p>
     </div>
   )
 }
@@ -979,13 +977,13 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
         position: 'relative',
         borderRadius: 14,
         border: open
-          ? '1px solid rgba(245,166,35,0.35)'
-          : hovered ? '1px solid var(--border)' : '1px solid var(--border)',
+          ? '1px solid color-mix(in srgb, var(--accent) 35%, transparent)'
+          : '1px solid var(--border-subtle)',
         background: open
-          ? 'linear-gradient(135deg, var(--bg-mid) 0%, var(--base-bg) 100%)'
-          : 'var(--card-bg)',
+          ? 'linear-gradient(135deg, var(--surface-2) 0%, var(--surface-1) 100%)'
+          : 'var(--surface-1)',
         transition: 'border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease',
-        boxShadow: open ? '0 4px 24px rgba(0,0,0,0.3)' : hovered ? '0 4px 16px rgba(0,0,0,0.25)' : 'none',
+        boxShadow: open ? 'var(--shadow-md)' : hovered ? 'var(--shadow-sm)' : 'none',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -1130,7 +1128,7 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
                         </span>
                       )}
                       {row.is_pr && (
-                        <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--base-bg)', background: 'var(--accent)', padding: '2px 8px', borderRadius: 4 }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: '#1A1A2E', background: 'var(--accent)', padding: '2px 8px', borderRadius: 4 }}>
                           PR
                         </span>
                       )}
@@ -1263,15 +1261,15 @@ export function Records() {
         {!streak.loading && (streak.gymCurrent > 0 || streak.gymLongest > 0) && (
           <Card className="flex items-center justify-between mb-4" style={{ padding: '12px 16px' }}>
             <div>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Gym Streak</p>
-              <p style={{ fontSize: 22, fontWeight: 700, color: streak.gymCurrent > 0 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1.2 }}>
-                {streak.gymCurrent} <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-muted)' }}>days</span>
+              <p className="section-label mb-1">Gym Streak</p>
+              <p style={{ fontSize: 24, fontWeight: 700, color: streak.gymCurrent > 0 ? 'var(--accent)' : 'var(--text-secondary)', lineHeight: 1, fontFamily: 'var(--font-mono)' }}>
+                {streak.gymCurrent} <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-tertiary)' }}>days</span>
               </p>
             </div>
             {streak.gymLongest > 0 && (
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Best</p>
-                <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-secondary)', lineHeight: 1.2 }}>
+                <p className="section-label mb-1">Best</p>
+                <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-secondary)', lineHeight: 1, fontFamily: 'var(--font-mono)' }}>
                   {streak.gymLongest}
                 </p>
               </div>
@@ -1302,9 +1300,9 @@ export function Records() {
                     onClick={() => setMuscleFilter(null)}
                     style={{
                       flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                      background: muscleFilter === null ? 'var(--accent)' : 'var(--input-bg)',
-                      color: muscleFilter === null ? 'var(--base-bg)' : 'var(--text-secondary)',
-                      border: `1px solid ${muscleFilter === null ? 'var(--accent)' : 'var(--border)'}`,
+                      background: muscleFilter === null ? 'var(--accent)' : 'var(--surface-2)',
+                      color: muscleFilter === null ? '#1A1A2E' : 'var(--text-secondary)',
+                      border: `1px solid ${muscleFilter === null ? 'var(--accent)' : 'var(--border-subtle)'}`,
                       cursor: 'pointer', transition: 'all 0.12s ease',
                     }}
                   >All</button>
@@ -1314,12 +1312,12 @@ export function Records() {
                       onClick={() => setMuscleFilter(g => g === grp ? null : grp)}
                       style={{
                         flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                        background: muscleFilter === grp ? 'var(--accent)' : 'var(--input-bg)',
-                        color: muscleFilter === grp ? 'var(--base-bg)' : 'var(--text-secondary)',
-                        border: `1px solid ${muscleFilter === grp ? 'var(--accent)' : 'var(--border)'}`,
+                        background: muscleFilter === grp ? 'var(--accent)' : 'var(--surface-2)',
+                        color: muscleFilter === grp ? '#1A1A2E' : 'var(--text-secondary)',
+                        border: `1px solid ${muscleFilter === grp ? 'var(--accent)' : 'var(--border-subtle)'}`,
                         cursor: 'pointer', transition: 'all 0.12s ease', whiteSpace: 'nowrap',
                       }}
-                    ><MuscleGroupIcon group={grp} color={muscleFilter === grp ? 'var(--base-bg)' : 'var(--text-secondary)'} /> {grp}</button>
+                    ><MuscleGroupIcon group={grp} color={muscleFilter === grp ? '#1A1A2E' : 'var(--text-secondary)'} /> {grp}</button>
                   ))}
                 </div>
               )}
@@ -1343,7 +1341,7 @@ export function Records() {
             <Card>
               <div style={{ marginBottom: 12 }}>
                 <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>Weekly Volume</p>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>lbs lifted (weight × sets × reps) per week</p>
+                <p className="section-label mt-0.5">lbs lifted (weight × sets × reps) per week</p>
               </div>
               <VolumeTrendChart />
             </Card>

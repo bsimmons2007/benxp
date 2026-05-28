@@ -93,7 +93,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
         {open ? '✕ Cancel' : '+ Log Round'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
             <Input label="Course" type="text" placeholder="Papago Disc Golf" {...register('course', { required: true })} />
@@ -149,7 +149,7 @@ function EditDiscGolfModal({ round, onClose, onSaved }: { round: DiscGolfRound; 
 
 // ── Main page ─────────────────────────────────────────────────────
 
-const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function DiscGolf() {
   usePageTitle('Disc Golf')
@@ -186,9 +186,9 @@ export function DiscGolf() {
             { label: 'Best',      value: bestDiff !== null ? vsParLabel(bestDiff) : '—', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
             { label: 'Under Par', value: underPar || '—', color: '#34d399' },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: s.color ?? ACCENT }}>{s.value}</p>
-              <p className="text-xs mt-0.5 section-label">{s.label}</p>
+            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ fontSize: 22, fontWeight: 700, color: s.color ?? ACCENT, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
+              <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>

@@ -26,8 +26,8 @@ function HobbyCard({ icon, label, sub, path, statLabel, statValue, accentColor }
       style={{
         width: '100%', textAlign: 'left', cursor: 'pointer',
         padding: '18px 20px', borderRadius: 16,
-        background: 'var(--card-bg)',
-        border: `1px solid var(--border)`,
+        background: 'var(--surface-1)',
+        border: `1px solid var(--border-subtle)`,
         display: 'flex', alignItems: 'center', gap: 16,
         transition: 'border-color 0.15s, transform 0.12s',
       }}

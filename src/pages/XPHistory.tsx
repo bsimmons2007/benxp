@@ -1,20 +1,33 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
-import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { useXP } from '../hooks/useXP'
 import { DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, GamepadIcon, MoonIcon, TargetIcon, ActivityIconComp } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
+// Category-specific colors matching the Home activity feed
+const CAT_COLORS = {
+  lift:       { icon: 'var(--accent)',  bg: 'color-mix(in srgb, var(--accent) 14%, transparent)' },
+  pr:         { icon: '#fbbf24',        bg: 'rgba(251,191,36,0.14)' },
+  book:       { icon: '#f59e0b',        bg: 'rgba(245,158,11,0.14)' },
+  skate:      { icon: '#38bdf8',        bg: 'rgba(56,189,248,0.14)' },
+  gaming:     { icon: '#a78bfa',        bg: 'rgba(167,139,250,0.14)' },
+  sleep:      { icon: '#818cf8',        bg: 'rgba(129,140,248,0.14)' },
+  challenge:  { icon: '#34d399',        bg: 'rgba(52,211,153,0.14)' },
+  cardio:     { icon: '#38bdf8',        bg: 'rgba(56,189,248,0.14)' },
+  goal:       { icon: '#fbbf24',        bg: 'rgba(251,191,36,0.14)' },
+}
+
 interface XPEvent {
-  date: string
-  label: string
-  icon: ReactNode
-  xp: number
-  key: string
+  date:      string
+  label:     string
+  icon:      ReactNode
+  xp:        number
+  key:       string
+  iconBg:    string
 }
 
 async function fetchXPEvents(): Promise<XPEvent[]> {
@@ -41,9 +54,10 @@ async function fetchXPEvents(): Promise<XPEvent[]> {
     events.push({
       date,
       label: `Gym Day — ${sets} set${sets !== 1 ? 's' : ''}`,
-      icon: <DumbbellIcon size={18} color="var(--accent)" />,
+      icon: <DumbbellIcon size={18} color={CAT_COLORS.lift.icon} />,
       xp: sets * XP_RATES.per_set + XP_RATES.workout_day,
       key: `lift-${date}`,
+      iconBg: CAT_COLORS.lift.bg,
     })
   })
 
@@ -52,9 +66,10 @@ async function fetchXPEvents(): Promise<XPEvent[]> {
     events.push({
       date: r.date,
       label: `New PR — ${r.lift} ${r.est_1rm.toFixed(0)} lbs`,
-      icon: <TrophyIcon size={18} color="var(--accent)" />,
+      icon: <TrophyIcon size={18} color={CAT_COLORS.pr.icon} />,
       xp: XP_RATES.new_pr,
       key: `pr-${r.date}-${r.lift}`,
+      iconBg: CAT_COLORS.pr.bg,
     })
   }
 
@@ -63,9 +78,10 @@ async function fetchXPEvents(): Promise<XPEvent[]> {
     events.push({
       date: r.date_finished,
       label: r.title,
-      icon: <BookIcon size={18} color="var(--accent)" />,
+      icon: <BookIcon size={18} color={CAT_COLORS.book.icon} />,
       xp: XP_RATES.book_finished,
       key: `book-${r.date_finished}-${r.title}`,
+      iconBg: CAT_COLORS.book.bg,
     })
   }
 
@@ -74,9 +90,10 @@ async function fetchXPEvents(): Promise<XPEvent[]> {
     events.push({
       date: r.date,
       label: `${r.miles} miles skated`,
-      icon: <SkateIcon size={18} color="var(--accent)" />,
+      icon: <SkateIcon size={18} color={CAT_COLORS.skate.icon} />,
       xp: Math.round(r.miles * XP_RATES.skate_per_mile),
       key: `skate-${r.date}-${r.miles}`,
+      iconBg: CAT_COLORS.skate.bg,
     })
   }
 
@@ -85,9 +102,10 @@ async function fetchXPEvents(): Promise<XPEvent[]> {
     events.push({
       date: r.date,
       label: `Fortnite Win${r.kills ? ` — ${r.kills} kills` : ''}`,
-      icon: <GamepadIcon size={18} color="var(--accent)" />,
+      icon: <GamepadIcon size={18} color={CAT_COLORS.gaming.icon} />,
       xp: XP_RATES.fortnite_win,
       key: `fn-${r.date}-${r.kills}`,
+      iconBg: CAT_COLORS.gaming.bg,
     })
   }
 
@@ -96,21 +114,23 @@ async function fetchXPEvents(): Promise<XPEvent[]> {
     const quality = (r.hours_slept ?? 0) >= 7
     events.push({
       date: r.date,
-      label: `Sleep — ${r.hours_slept ?? '?'}h${quality ? ' (quality bonus)' : ''}`,
-      icon: <MoonIcon size={18} color="var(--accent)" />,
+      label: `Sleep — ${r.hours_slept ?? '?'}h${quality ? ' · quality bonus' : ''}`,
+      icon: <MoonIcon size={18} color={CAT_COLORS.sleep.icon} />,
       xp: XP_RATES.sleep_log + (quality ? XP_RATES.sleep_quality_bonus : 0),
       key: `sleep-${r.date}`,
+      iconBg: CAT_COLORS.sleep.bg,
     })
   }
 
-  // Challenges
+  // Challenges / Quests
   for (const r of (challenges.data ?? []) as { challenge_name: string; xp_reward: number; completed_at: string }[]) {
     events.push({
       date: r.completed_at.split('T')[0],
       label: r.challenge_name,
-      icon: <TargetIcon size={18} color="var(--accent)" />,
+      icon: <TargetIcon size={18} color={CAT_COLORS.challenge.icon} />,
       xp: r.xp_reward ?? 0,
       key: `challenge-${r.completed_at}-${r.challenge_name}`,
+      iconBg: CAT_COLORS.challenge.bg,
     })
   }
 
@@ -119,10 +139,11 @@ async function fetchXPEvents(): Promise<XPEvent[]> {
     const actLabel = r.activity.charAt(0).toUpperCase() + r.activity.slice(1)
     events.push({
       date: r.date,
-      label: `${actLabel} — ${r.distance_miles.toFixed(2)} miles`,
-      icon: <ActivityIconComp activityKey={r.activity} size={18} color="var(--accent)" />,
+      label: `${actLabel} — ${r.distance_miles.toFixed(2)} mi`,
+      icon: <ActivityIconComp activityKey={r.activity} size={18} color={CAT_COLORS.cardio.icon} />,
       xp: Math.round(r.distance_miles * XP_RATES.cardio_per_mile),
       key: `cardio-${r.date}-${r.activity}-${r.distance_miles}`,
+      iconBg: CAT_COLORS.cardio.bg,
     })
   }
 
@@ -131,9 +152,10 @@ async function fetchXPEvents(): Promise<XPEvent[]> {
     events.push({
       date: r.completed_at.split('T')[0],
       label: `Goal: ${r.title}`,
-      icon: <TrophyIcon size={18} color="var(--accent)" />,
+      icon: <TrophyIcon size={18} color={CAT_COLORS.goal.icon} />,
       xp: r.xp_reward ?? 0,
       key: `goal-${r.completed_at}-${r.title}`,
+      iconBg: CAT_COLORS.goal.bg,
     })
   }
 
@@ -142,16 +164,22 @@ async function fetchXPEvents(): Promise<XPEvent[]> {
 
 function formatDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number)
-  return new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const date = new Date(y, m - 1, d)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1)
+  if (date.getTime() === today.getTime()) return 'Today'
+  if (date.getTime() === yesterday.getTime()) return 'Yesterday'
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 export function XPHistory() {
   usePageTitle('XP History')
-  const [events,    setEvents]    = useState<XPEvent[]>([])
+  const [events,       setEvents]       = useState<XPEvent[]>([])
   const [loading,      setLoading]      = useState(true)
   const [loadError,    setLoadError]    = useState(false)
-  const [visibleCount, setVisibleCount] = useState(30)
-  const { totalXP, loading: xpLoading } = useXP()
+  const [visibleCount, setVisibleCount] = useState(40)
+  const { totalXP, level, loading: xpLoading } = useXP()
 
   function load() {
     setLoadError(false)
@@ -169,13 +197,14 @@ export function XPHistory() {
 
   // Group events by date for visual separators (paginated)
   const visibleEvents = events.slice(0, visibleCount)
-  const grouped: { date: string; items: XPEvent[] }[] = []
+  const grouped: { date: string; items: XPEvent[]; dayTotal: number }[] = []
   for (const ev of visibleEvents) {
     const last = grouped[grouped.length - 1]
     if (last && last.date === ev.date) {
       last.items.push(ev)
+      last.dayTotal += ev.xp
     } else {
-      grouped.push({ date: ev.date, items: [ev] })
+      grouped.push({ date: ev.date, items: [ev], dayTotal: ev.xp })
     }
   }
 
@@ -184,76 +213,85 @@ export function XPHistory() {
       <TopBar title="XP History" />
       <PageWrapper>
 
-        {/* Summary */}
-        <Card
-          className="mb-5 flex items-center justify-between"
-          style={{ padding: '12px 16px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)' }}
-        >
-          <div>
-            <p className="section-label">All-time XP</p>
-            <p className="font-bold text-2xl" style={{ color: 'var(--accent)' }}>
-              {xpLoading ? '—' : totalXP.toLocaleString()}
-            </p>
+        {/* Hero */}
+        <div className="mb-5 rounded-2xl p-5" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+          <p className="section-label mb-1">All-Time XP</p>
+          <p style={{ fontSize: 44, fontWeight: 700, color: 'var(--accent)', lineHeight: 1, fontFamily: 'var(--font-mono)', letterSpacing: '-0.02em' }}>
+            {xpLoading ? '—' : totalXP.toLocaleString()}
+          </p>
+          <div className="flex items-center gap-3 mt-2">
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+              Level {level}
+            </span>
+            <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--border-default)', flexShrink: 0 }} />
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+              {loading ? '—' : events.length.toLocaleString()} events
+            </span>
           </div>
-          <div className="text-right">
-            <p className="section-label">Events</p>
-            <p className="font-bold text-2xl" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>
-              {loading ? '—' : events.length}
-            </p>
-          </div>
-        </Card>
+        </div>
 
         {/* Event list */}
         {loadError ? (
           <div className="flex flex-col items-center py-12 gap-3 fade-in">
-            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Could not load XP history</p>
+            <p style={{ color: 'var(--text-tertiary)', fontSize: 14 }}>Could not load XP history</p>
             <button
               onClick={load}
-              style={{ padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}
+              style={{ padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--accent)', color: '#1A1A2E', border: 'none', cursor: 'pointer' }}
             >
               Try again
             </button>
           </div>
         ) : loading ? (
-          <p style={{ color: 'var(--text-muted)', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
+          <p style={{ color: 'var(--text-tertiary)', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
         ) : (
-          <div className="flex flex-col gap-1">
+          <div>
             {grouped.map(group => (
-              <div key={group.date}>
-                {/* Date separator */}
-                <p className="section-label px-1 pt-3 pb-1">
-                  {formatDate(group.date)}
-                </p>
+              <div key={group.date} className="mb-3">
+                {/* Date header with day total */}
+                <div className="flex items-center justify-between px-1 mb-1.5">
+                  <p className="section-label">{formatDate(group.date)}</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>
+                    +{group.dayTotal.toLocaleString()} XP
+                  </p>
+                </div>
 
                 {/* Events for that day */}
-                {group.items.map(ev => (
-                  <Card
-                    key={ev.key}
-                    className="flex items-center gap-3 mb-1"
-                    style={{ padding: '10px 12px' }}
-                  >
-                    <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{ev.icon}</span>
-                    <span className="flex-1 text-sm truncate" style={{ color: 'var(--text-primary)' }}>{ev.label}</span>
-                    <span
-                      className="font-bold text-sm shrink-0"
-                      style={{ color: 'var(--accent)', fontFamily: 'var(--font-serif)', minWidth: 56, textAlign: 'right' }}
+                <div className="flex flex-col gap-1">
+                  {group.items.map(ev => (
+                    <div
+                      key={ev.key}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
+                      style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}
                     >
-                      +{ev.xp}
-                    </span>
-                  </Card>
-                ))}
+                      <div style={{
+                        width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                        background: ev.iconBg,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {ev.icon}
+                      </div>
+                      <span className="flex-1 text-sm" style={{ color: 'var(--text-primary)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.label}</span>
+                      <span
+                        className="font-bold text-sm shrink-0"
+                        style={{ color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}
+                      >
+                        +{ev.xp}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
             {visibleCount < events.length && (
               <button
-                onClick={() => setVisibleCount(c => c + 30)}
+                onClick={() => setVisibleCount(c => c + 40)}
                 style={{
-                  marginTop: 12, width: '100%', padding: '10px', borderRadius: 12,
-                  background: 'var(--input-bg)', border: '1px solid var(--border)',
-                  color: 'var(--text-muted)', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                  marginTop: 8, width: '100%', padding: '10px', borderRadius: 12,
+                  background: 'var(--surface-2)', border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-secondary)', fontSize: 13, fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                Show more ({events.length - visibleCount} remaining)
+                Load more · {events.length - visibleCount} remaining
               </button>
             )}
           </div>

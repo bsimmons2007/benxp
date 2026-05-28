@@ -248,7 +248,7 @@ function MarkFinishedModal({ book, onClose, onSaved }: { book: Book; onClose: ()
 }
 
 // ── Edit book modal ──────────────────────────────────────────
-const inputCls = "px-3 py-3 rounded-lg text-white outline-none text-base w-full"
+const inputCls = "px-3 py-3 rounded-lg outline-none text-base w-full"
 const inputStyle = { background: 'var(--input-bg)', border: '1px solid var(--border)' }
 const labelStyle = { color: 'var(--text-secondary)' }
 
@@ -424,9 +424,9 @@ function BookCard({ book, onEdited }: { book: Book; onEdited: () => void }) {
       <div
         className="rounded-xl p-4 mb-3 card-animate cursor-pointer"
         style={{
-          background: 'var(--card-bg)',
-          border: `1px solid ${expanded ? 'var(--accent)' : 'var(--border)'}`,
-          boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+          background: 'var(--surface-1)',
+          border: `1px solid ${expanded ? 'var(--accent)' : 'var(--border-subtle)'}`,
+          boxShadow: expanded ? 'var(--shadow-md)' : 'none',
           transition: 'border-color 0.2s',
         }}
         onClick={() => setExpanded(e => !e)}
@@ -575,7 +575,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
 
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Genre</label>
-              <select {...register('genre')} className="px-3 py-3 rounded-lg text-white outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
+              <select {...register('genre')} className="px-3 py-3 rounded-lg outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 {allGenres.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
@@ -654,7 +654,7 @@ function ToReadSection() {
             <Input label="Genre" type="text" className="flex-1" {...register('genre')} />
             <div className="flex flex-col gap-1 flex-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Priority</label>
-              <select {...register('priority')} className="px-3 py-3 rounded-lg text-white outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
+              <select {...register('priority')} className="px-3 py-3 rounded-lg outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 <option>High</option><option>Medium</option><option>Low</option>
               </select>
             </div>
@@ -767,9 +767,9 @@ export function Books() {
             { label: 'Avg Rating', value: avgRating ? avgRating.toFixed(1) + '★' : '—' },
             { label: 'Pages',      value: totalPages.toLocaleString() },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{s.value}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
+              <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>
@@ -798,7 +798,7 @@ export function Books() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 11, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}
+                    contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 11, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}
                     formatter={(value: number, name: string) => [`${value} book${value !== 1 ? 's' : ''} · ${Math.round(value / finished.length * 100)}%`, name]}
                   />
                 </PieChart>

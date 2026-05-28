@@ -87,7 +87,7 @@ function LogPickleballPanel({ onLogged }: { onLogged: () => void }) {
         {open ? '✕ Cancel' : '+ Log Game'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
@@ -179,7 +179,7 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
 
 // ── Main page ─────────────────────────────────────────────────────
 
-const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function Pickleball() {
   usePageTitle('Pickleball')
@@ -250,9 +250,9 @@ export function Pickleball() {
             { label: 'Win Rate', value: filteredGames.length ? `${winRate}%` : '—' },
             { label: 'Streak',   value: streak || '—' },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: ACCENT }}>{s.value}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ fontSize: 22, fontWeight: 700, color: ACCENT, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
+              <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>

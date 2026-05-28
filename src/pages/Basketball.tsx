@@ -123,7 +123,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
       </button>
 
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
 
           {/* Section toggles */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
@@ -209,7 +209,7 @@ function TrendChart({ data, dataKey, label, color = 'var(--accent)' }: {
           <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
           <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} domain={[0, 100]} unit="%" />
           <Tooltip
-            contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11 }}
+            contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, fontSize: 11 }}
             formatter={(v: unknown) => [`${v}%`, label]}
           />
           <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} fill={`url(#bb-grad-${dataKey})`} dot={{ r: 3, fill: color }} />
@@ -511,7 +511,7 @@ export function Basketball() {
                     <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
                     <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
                     <Tooltip
-                      contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11 }}
+                      contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, fontSize: 11 }}
                       formatter={(v: number) => [v, 'FGA']}
                     />
                     <Bar dataKey="shots" radius={[3, 3, 0, 0]}>

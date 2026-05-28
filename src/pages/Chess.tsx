@@ -201,7 +201,7 @@ function EditChessModal({ game, onClose, onSaved }: { game: ChessGame; onClose: 
 
 // ── Main page ─────────────────────────────────────────────────────
 
-const ttStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = { background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
 
 export function Chess() {
   usePageTitle('Chess')
@@ -270,9 +270,9 @@ export function Chess() {
             { label: 'Losses',   value: losses,  color: '#f87171' },
             { label: 'Win %',    value: filtered.length ? `${winRate}%` : '—', color: ACCENT },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-2 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-lg font-bold" style={{ color: s.color }}>{s.value}</p>
-              <p className="section-label" style={{ fontSize: 9 }}>{s.label}</p>
+            <div key={s.label} className="rounded-xl p-2 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ fontSize: 20, fontWeight: 700, color: s.color, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
+              <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>

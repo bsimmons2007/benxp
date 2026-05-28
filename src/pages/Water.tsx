@@ -233,24 +233,24 @@ export function Water() {
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2 mb-5">
-          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{totalOz.toFixed(0)}oz</p>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Today</p>
+          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+            <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{totalOz.toFixed(0)}<span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-tertiary)', marginLeft: 1 }}>oz</span></p>
+            <p className="section-label mt-1">Today</p>
           </div>
 
           {/* Goal tile — tap to edit */}
           <button
             onClick={() => { setGoalInput(String(goalOz)); setEditingGoal(true) }}
             className="rounded-xl p-3 text-center"
-            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', cursor: 'pointer' }}
+            style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', cursor: 'pointer' }}
           >
-            <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{goalOz}oz</p>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Goal</p>
+            <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{goalOz}<span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-tertiary)', marginLeft: 1 }}>oz</span></p>
+            <p className="section-label mt-1">Goal</p>
           </button>
 
-          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-            <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{totalOz >= goalOz ? 'Done!' : `${Math.max(0, goalOz - totalOz).toFixed(0)}oz`}</p>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Remaining</p>
+          <div className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+            <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{totalOz >= goalOz ? 'Done!' : `${Math.max(0, goalOz - totalOz).toFixed(0)}`}{totalOz < goalOz && <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-tertiary)', marginLeft: 1 }}>oz</span>}</p>
+            <p className="section-label mt-1">Remaining</p>
           </div>
         </div>
 

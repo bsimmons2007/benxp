@@ -161,8 +161,8 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
               <select
                 {...register('metric_key')}
                 onChange={e => handleMetricChange(e.target.value as MetricKey)}
-                className="px-3 py-2 rounded-lg text-white outline-none"
-                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}
+                className="px-3 py-2 rounded-lg outline-none"
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
               >
                 {GOAL_PRESETS.map(p => (
                   <option key={p.key} value={p.key}>{p.label}</option>
@@ -350,9 +350,9 @@ export function Goals() {
             { label: 'Complete',  value: completed.length },
             { label: 'XP Earned', value: completed.reduce((s, g) => s + g.xp_reward, 0) },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{s.value.toLocaleString()}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value.toLocaleString()}</p>
+              <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>

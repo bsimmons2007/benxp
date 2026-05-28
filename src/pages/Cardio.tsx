@@ -151,7 +151,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
         {open ? '✕ Cancel' : '+ Log Session'}
       </button>
       {open && (
-        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
           <FirstUseTip formKey="cardio" tip="Each activity has its own XP rate — runs earn more than walks. Log duration to track pace. Each mile brings you closer to your next level." />
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
@@ -364,11 +364,11 @@ export function Cardio() {
             { label: 'Sessions',    value: sessions.length },
             { label: 'Total XP',    value: totalXP.toLocaleString() },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-lg font-bold" style={{ color: 'var(--accent)' }}>
-                {s.value}{s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: 'var(--text-tertiary)' }}>{s.unit}</span>}
+            <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
+                {s.value}{s.unit && <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-tertiary)', marginLeft: 2 }}>{s.unit}</span>}
               </p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+              <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>
@@ -481,7 +481,7 @@ export function Cardio() {
                 <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.25)]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
                 <Tooltip
-                  contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
+                  contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: 'var(--shadow-md)' }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any

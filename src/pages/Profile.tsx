@@ -359,12 +359,12 @@ function BadgeTile({ badge }: { badge: Badge }) {
         <div style={{
           position: 'absolute', bottom: 'calc(100% + 8px)', left: '50%',
           transform: 'translateX(-50%)',
-          background: 'var(--card-bg)',
-          border: '1px solid var(--border)',
+          background: 'var(--surface-2)',
+          border: '1px solid var(--border-subtle)',
           borderRadius: 8, padding: '6px 10px',
           whiteSpace: 'nowrap', zIndex: 50,
           pointerEvents: 'none',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+          boxShadow: 'var(--shadow-md)',
         }}>
           <p style={{ color: 'var(--text-primary)', fontSize: 12, fontWeight: 700, marginBottom: 2 }}>{badge.name}</p>
           <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>{badge.description}</p>
@@ -631,7 +631,7 @@ function LevelAvatar({ level }: { level: number }) {
     : 100
 
   return (
-    <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+    <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
       <div className="flex items-center gap-4">
         {/* Avatar orb */}
         <div style={{
@@ -732,8 +732,8 @@ export function Profile() {
 
         {/* Hero card */}
         <div className="mb-5" style={{
-          background: 'var(--card-bg)',
-          border: '1px solid var(--border)',
+          background: 'var(--surface-1)',
+          border: '1px solid var(--border-subtle)',
           borderRadius: 18, padding: '20px 18px',
         }}>
           <div className="flex items-center gap-4">
@@ -877,13 +877,12 @@ export function Profile() {
             { label: 'Badges',      value: `${earned.length}/${badges.filter(b => !b.secret).length}` },
           ].map(s => (
             <div key={s.label} style={{
-              background: 'var(--card-bg)',
-              border: '1px solid var(--border)',
+              background: 'var(--surface-1)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: 12, padding: '12px 14px',
             }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 600,
-                letterSpacing: '-0.01em', marginBottom: 4 }}>{s.label}</p>
-              <p style={{ fontFamily: 'var(--font-sans)', fontSize: 20, fontWeight: 700,
+              <p className="section-label" style={{ marginBottom: 4 }}>{s.label}</p>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 700,
                 color: 'var(--text-primary)', lineHeight: 1 }}>{s.value}</p>
             </div>
           ))}

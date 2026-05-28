@@ -622,8 +622,8 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 const ttStyle = {
-  background: 'var(--card-bg)',
-  border: '1px solid var(--border)',
+  background: 'var(--surface-1)',
+  border: '1px solid var(--border-subtle)',
   borderRadius: 8, color: 'var(--text-primary)', fontSize: 12,
   boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
@@ -729,9 +729,9 @@ export function Sleep() {
             { label: 'Streak',      value: streak },
             { label: 'Best Streak', value: bestStreak },
           ].map(s => (
-            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{s.value}</p>
-              <p className="section-label mt-0.5">{s.label}</p>
+            <div key={s.label} className="rounded-xl p-3 text-center card-animate" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
+              <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>

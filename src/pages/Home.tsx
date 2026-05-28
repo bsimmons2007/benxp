@@ -207,8 +207,8 @@ function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, 
 
   const inner = (
     <div style={{
-      background:  'var(--card-bg)',
-      border:      '1px solid var(--border)',
+      background:  'var(--surface-1)',
+      border:      '1px solid var(--border-subtle)',
       borderLeft:  `3px solid ${accent}`,
       borderRadius: 12, padding: '12px 14px',
       boxShadow:   'var(--card-shadow)',
@@ -329,7 +329,7 @@ function WellnessWidget() {
   const gradeColor = w.total >= 80 ? '#34d399' : w.total >= 60 ? 'var(--accent)' : w.total >= 40 ? '#fbbf24' : '#f87171'
 
   return (
-    <div className="mb-5 rounded-xl p-4" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+    <div className="mb-5 rounded-xl p-4" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
       <div className="flex items-center justify-between mb-3">
         <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
           Weekly Wellness
@@ -536,16 +536,16 @@ export function Home() {
         }}>
           <div style={{
             padding: '5px 14px', borderRadius: 20,
-            background: 'var(--card-bg)', border: '1px solid var(--accent-dim)',
+            background: 'var(--surface-1)', border: '1px solid color-mix(in srgb, var(--accent) 25%, transparent)',
             color: 'var(--accent)', fontSize: 11, fontWeight: 600, letterSpacing: '0.04em',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+            boxShadow: 'var(--shadow-sm)',
           }}>
             ✓ Data updated
           </div>
         </div>
 
         {/* ── XP Hero Card ── */}
-        <div className="rounded-2xl mb-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', overflow: 'hidden' }}>
+        <div className="rounded-2xl mb-5" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
           <div className="flex items-center gap-4 p-4">
             {/* Level ring — no glow */}
             <Link to="/profile" style={{ flexShrink: 0, display: 'block', WebkitTapHighlightColor: 'transparent' }}>

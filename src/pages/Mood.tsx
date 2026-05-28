@@ -30,8 +30,8 @@ interface MoodForm {
 
 
 const TT_STYLE = {
-  background: 'var(--card-bg)', border: '1px solid var(--border)',
-  borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+  background: 'var(--surface-1)', border: '1px solid var(--border-subtle)',
+  borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: 'var(--shadow-md)',
 }
 
 function moodLabel(v: number) {
