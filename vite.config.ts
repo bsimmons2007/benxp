@@ -44,6 +44,7 @@ export default defineConfig({
           'vendor-form':     ['react-hook-form'],
           'vendor-state':    ['zustand'],
           'vendor-anime':    ['animejs'],
+          'vendor-sentry':   ['@sentry/react', '@sentry/core'],
         },
       },
     },
