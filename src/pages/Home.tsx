@@ -260,9 +260,9 @@ function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, 
         background:  'var(--surface-1)',
         border:      '1px solid var(--border-subtle)',
         borderLeft:  `3px solid ${accent}`,
-        borderRadius: 12, padding: '12px 14px',
+        borderRadius: 12, padding: '16px 14px',
         boxShadow:   'var(--card-shadow)',
-        height:      '100%',
+        minHeight:   88, height: '100%',
         transformStyle: 'preserve-3d',
         willChange: 'transform',
       }}
@@ -362,6 +362,100 @@ function AddPanel({ picks, onAdd, onClose }: {
         </div>
       </div>
     </>
+  )
+}
+
+// ── Active Quest cycling card ─────────────────────────────────
+const TIER_COLORS = {
+  Weekly:  'var(--accent)',
+  Monthly: '#7c3aed',
+  Boss:    '#f5a623',
+} as const
+
+function ActiveQuestCard() {
+  const [quests, setQuests] = useState<Array<{
+    id: string
+    tier: 'Weekly' | 'Monthly' | 'Boss'
+    challenge_name: string
+    xp_reward: number
+  }>>([])
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [loaded,    setLoaded]    = useState(false)
+
+  useEffect(() => {
+    async function fetchQuests() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase
+        .from('challenges')
+        .select('id, tier, challenge_name, xp_reward')
+        .eq('user_id', user.id)
+        .in('tier', ['Weekly', 'Monthly', 'Boss'])
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+      if (!data?.length) return
+      // One per tier — most recent each
+      const tiers = ['Weekly', 'Monthly', 'Boss'] as const
+      const picked = tiers
+        .map(t => data.find((q: { tier: string }) => q.tier === t))
+        .filter(Boolean) as typeof quests
+      setQuests(picked)
+      setLoaded(true)
+    }
+    fetchQuests()
+  }, [])
+
+  useEffect(() => {
+    if (quests.length <= 1) return
+    const id = setInterval(() => setActiveIdx(i => (i + 1) % quests.length), 4000)
+    return () => clearInterval(id)
+  }, [quests.length])
+
+  if (!loaded || quests.length === 0) return null
+
+  const quest = quests[activeIdx]
+  const color = TIER_COLORS[quest.tier]
+
+  return (
+    <Link to="/challenges" style={{ textDecoration: 'none', display: 'block', marginBottom: 16 }}>
+      <div style={{
+        padding: '12px 14px', borderRadius: 14,
+        background: 'var(--surface-1)',
+        border: `1px solid ${color}33`,
+        borderLeft: `3px solid ${color}`,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <span style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+            color, background: `${color}18`, padding: '2px 8px', borderRadius: 4,
+            fontFamily: 'var(--font-mono)',
+          }}>
+            {quest.tier}
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+            +{quest.xp_reward} XP
+          </span>
+        </div>
+        <p key={activeIdx} className="pop-in" style={{
+          fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.3, marginBottom: 8,
+        }}>
+          {quest.challenge_name}
+        </p>
+        {quests.length > 1 && (
+          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            {quests.map((_, i) => (
+              <div key={i} style={{
+                height: 5, borderRadius: 3,
+                width: i === activeIdx ? 14 : 5,
+                background: i === activeIdx ? color : 'var(--border-default)',
+                transition: 'all 0.35s ease',
+              }} />
+            ))}
+            <span style={{ fontSize: 9, color: 'var(--text-disabled)', marginLeft: 4 }}>active quest</span>
+          </div>
+        )}
+      </div>
+    </Link>
   )
 }
 
@@ -466,7 +560,7 @@ export function Home() {
   }
   const removeWidget = (id: StatId) => savePicks(statPicks.filter(p => p !== id))
   const addWidget    = (id: StatId) => {
-    if (statPicks.includes(id) || statPicks.length >= 8) return
+    if (statPicks.includes(id) || statPicks.length >= 6) return
     savePicks([...statPicks, id])
   }
 
@@ -755,6 +849,9 @@ export function Home() {
         {/* ── Weekly Wellness ── */}
         <WellnessWidget />
 
+        {/* ── Active Quest ── */}
+        <ActiveQuestCard />
+
         {/* ── Widget grid ── */}
         <div className="mb-5">
           <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 12 }}>
@@ -777,11 +874,11 @@ export function Home() {
                 />
               ))}
               {/* Add tile — shown in edit mode when below max */}
-              {editMode && statPicks.length < 8 && (
+              {editMode && statPicks.length < 6 && (
                 <button
                   onClick={() => setShowAddPanel(true)}
                   style={{
-                    borderRadius: 12, minHeight: 72,
+                    borderRadius: 12, minHeight: 88,
                     border: '1.5px dashed var(--border)',
                     background: 'transparent',
                     color: 'var(--text-muted)', fontSize: 28, fontWeight: 300,

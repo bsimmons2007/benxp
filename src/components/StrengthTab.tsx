@@ -7,6 +7,7 @@ import { useStore } from '../store/useStore'
 import { Card } from './ui/Card'
 import { BodyMap } from './BodyMap'
 import { playRankUp } from '../lib/sounds'
+import { loadStrengthData } from '../lib/strengthData'
 import {
   computeMuscleScores, computeStrengthQuotient, detectImbalances,
   MUSCLES, RANKS, IMBALANCE_PAIRS,
@@ -169,15 +170,14 @@ function GroupRow({ group, results, selected, onSelect }: {
           const result     = results.find(r => r.muscleKey === muscle.key)
           const isSelected = selected === muscle.key
           const tier       = result?.rank.tier ?? 0
-          // Ranked pill: dark medal background (rank.color) + vivid glow text
-          // Unranked pill: subtle surface
-          const pillBg   = tier > 0 ? result!.rank.color : 'var(--surface-2)'
-          const textColor = tier > 0
-            ? (result!.rank.glow !== 'none' ? result!.rank.glow : 'var(--text-primary)')
-            : 'var(--text-tertiary)'
+          const glowColor  = tier > 0 && result!.rank.glow !== 'none' ? result!.rank.glow : null
+          const pillBg     = glowColor ? `${glowColor}1a` : 'var(--surface-2)'
+          const textColor  = tier > 0 ? (glowColor ?? 'var(--text-primary)') : 'var(--text-tertiary)'
           const borderColor = isSelected
-            ? textColor
-            : tier > 0 ? `${textColor}55` : 'var(--border-subtle)'
+            ? (glowColor ?? 'var(--accent)')
+            : tier > 0
+              ? (glowColor ? `${glowColor}44` : 'var(--border-default)')
+              : 'var(--border-subtle)'
           return (
             <button
               key={muscle.key}
@@ -260,7 +260,8 @@ function RankDropdown() {
             <div key={rank.id} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '7px 12px', borderRadius: 8,
-              background: rank.color, border: `1px solid ${rank.border ?? 'transparent'}`,
+              background: rank.glow !== 'none' ? `${rank.glow}1a` : 'var(--surface-2)',
+              border: `1px solid ${rank.glow !== 'none' ? `${rank.glow}33` : 'var(--border-subtle)'}`,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 14 }}>{rank.icon}</span>
@@ -286,7 +287,7 @@ function SQMedal({ sq, topRank, rankedCount, setCount }: {
   setCount:    number
 }) {
   const fill   = topRank && topRank.glow !== 'none' ? topRank.glow : 'var(--accent)'
-  const discBg = topRank?.color ?? 'var(--surface-2)'
+  const discBg = `color-mix(in srgb, ${fill} 10%, transparent)`
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 0 4px' }}>
@@ -365,35 +366,14 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoading(false); return }
-
-      const [logRes, bwRes, exRes, actRes] = await Promise.all([
-        supabase.from('lifting_log').select('lift,weight,reps,sets,est_1rm,bodyweight,duration_secs,date').eq('user_id', user.id),
-        supabase.from('bodyweight_log').select('weight_lbs').eq('user_id', user.id).order('date', { ascending: false }).limit(1),
-        supabase.from('exercises').select('name,type,weight_multiplier,equipment'),
-        supabase.from('exercise_muscle_activations').select('muscle_key, activation, exercises(name)').order('activation', { ascending: false }),
-      ])
-
-      let bw = 160
-      if (bwRes.data?.[0]) bw = Number(bwRes.data[0].weight_lbs)
-      else {
-        const bwFromLifts = (logRes.data ?? []).find((r: LiftRow) => r.bodyweight != null)?.bodyweight
-        if (bwFromLifts) bw = bwFromLifts
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const flatActs: ActivationRow[] = (actRes.data ?? []).map((a: any) => ({
-        exercise_name: a.exercises?.name ?? '',
-        muscle_key:    a.muscle_key,
-        activation:    Number(a.activation),
-      })).filter((a: ActivationRow) => a.exercise_name)
-
-      setLiftLog(logRes.data ?? [])
-      setExercises(exRes.data ?? [])
-      setActivations(flatActs)
-      setBodyweight(bw)
+      const d = await loadStrengthData(user.id)
+      setLiftLog(d.liftLog)
+      setExercises(d.exercises)
+      setActivations(d.activations)
+      setBodyweight(d.bodyweight)
       setLoaded(true)
       setLoading(false)
-      if ((logRes.data ?? []).length > 0 && !loaded) setTimeout(() => playRankUp(), 600)
+      if (d.liftLog.length > 0 && !loaded) setTimeout(() => playRankUp(), 600)
     }
     load()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -569,35 +549,11 @@ export function useStrengthSnapshot() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-
-      const [logRes, bwRes, exRes, actRes] = await Promise.all([
-        supabase.from('lifting_log').select('lift,weight,reps,sets,est_1rm,bodyweight,duration_secs,date').eq('user_id', user.id),
-        supabase.from('bodyweight_log').select('weight_lbs').eq('user_id', user.id).order('date', { ascending: false }).limit(1),
-        supabase.from('exercises').select('name,type,weight_multiplier,equipment'),
-        supabase.from('exercise_muscle_activations').select('muscle_key, activation, exercises(name)').order('activation', { ascending: false }),
-      ])
-
-      let bw = 160
-      if (bwRes.data?.[0]) bw = Number(bwRes.data[0].weight_lbs)
-      else {
-        const bwFromLifts = (logRes.data ?? []).find((r: LiftRow) => r.bodyweight != null)?.bodyweight
-        if (bwFromLifts) bw = bwFromLifts
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const flatActs: ActivationRow[] = (actRes.data ?? []).map((a: any) => ({
-        exercise_name: a.exercises?.name ?? '',
-        muscle_key:    a.muscle_key,
-        activation:    Number(a.activation),
-      })).filter((a: ActivationRow) => a.exercise_name)
-
-      const r      = computeMuscleScores(logRes.data ?? [], exRes.data ?? [], flatActs, bw)
-      const sqVal  = computeStrengthQuotient(r)
-      const ranked = r.filter(x => x.rank.tier > 0).sort((a, b) => b.rank.tier - a.rank.tier)
+      const d      = await loadStrengthData(user.id)
+      const ranked = d.results.filter(x => x.rank.tier > 0).sort((a, b) => b.rank.tier - a.rank.tier)
       const best   = ranked[0]?.rank ?? null
-
-      snapshotCache = { sq: sqVal, topRank: best, ts: Date.now() }
-      setSq(sqVal)
+      snapshotCache = { sq: d.sq, topRank: best, ts: Date.now() }
+      setSq(d.sq)
       setTopRank(best)
     }
     load()
