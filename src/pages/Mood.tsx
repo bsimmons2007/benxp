@@ -47,8 +47,9 @@ function moodLabel(v: number) {
 function MoodFace({ value }: { value: number }) {
   const t = (value - 1) / 9          // 0 = worst, 1 = best
   const smileY = 62 + (1 - t) * 10  // mouth center Y: low=smiley, high=frown
-  // Mouth: cubic bezier control points — curves up at high mood, down at low
-  const cp1y = t >= 0.5 ? smileY - 10 : smileY + 10
+  // Smile: control points BELOW chord (higher Y) bows the curve down = corners up = smile
+  // Frown: control points ABOVE chord (lower Y) bows the curve up  = corners down = frown
+  const cp1y = t >= 0.5 ? smileY + 10 : smileY - 10
   const cp2y = cp1y
   const mouth = `M 34 ${smileY} C 40 ${cp1y}, 60 ${cp2y}, 66 ${smileY}`
   // Eye brow lift: raised at high mood
