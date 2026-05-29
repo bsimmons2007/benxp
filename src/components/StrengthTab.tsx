@@ -169,19 +169,28 @@ function GroupRow({ group, results, selected, onSelect }: {
           const result     = results.find(r => r.muscleKey === muscle.key)
           const isSelected = selected === muscle.key
           const tier       = result?.rank.tier ?? 0
-          const color      = tier > 0
-            ? (result!.rank.glow !== 'none' ? result!.rank.glow : 'var(--text-secondary)')
+          // Ranked pill: dark medal background (rank.color) + vivid glow text
+          // Unranked pill: subtle surface
+          const pillBg   = tier > 0 ? result!.rank.color : 'var(--surface-2)'
+          const textColor = tier > 0
+            ? (result!.rank.glow !== 'none' ? result!.rank.glow : 'var(--text-primary)')
             : 'var(--text-tertiary)'
+          const borderColor = isSelected
+            ? textColor
+            : tier > 0 ? `${textColor}55` : 'var(--border-subtle)'
           return (
             <button
               key={muscle.key}
               onClick={() => onSelect(muscle.key)}
               style={{
-                padding: '4px 10px', borderRadius: 8,
-                background: isSelected ? 'var(--surface-2)' : 'var(--surface-1)',
-                border: isSelected ? `1.5px solid ${color}` : '1px solid var(--border-subtle)',
-                color, fontSize: 11, fontWeight: isSelected ? 700 : 500,
+                padding: '4px 9px', borderRadius: 8,
+                background: pillBg,
+                border: `${isSelected ? '2px' : '1px'} solid ${borderColor}`,
+                color: textColor,
+                fontSize: 11, fontWeight: tier > 0 ? 600 : 400,
                 cursor: 'pointer', transition: 'all 0.12s',
+                whiteSpace: 'nowrap',
+                transform: isSelected ? 'scale(1.04)' : 'scale(1)',
               }}
             >
               {muscle.name}
@@ -229,66 +238,103 @@ function WeakLinksCard({ warnings }: { warnings: ReturnType<typeof detectImbalan
   )
 }
 
-// ── Rank tiers legend ─────────────────────────────────────────────────────────
+// ── Rank tiers — collapsable full list ────────────────────────────────────────
 
-const LEGEND_IDS = ['god', 'champion', 'elite', 'diamond3', 'platinum3', 'gold3', 'silver3', 'bronze3']
-
-function RankTiersLegend() {
-  const tiers = RANKS.filter(r => LEGEND_IDS.includes(r.id)).reverse()
+function RankDropdown() {
+  const ranked = [...RANKS.filter(r => r.tier > 0)].reverse()
   return (
-    <div>
-      <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8, fontFamily: 'var(--font-mono)' }}>
-        Rank tiers
-      </p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-        {tiers.map(r => {
-          const color = r.glow !== 'none' ? r.glow : 'var(--text-tertiary)'
-          const label = r.label.replace(/ I{1,3}$/, '')
+    <details>
+      <summary style={{
+        cursor: 'pointer', listStyle: 'none', display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', padding: '2px 0 10px',
+        fontSize: 13, fontWeight: 700, color: 'var(--text-primary)',
+        borderBottom: '1px solid var(--border-subtle)', userSelect: 'none',
+      }}>
+        <span>Rank Tiers</span>
+        <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>▾ tap to expand</span>
+      </summary>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 10 }}>
+        {ranked.map(rank => {
+          const color = rank.glow !== 'none' ? rank.glow : 'var(--text-tertiary)'
           return (
-            <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{
-                width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
-                background: color, opacity: 0.82,
-              }} />
-              <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600 }}>{label}</span>
+            <div key={rank.id} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '7px 12px', borderRadius: 8,
+              background: rank.color, border: `1px solid ${rank.border ?? 'transparent'}`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 14 }}>{rank.icon}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color }}>{rank.label}</span>
+              </div>
+              <span style={{ fontSize: 11, color: `${color}99`, fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums' }}>
+                {rank.minScore.toFixed(2)}{rank.maxScore === Infinity ? '+' : ` – ${rank.maxScore.toFixed(2)}`}
+              </span>
             </div>
           )
         })}
       </div>
-    </div>
+    </details>
   )
 }
 
-// ── Strength Quotient display ─────────────────────────────────────────────────
+// ── Strength Quotient medal ───────────────────────────────────────────────────
 
-function SQDisplay({ sq, topRank, rankedCount, setCount }: {
+function SQMedal({ sq, topRank, rankedCount, setCount }: {
   sq:          number
   topRank:     RankMeta | null
   rankedCount: number
   setCount:    number
 }) {
-  const color = topRank?.glow !== 'none' ? topRank?.glow : 'var(--accent)'
+  const fill   = topRank && topRank.glow !== 'none' ? topRank.glow : 'var(--accent)'
+  const discBg = topRank?.color ?? 'var(--surface-2)'
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 0 4px' }}>
+      {/* Ribbon clasp bar */}
       <div style={{
-        width: 60, height: 60, borderRadius: 14, flexShrink: 0,
-        background: 'var(--surface-2)', border: '1px solid var(--border-default)',
+        width: 40, height: 9, borderRadius: 5,
+        background: fill, opacity: 0.72,
+      }} />
+      {/* Ribbon stem */}
+      <div style={{ width: 3, height: 18, background: fill, opacity: 0.5 }} />
+
+      {/* Medal disc */}
+      <div style={{
+        width: 100, height: 100, borderRadius: '50%', position: 'relative',
+        background: discBg,
+        border: `3px solid ${fill}`,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       }}>
-        <span style={{ fontSize: 24, fontWeight: 800, color: color ?? 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
+        {/* Inner engraved ring */}
+        <div style={{
+          position: 'absolute', inset: 8, borderRadius: '50%',
+          border: `1px solid ${fill}`, opacity: 0.28, pointerEvents: 'none',
+        }} />
+        <span style={{
+          fontSize: 36, fontWeight: 800, color: fill,
+          fontFamily: 'var(--font-mono)', lineHeight: 1,
+        }}>
           {sq}
         </span>
-        <span style={{ fontSize: 8, color: 'var(--text-tertiary)', letterSpacing: '0.12em', fontFamily: 'var(--font-mono)' }}>SQ</span>
+        <span style={{
+          fontSize: 8, color: fill, opacity: 0.7,
+          letterSpacing: '0.14em', fontFamily: 'var(--font-mono)',
+        }}>
+          SQ
+        </span>
       </div>
-      <div>
-        <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>
-          Strength Quotient
-        </p>
-        <p style={{ fontSize: 11, color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>
-          {rankedCount} muscles ranked · {setCount} sets
-        </p>
-        {topRank && <RankBadge rank={topRank} size="sm" />}
-      </div>
+
+      <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 10, fontWeight: 600 }}>
+        Strength Quotient
+      </p>
+      {topRank && (
+        <div style={{ marginTop: 4 }}>
+          <RankBadge rank={topRank} size="sm" />
+        </div>
+      )}
+      <p style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 6, fontFamily: 'var(--font-mono)' }}>
+        {rankedCount} muscles ranked · {setCount} sets
+      </p>
     </div>
   )
 }
@@ -463,9 +509,9 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
         {/* ── Right: stats + muscles + tiers ── */}
         <div className="md:flex-1">
 
-          {/* SQ + stats */}
+          {/* SQ medal */}
           <Card style={{ marginBottom: 12 }}>
-            <SQDisplay
+            <SQMedal
               sq={sq}
               topRank={topRank}
               rankedCount={rankedCount}
@@ -498,9 +544,9 @@ export function StrengthTab({ triggerLoad }: StrengthTabProps) {
             </div>
           </Card>
 
-          {/* Rank tiers */}
+          {/* Rank tiers — collapsable */}
           <Card>
-            <RankTiersLegend />
+            <RankDropdown />
           </Card>
         </div>
 

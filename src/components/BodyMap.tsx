@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from 'react'
 import type { MuscleScoreResult } from '../lib/muscleScore'
-import { MUSCLES } from '../lib/muscleScore'
+import { MUSCLES, RANKS } from '../lib/muscleScore'
 
 interface Props {
   view:            'front' | 'back'
@@ -44,6 +44,32 @@ function sha(
     strokeWidth: isSel ? 2.2 : isImb ? 1.8 : 1.4,
     style:       { cursor: 'pointer', transition: 'fill-opacity 0.12s, stroke 0.12s' },
   }
+}
+
+// ── Inline rank legend (placed to the right of the SVG) ──────────────────────
+
+const LEGEND_IDS = ['god', 'champion', 'elite', 'diamond3', 'platinum3', 'gold3', 'silver3', 'bronze3']
+
+function RankLegend() {
+  const items = RANKS.filter(r => LEGEND_IDS.includes(r.id)).reverse()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '4px 6px' }}>
+      {items.map(r => (
+        <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{
+            width: 9, height: 9, borderRadius: '50%', flexShrink: 0,
+            background: r.glow !== 'none' ? r.glow : 'var(--text-disabled)',
+          }} />
+          <span style={{
+            fontSize: 9, fontWeight: 600, color: 'var(--text-tertiary)',
+            whiteSpace: 'nowrap', letterSpacing: '0.02em',
+          }}>
+            {r.label.replace(/ I{1,3}$/, '')}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 // ── Muscle label ──────────────────────────────────────────────────────────────
@@ -143,7 +169,7 @@ function FrontView({ scores, sel, hov, onSel, onHov, imb }: VP) {
   })
 
   return (
-    <svg viewBox="0 0 260 580" style={{ width: '100%', maxWidth: 220, display: 'block', userSelect: 'none' }}>
+    <svg viewBox="0 0 260 580" style={{ width: '100%', maxWidth: 260, display: 'block', userSelect: 'none' }}>
       <Silhouette />
 
       {/* Front delts */}
@@ -204,7 +230,7 @@ function BackView({ scores, sel, hov, onSel, onHov, imb }: VP) {
   })
 
   return (
-    <svg viewBox="0 0 260 580" style={{ width: '100%', maxWidth: 220, display: 'block', userSelect: 'none' }}>
+    <svg viewBox="0 0 260 580" style={{ width: '100%', maxWidth: 260, display: 'block', userSelect: 'none' }}>
       <Silhouette />
 
       {/* Traps — horizontal band + narrowing below */}
@@ -267,10 +293,16 @@ export function BodyMap({ view, scores, selected, onSelect, imbalancedKeys }: Pr
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-      {view === 'front'
-        ? <FrontView scores={scores} sel={selected} hov={hovered} onSel={onSelect} onHov={handleHover} imb={imbalancedKeys} />
-        : <BackView  scores={scores} sel={selected} hov={hovered} onSel={onSelect} onHov={handleHover} imb={imbalancedKeys} />
-      }
+      {/* SVG body + rank legend side-by-side */}
+      <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
+        {view === 'front'
+          ? <FrontView scores={scores} sel={selected} hov={hovered} onSel={onSelect} onHov={handleHover} imb={imbalancedKeys} />
+          : <BackView  scores={scores} sel={selected} hov={hovered} onSel={onSelect} onHov={handleHover} imb={imbalancedKeys} />
+        }
+        <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
+          <RankLegend />
+        </div>
+      </div>
       <MuscleLabel muscleKey={hovered ?? selected} scores={scores} />
     </div>
   )
