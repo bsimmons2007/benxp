@@ -1,368 +1,260 @@
 // Interactive SVG body map — front & back views.
-// Clean non-overlapping muscle regions, centered figure, vertical rank dots.
+// Clean flat design: rounded-rect + ellipse muscle shapes, rank-colored fills, no glow filters.
 
 import { useState, useCallback } from 'react'
 import type { MuscleScoreResult } from '../lib/muscleScore'
-import { RANKS, MUSCLES } from '../lib/muscleScore'
+import { MUSCLES } from '../lib/muscleScore'
 
 interface Props {
-  view:           'front' | 'back'
-  scores:         MuscleScoreResult[]
-  selected:       string | null
-  onSelect:       (key: string) => void
-  imbalancedKeys?: Set<string>
-}
-
-const EMPTY_COLOR  = 'var(--surface-2)'
-const EMPTY_BORDER = 'var(--border-default)'
-
-function getAccentHex(): string {
-  const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
-  return v || '#F5A623'
-}
-
-// ── Shared SVG defs ───────────────────────────────────────────────────────────
-
-function SvgDefs({ accentHex }: { accentHex: string }) {
-  return (
-    <defs>
-      {RANKS.filter(r => r.tier > 0).map(rank => {
-        const isTopTier = rank.tier >= 16
-        const hi   = isTopTier ? accentHex : (rank.glow !== 'none' ? rank.glow : '#ffffff')
-        const base = isTopTier ? accentHex : rank.color
-        return (
-          <linearGradient key={rank.id} id={`grad-${rank.id}`} x1="20%" y1="0%" x2="80%" y2="100%">
-            <stop offset="0%"   stopColor={hi}   stopOpacity={isTopTier ? 0.9 : 0.45} />
-            <stop offset="45%"  stopColor={base} stopOpacity={0.97} />
-            <stop offset="100%" stopColor={base} stopOpacity={1}    />
-          </linearGradient>
-        )
-      })}
-      <linearGradient id="body-fill" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%"   style={{ stopColor: 'var(--surface-2)' }} stopOpacity={1} />
-        <stop offset="100%" style={{ stopColor: 'var(--surface-1)' }} stopOpacity={1} />
-      </linearGradient>
-      <filter id="muscleGlow" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur" />
-        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-      </filter>
-      <filter id="muscleGlowStrong" x="-40%" y="-40%" width="180%" height="180%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-      </filter>
-      <filter id="bodyEdge" x="-6%" y="-2%" width="112%" height="104%">
-        <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#000" floodOpacity="0.35" />
-      </filter>
-    </defs>
-  )
-}
-
-// ── Muscle polygon ────────────────────────────────────────────────────────────
-
-interface PolyProps {
-  muscleKey:       string
-  points:          string
+  view:            'front' | 'back'
   scores:          MuscleScoreResult[]
   selected:        string | null
-  hovered:         string | null
   onSelect:        (key: string) => void
-  onHover:         (key: string | null) => void
   imbalancedKeys?: Set<string>
 }
 
-function MP({ muscleKey, points, scores, selected, hovered, onSelect, onHover, imbalancedKeys }: PolyProps) {
-  const result       = scores.find(r => r.muscleKey === muscleKey)
-  const rank         = result?.rank
-  const tier         = rank?.tier ?? 0
-  const isSelected   = selected === muscleKey
-  const isHovered    = hovered  === muscleKey
-  const isImbalanced = imbalancedKeys?.has(muscleKey) ?? false
-  const glow         = rank?.glow ?? 'none'
+// ── Color ─────────────────────────────────────────────────────────────────────
 
-  const fill   = tier > 0 ? `url(#grad-${rank!.id})` : EMPTY_COLOR
-  const stroke = isSelected
-    ? (glow !== 'none' ? glow : 'var(--accent)')
-    : isImbalanced
-      ? '#e07830'
-      : isHovered
-        ? (glow !== 'none' ? `${glow}cc` : 'var(--border-strong)')
-        : (rank?.border ?? EMPTY_BORDER)
-
-  const filter = (isHovered && tier > 0) || tier >= 16
-    ? 'url(#muscleGlowStrong)'
-    : isImbalanced ? 'url(#muscleGlow)'
-    : tier >= 10 ? 'url(#muscleGlow)'
-    : 'none'
-
-  const rankClass = tier >= 16 ? 'muscle-ranked muscle-top'
-                  : tier >= 7  ? 'muscle-ranked muscle-high'
-                  : tier > 0   ? 'muscle-ranked'
-                  : ''
-
-  return (
-    <polygon
-      points={points}
-      strokeWidth={isSelected ? 2.6 : isImbalanced ? 2.0 : isHovered ? 1.8 : tier > 0 ? 1.0 : 0.5}
-      filter={filter}
-      style={{
-        cursor: 'pointer',
-        fill,
-        stroke,
-        transition: 'fill 0.15s ease, stroke 0.15s ease, stroke-width 0.15s ease',
-        transformBox: 'fill-box',
-        transformOrigin: 'center',
-        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
-        ['--muscle-glow' as string]: glow !== 'none' ? glow : 'var(--border-strong)',
-      }}
-      className={`${rankClass}${isSelected ? ' muscle-selected' : ''}`}
-      onClick={() => onSelect(muscleKey)}
-      onMouseEnter={() => onHover(muscleKey)}
-      onMouseLeave={() => onHover(null)}
-    />
-  )
+function rankFlatFill(result: MuscleScoreResult | undefined): string {
+  if (!result || result.rank.tier === 0) return '#8b93a1'
+  return result.rank.glow !== 'none' ? result.rank.glow : result.rank.color
 }
 
-// ── Rank legend — vertical, God → Bronze (major tiers only) ─────────────────
+// ── Per-shape SVG attributes ──────────────────────────────────────────────────
 
-const LEGEND_IDS = ['god', 'champion', 'elite', 'diamond3', 'platinum3', 'gold3', 'silver3', 'bronze3']
+type SVGAttrs = React.SVGAttributes<SVGElement>
 
-function RankLegend() {
-  const legendRanks = RANKS.filter(r => LEGEND_IDS.includes(r.id)).reverse() // God first (RANKS is asc)
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '4px 10px' }}>
-      {legendRanks.map(r => {
-        // Strip roman numeral suffix for compact label
-        const shortLabel = r.label.replace(/ I{1,3}$/, '')
-        return (
-          <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{
-              width: 13, height: 13, borderRadius: '50%', flexShrink: 0,
-              backgroundColor: r.color,
-              border: `1.5px solid ${r.border}`,
-              boxShadow: r.glow !== 'none' ? `0 0 6px ${r.glow}88` : 'none',
-            }} />
-            <span style={{
-              fontSize: 9, fontWeight: 700, whiteSpace: 'nowrap',
-              color: r.glow !== 'none' ? r.glow : 'var(--text-tertiary)', letterSpacing: '0.03em',
-            }}>
-              {shortLabel}
-            </span>
-          </div>
-        )
-      })}
-    </div>
-  )
+function sha(
+  key:  string,
+  scores: MuscleScoreResult[],
+  sel:  string | null,
+  hov:  string | null,
+  imb?: Set<string>,
+): SVGAttrs {
+  const result = scores.find(r => r.muscleKey === key)
+  const tier   = result?.rank.tier ?? 0
+  const isSel  = sel === key
+  const isHov  = hov === key
+  const isImb  = imb?.has(key) ?? false
+
+  return {
+    fill:        rankFlatFill(result),
+    fillOpacity: tier > 0 ? (isHov ? 1 : 0.88) : (isHov ? 0.68 : 0.46),
+    stroke:      isSel ? 'var(--accent)' : isImb ? '#e07830' : 'var(--surface-0)',
+    strokeWidth: isSel ? 2.2 : isImb ? 1.8 : 1.4,
+    style:       { cursor: 'pointer', transition: 'fill-opacity 0.12s, stroke 0.12s' },
+  }
 }
 
-// ── Hover / selected label ────────────────────────────────────────────────────
+// ── Muscle label ──────────────────────────────────────────────────────────────
 
 function MuscleLabel({ muscleKey, scores }: { muscleKey: string | null; scores: MuscleScoreResult[] }) {
   if (!muscleKey) {
     return (
-      <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-tertiary)', marginTop: 8, height: 30, lineHeight: '30px' }}>
+      <p style={{
+        textAlign: 'center', fontSize: 11, color: 'var(--text-tertiary)',
+        marginTop: 8, height: 28, lineHeight: '28px', letterSpacing: '0.02em',
+      }}>
         Tap a muscle to inspect
       </p>
     )
   }
+
   const muscle = MUSCLES.find(m => m.key === muscleKey)
   const result = scores.find(r => r.muscleKey === muscleKey)
-  const glow   = result?.rank.glow ?? 'none'
   const tier   = result?.rank.tier ?? 0
+  const color  = tier > 0
+    ? (result!.rank.glow !== 'none' ? result!.rank.glow : 'var(--text-secondary)')
+    : 'var(--text-disabled)'
 
   return (
-    <div className="pop-in" style={{
+    <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '7px 14px', marginTop: 8, borderRadius: 10, width: '100%',
-      background: tier > 0 ? `${result!.rank.color}cc` : 'var(--surface-2)',
-      border: `1px solid ${tier > 0 ? result!.rank.border : 'var(--border-subtle)'}`,
-      boxShadow: tier > 0 && glow !== 'none' ? `0 0 12px ${glow}33` : 'none',
+      padding: '7px 12px', marginTop: 8, borderRadius: 10,
+      background: 'var(--surface-2)', border: '1px solid var(--border-subtle)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 10, color: 'var(--text-tertiary)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>{muscle?.group}</span>
-        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{muscle?.name ?? muscleKey}</span>
+        <span style={{
+          fontSize: 10, color: 'var(--text-tertiary)', textTransform: 'uppercase',
+          fontFamily: 'var(--font-mono)', letterSpacing: '0.08em',
+        }}>
+          {muscle?.group}
+        </span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+          {muscle?.name ?? muscleKey}
+        </span>
       </div>
       {tier > 0 && result
-        ? <span style={{ fontSize: 11, color: glow !== 'none' ? glow : 'var(--text-secondary)', fontWeight: 700 }}>{result.rank.icon} {result.rank.label}</span>
+        ? <span style={{ fontSize: 11, fontWeight: 700, color }}>{result.rank.icon} {result.rank.label}</span>
         : <span style={{ fontSize: 10, color: 'var(--text-disabled)' }}>Unranked</span>
       }
     </div>
   )
 }
 
-type SP = {
-  scores:          MuscleScoreResult[]
-  selected:        string | null
-  hovered:         string | null
-  onSelect:        (k: string) => void
-  onHover:         (k: string | null) => void
-  imbalancedKeys?: Set<string>
+// ── Silhouette (shared front & back) ─────────────────────────────────────────
+
+function Silhouette() {
+  const s: SVGAttrs = { fill: 'var(--surface-2)', stroke: 'var(--border-subtle)', strokeWidth: 0.8 }
+  return (
+    <g>
+      <ellipse cx="130" cy="44"  rx="22" ry="27" {...s} />
+      <rect    x="119"  y="64"  width="22"  height="22"  rx="9"  {...s} />
+      <path    d="M84,108 Q83,140 96,150 L100,205 Q102,252 113,264 L147,264 Q158,252 160,205 L164,150 Q177,140 176,108 Q150,96 130,96 Q110,96 84,108 Z" {...s} />
+      {/* Left arm */}
+      <rect x="52"  y="106" width="26" height="90"  rx="13" {...s} />
+      <rect x="48"  y="188" width="22" height="84"  rx="11" {...s} />
+      <ellipse cx="59"  cy="280" rx="12" ry="15" {...s} />
+      {/* Right arm */}
+      <rect x="182" y="106" width="26" height="90"  rx="13" {...s} />
+      <rect x="190" y="188" width="22" height="84"  rx="11" {...s} />
+      <ellipse cx="201" cy="280" rx="12" ry="15" {...s} />
+      {/* Left leg */}
+      <rect x="97"  y="256" width="31" height="168" rx="15" {...s} />
+      <rect x="101" y="414" width="25" height="122" rx="12" {...s} />
+      <ellipse cx="113" cy="546" rx="15" ry="10" {...s} />
+      {/* Right leg */}
+      <rect x="132" y="256" width="31" height="168" rx="15" {...s} />
+      <rect x="134" y="414" width="25" height="122" rx="12" {...s} />
+      <ellipse cx="147" cy="546" rx="15" ry="10" {...s} />
+    </g>
+  )
 }
 
-// ── FRONT VIEW ───────────────────────────────────────────────────────────────
-// All muscle regions share exact boundary lines — no overlap possible.
-//
-// Coordinate map (viewBox 0 0 200 430):
-//   Shoulder line y=68 | Chest top y=68 | Chest bot y=132
-//   Abs y=134–182     | Hip y=206        | Knee y=322
-//   Calf y=328–388
+// ── View props ────────────────────────────────────────────────────────────────
 
-function FrontView({ scores, selected, hovered, onSelect, onHover, imbalancedKeys }: SP) {
-  const p = (key: string, pts: string, side?: string) =>
-    <MP key={`${key}-${side ?? 'c'}`} muscleKey={key} points={pts}
-      scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={onHover} imbalancedKeys={imbalancedKeys} />
+interface VP {
+  scores: MuscleScoreResult[]
+  sel:    string | null
+  hov:    string | null
+  onSel:  (k: string) => void
+  onHov:  (k: string | null) => void
+  imb?:   Set<string>
+}
+
+// ── Front view ────────────────────────────────────────────────────────────────
+
+function FrontView({ scores, sel, hov, onSel, onHov, imb }: VP) {
+  const a = (k: string): SVGAttrs => sha(k, scores, sel, hov, imb)
+  const h = (k: string) => ({
+    onClick:      () => onSel(k),
+    onMouseEnter: () => onHov(k),
+    onMouseLeave: () => onHov(null),
+  })
 
   return (
-    <svg viewBox="0 0 200 430" style={{ width: '100%', maxWidth: 300, display: 'block', userSelect: 'none' }}>
-      {/* ── Body silhouette ── */}
-      <polygon points="54,68 146,68 153,84 155,100 142,118 136,164 130,192 126,208 100,208 74,208 70,192 64,164 58,118 45,100 47,84"
-        fill="url(#body-fill)" filter="url(#bodyEdge)" stroke="none" />
-      <polygon points="38,70 56,68 54,182 46,224 33,220 35,178" fill="url(#body-fill)" stroke="none" />
-      <polygon points="144,68 162,70 165,178 167,220 154,224 146,182" fill="url(#body-fill)" stroke="none" />
-      <polygon points="70,210 100,208 98,328 64,322" fill="url(#body-fill)" stroke="none" />
-      <polygon points="100,208 130,210 136,322 102,328" fill="url(#body-fill)" stroke="none" />
-      <polygon points="64,330 96,328 94,390 62,384" fill="url(#body-fill)" stroke="none" />
-      <polygon points="104,328 136,330 138,384 106,390" fill="url(#body-fill)" stroke="none" />
+    <svg viewBox="0 0 260 580" style={{ width: '100%', maxWidth: 220, display: 'block', userSelect: 'none' }}>
+      <Silhouette />
 
-      {/* Head + neck */}
-      <ellipse cx="100" cy="26" rx="20" ry="24" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
-      <polygon points="91,48 109,48 112,68 88,68" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.8" />
+      {/* Front delts */}
+      <ellipse cx="79"  cy="112" rx="14" ry="14" {...a('delt_front')} {...h('delt_front')} />
+      <ellipse cx="181" cy="112" rx="14" ry="14" {...a('delt_front')} {...h('delt_front')} />
 
-      {/* ── CHEST (shared exact boundaries, no overlap) ── */}
-      {/* Upper: y68 → y90, slight inward taper */}
-      {p('chest_upper', '76,68 124,68 122,90 78,90')}
-      {/* Mid: y90 → y114 */}
-      {p('chest_mid',   '78,90 122,90 120,114 80,114')}
-      {/* Lower: diagonal fold, y114 → y132 */}
-      {p('chest_lower', '80,114 120,114 116,132 84,132')}
+      {/* Upper chest — pec ball (ellipse) + upper pad (rect) */}
+      <ellipse cx="92"  cy="116" rx="15" ry="14" {...a('chest_upper')} {...h('chest_upper')} />
+      <ellipse cx="168" cy="116" rx="15" ry="14" {...a('chest_upper')} {...h('chest_upper')} />
+      <rect x="95"  y="110" width="31" height="19" rx="7" {...a('chest_upper')} {...h('chest_upper')} />
+      <rect x="134" y="110" width="31" height="19" rx="7" {...a('chest_upper')} {...h('chest_upper')} />
 
-      {/* ── SHOULDERS — share exact boundary with chest sides ── */}
-      {/* Front delt L: fills gap between neck/side-delt and chest_upper left edge */}
-      {p('delt_front', '54,68 76,68 78,90 74,96 52,88',  'L')}
-      {p('delt_front', '124,68 146,68 148,88 126,96 122,90', 'R')}
-      {/* Side delt L: outer arm cap */}
-      {p('delt_side', '36,70 56,68 54,90 34,84', 'L')}
-      {p('delt_side', '144,68 164,70 166,84 146,90', 'R')}
+      {/* Mid chest */}
+      <rect x="95"  y="131" width="31" height="21" rx="7" {...a('chest_mid')} {...h('chest_mid')} />
+      <rect x="134" y="131" width="31" height="21" rx="7" {...a('chest_mid')} {...h('chest_mid')} />
 
-      {/* ── BICEPS — start where delt ends ── */}
-      {p('biceps', '34,86 54,92 52,174 32,168', 'L')}
-      {p('biceps', '146,92 166,86 168,168 148,174', 'R')}
+      {/* Lower chest */}
+      <rect x="99"  y="154" width="27" height="17" rx="7" {...a('chest_lower')} {...h('chest_lower')} />
+      <rect x="134" y="154" width="27" height="17" rx="7" {...a('chest_lower')} {...h('chest_lower')} />
 
-      {/* ── FOREARMS ── */}
-      {p('forearms', '32,170 52,176 48,222 34,218', 'L')}
-      {p('forearms', '148,176 168,170 166,218 152,222', 'R')}
+      {/* Biceps */}
+      <rect x="54"  y="126" width="22" height="62" rx="11" {...a('biceps')} {...h('biceps')} />
+      <rect x="184" y="126" width="22" height="62" rx="11" {...a('biceps')} {...h('biceps')} />
 
-      {/* ── CORE — abs share exact boundaries with each other & obliques ── */}
-      {/* Upper abs: y132 → y158 */}
-      {p('upper_abs', '80,132 120,132 118,158 82,158')}
-      {/* Lower abs: y158 → y178 */}
-      {p('lower_abs', '82,158 118,158 114,178 86,178')}
-      {/* Obliques: flank, exact shared boundary with abs */}
-      {p('obliques', '58,118 80,132 82,158 82,178 68,184 54,152 52,130', 'L')}
-      {p('obliques', '120,132 142,118 148,130 146,152 132,184 118,178 118,158', 'R')}
+      {/* Forearms */}
+      <rect x="49"  y="192" width="20" height="76" rx="10" {...a('forearms')} {...h('forearms')} />
+      <rect x="191" y="192" width="20" height="76" rx="10" {...a('forearms')} {...h('forearms')} />
 
-      {/* ── QUADS ── */}
-      {p('quads', '70,210 100,208 98,322 64,316', 'L')}
-      {p('quads', '100,208 130,210 136,316 102,322', 'R')}
+      {/* Obliques */}
+      <rect x="96"  y="180" width="13" height="64" rx="6" {...a('obliques')} {...h('obliques')} />
+      <rect x="151" y="180" width="13" height="64" rx="6" {...a('obliques')} {...h('obliques')} />
 
-      {/* ── CALVES front ── */}
-      {p('calves_gastro', '64,330 92,328 90,388 64,382', 'LF')}
-      {p('calves_gastro', '108,328 136,330 136,382 110,388', 'RF')}
+      {/* Upper abs */}
+      <rect x="111" y="178" width="38" height="30" rx="7" {...a('upper_abs')} {...h('upper_abs')} />
 
-      {/* ── Structural details ── */}
-      <ellipse cx="81"  cy="325" rx="14" ry="5" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.7" />
-      <ellipse cx="119" cy="325" rx="14" ry="5" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.7" />
-      <polygon points="76,180 124,180 128,196 72,196" style={{ fill: 'var(--surface-1)' }} stroke="none" />
-      <polygon points="58,384 94,382 92,402 56,400" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
-      <polygon points="106,382 142,384 144,400 108,402" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
-      <polygon points="28,220 46,220 44,244 26,242" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
-      <polygon points="154,220 172,220 174,242 156,244" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
-      <line x1="88" y1="68" x2="58" y2="76" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.9" />
-      <line x1="112" y1="68" x2="142" y2="76" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.9" />
-      <line x1="100" y1="68" x2="100" y2="132" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.7" strokeDasharray="2 3" />
-      <line x1="100" y1="132" x2="100" y2="178" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.6" strokeDasharray="2 3" />
-      <line x1="82" y1="158" x2="118" y2="158" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.5" strokeDasharray="2 4" />
+      {/* Lower abs */}
+      <rect x="113" y="211" width="34" height="36" rx="7" {...a('lower_abs')} {...h('lower_abs')} />
+
+      {/* Quads */}
+      <rect x="99"  y="290" width="28" height="122" rx="13" {...a('quads')} {...h('quads')} />
+      <rect x="133" y="290" width="28" height="122" rx="13" {...a('quads')} {...h('quads')} />
+
+      {/* Calves gastrocnemius (visible from front) */}
+      <rect x="102" y="420" width="21" height="68" rx="10" {...a('calves_gastro')} {...h('calves_gastro')} />
+      <rect x="137" y="420" width="21" height="68" rx="10" {...a('calves_gastro')} {...h('calves_gastro')} />
     </svg>
   )
 }
 
-// ── BACK VIEW ────────────────────────────────────────────────────────────────
-// All muscle regions share exact boundary lines.
+// ── Back view ─────────────────────────────────────────────────────────────────
 
-function BackView({ scores, selected, hovered, onSelect, onHover, imbalancedKeys }: SP) {
-  const p = (key: string, pts: string, side?: string) =>
-    <MP key={`${key}-${side ?? 'c'}`} muscleKey={key} points={pts}
-      scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={onHover} imbalancedKeys={imbalancedKeys} />
+function BackView({ scores, sel, hov, onSel, onHov, imb }: VP) {
+  const a = (k: string): SVGAttrs => sha(k, scores, sel, hov, imb)
+  const h = (k: string) => ({
+    onClick:      () => onSel(k),
+    onMouseEnter: () => onHov(k),
+    onMouseLeave: () => onHov(null),
+  })
 
   return (
-    <svg viewBox="0 0 200 430" style={{ width: '100%', maxWidth: 300, display: 'block', userSelect: 'none' }}>
-      {/* ── Body silhouette ── */}
-      <polygon points="54,68 146,68 154,84 156,102 144,120 136,166 128,198 126,212 100,212 74,212 72,198 64,166 56,120 44,102 46,84"
-        fill="url(#body-fill)" filter="url(#bodyEdge)" stroke="none" />
-      <polygon points="33,72 56,68 54,182 44,228 30,222 31,178" fill="url(#body-fill)" stroke="none" />
-      <polygon points="144,68 167,72 169,178 170,222 156,228 146,182" fill="url(#body-fill)" stroke="none" />
-      <polygon points="70,214 100,212 98,332 64,326" fill="url(#body-fill)" stroke="none" />
-      <polygon points="100,212 130,214 136,326 102,332" fill="url(#body-fill)" stroke="none" />
-      <polygon points="64,334 96,332 94,394 62,388" fill="url(#body-fill)" stroke="none" />
-      <polygon points="104,332 136,334 138,388 106,394" fill="url(#body-fill)" stroke="none" />
+    <svg viewBox="0 0 260 580" style={{ width: '100%', maxWidth: 220, display: 'block', userSelect: 'none' }}>
+      <Silhouette />
 
-      <ellipse cx="100" cy="26" rx="20" ry="24" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
-      <polygon points="91,48 109,48 112,68 88,68" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.8" />
+      {/* Traps — horizontal band + narrowing below */}
+      <rect x="90"  y="86"  width="80" height="18" rx="7" {...a('traps')} {...h('traps')} />
+      <rect x="98"  y="104" width="64" height="16" rx="7" {...a('traps')} {...h('traps')} />
 
-      {/* ── TRAPS — diamond from neck-base to mid-back ── */}
-      {p('traps', '82,62 118,62 140,84 134,110 100,118 66,110 60,84')}
+      {/* Lats — wings (render before triceps so triceps sit on top) */}
+      <rect x="61"  y="108" width="22" height="74" rx="10" {...a('lats')} {...h('lats')} />
+      <rect x="177" y="108" width="22" height="74" rx="10" {...a('lats')} {...h('lats')} />
 
-      {/* ── REAR DELTS — share exact boundary with traps outer edge ── */}
-      {p('delt_rear', '36,74 62,70 58,98 34,88', 'L')}
-      {p('delt_rear', '138,70 164,74 166,88 142,98', 'R')}
+      {/* Rear delts */}
+      <ellipse cx="70"  cy="110" rx="14" ry="13" {...a('delt_rear')} {...h('delt_rear')} />
+      <ellipse cx="190" cy="110" rx="14" ry="13" {...a('delt_rear')} {...h('delt_rear')} />
 
-      {/* ── SIDE DELTS back — share boundary with rear delt bottom ── */}
-      {p('delt_side', '31,90 56,100 54,120 29,110', 'LB')}
-      {p('delt_side', '144,100 169,90 171,110 146,120', 'RB')}
+      {/* Rhomboids — between shoulder blades */}
+      <rect x="101" y="122" width="58" height="34" rx="8" {...a('rhomboids')} {...h('rhomboids')} />
 
-      {/* ── RHOMBOIDS — inner upper back, shares boundary with traps bottom & lats inner ── */}
-      {p('rhomboids', '68,112 132,112 130,148 70,148')}
+      {/* Triceps */}
+      <rect x="54"  y="120" width="22" height="60" rx="11" {...a('triceps')} {...h('triceps')} />
+      <rect x="184" y="120" width="22" height="60" rx="11" {...a('triceps')} {...h('triceps')} />
 
-      {/* ── LATS — wings, share boundary with rhomboids inner edge ── */}
-      {p('lats', '46,100 68,112 70,148 66,184 46,170 40,148 42,114', 'L')}
-      {p('lats', '130,112 154,100 158,114 160,148 154,170 134,184 130,148', 'R')}
+      {/* Forearms */}
+      <rect x="49"  y="192" width="20" height="76" rx="10" {...a('forearms')} {...h('forearms')} />
+      <rect x="191" y="192" width="20" height="76" rx="10" {...a('forearms')} {...h('forearms')} />
 
-      {/* ── LOWER BACK — erectors, share boundary with rhomboids bottom ── */}
-      {p('lower_back', '70,150 130,150 128,198 72,198')}
+      {/* Lower back — erectors */}
+      <rect x="106" y="162" width="48" height="78" rx="10" {...a('lower_back')} {...h('lower_back')} />
 
-      {/* ── TRICEPS — back of arm ── */}
-      {p('triceps', '31,92 56,102 52,180 29,172', 'L')}
-      {p('triceps', '144,102 169,92 171,172 148,180', 'R')}
+      {/* Glutes */}
+      <rect x="97"  y="256" width="30" height="52" rx="13" {...a('glutes')} {...h('glutes')} />
+      <rect x="133" y="256" width="30" height="52" rx="13" {...a('glutes')} {...h('glutes')} />
 
-      {/* ── FOREARMS back ── */}
-      {p('forearms', '29,174 52,182 48,226 31,220', 'LB')}
-      {p('forearms', '148,182 171,174 169,220 152,226', 'RB')}
+      {/* Hamstrings */}
+      <rect x="99"  y="310" width="28" height="100" rx="13" {...a('hamstrings')} {...h('hamstrings')} />
+      <rect x="133" y="310" width="28" height="100" rx="13" {...a('hamstrings')} {...h('hamstrings')} />
 
-      {/* ── GLUTES — share boundary with lower back bottom ── */}
-      {p('glutes', '70,200 100,196 100,258 66,262', 'L')}
-      {p('glutes', '100,196 130,200 134,262 100,258', 'R')}
+      {/* Gastrocnemius */}
+      <rect x="102" y="418" width="22" height="74" rx="10" {...a('calves_gastro')} {...h('calves_gastro')} />
+      <rect x="136" y="418" width="22" height="74" rx="10" {...a('calves_gastro')} {...h('calves_gastro')} />
 
-      {/* ── HAMSTRINGS — share boundary with glutes bottom ── */}
-      {p('hamstrings', '64,264 100,260 100,304 62,300', 'L')}
-      {p('hamstrings', '100,260 136,264 138,300 100,304', 'R')}
+      {/* Soleus */}
+      <rect x="103" y="494" width="21" height="34" rx="8" {...a('calves_soleus')} {...h('calves_soleus')} />
+      <rect x="136" y="494" width="21" height="34" rx="8" {...a('calves_soleus')} {...h('calves_soleus')} />
 
-      {/* ── GASTROCNEMIUS ── */}
-      {p('calves_gastro', '62,312 90,310 88,364 62,358', 'LB')}
-      {p('calves_gastro', '110,310 138,312 138,358 112,364', 'RB')}
-
-      {/* ── SOLEUS — share boundary with gastro bottom ── */}
-      {p('calves_soleus', '62,360 88,366 86,388 62,382', 'L')}
-      {p('calves_soleus', '112,366 138,360 138,382 114,388', 'R')}
-
-      {/* ── Structural ── */}
-      <ellipse cx="81"  cy="329" rx="13" ry="4" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.7" />
-      <ellipse cx="119" cy="329" rx="13" ry="4" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="0.7" />
-      <line x1="100" y1="68" x2="100" y2="198" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="1" strokeDasharray="3 4" />
-      <line x1="93"  y1="150" x2="93"  y2="199" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.6" strokeDasharray="2 4" />
-      <line x1="107" y1="150" x2="107" y2="199" style={{ stroke: 'var(--border-subtle)' }} strokeWidth="0.6" strokeDasharray="2 4" />
-      <polygon points="58,390 94,388 92,406 56,404" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
-      <polygon points="106,388 142,390 144,404 108,406" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
-      <polygon points="17,222 33,222 31,248 15,246" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
-      <polygon points="167,222 183,222 185,246 169,248" style={{ fill: 'var(--surface-2)', stroke: 'var(--border-subtle)' }} strokeWidth="1" />
+      {/* Spine guide line */}
+      <line
+        x1="130" y1="86" x2="130" y2="242"
+        stroke="var(--border-subtle)" strokeWidth="0.8" strokeDasharray="3 4"
+        style={{ pointerEvents: 'none' }}
+      />
     </svg>
   )
 }
@@ -374,22 +266,11 @@ export function BodyMap({ view, scores, selected, onSelect, imbalancedKeys }: Pr
   const handleHover = useCallback((key: string | null) => setHovered(key), [])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, width: '100%' }}>
-      <svg aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-        <SvgDefs accentHex={getAccentHex()} />
-      </svg>
-
-      {/* Body centered, rank legend on right via absolute positioning */}
-      <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
-        {view === 'front'
-          ? <FrontView scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={handleHover} imbalancedKeys={imbalancedKeys} />
-          : <BackView  scores={scores} selected={selected} hovered={hovered} onSelect={onSelect} onHover={handleHover} imbalancedKeys={imbalancedKeys} />
-        }
-        <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
-          <RankLegend />
-        </div>
-      </div>
-
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+      {view === 'front'
+        ? <FrontView scores={scores} sel={selected} hov={hovered} onSel={onSelect} onHov={handleHover} imb={imbalancedKeys} />
+        : <BackView  scores={scores} sel={selected} hov={hovered} onSel={onSelect} onHov={handleHover} imb={imbalancedKeys} />
+      }
       <MuscleLabel muscleKey={hovered ?? selected} scores={scores} />
     </div>
   )
