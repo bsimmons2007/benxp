@@ -431,8 +431,8 @@ export function Cardio() {
             <button
               key={k}
               onClick={() => setFilter(k)}
-              className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5"
-              style={{ background: filter === k ? 'var(--accent)' : 'var(--input-bg)', color: filter === k ? 'var(--base-bg)' : 'var(--text-muted)' }}
+              className="shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-1.5"
+              style={{ background: filter === k ? 'var(--accent)' : 'var(--input-bg)', color: filter === k ? 'var(--base-bg)' : 'var(--text-secondary)', border: `1px solid ${filter === k ? 'transparent' : 'var(--border-subtle)'}` }}
             >
               {k === 'all' ? 'All' : (
                 <>

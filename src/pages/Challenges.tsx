@@ -700,9 +700,11 @@ export function Challenges() {
     }
   }
 
-  const weekly  = challenges.filter(c => c.tier === 'Weekly')
-  const monthly = challenges.filter(c => c.tier === 'Monthly')
-  const boss    = challenges.filter(c => c.tier === 'Boss')
+  const weekly      = challenges.filter(c => c.tier === 'Weekly')
+  const monthly     = challenges.filter(c => c.tier === 'Monthly')
+  const boss        = challenges.filter(c => c.tier === 'Boss')
+  const activeBoss  = boss.filter(c => c.status === 'active')
+  const claimedBoss = boss.filter(c => c.status === 'claimed')
 
   const monthResetLabel = `Resets in ${daysUntilMonthEnd()} day${daysUntilMonthEnd() === 1 ? '' : 's'}`
   const hasAnyContent   = !tutorialMode && (weekly.length > 0 || monthly.length > 0 || boss.length > 0)
@@ -782,7 +784,19 @@ export function Challenges() {
                   </p>
                 </div>
 
-                {boss.map(c => <BossCard key={c.id} challenge={c} onClaim={handleBossClaim} />)}
+                {activeBoss.map(c => <BossCard key={c.id} challenge={c} onClaim={handleBossClaim} />)}
+
+                {claimedBoss.length > 0 && (
+                  <>
+                    <p
+                      className="text-xs font-semibold uppercase tracking-wide mb-2 mt-1"
+                      style={{ color: 'var(--text-secondary)', letterSpacing: '0.08em' }}
+                    >
+                      Conquered
+                    </p>
+                    {claimedBoss.map(c => <BossCard key={c.id} challenge={c} onClaim={handleBossClaim} />)}
+                  </>
+                )}
               </section>
             )}
           </>

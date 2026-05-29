@@ -26,7 +26,6 @@ export function RankBadge({ rank, size = 'md' }: { rank: RankMeta; size?: 'sm' |
         color: rank.glow !== 'none' ? rank.glow : 'var(--text-tertiary)',
         fontSize: sz, fontWeight: 700,
         letterSpacing: '0.04em',
-        boxShadow: rank.glow !== 'none' ? `0 0 8px ${rank.glow}55` : 'none',
       }}
     >
       {rank.icon} {rank.label}
@@ -52,7 +51,6 @@ function RankProgressBar({ result }: { result: MuscleScoreResult }) {
             background: result.rank.tier >= 16
               ? `linear-gradient(90deg, ${result.rank.color}, ${glow})`
               : glow,
-            boxShadow: `0 0 6px ${glow}88`,
             transition: 'width 0.6s ease',
           }}
         />

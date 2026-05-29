@@ -979,9 +979,7 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
         border: open
           ? '1px solid color-mix(in srgb, var(--accent) 35%, transparent)'
           : '1px solid var(--border-subtle)',
-        background: open
-          ? 'linear-gradient(135deg, var(--surface-2) 0%, var(--surface-1) 100%)'
-          : 'var(--surface-1)',
+        background: open ? 'var(--surface-2)' : 'var(--surface-1)',
         transition: 'border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease',
         boxShadow: open ? 'var(--shadow-md)' : hovered ? 'var(--shadow-sm)' : 'none',
       }}
@@ -993,7 +991,6 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
         <div style={{
           position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
           background: 'var(--accent)', borderRadius: '14px 0 0 14px',
-          boxShadow: '0 0 12px var(--accent-dim)',
         }} />
       )}
 
@@ -1299,7 +1296,8 @@ export function Records() {
                   <button
                     onClick={() => setMuscleFilter(null)}
                     style={{
-                      flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                      flexShrink: 0, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                      display: 'inline-flex', alignItems: 'center',
                       background: muscleFilter === null ? 'var(--accent)' : 'var(--surface-2)',
                       color: muscleFilter === null ? '#1A1A2E' : 'var(--text-secondary)',
                       border: `1px solid ${muscleFilter === null ? 'var(--accent)' : 'var(--border-subtle)'}`,
@@ -1311,11 +1309,12 @@ export function Records() {
                       key={grp}
                       onClick={() => setMuscleFilter(g => g === grp ? null : grp)}
                       style={{
-                        flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                        flexShrink: 0, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                        display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
                         background: muscleFilter === grp ? 'var(--accent)' : 'var(--surface-2)',
                         color: muscleFilter === grp ? '#1A1A2E' : 'var(--text-secondary)',
                         border: `1px solid ${muscleFilter === grp ? 'var(--accent)' : 'var(--border-subtle)'}`,
-                        cursor: 'pointer', transition: 'all 0.12s ease', whiteSpace: 'nowrap',
+                        cursor: 'pointer', transition: 'all 0.12s ease',
                       }}
                     ><MuscleGroupIcon group={grp} color={muscleFilter === grp ? '#1A1A2E' : 'var(--text-secondary)'} /> {grp}</button>
                   ))}

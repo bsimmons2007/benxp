@@ -11,11 +11,11 @@ import { usePageTitle } from '../hooks/usePageTitle'
 
 type IconFn = (props: { size?: number; color?: string; style?: CSSProperties }) => React.ReactElement
 
-const NAV_LINKS: { to: string; Icon: IconFn; label: string; sub: string }[] = [
+const NAV_LINKS: { to: string; Icon: IconFn; label: string; sub: string; sidebarOnly?: boolean }[] = [
   { to: '/profile',      Icon: PersonIcon,   label: 'Profile',            sub: 'Badges, skills & identity'    },
-  { to: '/goals',        Icon: TargetIcon,   label: 'Goals',              sub: 'Set targets, earn XP'         },
+  { to: '/goals',        Icon: TargetIcon,   label: 'Goals',              sub: 'Set targets, earn XP',         sidebarOnly: true },
   { to: '/measurements', Icon: RulerIcon,    label: 'Measurements',       sub: 'Body composition over time'   },
-  { to: '/weekly',       Icon: CalendarIcon, label: 'Weekly Review',      sub: 'XP & highlights this week'    },
+  { to: '/weekly',       Icon: CalendarIcon, label: 'Weekly Review',      sub: 'XP & highlights this week',    sidebarOnly: true },
   { to: '/monthly',      Icon: GridIcon,     label: 'Monthly Reel',       sub: 'Your best moments this month' },
   { to: '/pr-feed',      Icon: TrophyIcon,   label: 'PR Feed',            sub: "Every record you've set"      },
   { to: '/share',        Icon: ShareIcon,    label: 'Share Card',         sub: 'Export your progress card'    },
@@ -35,7 +35,8 @@ export function More() {
       <PageWrapper>
         <div className="flex flex-col gap-2">
           {NAV_LINKS.map(link => (
-            <Link key={link.to} to={link.to} style={{ textDecoration: 'none' }}>
+            <div key={link.to} className={link.sidebarOnly ? 'md:hidden' : ''}>
+            <Link to={link.to} style={{ textDecoration: 'none' }}>
               <Card className="card-hover" style={{ padding: '14px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <div style={{
@@ -56,6 +57,7 @@ export function More() {
                 </div>
               </Card>
             </Link>
+            </div>
           ))}
         </div>
       </PageWrapper>

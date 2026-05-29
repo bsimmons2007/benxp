@@ -149,7 +149,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
                 <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: hadDream ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
               <span style={{ fontSize: 13, color: hadDream ? 'var(--accent)' : 'var(--text-muted)', fontWeight: 600 }}>
-                💭 Had a dream
+                Had a dream
               </span>
             </div>
 
@@ -165,6 +165,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
 // ── Nap log panel ─────────────────────────────────────────────────────────────
 
 function LogNapPanel({ onLogged }: { onLogged: () => void }) {
+
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const [date,  setDate]  = useState(today())
@@ -749,6 +750,11 @@ export function Sleep() {
           <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
         </div>
         <LogSleepPanel onLogged={load} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 8px' }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+          <span style={{ fontSize: 10, color: 'var(--text-disabled)', fontWeight: 600, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }}>or</span>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+        </div>
         <LogNapPanel onLogged={load} />
 
         {/* Hours slept trend */}
