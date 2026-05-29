@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { animate } from 'animejs'
 import { animateStreakDots, animateWidgets } from '../lib/animations'
+import { StreakFire } from '../components/ui/StreakFire'
 import { Link } from 'react-router-dom'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
@@ -143,11 +145,14 @@ function WeekDotStrip({ streak }: {
       {/* Streak info */}
       {!streak.loading && (
         <div style={{ textAlign: 'right', paddingLeft: 10 }}>
-          <p style={{ fontSize: 22, fontWeight: 700,
-            color: streak.current > 0 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1,
-          }}>
-            {streak.current}
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', lineHeight: 1 }}>
+            <span style={{ fontSize: 22, fontWeight: 700,
+              color: streak.current > 0 ? 'var(--accent)' : 'var(--text-muted)',
+            }}>
+              {streak.current}
+            </span>
+            {streak.current >= 7 && <StreakFire />}
+          </div>
           <p style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>day streak</p>
           {streak.longest > 0 && (
             <p style={{ fontSize: 9, color: 'var(--text-dim)', marginTop: 1 }}>
@@ -196,10 +201,10 @@ const ACTIVITY_COLORS: Record<string, string> = {
 }
 
 // ── Unified stat widget card ──────────────────────────────────
-function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, onRemove }: {
+function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, onRemove, slotIn = false }: {
   label: string; value: string | number; unit?: string
   trendDir?: TrendDir; delta?: number | null; to?: string; color?: string
-  editMode?: boolean; onRemove?: () => void
+  editMode?: boolean; onRemove?: () => void; slotIn?: boolean
 }) {
   const num      = typeof value === 'number' ? value : parseFloat(String(value))
   const isNum    = !isNaN(num)
@@ -207,21 +212,67 @@ function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, 
   const animated = useCountUp(isNum ? num : 0, 900, decimals)
   const accent   = color ?? 'var(--accent)'
 
+  // Slot machine: session-once spin to real value
+  const [slotDisplay, setSlotDisplay] = useState<string | null>(null)
+  const slotDone = useRef(false)
+  useEffect(() => {
+    if (!slotIn || slotDone.current || !isNum || num === 0) return
+    slotDone.current = true
+    const duration  = 1100 + Math.random() * 600
+    const startVal  = 50 + Math.random() * Math.max(900, num * 1.8)
+    const delayMs   = Math.random() * 350
+    let rafId: number
+    let startTs: number | null = null
+    function tick(ts: number) {
+      if (!startTs) startTs = ts
+      const t      = Math.min((ts - startTs) / duration, 1)
+      const eased  = t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+      setSlotDisplay((startVal + (num - startVal) * eased).toFixed(decimals))
+      if (t < 1) rafId = requestAnimationFrame(tick)
+      else setSlotDisplay(null)
+    }
+    const tid = setTimeout(() => { rafId = requestAnimationFrame(tick) }, delayMs)
+    return () => { clearTimeout(tid); cancelAnimationFrame(rafId) }
+  }, [isNum, num, slotIn, decimals])
+
+  // Card tilt on desktop hover
+  const cardRef = useRef<HTMLDivElement>(null)
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!cardRef.current || window.matchMedia('(max-width: 767px)').matches) return
+    const r = cardRef.current.getBoundingClientRect()
+    const x = ((e.clientX - r.left)  / r.width  - 0.5) * 2
+    const y = ((e.clientY - r.top)   / r.height - 0.5) * 2
+    animate(cardRef.current, { rotateY: x * 9, rotateX: -y * 7, duration: 80, ease: 'linear' })
+  }
+  function handleMouseLeave() {
+    if (!cardRef.current) return
+    animate(cardRef.current, { rotateY: 0, rotateX: 0, duration: 380, ease: 'outCubic' })
+  }
+
+  const displayNum = slotDisplay ?? (isNum ? animated : String(value))
+
   const inner = (
-    <div style={{
-      background:  'var(--surface-1)',
-      border:      '1px solid var(--border-subtle)',
-      borderLeft:  `3px solid ${accent}`,
-      borderRadius: 12, padding: '12px 14px',
-      boxShadow:   'var(--card-shadow)',
-      height:      '100%',
-    }}>
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        background:  'var(--surface-1)',
+        border:      '1px solid var(--border-subtle)',
+        borderLeft:  `3px solid ${accent}`,
+        borderRadius: 12, padding: '12px 14px',
+        boxShadow:   'var(--card-shadow)',
+        height:      '100%',
+        transformStyle: 'preserve-3d',
+        willChange: 'transform',
+      }}
+    >
       <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.01em', marginBottom: 5 }}>
         {label}
       </p>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, lineHeight: 1 }}>
         <span style={{ fontSize: 24, fontWeight: 700, color: accent }}>
-          {isNum ? animated : value}
+          {displayNum}
         </span>
         {trendDir && trendDir !== 'flat' && <TrendArrow direction={trendDir} />}
       </div>
@@ -235,7 +286,7 @@ function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, 
   )
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', perspective: 600 }}>
       {to ? <Link to={to} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>{inner}</Link> : inner}
       {editMode && (
         <button
@@ -375,6 +426,14 @@ export function Home() {
   const lastUpdated     = useStore(s => s.lastUpdated)
   const trends          = useTrends()
   const streak          = useStreak()
+
+  // Slot machine plays once per session for initial stats reveal
+  const [doSlot] = useState<boolean>(() => {
+    const key = 'youxp-home-slot-played'
+    if (sessionStorage.getItem(key)) return false
+    sessionStorage.setItem(key, '1')
+    return true
+  })
 
   // Stat picker / widget grid
   const [statPicks, setStatPicks] = useState<StatId[]>(() => {
@@ -631,8 +690,13 @@ export function Home() {
               <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.1, marginBottom: 2 }}>
                 {title}
               </p>
-              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 10 }}>
-                {Number(animatedXP).toLocaleString()} XP
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 10, overflow: 'hidden' }}>
+                <span
+                  key={loading ? 'l' : 'r'}
+                  style={{ display: 'inline-block', animation: loading ? 'none' : 'odometerIn 0.45s ease-out both' }}
+                >
+                  {Number(animatedXP).toLocaleString()} XP
+                </span>
                 {!loading && <span style={{ color: 'var(--text-dim)', marginLeft: 6 }}>· {toNext.toLocaleString()} to next</span>}
               </p>
               <ProgressBar value={progress} height={4} />
@@ -709,6 +773,7 @@ export function Home() {
                   {...getCardProps(id)}
                   editMode={editMode}
                   onRemove={() => removeWidget(id)}
+                  slotIn={doSlot}
                 />
               ))}
               {/* Add tile — shown in edit mode when below max */}

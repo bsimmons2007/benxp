@@ -1,4 +1,6 @@
 import type { ReactNode, ButtonHTMLAttributes } from 'react'
+import { useRef } from 'react'
+import { animate } from 'animejs'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
@@ -17,8 +19,20 @@ export function Button({
   disabled = false,
   className = '',
   style,
+  onPointerDown: externalPointerDown,
   ...props
 }: ButtonProps) {
+  const btnRef = useRef<HTMLButtonElement>(null)
+
+  function handlePointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    externalPointerDown?.(e)
+    if (disabled || loading || !btnRef.current) return
+    animate(btnRef.current, {
+      scale: [1, 0.88, 1],
+      duration: 360,
+      ease: 'spring(1, 80, 14, 0)',
+    })
+  }
   const sizeClasses = {
     sm: 'h-8 px-3 text-xs',
     md: 'h-10 px-5 text-sm',
@@ -55,7 +69,7 @@ export function Button({
         }
 
   return (
-    <button className={base} style={{ ...variantStyle, ...style }} disabled={disabled || loading} {...props}>
+    <button ref={btnRef} className={base} style={{ ...variantStyle, ...style }} disabled={disabled || loading} onPointerDown={handlePointerDown} {...props}>
       {loading && (
         <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3" />

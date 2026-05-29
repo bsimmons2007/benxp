@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { playXPGain, playPR } from '../../lib/sounds'
+import { XPCoins } from './XPCoins'
 
 interface ToastProps {
   message:   string
@@ -33,7 +34,12 @@ export function Toast({ message, onDone, onUndo, duration }: ToastProps) {
     setTimeout(() => { onUndo?.(); onDone() }, 50)
   }
 
+  const xpMatch = message.match(/\+(\d+)\s*XP/i)
+  const xpAmount = xpMatch ? parseInt(xpMatch[1]) : 0
+
   return (
+    <>
+      {xpAmount > 0 && <XPCoins xp={xpAmount} />}
     <div
       className="fixed left-1/2 z-50 overflow-hidden rounded-xl shadow-xl transition-all duration-280"
       style={{
@@ -75,5 +81,6 @@ export function Toast({ message, onDone, onUndo, duration }: ToastProps) {
         />
       </div>
     </div>
+    </>
   )
 }

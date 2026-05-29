@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { animateRipple } from '../lib/animations'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
@@ -268,8 +269,14 @@ export function Water() {
             {QUICK_ADDS.map(oz => (
               <button
                 key={oz}
-                onClick={() => addWater(oz)}
+                onClick={(e) => {
+                  addWater(oz)
+                  const btn = e.currentTarget
+                  const rect = btn.getBoundingClientRect()
+                  animateRipple(btn, e.clientX - rect.left, e.clientY - rect.top)
+                }}
                 style={{
+                  position: 'relative', overflow: 'hidden',
                   padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 700,
                   background: 'rgba(41,182,246,0.12)', border: '1.5px solid rgba(41,182,246,0.3)',
                   color: '#29b6f6', cursor: 'pointer', transition: 'all 0.12s ease',

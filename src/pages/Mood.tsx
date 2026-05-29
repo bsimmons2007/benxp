@@ -1,6 +1,7 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, type UseFormRegister } from 'react-hook-form'
+import { animate } from 'animejs'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -40,6 +41,81 @@ function moodLabel(v: number) {
   if (v >= 5) return 'Okay'
   if (v >= 3) return 'Low'
   return 'Rough'
+}
+
+// SVG face whose expression tracks mood 1–10
+function MoodFace({ value }: { value: number }) {
+  const t = (value - 1) / 9          // 0 = worst, 1 = best
+  const smileY = 62 + (1 - t) * 10  // mouth center Y: low=smiley, high=frown
+  // Mouth: cubic bezier control points — curves up at high mood, down at low
+  const cp1y = t >= 0.5 ? smileY - 10 : smileY + 10
+  const cp2y = cp1y
+  const mouth = `M 34 ${smileY} C 40 ${cp1y}, 60 ${cp2y}, 66 ${smileY}`
+  // Eye brow lift: raised at high mood
+  const browDrop = (1 - t) * 5
+  const color = t >= 0.7 ? 'var(--accent)' : t >= 0.4 ? '#fbbf24' : '#f87171'
+
+  return (
+    <svg viewBox="0 0 100 100" width={72} height={72} style={{ display: 'block' }}>
+      <circle cx="50" cy="50" r="46" fill={color} opacity={0.12} />
+      <circle cx="50" cy="50" r="44" fill="none" stroke={color} strokeWidth={1.5} opacity={0.4} />
+      {/* Eyes */}
+      <circle cx="35" cy="42" r="4.5" fill={color} />
+      <circle cx="65" cy="42" r="4.5" fill={color} />
+      {/* Brows */}
+      <path d={`M 28 ${36 + browDrop} Q 35 ${33 + browDrop}, 42 ${36 + browDrop}`} stroke={color} strokeWidth={2.2} fill="none" strokeLinecap="round" />
+      <path d={`M 58 ${36 + browDrop} Q 65 ${33 + browDrop}, 72 ${36 + browDrop}`} stroke={color} strokeWidth={2.2} fill="none" strokeLinecap="round" />
+      {/* Mouth */}
+      <path d={mouth} stroke={color} strokeWidth={2.5} fill="none" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// Slider row with spring bounce on the value number when it changes
+function SliderRow({
+  label, name, val, color, register,
+}: {
+  label: string
+  name: keyof MoodForm
+  val: number
+  color: string
+  register: UseFormRegister<MoodForm>
+}) {
+  const numRef  = useRef<HTMLSpanElement>(null)
+  const prevVal = useRef(val)
+
+  useEffect(() => {
+    if (prevVal.current === val || !numRef.current) { prevVal.current = val; return }
+    prevVal.current = val
+    animate(numRef.current, {
+      scale:    [1.6, 1],
+      duration: 360,
+      ease:     'spring(1, 100, 10, 0)',
+    })
+  }, [val])
+
+  const fillPct = ((val - 1) / 9) * 100
+  return (
+    <div className="flex flex-col gap-1">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <label style={{ color: 'var(--text-secondary)', fontSize: 15, fontWeight: 500 }}>
+          {label}
+        </label>
+        <span ref={numRef} style={{ color, fontWeight: 700, fontSize: 16, minWidth: 20, textAlign: 'right', display: 'inline-block' }}>
+          {val}
+        </span>
+      </div>
+      <input
+        type="range" min="1" max="10" step="1"
+        {...register(name)}
+        style={{
+          '--slider-fill': color,
+          background: `linear-gradient(to right, ${color} 0%, ${color} ${fillPct}%, var(--surface-2) ${fillPct}%, var(--surface-2) 100%)`,
+        } as React.CSSProperties}
+        className="w-full"
+      />
+    </div>
+  )
 }
 
 export function Mood() {
@@ -145,9 +221,9 @@ export function Mood() {
                 className="card-animate"
                 style={{
                   background: 'var(--surface-1)',
-                  border: '1px solid var(--border-default)', borderRadius: 14,
+                  border: '1px solid var(--border-subtle)', borderRadius: 14,
                   padding: '12px 10px', textAlign: 'center',
-                  boxShadow: `0 0 16px ${s.color}15`,
+                  boxShadow: 'var(--shadow-sm)',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 3 }}>{s.icon}</div>
@@ -173,7 +249,7 @@ export function Mood() {
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
               {chartData.map(d => (
                 <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f472b6', boxShadow: '0 0 8px #f472b6' }} />
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f472b6' }} />
                   <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>{d.mood}</p>
                 </div>
               ))}
@@ -219,9 +295,9 @@ export function Mood() {
                   formatter={(v: any, name: string) => [v, name.charAt(0).toUpperCase() + name.slice(1)]}
                   cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }}
                 />
-                {visibleLines.mood   && <Area type="monotone" dataKey="mood"   stroke="#f472b6" strokeWidth={2}   fill="url(#mood-grad)"   dot={false} />}
-                {visibleLines.energy && <Area type="monotone" dataKey="energy" stroke="#4ade80" strokeWidth={1.5} fill="url(#energy-grad)" dot={false} />}
-                {visibleLines.stress && <Area type="monotone" dataKey="stress" stroke="#f87171" strokeWidth={1.5} fill="url(#stress-grad)" dot={false} />}
+                {visibleLines.mood   && <Area type="monotone" dataKey="mood"   stroke="#f472b6" strokeWidth={2}   fill="url(#mood-grad)"   dot={false} animationBegin={0} animationDuration={1100} />}
+                {visibleLines.energy && <Area type="monotone" dataKey="energy" stroke="#4ade80" strokeWidth={1.5} fill="url(#energy-grad)" dot={false} animationBegin={0} animationDuration={1100} />}
+                {visibleLines.stress && <Area type="monotone" dataKey="stress" stroke="#f87171" strokeWidth={1.5} fill="url(#stress-grad)" dot={false} animationBegin={0} animationDuration={1100} />}
               </AreaChart>
             </ResponsiveContainer>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 8, flexWrap: 'wrap' }}>
@@ -249,41 +325,18 @@ export function Mood() {
 
         {/* Log form */}
         <Card className="mb-5">
-          <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 16 }}>
-            {moodLabel(moodVal)} Daily Check-in
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+            <MoodFace value={moodVal} />
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em' }}>
+              {moodLabel(moodVal)} Daily Check-in
+            </p>
+          </div>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
-            {/* Slider with live value display */}
-            {[
-              { label: 'Mood',   name: 'mood'   as const, val: moodVal,   color: 'var(--accent)' },
-              { label: 'Energy', name: 'energy' as const, val: energyVal, color: '#4ade80' },
-              { label: 'Stress', name: 'stress' as const, val: parseInt(watch('stress') ?? '5'), color: '#f87171' },
-            ].map(({ label, name, val, color }) => {
-              const fillPct = ((val - 1) / 9) * 100
-              return (
-                <div key={name} className="flex flex-col gap-1">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <label style={{ color: 'var(--text-secondary)', fontSize: 15, fontWeight: 500 }}>
-                      {label}
-                    </label>
-                    <span style={{ color, fontWeight: 700, fontSize: 16, minWidth: 20, textAlign: 'right' }}>
-                      {val}
-                    </span>
-                  </div>
-                  <input
-                    type="range" min="1" max="10" step="1"
-                    {...register(name)}
-                    style={{
-                      '--slider-fill': color,
-                      background: `linear-gradient(to right, ${color} 0%, ${color} ${fillPct}%, var(--surface-2) ${fillPct}%, var(--surface-2) 100%)`,
-                    } as React.CSSProperties}
-                    className="w-full"
-                  />
-                </div>
-              )
-            })}
+            <SliderRow label="Mood"   name="mood"   val={moodVal}                                  color="var(--accent)" register={register} />
+            <SliderRow label="Energy" name="energy" val={energyVal}                                color="#4ade80"       register={register} />
+            <SliderRow label="Stress" name="stress" val={parseInt(watch('stress') ?? '5')}         color="#f87171"       register={register} />
 
             <Input label="Activities" type="text" placeholder="Gym, reading, skating…" {...register('activities')} />
             <div className="flex flex-col gap-1">
