@@ -858,7 +858,7 @@ export function Sleep() {
                     <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
                       {formatDate(entry.date)} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({dayLabel})</span>
                       {entry.is_nap && <span style={{ marginLeft: 6, fontSize: 10, background: 'var(--input-bg)', color: 'var(--text-muted)', padding: '1px 6px', borderRadius: 4 }}>NAP</span>}
-                      {dreamsMap[entry.id] && <span style={{ marginLeft: 6, fontSize: 11 }} title="Had a dream">💭</span>}
+                      {dreamsMap[entry.id] && <span style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, color: 'var(--text-tertiary)', background: 'var(--surface-2)', padding: '1px 5px', borderRadius: 4, fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>dream</span>}
                     </p>
                     <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                       {entry.bedtime  && `Bed ${entry.bedtime} · `}
