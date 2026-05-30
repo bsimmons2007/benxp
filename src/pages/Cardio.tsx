@@ -282,9 +282,11 @@ export function Cardio() {
   async function load() {
     setLoadError(false)
     setSplitsMap(getSplitsMap())
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setChartLoading(false); return }
     const [cardio, skate] = await Promise.all([
-      supabase.from('cardio_sessions').select('*').order('date', { ascending: false }),
-      supabase.from('skate_sessions').select('*').order('date', { ascending: false }),
+      supabase.from('cardio_sessions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(500),
+      supabase.from('skate_sessions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(500),
     ])
 
     const cardioSessions: Session[] = (cardio.data ?? []).map((r: {

@@ -643,7 +643,9 @@ export function Fortnite() {
   const [editing, setEditing] = useState<FortniteGame | null>(null)
 
   async function load() {
-    const { data } = await supabase.from('fortnite_games').select('*').order('date', { ascending: false })
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data } = await supabase.from('fortnite_games').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(1000)
     setGames(data ?? [])
   }
   useEffect(() => { load() }, [])

@@ -62,17 +62,19 @@ function useMetricValues() {
 
   useEffect(() => {
     async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
       const cutoff = localDateStr(thirtyDaysAgo)
 
       const [prs, skate, cardio, books, wins, sleep] = await Promise.all([
-        supabase.from('pr_history').select('lift, est_1rm'),
-        supabase.from('skate_sessions').select('miles'),
-        supabase.from('cardio_sessions').select('distance_miles'),
-        supabase.from('books').select('id').not('date_finished', 'is', null),
-        supabase.from('fortnite_games').select('id').eq('win', true),
-        supabase.from('sleep_log').select('hours_slept').eq('is_nap', false).gte('date', cutoff),
+        supabase.from('pr_history').select('lift, est_1rm').eq('user_id', user.id),
+        supabase.from('skate_sessions').select('miles').eq('user_id', user.id),
+        supabase.from('cardio_sessions').select('distance_miles').eq('user_id', user.id),
+        supabase.from('books').select('id').eq('user_id', user.id).not('date_finished', 'is', null),
+        supabase.from('fortnite_games').select('id').eq('user_id', user.id).eq('win', true),
+        supabase.from('sleep_log').select('hours_slept').eq('user_id', user.id).eq('is_nap', false).gte('date', cutoff),
       ])
 
       const bestPR = (lift: string) =>

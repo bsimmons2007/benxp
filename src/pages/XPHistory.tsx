@@ -32,15 +32,15 @@ interface XPEvent {
 
 async function fetchXPEvents(userId: string): Promise<XPEvent[]> {
   const [lifting, prs, books, skate, games, sleep, challenges, cardio, goals] = await Promise.all([
-    supabase.from('lifting_log').select('date').eq('user_id', userId),
-    supabase.from('pr_history').select('date, lift, est_1rm').eq('user_id', userId),
-    supabase.from('books').select('date_finished, title').eq('user_id', userId).not('date_finished', 'is', null),
-    supabase.from('skate_sessions').select('date, miles').eq('user_id', userId),
-    supabase.from('fortnite_games').select('date, kills').eq('user_id', userId).eq('win', true),
-    supabase.from('sleep_log').select('date, hours_slept').eq('user_id', userId),
-    supabase.from('challenges').select('challenge_name, xp_reward, completed_at').eq('user_id', userId).eq('status', 'completed').not('completed_at', 'is', null),
-    supabase.from('cardio_sessions').select('date, activity, distance_miles').eq('user_id', userId),
-    supabase.from('goals').select('title, xp_reward, completed_at').eq('user_id', userId).eq('status', 'completed').not('completed_at', 'is', null),
+    supabase.from('lifting_log').select('date').eq('user_id', userId).order('date', { ascending: false }).limit(500),
+    supabase.from('pr_history').select('date, lift, est_1rm').eq('user_id', userId).order('date', { ascending: false }).limit(500),
+    supabase.from('books').select('date_finished, title').eq('user_id', userId).not('date_finished', 'is', null).order('date_finished', { ascending: false }).limit(500),
+    supabase.from('skate_sessions').select('date, miles').eq('user_id', userId).order('date', { ascending: false }).limit(500),
+    supabase.from('fortnite_games').select('date, kills').eq('user_id', userId).eq('win', true).order('date', { ascending: false }).limit(500),
+    supabase.from('sleep_log').select('date, hours_slept').eq('user_id', userId).order('date', { ascending: false }).limit(500),
+    supabase.from('challenges').select('challenge_name, xp_reward, completed_at').eq('user_id', userId).eq('status', 'completed').not('completed_at', 'is', null).order('completed_at', { ascending: false }).limit(500),
+    supabase.from('cardio_sessions').select('date, activity, distance_miles').eq('user_id', userId).order('date', { ascending: false }).limit(500),
+    supabase.from('goals').select('title, xp_reward, completed_at').eq('user_id', userId).eq('status', 'completed').not('completed_at', 'is', null).order('completed_at', { ascending: false }).limit(500),
   ])
 
   const events: XPEvent[] = []
@@ -246,6 +246,14 @@ export function XPHistory() {
           </div>
         ) : loading ? (
           <p style={{ color: 'var(--text-tertiary)', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
+        ) : events.length === 0 ? (
+          <div className="flex flex-col items-center py-16 fade-in" style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 48, marginBottom: 16, opacity: 0.3 }}>⚡</div>
+            <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8 }}>No XP earned yet</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 240, lineHeight: 1.6 }}>
+              Log a workout, finish a book, or get some sleep — every action earns XP.
+            </p>
+          </div>
         ) : (
           <div>
             {grouped.map(group => (

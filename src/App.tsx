@@ -83,7 +83,7 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   const { session, loading, error } = useContext(AuthContext)
   if (loading) return <AppShellSkeleton />
   if (error || !session) return <Navigate to="/login" replace />
-  return <>{children}</>
+  return <ErrorBoundary inline>{children}</ErrorBoundary>
 }
 
 // ── Keyboard shortcuts ────────────────────────────────────────────────────────
