@@ -37,16 +37,19 @@ ALTER TABLE volleyball_sessions           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE spikeball_games               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pool_games                    ENABLE ROW LEVEL SECURITY;
 
+-- Additional user-owned tables found in codebase
+ALTER TABLE bodyweight_log                ENABLE ROW LEVEL SECURITY;
+ALTER TABLE to_read                       ENABLE ROW LEVEL SECURITY;
+
 -- Reference / shared tables (public read, no client writes)
 ALTER TABLE exercises                     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE exercise_muscle_activations   ENABLE ROW LEVEL SECURITY;
 
--- Profile / social tables
+-- Profile table (exists — queried by Leaderboard page)
 ALTER TABLE public_profiles               ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_privacy_settings         ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_audit_log                ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_follows                  ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_blocks                   ENABLE ROW LEVEL SECURITY;
+
+-- Social/audit tables — guarded below with IF EXISTS because they may not
+-- be created yet (not yet wired to app code). See section at bottom.
 
 
 -- ══════════════════════════════════════════════
@@ -297,6 +300,29 @@ CREATE POLICY "pool_games_update" ON pool_games FOR UPDATE USING (user_id = auth
 CREATE POLICY "pool_games_delete" ON pool_games FOR DELETE USING (user_id = auth.uid());
 
 
+-- ── bodyweight_log ─────────────────────────────
+DROP POLICY IF EXISTS "bodyweight_log_select" ON bodyweight_log;
+DROP POLICY IF EXISTS "bodyweight_log_insert" ON bodyweight_log;
+DROP POLICY IF EXISTS "bodyweight_log_update" ON bodyweight_log;
+DROP POLICY IF EXISTS "bodyweight_log_delete" ON bodyweight_log;
+
+CREATE POLICY "bodyweight_log_select" ON bodyweight_log FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "bodyweight_log_insert" ON bodyweight_log FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "bodyweight_log_update" ON bodyweight_log FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "bodyweight_log_delete" ON bodyweight_log FOR DELETE USING (user_id = auth.uid());
+
+-- ── to_read ────────────────────────────────────
+DROP POLICY IF EXISTS "to_read_select" ON to_read;
+DROP POLICY IF EXISTS "to_read_insert" ON to_read;
+DROP POLICY IF EXISTS "to_read_update" ON to_read;
+DROP POLICY IF EXISTS "to_read_delete" ON to_read;
+
+CREATE POLICY "to_read_select" ON to_read FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "to_read_insert" ON to_read FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "to_read_update" ON to_read FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "to_read_delete" ON to_read FOR DELETE USING (user_id = auth.uid());
+
+
 -- ══════════════════════════════════════════════
 -- REFERENCE TABLES — public read, no client writes
 -- ══════════════════════════════════════════════
@@ -334,49 +360,62 @@ CREATE POLICY "public_profiles_update_own" ON public_profiles
 CREATE POLICY "public_profiles_delete_own" ON public_profiles
   FOR DELETE USING (user_id = auth.uid());
 
--- ── user_privacy_settings ──────────────────────
-DROP POLICY IF EXISTS "user_privacy_settings_select" ON user_privacy_settings;
-DROP POLICY IF EXISTS "user_privacy_settings_insert" ON user_privacy_settings;
-DROP POLICY IF EXISTS "user_privacy_settings_update" ON user_privacy_settings;
-DROP POLICY IF EXISTS "user_privacy_settings_delete" ON user_privacy_settings;
+-- ── user_privacy_settings (optional — skip if table doesn't exist yet) ──
+DO $$ BEGIN
+  ALTER TABLE user_privacy_settings ENABLE ROW LEVEL SECURITY;
+  DROP POLICY IF EXISTS "user_privacy_settings_select" ON user_privacy_settings;
+  DROP POLICY IF EXISTS "user_privacy_settings_insert" ON user_privacy_settings;
+  DROP POLICY IF EXISTS "user_privacy_settings_update" ON user_privacy_settings;
+  DROP POLICY IF EXISTS "user_privacy_settings_delete" ON user_privacy_settings;
+  CREATE POLICY "user_privacy_settings_select" ON user_privacy_settings FOR SELECT USING (user_id = auth.uid());
+  CREATE POLICY "user_privacy_settings_insert" ON user_privacy_settings FOR INSERT WITH CHECK (user_id = auth.uid());
+  CREATE POLICY "user_privacy_settings_update" ON user_privacy_settings FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+  CREATE POLICY "user_privacy_settings_delete" ON user_privacy_settings FOR DELETE USING (user_id = auth.uid());
+EXCEPTION WHEN undefined_table THEN
+  RAISE NOTICE 'user_privacy_settings does not exist — skipping';
+END $$;
 
-CREATE POLICY "user_privacy_settings_select" ON user_privacy_settings FOR SELECT USING (user_id = auth.uid());
-CREATE POLICY "user_privacy_settings_insert" ON user_privacy_settings FOR INSERT WITH CHECK (user_id = auth.uid());
-CREATE POLICY "user_privacy_settings_update" ON user_privacy_settings FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
-CREATE POLICY "user_privacy_settings_delete" ON user_privacy_settings FOR DELETE USING (user_id = auth.uid());
+-- ── user_audit_log (optional — append-only, written via Edge Function service_role) ──
+DO $$ BEGIN
+  ALTER TABLE user_audit_log ENABLE ROW LEVEL SECURITY;
+  DROP POLICY IF EXISTS "user_audit_log_select" ON user_audit_log;
+  -- SELECT only — no INSERT/UPDATE/DELETE; Edge Functions use service_role which bypasses RLS
+  CREATE POLICY "user_audit_log_select" ON user_audit_log FOR SELECT USING (user_id = auth.uid());
+EXCEPTION WHEN undefined_table THEN
+  RAISE NOTICE 'user_audit_log does not exist — skipping';
+END $$;
 
--- ── user_audit_log ─────────────────────────────
--- Append-only: users can read their own log, cannot update or delete entries.
--- Writes come from Edge Functions (service_role key bypasses RLS).
-DROP POLICY IF EXISTS "user_audit_log_select" ON user_audit_log;
-CREATE POLICY "user_audit_log_select" ON user_audit_log FOR SELECT USING (user_id = auth.uid());
--- No INSERT/UPDATE/DELETE — written only by Edge Functions via service_role
+-- ── user_follows (optional — follower can read/write own follows) ──
+DO $$ BEGIN
+  ALTER TABLE user_follows ENABLE ROW LEVEL SECURITY;
+  DROP POLICY IF EXISTS "user_follows_select" ON user_follows;
+  DROP POLICY IF EXISTS "user_follows_insert" ON user_follows;
+  DROP POLICY IF EXISTS "user_follows_delete" ON user_follows;
+  CREATE POLICY "user_follows_select" ON user_follows
+    FOR SELECT USING (follower_id = auth.uid() OR following_id = auth.uid());
+  CREATE POLICY "user_follows_insert" ON user_follows
+    FOR INSERT WITH CHECK (follower_id = auth.uid());
+  CREATE POLICY "user_follows_delete" ON user_follows
+    FOR DELETE USING (follower_id = auth.uid());
+EXCEPTION WHEN undefined_table THEN
+  RAISE NOTICE 'user_follows does not exist — skipping';
+END $$;
 
--- ── user_follows ───────────────────────────────
--- A user can follow/unfollow (insert/delete their own rows).
--- A user can see who follows them and who they follow.
-DROP POLICY IF EXISTS "user_follows_select"  ON user_follows;
-DROP POLICY IF EXISTS "user_follows_insert"  ON user_follows;
-DROP POLICY IF EXISTS "user_follows_delete"  ON user_follows;
-
-CREATE POLICY "user_follows_select" ON user_follows
-  FOR SELECT USING (follower_id = auth.uid() OR following_id = auth.uid());
-CREATE POLICY "user_follows_insert" ON user_follows
-  FOR INSERT WITH CHECK (follower_id = auth.uid());
-CREATE POLICY "user_follows_delete" ON user_follows
-  FOR DELETE USING (follower_id = auth.uid());
-
--- ── user_blocks ────────────────────────────────
-DROP POLICY IF EXISTS "user_blocks_select" ON user_blocks;
-DROP POLICY IF EXISTS "user_blocks_insert" ON user_blocks;
-DROP POLICY IF EXISTS "user_blocks_delete" ON user_blocks;
-
-CREATE POLICY "user_blocks_select" ON user_blocks
-  FOR SELECT USING (blocker_id = auth.uid());
-CREATE POLICY "user_blocks_insert" ON user_blocks
-  FOR INSERT WITH CHECK (blocker_id = auth.uid());
-CREATE POLICY "user_blocks_delete" ON user_blocks
-  FOR DELETE USING (blocker_id = auth.uid());
+-- ── user_blocks (optional — blocker controls their own block list) ──
+DO $$ BEGIN
+  ALTER TABLE user_blocks ENABLE ROW LEVEL SECURITY;
+  DROP POLICY IF EXISTS "user_blocks_select" ON user_blocks;
+  DROP POLICY IF EXISTS "user_blocks_insert" ON user_blocks;
+  DROP POLICY IF EXISTS "user_blocks_delete" ON user_blocks;
+  CREATE POLICY "user_blocks_select" ON user_blocks
+    FOR SELECT USING (blocker_id = auth.uid());
+  CREATE POLICY "user_blocks_insert" ON user_blocks
+    FOR INSERT WITH CHECK (blocker_id = auth.uid());
+  CREATE POLICY "user_blocks_delete" ON user_blocks
+    FOR DELETE USING (blocker_id = auth.uid());
+EXCEPTION WHEN undefined_table THEN
+  RAISE NOTICE 'user_blocks does not exist — skipping';
+END $$;
 
 
 -- ══════════════════════════════════════════════
