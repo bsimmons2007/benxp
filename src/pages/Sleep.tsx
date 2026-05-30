@@ -292,35 +292,36 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
   const maxBar = Math.max(totalDebt, 10)
 
   return (
-    <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
-      <div className="flex items-center justify-between mb-2">
+    <div className="rounded-xl mb-4" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-2">
-          <MoonIcon size={15} color={debtColor} />
-          <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Sleep Debt</span>
+          <MoonIcon size={16} color={debtColor} />
+          <span className="font-bold" style={{ color: 'var(--text-primary)', fontSize: 15 }}>Sleep Debt</span>
         </div>
-        <span className="font-bold font-mono" style={{ color: debtColor, fontSize: 18 }}>
+        <span className="font-bold font-mono" style={{ color: debtColor, fontSize: 20 }}>
           {totalDebt.toFixed(1)}h
         </span>
       </div>
 
-      {/* Debt bar */}
-      <div style={{ height: 5, borderRadius: 3, background: 'var(--surface-2)', overflow: 'hidden', marginBottom: 12 }}>
+      {/* Debt bar — full width flush */}
+      <div style={{ height: 6, background: 'var(--surface-2)' }}>
         <div style={{
           height: '100%', width: `${Math.min(100, (totalDebt / maxBar) * 100).toFixed(0)}%`,
-          background: debtColor, borderRadius: 3, transition: 'width 0.6s ease',
+          background: debtColor, transition: 'width 0.6s ease',
         }} />
       </div>
 
       {/* Three stat chips */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-px p-4" style={{ gap: 8 }}>
         {[
           { label: '7-night deficit', value: `${recentDebt.toFixed(1)}h`, color: debtColor },
           { label: '14-day rolling',  value: `${totalDebt.toFixed(1)}h`,  color: debtColor },
           { label: 'Nights to clear', value: String(recoveryNights),       color: 'var(--text-primary)' },
         ].map(s => (
-          <div key={s.label} className="rounded-lg p-2.5 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}>
-            <p className="font-bold font-mono" style={{ color: s.color, fontSize: 17, lineHeight: 1 }}>{s.value}</p>
-            <p className="section-label mt-1" style={{ fontSize: 9 }}>{s.label}</p>
+          <div key={s.label} className="rounded-lg text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)', padding: '10px 6px 8px' }}>
+            <p className="font-bold font-mono" style={{ color: s.color, fontSize: 20, lineHeight: 1 }}>{s.value}</p>
+            <p className="section-label" style={{ fontSize: 9, marginTop: 5 }}>{s.label}</p>
           </div>
         ))}
       </div>
@@ -415,19 +416,19 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full rounded-xl p-4 mb-4 text-left"
-        style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', cursor: 'pointer' }}
+        className="w-full rounded-xl mb-4 text-left"
+        style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)', cursor: 'pointer', padding: '14px 16px' }}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Wake Time Trainer</p>
-            <p style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 2 }}>
+            <p className="font-bold" style={{ color: 'var(--accent)', fontSize: 15 }}>Wake Time Trainer</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 3 }}>
               {avgWakeMins !== null
-                ? `Avg wake: ${fmtTime(avgWakeMins)} · Tap to set a goal`
+                ? <><span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{fmtTime(avgWakeMins)}</span> avg · tap to set a goal</>
                 : 'Plan a gradual wake time shift with a day-by-day schedule'}
             </p>
           </div>
-          <span style={{ color: 'var(--text-muted)', fontSize: 18 }}>›</span>
+          <span style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 300 }}>›</span>
         </div>
       </button>
     )
