@@ -615,7 +615,9 @@ function ToReadSection() {
   })
 
   async function load() {
-    const { data } = await supabase.from('to_read').select('*').order('created_at', { ascending: false })
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data } = await supabase.from('to_read').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
     setBooks(data ?? [])
   }
   useEffect(() => { load() }, [])

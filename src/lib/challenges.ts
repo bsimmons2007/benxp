@@ -112,29 +112,29 @@ export function getSeen(period: 'weekly' | 'monthly'): string[] {
 
 // ── Activity detection ────────────────────────────────────────────
 
-export async function detectActiveSections(supabase: SupabaseClient): Promise<Set<ActivitySection>> {
+export async function detectActiveSections(supabase: SupabaseClient, userId: string): Promise<Set<ActivitySection>> {
   const checks: Array<[ActivitySection, () => Promise<number>]> = [
-    ['lifting',      () => supabase.from('lifting_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['run',          () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'run').then(r => r.count ?? 0)],
-    ['bike',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'bike').then(r => r.count ?? 0)],
-    ['swim',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'swim').then(r => r.count ?? 0)],
-    ['walk',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'walk').then(r => r.count ?? 0)],
-    ['skate',        () => supabase.from('skate_sessions').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['sleep',        () => supabase.from('sleep_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['water',        () => supabase.from('water_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['books',        () => supabase.from('books').select('id', { count: 'exact', head: true }).not('date_finished', 'is', null).then(r => r.count ?? 0)],
-    ['mood',         () => supabase.from('mood_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['chess',        () => supabase.from('chess_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['disc_golf',    () => supabase.from('disc_golf_rounds').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['fortnite',     () => supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['golf',         () => supabase.from('golf_rounds').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['hiking',       () => supabase.from('hiking_sessions').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['basketball',   () => supabase.from('basketball_sessions').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['pickleball',   () => supabase.from('pickleball_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['pool',         () => supabase.from('pool_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['spikeball',    () => supabase.from('spikeball_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['table_tennis', () => supabase.from('table_tennis_games').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
-    ['volleyball',   () => supabase.from('volleyball_sessions').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0)],
+    ['lifting',      () => supabase.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['run',          () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'run').then(r => r.count ?? 0)],
+    ['bike',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'bike').then(r => r.count ?? 0)],
+    ['swim',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'swim').then(r => r.count ?? 0)],
+    ['walk',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'walk').then(r => r.count ?? 0)],
+    ['skate',        () => supabase.from('skate_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['sleep',        () => supabase.from('sleep_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['water',        () => supabase.from('water_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['books',        () => supabase.from('books').select('id', { count: 'exact', head: true }).eq('user_id', userId).not('date_finished', 'is', null).then(r => r.count ?? 0)],
+    ['mood',         () => supabase.from('mood_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['chess',        () => supabase.from('chess_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['disc_golf',    () => supabase.from('disc_golf_rounds').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['fortnite',     () => supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['golf',         () => supabase.from('golf_rounds').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['hiking',       () => supabase.from('hiking_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['basketball',   () => supabase.from('basketball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['pickleball',   () => supabase.from('pickleball_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['pool',         () => supabase.from('pool_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['spikeball',    () => supabase.from('spikeball_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['table_tennis', () => supabase.from('table_tennis_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['volleyball',   () => supabase.from('volleyball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
   ]
 
   const results = await Promise.all(checks.map(([, fn]) => fn().catch(() => 0)))
@@ -145,7 +145,7 @@ export async function detectActiveSections(supabase: SupabaseClient): Promise<Se
 
 // ── Stats computation ─────────────────────────────────────────────
 
-export async function fetchUserStats(supabase: SupabaseClient): Promise<UserStats> {
+export async function fetchUserStats(supabase: SupabaseClient, userId: string): Promise<UserStats> {
   const [
     liftingDates, liftingSets,
     cardioAll,
@@ -166,25 +166,25 @@ export async function fetchUserStats(supabase: SupabaseClient): Promise<UserStat
     tableTennisGames,
     volleyballSessions,
   ] = await Promise.all([
-    supabase.from('lifting_log').select('date').then(r => r.data ?? []),
-    supabase.from('lifting_log').select('date').then(r => r.data ?? []),
-    supabase.from('cardio_sessions').select('date, activity, distance_miles').then(r => r.data ?? []),
-    supabase.from('skate_sessions').select('date, miles').then(r => r.data ?? []),
-    supabase.from('sleep_log').select('date, hours_slept, is_nap').then(r => r.data ?? []),
-    supabase.from('water_log').select('date').then(r => r.data ?? []),
-    supabase.from('books').select('date_finished').not('date_finished', 'is', null).then(r => r.data ?? []),
-    supabase.from('mood_log').select('date, mood').then(r => r.data ?? []),
-    supabase.from('chess_games').select('date, result').then(r => r.data ?? []),
-    supabase.from('disc_golf_rounds').select('date').then(r => r.data ?? []),
-    supabase.from('fortnite_games').select('date, kills').then(r => r.data ?? []),
-    supabase.from('golf_rounds').select('date').then(r => r.data ?? []),
-    supabase.from('hiking_sessions').select('date, distance_miles').then(r => r.data ?? []),
-    supabase.from('basketball_sessions').select('date').then(r => r.data ?? []),
-    supabase.from('pickleball_games').select('date, win').then(r => r.data ?? []),
-    supabase.from('pool_games').select('date, win').then(r => r.data ?? []),
-    supabase.from('spikeball_games').select('date, win').then(r => r.data ?? []),
-    supabase.from('table_tennis_games').select('date, win').then(r => r.data ?? []),
-    supabase.from('volleyball_sessions').select('date, win').then(r => r.data ?? []),
+    supabase.from('lifting_log').select('date').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('lifting_log').select('date').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('cardio_sessions').select('date, activity, distance_miles').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('skate_sessions').select('date, miles').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('sleep_log').select('date, hours_slept, is_nap').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('water_log').select('date').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('books').select('date_finished').eq('user_id', userId).not('date_finished', 'is', null).then(r => r.data ?? []),
+    supabase.from('mood_log').select('date, mood').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('chess_games').select('date, result').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('disc_golf_rounds').select('date').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('fortnite_games').select('date, kills').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('golf_rounds').select('date').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('hiking_sessions').select('date, distance_miles').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('basketball_sessions').select('date').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('pickleball_games').select('date, win').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('pool_games').select('date, win').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('spikeball_games').select('date, win').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('table_tennis_games').select('date, win').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('volleyball_sessions').select('date, win').eq('user_id', userId).then(r => r.data ?? []),
   ])
 
   function weeksSpan(rows: { date: string }[]): number {
@@ -368,7 +368,7 @@ function pickTemplates(
 // ── Main sync ─────────────────────────────────────────────────────
 
 export async function syncUserChallenges(supabase: SupabaseClient, userId: string): Promise<void> {
-  const activeSections = await detectActiveSections(supabase)
+  const activeSections = await detectActiveSections(supabase, userId)
 
   if (activeSections.size === 0) {
     localStorage.setItem('youxp-needs-tutorial', 'true')
@@ -406,7 +406,7 @@ export async function syncUserChallenges(supabase: SupabaseClient, userId: strin
 
   if (weeklyNeeded <= 0 && monthlyNeeded <= 0) return
 
-  const stats = await fetchUserStats(supabase)
+  const stats = await fetchUserStats(supabase, userId)
 
   if (weeklyNeeded > 0) {
     const usedKeys = new Set(activeWeekly.map(c => c.notes ?? ''))
@@ -473,8 +473,8 @@ export async function rerollChallenge(
 ): Promise<boolean> {
   if (!consumeReroll(period)) return false
 
-  const activeSections = await detectActiveSections(supabase)
-  const stats = await fetchUserStats(supabase)
+  const activeSections = await detectActiveSections(supabase, userId)
+  const stats = await fetchUserStats(supabase, userId)
 
   const currentTemplate = CHALLENGE_TEMPLATES.find(t => t.key === currentTemplateKey)
   const section = currentTemplate?.section

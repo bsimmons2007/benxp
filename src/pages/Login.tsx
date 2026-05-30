@@ -200,11 +200,18 @@ export function Login() {
     resetStore()
 
     if (mode === 'signup') {
-      // Always show generic response — never reveal whether email exists (COPPA/privacy)
-      await supabase.auth.signUp({
+      const { data: signUpData } = await supabase.auth.signUp({
         email: data.email, password: data.password,
         options: { data: { name: (data.name ?? '').trim() } },
       })
+      // If Supabase email confirmation is disabled, signUp returns a live session — redirect straight in
+      if (signUpData?.session) {
+        clearRateLimit()
+        setSuccess(true)
+        setTimeout(() => navigate('/'), 420)
+        return
+      }
+      // Confirmation required (or generic fallback — never reveal whether email exists)
       setSuccess(true)
       setResetMsg('Check your email to confirm your account and get started.')
       return
