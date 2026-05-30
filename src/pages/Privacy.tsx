@@ -5,7 +5,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 
 const EFFECTIVE_DATE = 'May 29, 2026'
 const APP_NAME       = 'YouXP'
-const CONTACT_EMAIL  = 'benthejamsimmons@gmail.com'
+const CONTACT_EMAIL  = 'TeamYouXP@gmail.com'
 
 function Section({ title, children, accent }: { title: string; children: React.ReactNode; accent?: boolean }) {
   return (
