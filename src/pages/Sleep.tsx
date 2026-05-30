@@ -347,71 +347,145 @@ function fmtTime(mins: number): string {
   return `${h12}:${String(m).padStart(2, '0')} ${ampm}`
 }
 
-/** Add N days to a YYYY-MM-DD string */
-function addDays(dateStr: string, n: number): string {
-  const d = new Date(dateStr + 'T12:00:00')
-  d.setDate(d.getDate() + n)
-  return d.toLocaleDateString('en-CA')
+// ── Wake schedule math (ported from wake-shared.jsx) ─────────────────────────
+
+interface ScheduleNight {
+  idx:       number
+  wake:      number   // minutes since midnight
+  sleep:     number   // bedtime minutes
+  atGoal:    boolean
+  dateLabel: string   // "May 30"
+  dow:       string
+  label:     string   // "Tonight" | "Tomorrow" | "Sat"
+  dateStr:   string   // YYYY-MM-DD for log matching
 }
 
-function dayLabel(dateStr: string): string {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  return days[new Date(dateStr + 'T12:00:00').getDay()]
+const MON_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const DOW_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+
+function buildWakeSchedule(
+  startWake: number, goalWake: number, drift: number,
+  sleepDur: number, todayStr: string,
+): ScheduleNight[] {
+  const out: ScheduleNight[] = []
+  let wake = startWake
+  const dir = goalWake < startWake ? -1 : 1
+  for (let i = 0; i < 21; i++) {
+    const atGoal = (goalWake - wake) * dir <= 0.0001
+    const d = new Date(todayStr + 'T12:00:00')
+    d.setDate(d.getDate() + i)
+    out.push({
+      idx: i, wake, sleep: wake - sleepDur * 60, atGoal,
+      dateLabel: `${MON_SHORT[d.getMonth()]} ${d.getDate()}`,
+      dow: DOW_SHORT[d.getDay()],
+      label: i === 0 ? 'Tonight' : i === 1 ? 'Tomorrow' : DOW_SHORT[d.getDay()],
+      dateStr: localDateStr(d),
+    })
+    if (atGoal) {
+      if (out.filter(n => n.atGoal).length >= 3) break
+      wake = goalWake
+    } else {
+      wake = dir < 0 ? Math.max(goalWake, wake - drift) : Math.min(goalWake, wake + drift)
+    }
+  }
+  return out
 }
+
+// ── Ramp SVG (ported from wake-ramp.jsx) ─────────────────────────────────────
+
+function WakeRamp({ schedule, startWake, goalWake }: {
+  schedule: ScheduleNight[]; startWake: number; goalWake: number
+}) {
+  if (schedule.length < 2) return null
+  const W = 560, H = 148, pL = 8, pR = 14, pT = 20, pB = 28
+  const iW = W - pL - pR, iH = H - pT - pB
+  const hi = startWake + 18, lo = goalWake - 18
+  const xf = (i: number) => pL + (iW * i) / (schedule.length - 1)
+  const yf = (m: number) => pT + iH * (1 - (m - lo) / (hi - lo))
+
+  const pts = schedule.map((n, i) => [xf(i), yf(n.wake)] as [number, number])
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ')
+  const area = `${line} L${pts[pts.length-1][0].toFixed(1)} ${(pT+iH).toFixed(1)} L${pts[0][0].toFixed(1)} ${(pT+iH).toFixed(1)} Z`
+  const goalY  = yf(goalWake)
+  const goalIdx = schedule.findIndex(n => n.atGoal)
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block', overflow: 'visible' }}>
+      <defs>
+        <linearGradient id="wt-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--text-primary)" stopOpacity="0.07" />
+          <stop offset="100%" stopColor="var(--text-primary)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {/* goal floor dashed line */}
+      <line x1={pL} y1={goalY} x2={W-pR} y2={goalY}
+        stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="2 5" opacity="0.9" />
+      <text x={W-pR} y={goalY-7} textAnchor="end"
+        fontFamily="var(--font-mono)" fontSize="10" letterSpacing="0.04em" fill="var(--accent)">
+        GOAL {fmtTime(goalWake)}
+      </text>
+      {/* area fill + line */}
+      <path d={area} fill="url(#wt-grad)" />
+      <path d={line} fill="none" stroke="var(--text-primary)" strokeWidth="2.4"
+        strokeLinejoin="round" strokeLinecap="round" />
+      {/* nodes */}
+      {schedule.map((n, i) => {
+        const isFirst = i === 0
+        const isGoal  = i === goalIdx
+        const r     = isFirst ? 5.5 : 3.2
+        const fill  = (isFirst || isGoal) ? 'var(--accent)' : 'var(--surface-1)'
+        const stroke = (isFirst || n.atGoal) ? 'var(--accent)' : 'var(--text-primary)'
+        return <circle key={i} cx={xf(i)} cy={yf(n.wake)} r={r} fill={fill} stroke={stroke} strokeWidth="2" />
+      })}
+      {/* tonight time label above first node */}
+      <text x={pts[0][0]} y={pts[0][1]-12} textAnchor="start"
+        fontFamily="var(--font-mono)" fontSize="10" fontWeight="700" fill="var(--accent)">
+        {fmtTime(startWake)}
+      </text>
+      {/* x-axis labels */}
+      <text x={pts[0][0]} y={H-5} textAnchor="start"
+        fontFamily="var(--font-mono)" fontSize="9" letterSpacing="0.07em" fill="var(--text-muted)">
+        TONIGHT
+      </text>
+      {goalIdx > 0 && (
+        <text x={xf(goalIdx)} y={H-5} textAnchor="middle"
+          fontFamily="var(--font-mono)" fontSize="9" letterSpacing="0.07em" fill="var(--text-muted)">
+          {schedule[goalIdx].dateLabel.toUpperCase()}
+        </text>
+      )}
+    </svg>
+  )
+}
+
+// ── Wake Time Trainer ─────────────────────────────────────────────────────────
+
+const DRIFT_OPTIONS = [
+  { label: 'Gentle',   value: 10, sub: '10 min/day' },
+  { label: 'Moderate', value: 20, sub: '20 min/day' },
+  { label: 'Fast',     value: 30, sub: '30 min/day' },
+]
 
 function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
-  const [open,          setOpen]         = useState(false)
-  const [targetWake,    setTargetWake]   = useState('08:00')
-  const [sleepHours,    setSleepHours]   = useState('8')
-  const [shiftMins,     setShiftMins]    = useState(20)
+  const [open,         setOpen]        = useState(false)
+  const [targetMins,   setTargetMins]  = useState(8 * 60)   // default 8:00 AM
+  const [drift,        setDrift]       = useState(20)
+  const [showSchedule, setShowSchedule] = useState(false)
 
-  // Derive current average wake time from actual log data
-  const wakeTimeLogs = logs.filter(l => l.wake_time && l.wake_time.length >= 4).slice(0, 14)
+  const wakeTimeLogs    = logs.filter(l => l.wake_time && l.wake_time.length >= 4).slice(0, 14)
   const avgWakeMins: number | null = wakeTimeLogs.length >= 2
     ? Math.round(wakeTimeLogs.reduce((s, l) => s + parseTime(l.wake_time!), 0) / wakeTimeLogs.length)
     : null
-
-  // What user is currently waking up at (default: 11am if no data)
   const currentWakeMins = avgWakeMins ?? parseTime('11:00')
-  const targetWakeMins  = parseTime(targetWake)
-  const deltaMinutes    = currentWakeMins - targetWakeMins     // how many minutes earlier to shift
+  const alreadyAtGoal   = currentWakeMins <= targetMins
 
-  const sleepDuration   = Math.max(6, Math.min(10, parseFloat(sleepHours) || 8))
-  const daysNeeded      = deltaMinutes <= 0 ? 0 : Math.ceil(deltaMinutes / shiftMins)
+  const todayStr  = today()
+  const nNeeded   = alreadyAtGoal ? 0 : Math.ceil((currentWakeMins - targetMins) / drift)
+  const schedule  = buildWakeSchedule(currentWakeMins, targetMins, drift, 8, todayStr)
+  const goalNight = schedule.find(n => n.atGoal)
 
-  // Build the day-by-day schedule starting from today
-  const todayStr = today()
-  const schedule = Array.from({ length: daysNeeded + 1 }, (_, i) => {
-    const wakeMin  = currentWakeMins - i * shiftMins
-    const bedMin   = wakeMin - sleepDuration * 60
-    return {
-      date:     addDays(todayStr, i),
-      day:      i,
-      wakeMins: wakeMin,
-      bedMins:  bedMin,
-      wake:     fmtTime(wakeMin),
-      bed:      fmtTime(bedMin),
-      isGoal:   wakeMin <= targetWakeMins,
-    }
-  })
+  const adjustTarget = (delta: number) => setTargetMins(m => (((m + delta) % 1440) + 1440) % 1440)
 
-  // Check actual progress — how many recent wake times match or beat the plan?
-  const recentWakes = logs
-    .filter(l => l.wake_time && l.date >= todayStr)
-    .map(l => ({ date: l.date, mins: parseTime(l.wake_time!) }))
-
-  // Days already on-track: wake time ≤ scheduled target for that day
-  const daysOnTrack = recentWakes.filter(w => {
-    const dayNum = Math.round((new Date(w.date + 'T12:00:00').getTime() - new Date(todayStr + 'T12:00:00').getTime()) / 86400000)
-    const planned = currentWakeMins - dayNum * shiftMins
-    return w.mins <= planned + 15   // 15-min grace
-  }).length
-
-  const progressPct = daysNeeded > 0 ? Math.min(100, Math.round((daysOnTrack / daysNeeded) * 100)) : 100
-
-  // Estimate completion date
-  const goalDate = daysNeeded > 0 ? addDays(todayStr, daysNeeded - 1) : todayStr
-
+  // ── Closed ──
   if (!open) {
     return (
       <button
@@ -423,9 +497,15 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
           <div>
             <p className="font-bold" style={{ color: 'var(--accent)', fontSize: 15 }}>Wake Time Trainer</p>
             <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 3 }}>
-              {avgWakeMins !== null
-                ? <><span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{fmtTime(avgWakeMins)}</span> avg · tap to set a goal</>
-                : 'Plan a gradual wake time shift with a day-by-day schedule'}
+              {avgWakeMins !== null ? (
+                <>
+                  Goal <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{fmtTime(targetMins)}</span>
+                  {' · '}
+                  {alreadyAtGoal
+                    ? 'Already at goal'
+                    : `${nNeeded} night${nNeeded === 1 ? '' : 's'} to go`}
+                </>
+              ) : 'Set a gradual wake-time goal — night by night'}
             </p>
           </div>
           <span style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 300 }}>›</span>
@@ -434,180 +514,176 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
     )
   }
 
-  const inputStyle: CSSProperties = {
-    width: '100%', padding: '9px 12px', borderRadius: 8,
-    background: 'var(--surface-2)', border: '1px solid var(--border-subtle)',
-    color: 'var(--text-primary)', fontSize: 15, outline: 'none',
-    fontFamily: 'inherit',
-  }
-  const labelStyle2: CSSProperties = {
-    display: 'block', color: 'var(--text-muted)', fontSize: 10,
-    fontWeight: 700, textTransform: 'uppercase',
-    fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 6,
-  }
-
+  // ── Open ──
   return (
     <Card className="mb-4 pop-in">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+      <div className="flex items-center justify-between px-4 pt-4 pb-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
         <p className="font-bold" style={{ color: 'var(--text-primary)', fontSize: 15 }}>Wake Time Trainer</p>
-        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✕</button>
+        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16 }}>✕</button>
       </div>
 
       <div className="p-4 flex flex-col gap-4">
 
-        {/* Current vs target */}
+        {/* Zone 1 — Now → Goal */}
         <div className="flex items-center gap-3">
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.10em', marginBottom: 4 }}>
-              {avgWakeMins !== null ? `Avg (${wakeTimeLogs.length} nights)` : 'Current'}
-            </p>
-            <p className="font-bold font-mono" style={{ color: 'var(--text-primary)', fontSize: 20 }}>{fmtTime(currentWakeMins)}</p>
+            <p className="section-label mb-1">{avgWakeMins !== null ? `Avg · ${wakeTimeLogs.length} nights` : 'Current'}</p>
+            <p className="font-bold font-mono" style={{ color: 'var(--text-primary)', fontSize: 21 }}>{fmtTime(currentWakeMins)}</p>
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: 18, fontWeight: 300 }}>→</div>
+          <span style={{ color: 'var(--text-muted)', fontSize: 18 }}>→</span>
           <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--accent)' }}>
-            <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.10em', marginBottom: 4 }}>Goal</p>
-            <p className="font-bold font-mono" style={{ color: 'var(--accent)', fontSize: 20 }}>{fmtTime(targetWakeMins)}</p>
+            <p className="section-label mb-1" style={{ color: 'var(--accent)' }}>Goal</p>
+            <p className="font-bold font-mono" style={{ color: 'var(--accent)', fontSize: 21 }}>{fmtTime(targetMins)}</p>
           </div>
         </div>
 
-        {/* Settings */}
-        <div className="flex flex-col gap-3">
-          <div>
-            <label style={labelStyle2}>Target Wake Time</label>
-            <input type="time" value={targetWake} onChange={e => setTargetWake(e.target.value)} style={inputStyle} />
-          </div>
-
-          <div className="flex gap-3">
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle2}>Sleep Duration (hrs)</label>
-              <input type="number" step="0.5" min="5" max="10" value={sleepHours} onChange={e => setSleepHours(e.target.value)} style={inputStyle} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle2}>Shift Speed</label>
-              <select value={shiftMins} onChange={e => setShiftMins(Number(e.target.value))} style={{ ...inputStyle, fontSize: 13 }}>
-                <option value={10}>Slow (10 min/day)</option>
-                <option value={15}>Gentle (15 min/day)</option>
-                <option value={20}>Moderate (20 min/day)</option>
-                <option value={30}>Fast (30 min/day)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Already at goal */}
-        {deltaMinutes <= 0 && (
+        {/* Status line */}
+        {alreadyAtGoal ? (
           <div className="rounded-lg p-3 flex items-center gap-2" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}>
-            <CheckIcon size={16} color="#4ade80" />
-            <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>You're already at or ahead of your goal!</p>
+            <CheckIcon size={15} color="#4ade80" />
+            <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>Already at or ahead of goal</p>
           </div>
+        ) : (
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center' }}>
+            <span className="font-bold font-mono" style={{ color: 'var(--text-primary)' }}>{nNeeded} night{nNeeded !== 1 ? 's' : ''}</span>
+            {' to reach your goal'}
+            {goalNight && <> · <span style={{ color: 'var(--text-secondary)' }}>by {goalNight.dateLabel}</span></>}
+          </p>
         )}
 
-        {/* Summary stats + schedule */}
-        {deltaMinutes > 0 && (
-          <>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { label: 'Days needed',   value: String(daysNeeded)      },
-                { label: 'Shift/day',     value: `${shiftMins}m`         },
-                { label: 'Goal by',       value: formatDate(goalDate)    },
-              ].map(s => (
-                <div key={s.label} className="rounded-lg p-2.5 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}>
-                  <p className="font-bold font-mono" style={{ color: 'var(--accent)', fontSize: 16, lineHeight: 1 }}>{s.value}</p>
-                  <p className="section-label mt-1" style={{ fontSize: 9 }}>{s.label}</p>
-                </div>
-              ))}
+        {/* Zone 2 — Controls */}
+        {/* Target wake stepper */}
+        <div>
+          <p className="section-label mb-2">Target wake time</p>
+          <div className="flex items-center justify-between rounded-lg" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)', padding: '8px 12px' }}>
+            <button
+              onClick={() => adjustTarget(-15)}
+              style={{ width: 34, height: 34, borderRadius: 8, border: 'none', background: 'var(--surface-1)', cursor: 'pointer', fontWeight: 700, fontSize: 20, color: 'var(--text-primary)', lineHeight: 1, boxShadow: 'var(--shadow-sm)' }}
+            >−</button>
+            <p className="font-bold font-mono" style={{ fontSize: 24, color: 'var(--accent)' }}>{fmtTime(targetMins)}</p>
+            <button
+              onClick={() => adjustTarget(+15)}
+              style={{ width: 34, height: 34, borderRadius: 8, border: 'none', background: 'var(--surface-1)', cursor: 'pointer', fontWeight: 700, fontSize: 20, color: 'var(--text-primary)', lineHeight: 1, boxShadow: 'var(--shadow-sm)' }}
+            >+</button>
+          </div>
+        </div>
+
+        {/* Drift speed segmented control */}
+        <div>
+          <p className="section-label mb-2">Shift speed</p>
+          <div className="flex rounded-lg" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)', padding: 3, gap: 3 }}>
+            {DRIFT_OPTIONS.map(o => (
+              <button
+                key={o.value}
+                onClick={() => setDrift(o.value)}
+                style={{
+                  flex: 1, padding: '7px 4px', borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                  background: drift === o.value ? 'var(--surface-1)' : 'transparent',
+                  color: drift === o.value ? 'var(--text-primary)' : 'var(--text-muted)',
+                  fontWeight: drift === o.value ? 700 : 500,
+                  fontSize: 12, lineHeight: 1.2,
+                  boxShadow: drift === o.value ? 'var(--shadow-sm)' : 'none',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+              >
+                {o.label}
+                <span style={{ display: 'block', fontSize: 9, marginTop: 2, fontFamily: 'var(--font-mono)', opacity: 0.55, fontWeight: 400 }}>{o.sub}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Zone 3 — Ramp chart + schedule */}
+        {!alreadyAtGoal && (
+          <div>
+            <div style={{ margin: '2px 0 6px' }}>
+              <WakeRamp schedule={schedule} startWake={currentWakeMins} goalWake={targetMins} />
             </div>
 
-            {/* Progress bar (if user has started) */}
-            {daysOnTrack > 0 && (
-              <div>
-                <div className="flex justify-between mb-1">
-                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Progress</p>
-                  <p style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700 }}>{daysOnTrack}/{daysNeeded} days on track</p>
-                </div>
-                <div style={{ height: 5, borderRadius: 999, background: 'var(--surface-2)', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${progressPct}%`, background: 'var(--accent)', borderRadius: 999, transition: 'width 0.6s ease' }} />
-                </div>
-              </div>
-            )}
-
             {/* Tonight callout */}
-            <div className="rounded-lg p-3" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+            <div className="rounded-lg" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)', padding: '10px 14px', marginBottom: 8 }}>
               <p className="section-label mb-2">Tonight</p>
               <div className="flex justify-between items-end">
                 <div>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Go to sleep by</p>
-                  <p className="font-bold font-mono" style={{ color: 'var(--accent)', fontSize: 24, lineHeight: 1.1 }}>{schedule[0]?.bed}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Bed by</p>
+                  <p className="font-bold font-mono" style={{ color: 'var(--accent)', fontSize: 22, lineHeight: 1.1 }}>{fmtTime(schedule[0]?.sleep)}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Wake up at</p>
-                  <p className="font-bold font-mono" style={{ color: 'var(--text-primary)', fontSize: 18, lineHeight: 1.1 }}>{schedule[0]?.wake}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Wake at</p>
+                  <p className="font-bold font-mono" style={{ color: 'var(--text-primary)', fontSize: 18, lineHeight: 1.1 }}>{fmtTime(schedule[0]?.wake)}</p>
                 </div>
               </div>
             </div>
 
-            {/* Day-by-day schedule */}
-            <div>
-              <p className="section-label mb-2">Full Schedule</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 3, maxHeight: 280, overflowY: 'auto' }}>
-                {schedule.map((s, i) => {
-                  const isToday    = s.date === todayStr
-                  const isGoalDay  = i === daysNeeded
-                  const actualWake = logs.find(l => l.date === s.date)
-                  const onTrack    = actualWake?.wake_time
-                    ? parseTime(actualWake.wake_time) <= s.wakeMins + 15
-                    : null
+            {/* Collapsible full schedule */}
+            <button
+              onClick={() => setShowSchedule(s => !s)}
+              style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '4px 0 2px', color: 'var(--text-muted)', fontSize: 12 }}
+            >
+              <span className="section-label" style={{ pointerEvents: 'none' }}>Full schedule</span>
+              <span style={{ fontSize: 14, display: 'inline-block', transform: showSchedule ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</span>
+            </button>
 
-                  return (
-                    <div
-                      key={s.date}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 10,
-                        padding: '7px 10px', borderRadius: 8,
-                        background: isToday ? 'var(--surface-2)' : 'transparent',
-                        border: isToday ? '1px solid var(--border-default)' : isGoalDay ? '1px solid var(--border-subtle)' : '1px solid transparent',
-                      }}
-                    >
-                      {/* Status icon / day number */}
-                      <div style={{ width: 24, textAlign: 'center', flexShrink: 0 }}>
-                        {onTrack === true || isGoalDay
-                          ? <CheckIcon size={13} color="#4ade80" />
-                          : <span className="font-mono" style={{ color: isToday ? 'var(--accent)' : 'var(--text-muted)', fontSize: 10, fontWeight: 700 }}>D{i + 1}</span>
-                        }
-                      </div>
+            {showSchedule && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 6, maxHeight: 260, overflowY: 'auto' }}>
+                {schedule
+                  .filter((n, _, arr) => !n.atGoal || n === arr.find(x => x.atGoal))
+                  .map(n => {
+                    const actual   = logs.find(l => l.date === n.dateStr)
+                    const onTrack  = actual?.wake_time ? parseTime(actual.wake_time) <= n.wake + 15 : null
+                    const isFirst  = n.idx === 0
 
-                      {/* Date */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ color: isGoalDay ? '#4ade80' : isToday ? 'var(--accent)' : 'var(--text-secondary)', fontSize: 12, fontWeight: isToday ? 700 : 500 }}>
-                          {dayLabel(s.date)} · {formatDate(s.date)}
-                          {isToday && <span className="font-mono" style={{ marginLeft: 6, fontSize: 9, background: 'var(--accent)', color: 'var(--base-bg)', padding: '1px 5px', borderRadius: 3 }}>TODAY</span>}
-                          {isGoalDay && <span className="font-mono" style={{ marginLeft: 6, fontSize: 9, background: 'var(--surface-2)', color: '#4ade80', padding: '1px 5px', borderRadius: 3, border: '1px solid var(--border-subtle)' }}>GOAL</span>}
-                        </p>
-                        {actualWake?.wake_time && (
-                          <p style={{ color: onTrack ? '#4ade80' : 'var(--text-muted)', fontSize: 10, marginTop: 1 }}>
-                            Actual: {fmtTime(parseTime(actualWake.wake_time))} {onTrack ? '✓' : '✗'}
-                          </p>
-                        )}
+                    return (
+                      <div
+                        key={n.idx}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 10,
+                          padding: '6px 10px', borderRadius: 8,
+                          background: isFirst ? 'var(--surface-2)' : 'transparent',
+                          border: `1px solid ${isFirst ? 'var(--border-default)' : 'transparent'}`,
+                        }}
+                      >
+                        <div style={{ width: 22, textAlign: 'center', flexShrink: 0 }}>
+                          {onTrack === true
+                            ? <CheckIcon size={12} color="#4ade80" />
+                            : n.atGoal
+                              ? <CheckIcon size={12} color="var(--accent)" />
+                              : <span className="font-mono" style={{ color: isFirst ? 'var(--accent)' : 'var(--text-muted)', fontSize: 10, fontWeight: 700 }}>D{n.idx+1}</span>
+                          }
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <span style={{ color: n.atGoal ? 'var(--accent)' : isFirst ? 'var(--text-primary)' : 'var(--text-secondary)', fontSize: 12, fontWeight: isFirst ? 700 : 500 }}>
+                            {n.label}
+                            {n.idx > 1 && <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}> · {n.dateLabel}</span>}
+                            {isFirst && <span className="font-mono" style={{ marginLeft: 6, fontSize: 9, background: 'var(--accent)', color: 'var(--base-bg)', padding: '1px 5px', borderRadius: 3 }}>TODAY</span>}
+                            {n.atGoal && <span className="font-mono" style={{ marginLeft: 6, fontSize: 9, color: 'var(--accent)', padding: '1px 5px', borderRadius: 3, border: '1px solid var(--border-subtle)' }}>GOAL</span>}
+                          </span>
+                          {actual?.wake_time && (
+                            <p style={{ color: onTrack ? '#4ade80' : 'var(--text-muted)', fontSize: 10, marginTop: 1 }}>
+                              Actual {fmtTime(parseTime(actual.wake_time))} {onTrack ? '✓' : '✗'}
+                            </p>
+                          )}
+                        </div>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <p className="font-mono" style={{ color: 'var(--text-muted)', fontSize: 10 }}>{fmtTime(n.sleep)}</p>
+                          <p className="font-mono" style={{ color: n.atGoal ? 'var(--accent)' : 'var(--text-secondary)', fontSize: 11, fontWeight: 700 }}>{fmtTime(n.wake)}</p>
+                        </div>
                       </div>
-
-                      {/* Bedtime & Wake */}
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <p className="font-mono" style={{ color: 'var(--text-muted)', fontSize: 10 }}>{s.bed}</p>
-                        <p className="font-mono" style={{ color: isGoalDay ? '#4ade80' : 'var(--accent)', fontSize: 11, fontWeight: 700 }}>{s.wake}</p>
-                      </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
               </div>
-            </div>
-
-            <p style={{ color: 'var(--text-muted)', fontSize: 10, textAlign: 'center', lineHeight: 1.5 }}>
-              Shifting {shiftMins} min/day matches the body's natural circadian adaptation rate.
-              Consistency every night, including weekends, is key.
-            </p>
-          </>
+            )}
+          </div>
         )}
+
+        <p style={{ color: 'var(--text-muted)', fontSize: 10, textAlign: 'center', lineHeight: 1.5 }}>
+          Shifting {drift} min/day matches the body's natural circadian adaptation rate.
+          Consistency every night, including weekends, is key.
+        </p>
+
       </div>
     </Card>
   )
