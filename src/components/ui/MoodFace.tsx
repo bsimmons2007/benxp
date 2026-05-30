@@ -8,8 +8,12 @@ function clamp(v: number, a: number, b: number) { return Math.max(a, Math.min(b,
 function lerp(a: number, b: number, t: number)  { return a + (b - a) * t }
 
 function parseRGB(s: string): [number, number, number] {
-  const h = s.slice(1)
-  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]
+  if (s[0] === '#') {
+    const h = s.slice(1)
+    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]
+  }
+  const m = s.match(/\d+/g)!
+  return [+m[0], +m[1], +m[2]]
 }
 
 function mixColor(a: string, b: string, t: number): string {
