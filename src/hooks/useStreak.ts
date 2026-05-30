@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useStore } from '../store/useStore'
-import { today as appToday, localDateStr } from '../lib/utils'
+import { localDateStr } from '../lib/utils'
 
 export interface StreakData {
   current: number
@@ -53,7 +53,7 @@ export function useStreak(): StreakData {
       return { current: 0, longest: 0, activeToday: false, activeDays: new Set<string>(), loading: true, sleepCurrent: 0, sleepLongest: 0, gymCurrent: 0, gymLongest: 0, cardioCurrent: 0, cardioLongest: 0 }
     }
 
-    const today = appToday()
+    const today = localDateStr(new Date())
 
     const allDates = new Set<string>([
       ...rawRows.liftingRows.map(r => r.date),

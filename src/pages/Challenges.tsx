@@ -626,8 +626,8 @@ export function Challenges() {
       const rows = (data ?? []) as Challenge[]
       setChallenges(rows)
 
-      setWeeklyRerolls(getRerollsRemaining('weekly'))
-      setMonthlyRerolls(getRerollsRemaining('monthly'))
+      setWeeklyRerolls(getRerollsRemaining('weekly', user.id))
+      setMonthlyRerolls(getRerollsRemaining('monthly', user.id))
 
       // Fetch progress for active weekly/monthly challenges in parallel
       const active = rows.filter(c => c.status === 'active' && (c.tier === 'Weekly' || c.tier === 'Monthly') && c.notes)
@@ -702,8 +702,8 @@ export function Challenges() {
     if (!user) return
     const success = await rerollChallenge(supabase, user.id, challengeId, period, templateKey)
     if (success) {
-      setWeeklyRerolls(getRerollsRemaining('weekly'))
-      setMonthlyRerolls(getRerollsRemaining('monthly'))
+      setWeeklyRerolls(getRerollsRemaining('weekly', user.id))
+      setMonthlyRerolls(getRerollsRemaining('monthly', user.id))
       await load()
     }
   }

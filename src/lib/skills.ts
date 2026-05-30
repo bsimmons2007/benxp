@@ -68,23 +68,23 @@ export interface SkillState {
   nextXP:   number
 }
 
-export async function fetchSkillXP(supabase: SupabaseClient): Promise<Record<SkillKey, number>> {
+export async function fetchSkillXP(supabase: SupabaseClient, userId: string): Promise<Record<SkillKey, number>> {
   const [lifting, books, games, sleep, cardio, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess, volleyball, spikeball, pool] = await Promise.all([
-    supabase.from('lifting_log').select('date'),
-    supabase.from('books').select('id').not('date_finished', 'is', null),
-    supabase.from('fortnite_games').select('kills, win'),
-    supabase.from('sleep_log').select('hours_slept').eq('is_nap', false),
-    supabase.from('cardio_sessions').select('distance_miles'),
-    supabase.from('basketball_sessions').select('points'),
-    supabase.from('pickleball_games').select('win'),
-    supabase.from('golf_rounds').select('score, par'),
-    supabase.from('disc_golf_rounds').select('score, par'),
-    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft'),
-    supabase.from('table_tennis_games').select('win'),
-    supabase.from('chess_games').select('result'),
-    supabase.from('volleyball_sessions').select('win'),
-    supabase.from('spikeball_games').select('win'),
-    supabase.from('pool_games').select('win, break_and_run'),
+    supabase.from('lifting_log').select('date').eq('user_id', userId),
+    supabase.from('books').select('id').eq('user_id', userId).not('date_finished', 'is', null),
+    supabase.from('fortnite_games').select('kills, win').eq('user_id', userId),
+    supabase.from('sleep_log').select('hours_slept').eq('user_id', userId).eq('is_nap', false),
+    supabase.from('cardio_sessions').select('distance_miles').eq('user_id', userId),
+    supabase.from('basketball_sessions').select('points').eq('user_id', userId),
+    supabase.from('pickleball_games').select('win').eq('user_id', userId),
+    supabase.from('golf_rounds').select('score, par').eq('user_id', userId),
+    supabase.from('disc_golf_rounds').select('score, par').eq('user_id', userId),
+    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft').eq('user_id', userId),
+    supabase.from('table_tennis_games').select('win').eq('user_id', userId),
+    supabase.from('chess_games').select('result').eq('user_id', userId),
+    supabase.from('volleyball_sessions').select('win').eq('user_id', userId),
+    supabase.from('spikeball_games').select('win').eq('user_id', userId),
+    supabase.from('pool_games').select('win, break_and_run').eq('user_id', userId),
   ])
 
   // Lifting XP: 15/set + 60/workout day

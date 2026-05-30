@@ -526,12 +526,15 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       return
     }
 
-    // ── Step 3: PR checks in parallel, then aggregate results ─────────
+    // ── Step 3: PR checks sequentially to prevent duplicate pr_history rows ──
+    // (parallel checks all read before any write — two sets same lift = double PR)
     type RowResult = { isPR: boolean; xp: number; milestone: import('../lib/xp').StrengthMilestone | null; liftName: string }
 
-    const rowResults: RowResult[] = await Promise.all(
-      inserted.map(async (row, i) => {
-        const entry   = valid[i]
+    const rowResults: RowResult[] = []
+    for (let i = 0; i < inserted.length; i++) {
+      const row   = inserted[i]
+      const entry = valid[i]
+      await (async () => {
         const isTimed = entry.isTimed || TIMED_EXERCISES.has(entry.liftName)
         const sets    = parseInt(entry.sets) || 1
         const reps    = isTimed ? 0 : (parseInt(entry.reps) || 0)
@@ -550,14 +553,14 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
           milestone       = getMilestoneHit(entry.liftName, prevBest, newVal) ?? null
         }
 
-        return {
+        rowResults.push({
           isPR,
           xp:       sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0),
           milestone,
           liftName: entry.liftName,
-        }
-      })
-    )
+        })
+      })()
+    }
 
     const totalXP     = rowResults.reduce((s, r) => s + r.xp, 0)
     const prCount     = rowResults.filter(r => r.isPR).length
@@ -857,18 +860,37 @@ function EditLiftModal({ row, onClose, onSaved }: { row: LiftingLog; onClose: ()
 
   async function save() {
     setSaving(true)
+    const newWeight = weight ? parseFloat(weight) : null
+    const newReps   = reps   ? parseInt(reps)     : null
+    // Recompute est_1rm so PR comparisons stay accurate after an edit
+    const newEst1rm = newWeight && newReps
+      ? Math.round(newWeight * (1 + Math.min(newReps, 12) / 30))
+      : null
     const { error } = await supabase.from('lifting_log').update({
-      weight: weight ? parseFloat(weight) : null,
-      sets: sets ? parseInt(sets) : null,
-      reps: reps ? parseInt(reps) : null,
+      weight: newWeight,
+      sets:   sets ? parseInt(sets) : null,
+      reps:   newReps,
+      est_1rm: newEst1rm,
     }).eq('id', row.id)
     setSaving(false)
     if (!error) { onSaved(); onClose() }
   }
 
   async function del() {
+    setSaving(true)
     const { error } = await supabase.from('lifting_log').delete().eq('id', row.id)
-    if (!error) { onSaved(); onClose() }
+    if (error) { setSaving(false); return }
+    // Remove orphaned pr_history entry that was created from this set
+    if (row.is_pr && row.est_1rm) {
+      await supabase.from('pr_history')
+        .delete()
+        .eq('lift', row.lift)
+        .eq('est_1rm', row.est_1rm)
+        .eq('date', row.date)
+    }
+    setSaving(false)
+    onSaved()
+    onClose()
   }
 
   return (

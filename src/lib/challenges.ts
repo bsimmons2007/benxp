@@ -63,23 +63,23 @@ export function getMonthKey(): string {
 
 const MAX_REROLLS = 3
 
-function rerollStorageKey(period: 'weekly' | 'monthly'): string {
+function rerollStorageKey(period: 'weekly' | 'monthly', userId: string): string {
   const cycleKey = period === 'weekly' ? getWeekKey() : getMonthKey()
-  return `youxp-rerolls-${period}-${cycleKey}`
+  return `youxp-rerolls-${period}-${cycleKey}-${userId}`
 }
 
-export function getRerollsRemaining(period: 'weekly' | 'monthly'): number {
-  const key = rerollStorageKey(period)
+export function getRerollsRemaining(period: 'weekly' | 'monthly', userId: string): number {
+  const key = rerollStorageKey(period, userId)
   const stored = localStorage.getItem(key)
   if (stored === null) return MAX_REROLLS
   const used = parseInt(stored, 10)
   return isNaN(used) ? MAX_REROLLS : Math.max(0, MAX_REROLLS - used)
 }
 
-export function consumeReroll(period: 'weekly' | 'monthly'): boolean {
-  const remaining = getRerollsRemaining(period)
+export function consumeReroll(period: 'weekly' | 'monthly', userId: string): boolean {
+  const remaining = getRerollsRemaining(period, userId)
   if (remaining <= 0) return false
-  const key = rerollStorageKey(period)
+  const key = rerollStorageKey(period, userId)
   const stored = localStorage.getItem(key)
   const used = stored ? parseInt(stored, 10) || 0 : 0
   localStorage.setItem(key, String(used + 1))
@@ -90,19 +90,19 @@ export function consumeReroll(period: 'weekly' | 'monthly'): boolean {
 
 const SEEN_MAX = 30
 
-function seenStorageKey(period: 'weekly' | 'monthly'): string {
-  return `youxp-seen-templates-${period}`
+function seenStorageKey(period: 'weekly' | 'monthly', userId: string): string {
+  return `youxp-seen-templates-${period}-${userId}`
 }
 
-export function addSeen(period: 'weekly' | 'monthly', key: string): void {
-  const seen = getSeen(period)
+export function addSeen(period: 'weekly' | 'monthly', key: string, userId: string): void {
+  const seen = getSeen(period, userId)
   const updated = [key, ...seen.filter(k => k !== key)].slice(0, SEEN_MAX)
-  localStorage.setItem(seenStorageKey(period), JSON.stringify(updated))
+  localStorage.setItem(seenStorageKey(period, userId), JSON.stringify(updated))
 }
 
-export function getSeen(period: 'weekly' | 'monthly'): string[] {
+export function getSeen(period: 'weekly' | 'monthly', userId: string): string[] {
   try {
-    const raw = localStorage.getItem(seenStorageKey(period))
+    const raw = localStorage.getItem(seenStorageKey(period, userId))
     if (!raw) return []
     const parsed = JSON.parse(raw)
     if (Array.isArray(parsed)) return parsed as string[]
@@ -311,8 +311,9 @@ function pickTemplates(
   period: 'weekly' | 'monthly',
   existingTemplateKeys: Set<string>,
   totalSlots: number,
+  userId: string,
 ): Array<{ template: ChallengeTemplate; target: number; xp: number }> {
-  const seen = getSeen(period)
+  const seen = getSeen(period, userId)
   const seenSet = new Set(seen)
 
   // Filter by period and active section
@@ -410,7 +411,7 @@ export async function syncUserChallenges(supabase: SupabaseClient, userId: strin
 
   if (weeklyNeeded > 0) {
     const usedKeys = new Set(activeWeekly.map(c => c.notes ?? ''))
-    const picks = pickTemplates(activeSections, stats, 'weekly', usedKeys, weeklyNeeded)
+    const picks = pickTemplates(activeSections, stats, 'weekly', usedKeys, weeklyNeeded, userId)
     if (picks.length > 0) {
       await supabase.from('challenges').insert(picks.map(({ template, target, xp }) => ({
         user_id: userId,
@@ -423,13 +424,13 @@ export async function syncUserChallenges(supabase: SupabaseClient, userId: strin
         notes: template.key,
         target: String(target),
       })))
-      for (const { template } of picks) addSeen('weekly', template.key)
+      for (const { template } of picks) addSeen('weekly', template.key, userId)
     }
   }
 
   if (monthlyNeeded > 0) {
     const usedKeys = new Set(activeMonthly.map(c => c.notes ?? ''))
-    const picks = pickTemplates(activeSections, stats, 'monthly', usedKeys, monthlyNeeded)
+    const picks = pickTemplates(activeSections, stats, 'monthly', usedKeys, monthlyNeeded, userId)
     if (picks.length > 0) {
       await supabase.from('challenges').insert(picks.map(({ template, target, xp }) => ({
         user_id: userId,
@@ -442,7 +443,7 @@ export async function syncUserChallenges(supabase: SupabaseClient, userId: strin
         notes: template.key,
         target: String(target),
       })))
-      for (const { template } of picks) addSeen('monthly', template.key)
+      for (const { template } of picks) addSeen('monthly', template.key, userId)
     }
   }
 }
@@ -472,7 +473,7 @@ export async function rerollChallenge(
   period: 'weekly' | 'monthly',
   currentTemplateKey: string,
 ): Promise<boolean> {
-  if (!consumeReroll(period)) return false
+  if (!consumeReroll(period, userId)) return false
 
   const activeSections = await detectActiveSections(supabase, userId)
   const stats = await fetchUserStats(supabase, userId)
@@ -518,7 +519,7 @@ export async function rerollChallenge(
   const xp = newTemplate.xpForTarget(target)
 
   // Mark old challenge expired and insert new one
-  await supabase.from('challenges').update({ status: 'expired' }).eq('id', challengeId)
+  await supabase.from('challenges').update({ status: 'expired' }).eq('id', challengeId).eq('user_id', userId)
   await supabase.from('challenges').insert({
     user_id: userId,
     tier: period === 'weekly' ? 'Weekly' : 'Monthly',
@@ -531,7 +532,7 @@ export async function rerollChallenge(
     target: String(target),
   })
 
-  addSeen(period, newTemplate.key)
+  addSeen(period, newTemplate.key, userId)
   return true
 }
 

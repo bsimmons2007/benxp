@@ -36,6 +36,7 @@ interface AppState {
   levelUpPending: number | null
 
   // User identity
+  userId:    string | null
   userName:  string
   avatarUrl: string | null
 
@@ -68,6 +69,7 @@ export const useStore = create<AppState>((set, get) => ({
   progress:       0,
   loading:        true,
   levelUpPending: null,
+  userId:         null,
   userName:       '',
   avatarUrl:      null,
   stats:          DEFAULT_STATS,
@@ -92,6 +94,7 @@ export const useStore = create<AppState>((set, get) => ({
     progress:       0,
     loading:        true,
     levelUpPending: null,
+    userId:         null,
     userName:       '',
     avatarUrl:      null,
     stats:          DEFAULT_STATS,
@@ -155,6 +158,7 @@ export const useStore = create<AppState>((set, get) => ({
         initialized:    true,
         _initializing:  false,
         levelUpPending: level > lastSeen ? level : null,
+        userId,
         stats,
         rawRows,
         recentActivity: deriveActivityFromRawRows(rawRows),
@@ -171,6 +175,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   /** XP + stats refresh — called after logging any activity. */
   refreshXP: async () => {
+    if (!get().initialized) return
     if (get()._refreshingXP) return
     set({ _refreshingXP: true })
     try {
@@ -185,6 +190,7 @@ export const useStore = create<AppState>((set, get) => ({
         level,
         progress:       levelProgress(totalXP),
         loading:        false,
+        userId:         user.id,
         stats,
         rawRows,
         recentActivity: deriveActivityFromRawRows(rawRows),

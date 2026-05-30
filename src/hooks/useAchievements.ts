@@ -519,9 +519,8 @@ function evaluate(data: RawData): Badge[] {
   ] as Badge[]
 }
 
-// Module-level cache — keyed on XP + revision. TTL prevents re-fetch on minor
-// XP changes within the same session.
-let badgeCache: { xp: number; rev: number; ts: number; badges: Badge[] } | null = null
+// Module-level cache — keyed on userId + XP + revision to prevent cross-user contamination.
+let badgeCache: { userId: string | null; xp: number; rev: number; ts: number; badges: Badge[] } | null = null
 let badgeCacheRevision = 0
 const BADGE_TTL = 5 * 60 * 1000
 
@@ -530,9 +529,10 @@ export function invalidateBadgeCache() {
   badgeCacheRevision++
 }
 
-function cacheHit(xp: number): boolean {
+function cacheHit(userId: string | null, xp: number): boolean {
   return (
     badgeCache !== null &&
+    badgeCache.userId === userId &&
     badgeCache.xp === xp &&
     badgeCache.rev === badgeCacheRevision &&
     Date.now() - badgeCache.ts < BADGE_TTL
@@ -544,13 +544,14 @@ export function useAchievements() {
   const level       = useStore(s => s.level)
   const rawRows     = useStore(s => s.rawRows)
   const initialized = useStore(s => s.initialized)
+  const userId      = useStore(s => s.userId)
 
   return useMemo(() => {
     if (!initialized || !rawRows) {
       return { badges: [], earned: [], unearned: [], loading: true }
     }
 
-    if (cacheHit(totalXP)) {
+    if (cacheHit(userId, totalXP)) {
       const badges   = badgeCache!.badges
       const earned   = badges.filter(b => b.earned)
       const unearned = badges.filter(b => !b.earned && !b.secret)
@@ -582,9 +583,9 @@ export function useAchievements() {
       level,
     })
 
-    badgeCache = { xp: totalXP, rev: badgeCacheRevision, ts: Date.now(), badges }
+    badgeCache = { userId, xp: totalXP, rev: badgeCacheRevision, ts: Date.now(), badges }
     const earned   = badges.filter(b => b.earned)
     const unearned = badges.filter(b => !b.earned && !b.secret)
     return { badges, earned, unearned, loading: false }
-  }, [initialized, rawRows, totalXP, level])
+  }, [initialized, rawRows, totalXP, level, userId])
 }
