@@ -8,11 +8,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       manifest: false,
       includeAssets: ['favicon.svg', 'icons.svg', 'favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       workbox: {
-        globPatterns: ['**/*.{css,html,ico,png,svg}', 'assets/index-*.js', 'assets/vendor-*.js'],
+        globPatterns: ['**/*.{css,html,ico,png,svg}', 'assets/*.js'],
+        skipWaiting: false,
+        clientsClaim: false,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
