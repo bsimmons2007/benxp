@@ -1,24 +1,12 @@
-import * as Sentry from '@sentry/react'
-
-const dsn = import.meta.env.VITE_SENTRY_DSN
+// Sentry is not currently configured.
+// To enable error monitoring, install @sentry/browser, add VITE_SENTRY_DSN
+// to your environment, and replace the stubs below.
 
 export function initSentry() {
-  if (!dsn) return
-  Sentry.init({
-    dsn,
-    environment: import.meta.env.MODE,
-    integrations: [Sentry.browserTracingIntegration()],
-    tracesSampleRate: 0.1,
-    beforeSend(event) {
-      // Strip PII — never send email or username in error reports
-      if (event.user) {
-        delete event.user.email
-        delete event.user.username
-        delete event.user.ip_address
-      }
-      return event
-    },
-  })
+  // no-op
 }
 
-export { Sentry }
+export const Sentry = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  captureException: (_err: unknown, _ctx?: any) => {},
+}
