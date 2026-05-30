@@ -70,7 +70,7 @@ export class ErrorBoundary extends Component<Props, State> {
           Something went wrong
         </p>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24, maxWidth: 300 }}>
-          {this.state.error.message}
+          If the problem persists, try clearing your browser cache or reinstalling the app.
         </p>
         <button
           onClick={() => window.location.reload()}

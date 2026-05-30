@@ -252,7 +252,7 @@ function OfflineBanner() {
         flexShrink: 0,
       }} />
       <p style={{ fontSize: 12, fontWeight: 600, color: offline ? 'var(--red)' : 'var(--green)', letterSpacing: '0.04em' }}>
-        {offline ? 'You\'re offline — changes will sync when reconnected' : 'Back online'}
+        {offline ? 'You\'re offline' : 'Back online'}
       </p>
     </div>
   )

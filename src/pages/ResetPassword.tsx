@@ -25,14 +25,16 @@ export function ResetPassword() {
   // Supabase fires SIGNED_IN + PASSWORD_RECOVERY when the magic link is followed
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+      if (event === 'PASSWORD_RECOVERY') {
         setReady(true)
       }
     })
-    // Also check if we already have an active session (user opened the link in same browser)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setReady(true)
-    })
+    // Trust an existing session only when arriving via a recovery link (hash contains type=recovery)
+    if (window.location.hash.includes('type=recovery')) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) setReady(true)
+      })
+    }
     return () => subscription.unsubscribe()
   }, [])
 
@@ -56,7 +58,8 @@ export function ResetPassword() {
       setStatus('error')
     } else {
       setStatus('done')
-      setTimeout(() => navigate('/'), 2000)
+      await supabase.auth.signOut({ scope: 'global' })
+      setTimeout(() => navigate('/login'), 2000)
     }
   }
 

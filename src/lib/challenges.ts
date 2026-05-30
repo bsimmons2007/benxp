@@ -613,7 +613,7 @@ export async function syncBossChallenges(supabase: SupabaseClient, userId: strin
     .eq('status', 'active')
     .lt('created_at', sy + 'T00:00:00')
 
-  const { data: all } = await supabase.from('challenges').select('*').eq('user_id', userId)
+  const { data: all } = await supabase.from('challenges').select('*').eq('user_id', userId).eq('tier', 'Boss')
   const rows = (all ?? []) as { id: string; tier: string; notes: string | null; status: string; completed_at: string | null; target: string | null; created_at: string }[]
 
   // Deduplicate: if multiple active boss challenges share the same key, keep the newest and expire the rest

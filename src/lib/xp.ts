@@ -426,53 +426,57 @@ export async function fetchXPAndStats(supabase: SupabaseClient, userId: string):
 
 /** Derive the activity feed from rawRows — eliminates 14 duplicate Supabase queries. */
 export function deriveActivityFromRawRows(rawRows: RawActivityData): ActivityEntry[] {
+  // Sort newest-first before slicing so we always get the most recent N, not the last N inserted
+  const top = <T extends { date: string }>(arr: T[], n: number) =>
+    [...arr].sort((a, b) => b.date.localeCompare(a.date)).slice(0, n)
+
   const entries: ActivityEntry[] = [
-    ...rawRows.liftingRows.slice(-3).map(r => ({
+    ...top(rawRows.liftingRows, 3).map(r => ({
       type: 'lift', label: `${r.lift}${r.weight ? ` ${r.weight}lbs` : ''} ×${r.reps ?? 0}`, date: r.date, icon: 'lift',
     })),
-    ...rawRows.skateRows.slice(-2).map(r => ({
+    ...top(rawRows.skateRows, 2).map(r => ({
       type: 'skate', label: `Skate — ${r.miles} mi`, date: r.date, icon: 'skate',
     })),
-    ...rawRows.bookRows.filter(r => r.date_finished).slice(-2).map(r => ({
-      type: 'book', label: r.title, date: r.date_finished!, icon: 'book',
-    })),
-    ...rawRows.gameRows.slice(-2).map(r => ({
+    ...[...rawRows.bookRows.filter(r => r.date_finished)]
+      .sort((a, b) => (b.date_finished ?? '').localeCompare(a.date_finished ?? '')).slice(0, 2)
+      .map(r => ({ type: 'book', label: r.title, date: r.date_finished!, icon: 'book' })),
+    ...top(rawRows.gameRows, 2).map(r => ({
       type: 'fortnite', label: `Fortnite — ${r.kills} kills${r.win ? ' · WIN' : ''}`, date: r.date, icon: 'game',
     })),
-    ...rawRows.bbRows.slice(-2).map(r => ({
+    ...top(rawRows.bbRows, 2).map(r => ({
       type: 'basketball', label: `Basketball — ${r.points} pts`, date: r.date, icon: 'basketball',
     })),
-    ...rawRows.pbRows.slice(-2).map(r => ({
+    ...top(rawRows.pbRows, 2).map(r => ({
       type: 'pickleball',
       label: `Pickleball — ${r.my_score != null && r.opp_score != null ? `${r.my_score}–${r.opp_score}` : r.win ? 'Win' : 'Loss'}`,
       date: r.date, icon: 'pickleball',
     })),
-    ...rawRows.golfRows.slice(-2).map(r => {
+    ...top(rawRows.golfRows, 2).map(r => {
       const vp = r.score - r.par; const vpStr = vp === 0 ? 'E' : vp > 0 ? `+${vp}` : String(vp)
       return { type: 'golf', label: `Golf${r.course ? ` — ${r.course}` : ''} (${vpStr})`, date: r.date, icon: 'golf' }
     }),
-    ...rawRows.dgRows.slice(-2).map(r => {
+    ...top(rawRows.dgRows, 2).map(r => {
       const vp = r.score - r.par; const vpStr = vp === 0 ? 'E' : vp > 0 ? `+${vp}` : String(vp)
       return { type: 'disc_golf', label: `Disc Golf${r.course ? ` — ${r.course}` : ''} (${vpStr})`, date: r.date, icon: 'disc_golf' }
     }),
-    ...rawRows.hikeRows.slice(-2).map(r => ({
+    ...top(rawRows.hikeRows, 2).map(r => ({
       type: 'hiking', label: `Hike${r.trail ? ` — ${r.trail}` : ''} (${r.distance_miles} mi)`, date: r.date, icon: 'hiking',
     })),
-    ...rawRows.ttRows.slice(-2).map(r => ({
+    ...top(rawRows.ttRows, 2).map(r => ({
       type: 'table_tennis', label: `Table Tennis — ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'table_tennis',
     })),
-    ...rawRows.chessRows.slice(-2).map(r => ({
+    ...top(rawRows.chessRows, 2).map(r => ({
       type: 'chess',
       label: `Chess — ${r.result.charAt(0).toUpperCase() + r.result.slice(1)}${r.rating_after ? ` (${r.rating_after})` : ''}`,
       date: r.date, icon: 'chess',
     })),
-    ...rawRows.poolRows.slice(-2).map(r => ({
+    ...top(rawRows.poolRows, 2).map(r => ({
       type: 'pool', label: `Pool${r.game_type ? ` — ${r.game_type}` : ''} · ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'pool',
     })),
-    ...rawRows.vbRows.slice(-2).map(r => ({
+    ...top(rawRows.vbRows, 2).map(r => ({
       type: 'volleyball', label: `Volleyball — ${r.format} · ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'volleyball',
     })),
-    ...rawRows.sbRows.slice(-2).map(r => ({
+    ...top(rawRows.sbRows, 2).map(r => ({
       type: 'spikeball', label: `Spikeball — ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'spikeball',
     })),
   ]

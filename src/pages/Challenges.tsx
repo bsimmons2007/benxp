@@ -655,9 +655,10 @@ export function Challenges() {
   useEffect(() => { load() }, [])
 
   async function handleClaim(id: string, xp: number) {
-    await supabase.from('challenges')
+    const { error } = await supabase.from('challenges')
       .update({ status: 'claimed', completed_at: new Date().toISOString() })
       .eq('id', id)
+    if (error) { console.error('[handleClaim]', error); return }
     playGoalComplete()
     await refreshXP()
     await load()
@@ -682,14 +683,16 @@ export function Challenges() {
       return c.status === 'active' && (progressMap[c.id] ?? 0) >= target
     })
     if (claimable.length === 0) return
-    await Promise.all(
+    const results = await Promise.allSettled(
       claimable.map(c =>
         supabase.from('challenges')
           .update({ status: 'claimed', completed_at: new Date().toISOString() })
           .eq('id', c.id)
       )
     )
-    playGoalComplete()
+    const anyFailed = results.some(r => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.error))
+    if (anyFailed) console.error('[handleClaimAll] one or more claims failed', results)
+    if (!anyFailed) playGoalComplete()
     await refreshXP()
     await load()
   }
