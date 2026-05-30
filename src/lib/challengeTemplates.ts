@@ -293,87 +293,87 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
 
 // ── Progress functions ────────────────────────────────────────────
 
-export const PROGRESS_FNS: Record<string, (sb: SupabaseClient, since: string) => Promise<number>> = {
-  lifting_days: async (sb, since) => {
-    const { data } = await sb.from('lifting_log').select('date').gte('date', since)
+export const PROGRESS_FNS: Record<string, (sb: SupabaseClient, since: string, userId: string) => Promise<number>> = {
+  lifting_days: async (sb, since, userId) => {
+    const { data } = await sb.from('lifting_log').select('date').eq('user_id', userId).gte('date', since)
     return new Set((data ?? []).map((r: { date: string }) => r.date)).size
   },
-  lifting_sets: async (sb, since) => {
-    const { count } = await sb.from('lifting_log').select('id', { count: 'exact', head: true }).gte('date', since)
+  lifting_sets: async (sb, since, userId) => {
+    const { count } = await sb.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  lifting_prs: async (sb, since) => {
-    const { count } = await sb.from('pr_history').select('id', { count: 'exact', head: true }).gte('date', since)
+  lifting_prs: async (sb, since, userId) => {
+    const { count } = await sb.from('pr_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  lifting_distinct_lifts: async (sb, since) => {
-    const { data } = await sb.from('lifting_log').select('lift').gte('date', since)
+  lifting_distinct_lifts: async (sb, since, userId) => {
+    const { data } = await sb.from('lifting_log').select('lift').eq('user_id', userId).gte('date', since)
     return new Set((data ?? []).map((r: { lift: string }) => r.lift)).size
   },
-  lifting_bench_sets: async (sb, since) => {
-    const { count } = await sb.from('lifting_log').select('id', { count: 'exact', head: true }).eq('lift', 'Bench').gte('date', since)
+  lifting_bench_sets: async (sb, since, userId) => {
+    const { count } = await sb.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('lift', 'Bench').gte('date', since)
     return count ?? 0
   },
-  lifting_squat_sets: async (sb, since) => {
-    const { count } = await sb.from('lifting_log').select('id', { count: 'exact', head: true }).eq('lift', 'Squat').gte('date', since)
+  lifting_squat_sets: async (sb, since, userId) => {
+    const { count } = await sb.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('lift', 'Squat').gte('date', since)
     return count ?? 0
   },
-  run_miles: async (sb, since) => {
-    const { data } = await sb.from('cardio_sessions').select('distance_miles').eq('activity', 'run').gte('date', since)
+  run_miles: async (sb, since, userId) => {
+    const { data } = await sb.from('cardio_sessions').select('distance_miles').eq('user_id', userId).eq('activity', 'run').gte('date', since)
     return Math.round(((data ?? []).reduce((s: number, r: { distance_miles: number }) => s + (r.distance_miles ?? 0), 0)) * 10) / 10
   },
-  run_sessions: async (sb, since) => {
-    const { count } = await sb.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'run').gte('date', since)
+  run_sessions: async (sb, since, userId) => {
+    const { count } = await sb.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'run').gte('date', since)
     return count ?? 0
   },
-  bike_miles: async (sb, since) => {
-    const { data } = await sb.from('cardio_sessions').select('distance_miles').eq('activity', 'bike').gte('date', since)
+  bike_miles: async (sb, since, userId) => {
+    const { data } = await sb.from('cardio_sessions').select('distance_miles').eq('user_id', userId).eq('activity', 'bike').gte('date', since)
     return Math.round(((data ?? []).reduce((s: number, r: { distance_miles: number }) => s + (r.distance_miles ?? 0), 0)) * 10) / 10
   },
-  bike_sessions: async (sb, since) => {
-    const { count } = await sb.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'bike').gte('date', since)
+  bike_sessions: async (sb, since, userId) => {
+    const { count } = await sb.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'bike').gte('date', since)
     return count ?? 0
   },
-  swim_sessions: async (sb, since) => {
-    const { count } = await sb.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'swim').gte('date', since)
+  swim_sessions: async (sb, since, userId) => {
+    const { count } = await sb.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'swim').gte('date', since)
     return count ?? 0
   },
-  walk_miles: async (sb, since) => {
-    const { data } = await sb.from('cardio_sessions').select('distance_miles').eq('activity', 'walk').gte('date', since)
+  walk_miles: async (sb, since, userId) => {
+    const { data } = await sb.from('cardio_sessions').select('distance_miles').eq('user_id', userId).eq('activity', 'walk').gte('date', since)
     return Math.round(((data ?? []).reduce((s: number, r: { distance_miles: number }) => s + (r.distance_miles ?? 0), 0)) * 10) / 10
   },
-  walk_sessions: async (sb, since) => {
-    const { count } = await sb.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('activity', 'walk').gte('date', since)
+  walk_sessions: async (sb, since, userId) => {
+    const { count } = await sb.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'walk').gte('date', since)
     return count ?? 0
   },
-  skate_miles: async (sb, since) => {
-    const { data } = await sb.from('skate_sessions').select('miles').gte('date', since)
+  skate_miles: async (sb, since, userId) => {
+    const { data } = await sb.from('skate_sessions').select('miles').eq('user_id', userId).gte('date', since)
     return Math.round(((data ?? []).reduce((s: number, r: { miles: number }) => s + (r.miles ?? 0), 0)) * 10) / 10
   },
-  skate_sessions: async (sb, since) => {
-    const { count } = await sb.from('skate_sessions').select('id', { count: 'exact', head: true }).gte('date', since)
+  skate_sessions: async (sb, since, userId) => {
+    const { count } = await sb.from('skate_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  sleep_nights: async (sb, since) => {
-    const { count } = await sb.from('sleep_log').select('id', { count: 'exact', head: true }).eq('is_nap', false).gte('date', since)
+  sleep_nights: async (sb, since, userId) => {
+    const { count } = await sb.from('sleep_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('is_nap', false).gte('date', since)
     return count ?? 0
   },
-  sleep_avg_hours: async (sb, since) => {
-    const { data } = await sb.from('sleep_log').select('hours_slept').eq('is_nap', false).gte('date', since).not('hours_slept', 'is', null)
+  sleep_avg_hours: async (sb, since, userId) => {
+    const { data } = await sb.from('sleep_log').select('hours_slept').eq('user_id', userId).eq('is_nap', false).gte('date', since).not('hours_slept', 'is', null)
     if (!data || data.length === 0) return 0
     const sum = data.reduce((s: number, r: { hours_slept: number }) => s + (r.hours_slept ?? 0), 0)
     return Math.round((sum / data.length) * 10) / 10
   },
-  sleep_quality_nights: async (sb, since) => {
-    const { count } = await sb.from('sleep_log').select('id', { count: 'exact', head: true }).eq('is_nap', false).gte('hours_slept', 7).gte('date', since)
+  sleep_quality_nights: async (sb, since, userId) => {
+    const { count } = await sb.from('sleep_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('is_nap', false).gte('hours_slept', 7).gte('date', since)
     return count ?? 0
   },
-  water_days: async (sb, since) => {
-    const { data } = await sb.from('water_log').select('date').gte('date', since)
+  water_days: async (sb, since, userId) => {
+    const { data } = await sb.from('water_log').select('date').eq('user_id', userId).gte('date', since)
     return new Set((data ?? []).map((r: { date: string }) => r.date)).size
   },
-  water_goal_days: async (sb, since) => {
-    const { data } = await sb.from('water_log').select('date, oz').gte('date', since)
+  water_goal_days: async (sb, since, userId) => {
+    const { data } = await sb.from('water_log').select('date, oz').eq('user_id', userId).gte('date', since)
     if (!data || data.length === 0) return 0
     const byDate: Record<string, number> = {}
     for (const r of data as { date: string; oz: number }[]) {
@@ -381,98 +381,98 @@ export const PROGRESS_FNS: Record<string, (sb: SupabaseClient, since: string) =>
     }
     return Object.values(byDate).filter(oz => oz >= 64).length
   },
-  books_finished: async (sb, since) => {
-    const { count } = await sb.from('books').select('id', { count: 'exact', head: true }).not('date_finished', 'is', null).gte('date_finished', since)
+  books_finished: async (sb, since, userId) => {
+    const { count } = await sb.from('books').select('id', { count: 'exact', head: true }).eq('user_id', userId).not('date_finished', 'is', null).gte('date_finished', since)
     return count ?? 0
   },
-  mood_days: async (sb, since) => {
-    const { count } = await sb.from('mood_log').select('id', { count: 'exact', head: true }).gte('date', since)
+  mood_days: async (sb, since, userId) => {
+    const { count } = await sb.from('mood_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  mood_avg: async (sb, since) => {
-    const { data } = await sb.from('mood_log').select('mood').gte('date', since).not('mood', 'is', null)
+  mood_avg: async (sb, since, userId) => {
+    const { data } = await sb.from('mood_log').select('mood').eq('user_id', userId).gte('date', since).not('mood', 'is', null)
     if (!data || data.length === 0) return 0
     const sum = data.reduce((s: number, r: { mood: number }) => s + (r.mood ?? 0), 0)
     return Math.round((sum / data.length) * 10) / 10
   },
-  chess_games: async (sb, since) => {
-    const { count } = await sb.from('chess_games').select('id', { count: 'exact', head: true }).gte('date', since)
+  chess_games: async (sb, since, userId) => {
+    const { count } = await sb.from('chess_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  chess_wins: async (sb, since) => {
-    const { count } = await sb.from('chess_games').select('id', { count: 'exact', head: true }).eq('result', 'win').gte('date', since)
+  chess_wins: async (sb, since, userId) => {
+    const { count } = await sb.from('chess_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('result', 'win').gte('date', since)
     return count ?? 0
   },
-  disc_golf_rounds: async (sb, since) => {
-    const { count } = await sb.from('disc_golf_rounds').select('id', { count: 'exact', head: true }).gte('date', since)
+  disc_golf_rounds: async (sb, since, userId) => {
+    const { count } = await sb.from('disc_golf_rounds').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  fortnite_games: async (sb, since) => {
-    const { count } = await sb.from('fortnite_games').select('id', { count: 'exact', head: true }).gte('date', since)
+  fortnite_games: async (sb, since, userId) => {
+    const { count } = await sb.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  fortnite_wins: async (sb, since) => {
-    const { count } = await sb.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('win', true).gte('date', since)
+  fortnite_wins: async (sb, since, userId) => {
+    const { count } = await sb.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('win', true).gte('date', since)
     return count ?? 0
   },
-  fortnite_kills_total: async (sb, since) => {
-    const { data } = await sb.from('fortnite_games').select('kills').gte('date', since)
+  fortnite_kills_total: async (sb, since, userId) => {
+    const { data } = await sb.from('fortnite_games').select('kills').eq('user_id', userId).gte('date', since)
     return (data ?? []).reduce((s: number, r: { kills: number }) => s + (r.kills ?? 0), 0)
   },
-  golf_rounds: async (sb, since) => {
-    const { count } = await sb.from('golf_rounds').select('id', { count: 'exact', head: true }).gte('date', since)
+  golf_rounds: async (sb, since, userId) => {
+    const { count } = await sb.from('golf_rounds').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  hiking_miles: async (sb, since) => {
-    const { data } = await sb.from('hiking_sessions').select('distance_miles').gte('date', since)
+  hiking_miles: async (sb, since, userId) => {
+    const { data } = await sb.from('hiking_sessions').select('distance_miles').eq('user_id', userId).gte('date', since)
     return Math.round(((data ?? []).reduce((s: number, r: { distance_miles: number }) => s + (r.distance_miles ?? 0), 0)) * 10) / 10
   },
-  hiking_sessions: async (sb, since) => {
-    const { count } = await sb.from('hiking_sessions').select('id', { count: 'exact', head: true }).gte('date', since)
+  hiking_sessions: async (sb, since, userId) => {
+    const { count } = await sb.from('hiking_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  basketball_sessions: async (sb, since) => {
-    const { count } = await sb.from('basketball_sessions').select('id', { count: 'exact', head: true }).gte('date', since)
+  basketball_sessions: async (sb, since, userId) => {
+    const { count } = await sb.from('basketball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  pickleball_games: async (sb, since) => {
-    const { count } = await sb.from('pickleball_games').select('id', { count: 'exact', head: true }).gte('date', since)
+  pickleball_games: async (sb, since, userId) => {
+    const { count } = await sb.from('pickleball_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  pickleball_wins: async (sb, since) => {
-    const { count } = await sb.from('pickleball_games').select('id', { count: 'exact', head: true }).eq('win', true).gte('date', since)
+  pickleball_wins: async (sb, since, userId) => {
+    const { count } = await sb.from('pickleball_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('win', true).gte('date', since)
     return count ?? 0
   },
-  pool_games: async (sb, since) => {
-    const { count } = await sb.from('pool_games').select('id', { count: 'exact', head: true }).gte('date', since)
+  pool_games: async (sb, since, userId) => {
+    const { count } = await sb.from('pool_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  pool_wins: async (sb, since) => {
-    const { count } = await sb.from('pool_games').select('id', { count: 'exact', head: true }).eq('win', true).gte('date', since)
+  pool_wins: async (sb, since, userId) => {
+    const { count } = await sb.from('pool_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('win', true).gte('date', since)
     return count ?? 0
   },
-  spikeball_games: async (sb, since) => {
-    const { count } = await sb.from('spikeball_games').select('id', { count: 'exact', head: true }).gte('date', since)
+  spikeball_games: async (sb, since, userId) => {
+    const { count } = await sb.from('spikeball_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  spikeball_wins: async (sb, since) => {
-    const { count } = await sb.from('spikeball_games').select('id', { count: 'exact', head: true }).eq('win', true).gte('date', since)
+  spikeball_wins: async (sb, since, userId) => {
+    const { count } = await sb.from('spikeball_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('win', true).gte('date', since)
     return count ?? 0
   },
-  table_tennis_games: async (sb, since) => {
-    const { count } = await sb.from('table_tennis_games').select('id', { count: 'exact', head: true }).gte('date', since)
+  table_tennis_games: async (sb, since, userId) => {
+    const { count } = await sb.from('table_tennis_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  table_tennis_wins: async (sb, since) => {
-    const { count } = await sb.from('table_tennis_games').select('id', { count: 'exact', head: true }).eq('win', true).gte('date', since)
+  table_tennis_wins: async (sb, since, userId) => {
+    const { count } = await sb.from('table_tennis_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('win', true).gte('date', since)
     return count ?? 0
   },
-  volleyball_sessions: async (sb, since) => {
-    const { count } = await sb.from('volleyball_sessions').select('id', { count: 'exact', head: true }).gte('date', since)
+  volleyball_sessions: async (sb, since, userId) => {
+    const { count } = await sb.from('volleyball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
     return count ?? 0
   },
-  volleyball_wins: async (sb, since) => {
-    const { count } = await sb.from('volleyball_sessions').select('id', { count: 'exact', head: true }).eq('win', true).gte('date', since)
+  volleyball_wins: async (sb, since, userId) => {
+    const { count } = await sb.from('volleyball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('win', true).gte('date', since)
     return count ?? 0
   },
 }

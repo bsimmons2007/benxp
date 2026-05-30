@@ -111,7 +111,9 @@ export function Mood() {
   const energyVal = parseInt(watch('energy') ?? '7')
 
   async function loadRecent() {
-    const { data } = await supabase.from('mood_log').select('*').order('date', { ascending: false }).limit(30)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setChartLoading(false); return }
+    const { data } = await supabase.from('mood_log').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(30)
     setRecent(data ?? [])
     setChartLoading(false)
   }

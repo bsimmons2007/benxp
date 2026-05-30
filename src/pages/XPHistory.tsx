@@ -30,17 +30,17 @@ interface XPEvent {
   iconBg:    string
 }
 
-async function fetchXPEvents(): Promise<XPEvent[]> {
+async function fetchXPEvents(userId: string): Promise<XPEvent[]> {
   const [lifting, prs, books, skate, games, sleep, challenges, cardio, goals] = await Promise.all([
-    supabase.from('lifting_log').select('date'),
-    supabase.from('pr_history').select('date, lift, est_1rm'),
-    supabase.from('books').select('date_finished, title').not('date_finished', 'is', null),
-    supabase.from('skate_sessions').select('date, miles'),
-    supabase.from('fortnite_games').select('date, kills').eq('win', true),
-    supabase.from('sleep_log').select('date, hours_slept'),
-    supabase.from('challenges').select('challenge_name, xp_reward, completed_at').eq('status', 'completed').not('completed_at', 'is', null),
-    supabase.from('cardio_sessions').select('date, activity, distance_miles'),
-    supabase.from('goals').select('title, xp_reward, completed_at').eq('status', 'completed').not('completed_at', 'is', null),
+    supabase.from('lifting_log').select('date').eq('user_id', userId),
+    supabase.from('pr_history').select('date, lift, est_1rm').eq('user_id', userId),
+    supabase.from('books').select('date_finished, title').eq('user_id', userId).not('date_finished', 'is', null),
+    supabase.from('skate_sessions').select('date, miles').eq('user_id', userId),
+    supabase.from('fortnite_games').select('date, kills').eq('user_id', userId).eq('win', true),
+    supabase.from('sleep_log').select('date, hours_slept').eq('user_id', userId),
+    supabase.from('challenges').select('challenge_name, xp_reward, completed_at').eq('user_id', userId).eq('status', 'completed').not('completed_at', 'is', null),
+    supabase.from('cardio_sessions').select('date, activity, distance_miles').eq('user_id', userId),
+    supabase.from('goals').select('title, xp_reward, completed_at').eq('user_id', userId).eq('status', 'completed').not('completed_at', 'is', null),
   ])
 
   const events: XPEvent[] = []
@@ -181,16 +181,19 @@ export function XPHistory() {
   const [visibleCount, setVisibleCount] = useState(40)
   const { totalXP, level, loading: xpLoading } = useXP()
 
-  function load() {
+  async function load() {
     setLoadError(false)
     setLoading(true)
-    fetchXPEvents().then(evs => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
+      const evs = await fetchXPEvents(user.id)
       setEvents(evs)
       setLoading(false)
-    }).catch(() => {
+    } catch {
       setLoadError(true)
       setLoading(false)
-    })
+    }
   }
 
   useEffect(() => { load() }, [])

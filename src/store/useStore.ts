@@ -73,7 +73,7 @@ export const useStore = create<AppState>((set, get) => ({
   stats:          DEFAULT_STATS,
   rawRows:        null,
   recentActivity: [],
-  lastUpdated:    getCachedXPTimestamp(),
+  lastUpdated:    null,
   initialized:    false,
   // Set synchronously before first await so concurrent callers
   // (e.g. StrictMode double-mount) can't pass the guard while
@@ -110,8 +110,13 @@ export const useStore = create<AppState>((set, get) => ({
     if (initialized || _initializing) return
     set({ _initializing: true })  // synchronous — blocks any concurrent caller
 
+    // Resolve user first — needed to scope cache and all queries to this user
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { set({ loading: false, _initializing: false }); return }
+    const userId = user.id
+
     // Show stale cache immediately so the UI isn't blank while fetching
-    const cached = getCachedXPData()
+    const cached = getCachedXPData(userId)
     if (cached) {
       const cachedLevel = calculateLevel(cached.totalXP)
       set({
@@ -120,6 +125,7 @@ export const useStore = create<AppState>((set, get) => ({
         progress: levelProgress(cached.totalXP),
         stats:    cached.stats,
         loading:  false,
+        lastUpdated: getCachedXPTimestamp(userId),
       })
     }
 
@@ -132,10 +138,10 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       const [userData, { totalXP, stats, rawRows }] = await Promise.all([
         fetchUser(),
-        fetchXPAndStats(supabase),
+        fetchXPAndStats(supabase, userId),
       ])
       clearTimeout(safetyTimer)
-      setCachedXPData({ totalXP, stats })
+      setCachedXPData(userId, { totalXP, stats })
       const now = Date.now()
 
       const level    = calculateLevel(totalXP)
@@ -168,8 +174,10 @@ export const useStore = create<AppState>((set, get) => ({
     if (get()._refreshingXP) return
     set({ _refreshingXP: true })
     try {
-      const { totalXP, stats, rawRows } = await fetchXPAndStats(supabase)
-      setCachedXPData({ totalXP, stats })
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { set({ _refreshingXP: false }); return }
+      const { totalXP, stats, rawRows } = await fetchXPAndStats(supabase, user.id)
+      setCachedXPData(user.id, { totalXP, stats })
       const level    = calculateLevel(totalXP)
       const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10) || 1
       set({

@@ -64,15 +64,17 @@ export function Monthly() {
     let cancelled = false
     async function load() {
       setLoading(true)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
       const { start, end } = monthRange(year, month)
 
       const [lifting, prs, skate, books, games, sleep] = await Promise.all([
-        supabase.from('lifting_log').select('date, lift, weight, reps, est_1rm').gte('date', start).lte('date', end),
-        supabase.from('pr_history').select('lift, est_1rm, date').gte('date', start).lte('date', end).order('est_1rm', { ascending: false }),
-        supabase.from('skate_sessions').select('miles, date').gte('date', start).lte('date', end).order('miles', { ascending: false }),
-        supabase.from('books').select('title, date_finished').not('date_finished', 'is', null).gte('date_finished', start).lte('date_finished', end),
-        supabase.from('fortnite_games').select('date, kills, win').gte('date', start).lte('date', end).order('kills', { ascending: false }),
-        supabase.from('sleep_log').select('date, hours_slept').gte('date', start).lte('date', end),
+        supabase.from('lifting_log').select('date, lift, weight, reps, est_1rm').eq('user_id', user.id).gte('date', start).lte('date', end),
+        supabase.from('pr_history').select('lift, est_1rm, date').eq('user_id', user.id).gte('date', start).lte('date', end).order('est_1rm', { ascending: false }),
+        supabase.from('skate_sessions').select('miles, date').eq('user_id', user.id).gte('date', start).lte('date', end).order('miles', { ascending: false }),
+        supabase.from('books').select('title, date_finished').eq('user_id', user.id).not('date_finished', 'is', null).gte('date_finished', start).lte('date_finished', end),
+        supabase.from('fortnite_games').select('date, kills, win').eq('user_id', user.id).gte('date', start).lte('date', end).order('kills', { ascending: false }),
+        supabase.from('sleep_log').select('date, hours_slept').eq('user_id', user.id).gte('date', start).lte('date', end),
       ])
 
       const liftRows  = lifting.data ?? []

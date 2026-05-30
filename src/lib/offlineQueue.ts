@@ -23,11 +23,13 @@ function writeQueue(q: QueuedInsert[]) {
 export async function flushQueue(): Promise<void> {
   const q = readQueue()
   if (!q.length) return
-  const failed: QueuedInsert[] = []
-  for (const item of q) {
-    const { error } = await supabase.from(item.table).insert(item.payload)
-    if (error) failed.push(item)
-  }
+  const results = await Promise.allSettled(
+    q.map(item => supabase.from(item.table).insert(item.payload))
+  )
+  const failed = q.filter((_, i) => {
+    const r = results[i]
+    return r.status === 'rejected' || (r.status === 'fulfilled' && r.value.error)
+  })
   writeQueue(failed)
 }
 

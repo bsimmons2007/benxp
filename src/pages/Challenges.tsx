@@ -218,9 +218,11 @@ function ChallengeCard({
 function BossCard({
   challenge,
   onClaim,
+  userId,
 }: {
   challenge: Challenge
   onClaim: (id: string, xp: number) => Promise<void>
+  userId: string | null
 }) {
   const [progress, setProgress] = useState<{ current: number; target: number } | null>(null)
   const [claiming, setClaiming] = useState(false)
@@ -230,11 +232,11 @@ function BossCard({
   const isClaimed = challenge.status === 'claimed'
 
   useEffect(() => {
-    if (!poolKey || !targetVal) return
+    if (!poolKey || !targetVal || !userId) return
     let cancelled = false
-    getBossProgress(supabase, poolKey, targetVal).then(r => { if (!cancelled) setProgress(r) })
+    getBossProgress(supabase, poolKey, targetVal, userId).then(r => { if (!cancelled) setProgress(r) })
     return () => { cancelled = true }
-  }, [poolKey, targetVal])
+  }, [poolKey, targetVal, userId])
 
   const pct    = progress ? Math.min((progress.current / progress.target) * 100, 100) : null
   const isDone = pct !== null && pct >= 100
@@ -600,6 +602,7 @@ export function Challenges() {
   const [weeklyRerolls, setWeeklyRerolls] = useState(3)
   const [monthlyRerolls, setMonthlyRerolls] = useState(3)
   const [conqueredBoss, setConqueredBoss] = useState<{ name: string; xp: number; nextName: string } | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const refreshXP = useStore(s => s.refreshXP)
 
@@ -607,6 +610,7 @@ export function Challenges() {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+      setUserId(user.id)
 
       await syncUserChallenges(supabase, user.id)
       await syncBossChallenges(supabase, user.id)
@@ -614,6 +618,7 @@ export function Challenges() {
       const { data } = await supabase
         .from('challenges')
         .select('*')
+        .eq('user_id', user.id)
         .in('status', ['active', 'claimed'])
         .in('tier', ['Weekly', 'Monthly', 'Boss'])
         .order('created_at', { ascending: false })
@@ -628,16 +633,16 @@ export function Challenges() {
       const active = rows.filter(c => c.status === 'active' && (c.tier === 'Weekly' || c.tier === 'Monthly') && c.notes)
       const entries = await Promise.all(
         active.map(async c => {
-          const prog = await getProgress(supabase, c.notes!, c.tier as 'Weekly' | 'Monthly')
+          const prog = await getProgress(supabase, c.notes!, c.tier as 'Weekly' | 'Monthly', user.id)
           return [c.id, prog] as [string, number]
         })
       )
       setProgressMap(Object.fromEntries(entries))
 
-      const tutorial = await isTutorialMode(supabase)
+      const tutorial = await isTutorialMode(supabase, user.id)
       setTutorialMode(tutorial)
       if (tutorial) {
-        const steps = await getTutorialSteps(supabase)
+        const steps = await getTutorialSteps(supabase, user.id)
         setTutorialSteps(steps)
       }
     } catch (e) {
@@ -784,7 +789,7 @@ export function Challenges() {
                   </p>
                 </div>
 
-                {activeBoss.map(c => <BossCard key={c.id} challenge={c} onClaim={handleBossClaim} />)}
+                {activeBoss.map(c => <BossCard key={c.id} challenge={c} onClaim={handleBossClaim} userId={userId} />)}
 
                 {claimedBoss.length > 0 && (
                   <>
@@ -794,7 +799,7 @@ export function Challenges() {
                     >
                       Conquered
                     </p>
-                    {claimedBoss.map(c => <BossCard key={c.id} challenge={c} onClaim={handleBossClaim} />)}
+                    {claimedBoss.map(c => <BossCard key={c.id} challenge={c} onClaim={handleBossClaim} userId={userId} />)}
                   </>
                 )}
               </section>

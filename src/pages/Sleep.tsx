@@ -641,7 +641,9 @@ export function Sleep() {
 
   async function load() {
     setLoadError(false)
-    const { data, error } = await supabase.from('sleep_log').select('*').order('date', { ascending: false })
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setChartLoading(false); return }
+    const { data, error } = await supabase.from('sleep_log').select('*').eq('user_id', user.id).order('date', { ascending: false })
     if (error) { setLoadError(true); setChartLoading(false); return }
     setLogs(data ?? [])
     setDreamsMap(getDreamsMap())

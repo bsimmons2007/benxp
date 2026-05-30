@@ -453,13 +453,14 @@ export async function getProgress(
   supabase: SupabaseClient,
   templateKey: string,
   tier: 'Weekly' | 'Monthly',
+  userId: string,
 ): Promise<number> {
   const template = CHALLENGE_TEMPLATES.find(t => t.key === templateKey)
   if (!template) return 0
   const fn = PROGRESS_FNS[template.progressKey]
   if (!fn) return 0
   const since = tier === 'Weekly' ? startOfWeekDate() : startOfMonthDate()
-  return fn(supabase, since).catch(() => 0)
+  return fn(supabase, since, userId).catch(() => 0)
 }
 
 // ── Reroll ────────────────────────────────────────────────────────
@@ -536,13 +537,13 @@ export async function rerollChallenge(
 
 // ── Tutorial helpers ──────────────────────────────────────────────
 
-export async function isTutorialMode(supabase: SupabaseClient): Promise<boolean> {
+export async function isTutorialMode(supabase: SupabaseClient, userId: string): Promise<boolean> {
   const [lifting, mood, water, sleep, books] = await Promise.all([
-    supabase.from('lifting_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0),
-    supabase.from('mood_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0),
-    supabase.from('water_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0),
-    supabase.from('sleep_log').select('id', { count: 'exact', head: true }).then(r => r.count ?? 0),
-    supabase.from('books').select('id', { count: 'exact', head: true }).not('date_finished', 'is', null).then(r => r.count ?? 0),
+    supabase.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0),
+    supabase.from('mood_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0),
+    supabase.from('water_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0),
+    supabase.from('sleep_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0),
+    supabase.from('books').select('id', { count: 'exact', head: true }).eq('user_id', userId).not('date_finished', 'is', null).then(r => r.count ?? 0),
   ])
   return lifting === 0 && mood === 0 && water === 0 && sleep === 0 && books === 0
 }
@@ -555,13 +556,13 @@ export interface TutorialStep {
   path: string
 }
 
-export async function getTutorialSteps(supabase: SupabaseClient): Promise<TutorialStep[]> {
+export async function getTutorialSteps(supabase: SupabaseClient, userId: string): Promise<TutorialStep[]> {
   const theme = localStorage.getItem('youxp-theme')
   const [lifting, mood, water, sleep] = await Promise.all([
-    supabase.from('lifting_log').select('id', { count: 'exact', head: true }).then(r => (r.count ?? 0) > 0),
-    supabase.from('mood_log').select('id', { count: 'exact', head: true }).then(r => (r.count ?? 0) > 0),
-    supabase.from('water_log').select('id', { count: 'exact', head: true }).then(r => (r.count ?? 0) > 0),
-    supabase.from('sleep_log').select('id', { count: 'exact', head: true }).then(r => (r.count ?? 0) > 0),
+    supabase.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => (r.count ?? 0) > 0),
+    supabase.from('mood_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => (r.count ?? 0) > 0),
+    supabase.from('water_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => (r.count ?? 0) > 0),
+    supabase.from('sleep_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => (r.count ?? 0) > 0),
   ])
   return [
     { key: 'theme',   name: 'Change your theme',          description: 'Head to Settings and pick a theme that fits your style.', done: theme !== null && theme !== 'coral',  path: '/settings' },
@@ -642,12 +643,12 @@ export async function syncBossChallenges(supabase: SupabaseClient, userId: strin
       target = nextBossTarget(key, parseFloat(completed[0].target ?? '0'))
     } else {
       if (key === 'boss_skate') {
-        const { data } = await supabase.from('skate_sessions').select('miles')
+        const { data } = await supabase.from('skate_sessions').select('miles').eq('user_id', userId)
         const total = (data ?? []).reduce((s: number, r: { miles: number }) => s + r.miles, 0)
         target = Math.ceil(Math.max(total, 1) / 100) * 100
       } else {
         const lift = BOSS_CONFIGS[key].lift!
-        const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', lift).order('est_1rm', { ascending: false }).limit(1)
+        const { data } = await supabase.from('pr_history').select('est_1rm').eq('user_id', userId).eq('lift', lift).order('est_1rm', { ascending: false }).limit(1)
         const pr = (data as { est_1rm: number }[] | null)?.[0]?.est_1rm
         if (pr) target = roundToNearest5(pr * 1.1)
       }
@@ -669,22 +670,23 @@ export async function getBossProgress(
   supabase: SupabaseClient,
   poolKey: string,
   targetValue: number,
+  userId: string,
 ): Promise<{ current: number; target: number }> {
   const t = targetValue
   if (poolKey === 'boss_bench') {
-    const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', 'Bench').order('est_1rm', { ascending: false }).limit(1)
+    const { data } = await supabase.from('pr_history').select('est_1rm').eq('user_id', userId).eq('lift', 'Bench').order('est_1rm', { ascending: false }).limit(1)
     return { current: Math.round(((data as { est_1rm: number }[] | null)?.[0]?.est_1rm ?? 0) * 10) / 10, target: t }
   }
   if (poolKey === 'boss_squat') {
-    const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', 'Squat').order('est_1rm', { ascending: false }).limit(1)
+    const { data } = await supabase.from('pr_history').select('est_1rm').eq('user_id', userId).eq('lift', 'Squat').order('est_1rm', { ascending: false }).limit(1)
     return { current: Math.round(((data as { est_1rm: number }[] | null)?.[0]?.est_1rm ?? 0) * 10) / 10, target: t }
   }
   if (poolKey === 'boss_deadlift') {
-    const { data } = await supabase.from('pr_history').select('est_1rm').eq('lift', 'Deadlift').order('est_1rm', { ascending: false }).limit(1)
+    const { data } = await supabase.from('pr_history').select('est_1rm').eq('user_id', userId).eq('lift', 'Deadlift').order('est_1rm', { ascending: false }).limit(1)
     return { current: Math.round(((data as { est_1rm: number }[] | null)?.[0]?.est_1rm ?? 0) * 10) / 10, target: t }
   }
   if (poolKey === 'boss_skate') {
-    const { data } = await supabase.from('skate_sessions').select('miles')
+    const { data } = await supabase.from('skate_sessions').select('miles').eq('user_id', userId)
     const total = (data ?? []).reduce((s: number, r: { miles: number }) => s + r.miles, 0)
     return { current: Math.round(total * 10) / 10, target: t }
   }

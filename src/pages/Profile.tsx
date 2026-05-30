@@ -389,18 +389,20 @@ function ActivityHeatmap() {
 
   useEffect(() => {
     async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoaded(true); return }
       const year  = new Date().getFullYear()
       const start = `${year}-01-01`
       const end   = `${year}-12-31`
 
       const [lifting, skate, games, books, sleep, mood, cardio] = await Promise.all([
-        supabase.from('lifting_log').select('date').gte('date', start).lte('date', end),
-        supabase.from('skate_sessions').select('date').gte('date', start).lte('date', end),
-        supabase.from('fortnite_games').select('date').gte('date', start).lte('date', end),
-        supabase.from('books').select('date_finished').not('date_finished', 'is', null).gte('date_finished', start).lte('date_finished', end),
-        supabase.from('sleep_log').select('date').gte('date', start).lte('date', end),
-        supabase.from('mood_log').select('date').gte('date', start).lte('date', end),
-        supabase.from('cardio_sessions').select('date').gte('date', start).lte('date', end),
+        supabase.from('lifting_log').select('date').eq('user_id', user.id).gte('date', start).lte('date', end),
+        supabase.from('skate_sessions').select('date').eq('user_id', user.id).gte('date', start).lte('date', end),
+        supabase.from('fortnite_games').select('date').eq('user_id', user.id).gte('date', start).lte('date', end),
+        supabase.from('books').select('date_finished').eq('user_id', user.id).not('date_finished', 'is', null).gte('date_finished', start).lte('date_finished', end),
+        supabase.from('sleep_log').select('date').eq('user_id', user.id).gte('date', start).lte('date', end),
+        supabase.from('mood_log').select('date').eq('user_id', user.id).gte('date', start).lte('date', end),
+        supabase.from('cardio_sessions').select('date').eq('user_id', user.id).gte('date', start).lte('date', end),
       ])
 
       const c: Record<string, number> = {}
@@ -540,16 +542,18 @@ function useConsistencyScore() {
 
   useEffect(() => {
     async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
       // Look at last 30 days (local dates)
       const now   = new Date()
       const e = localDateStr(now)
       const s = localDateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29))
 
       const [lifting, skate, games, sleep] = await Promise.all([
-        supabase.from('lifting_log').select('date').gte('date', s).lte('date', e),
-        supabase.from('skate_sessions').select('date').gte('date', s).lte('date', e),
-        supabase.from('fortnite_games').select('date').gte('date', s).lte('date', e),
-        supabase.from('sleep_log').select('date').gte('date', s).lte('date', e),
+        supabase.from('lifting_log').select('date').eq('user_id', user.id).gte('date', s).lte('date', e),
+        supabase.from('skate_sessions').select('date').eq('user_id', user.id).gte('date', s).lte('date', e),
+        supabase.from('fortnite_games').select('date').eq('user_id', user.id).gte('date', s).lte('date', e),
+        supabase.from('sleep_log').select('date').eq('user_id', user.id).gte('date', s).lte('date', e),
       ])
 
       const days = new Set([
@@ -580,11 +584,11 @@ function useLifetimeStats() {
         : ''
 
       const [sets, miles, wins, books, prs] = await Promise.all([
-        supabase.from('lifting_log').select('id', { count: 'exact', head: true }),
-        supabase.from('skate_sessions').select('miles'),
-        supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('win', true),
-        supabase.from('books').select('id', { count: 'exact', head: true }).not('date_finished', 'is', null),
-        supabase.from('pr_history').select('id', { count: 'exact', head: true }),
+        supabase.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('skate_sessions').select('miles').eq('user_id', user.id),
+        supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
+        supabase.from('books').select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('date_finished', 'is', null),
+        supabase.from('pr_history').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
       ])
 
       setS({

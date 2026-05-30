@@ -169,13 +169,14 @@ export interface RawActivityData {
   waterRows:     { date: string; oz: number }[]
 }
 
-// ── localStorage cache (stale-while-revalidate) ──────────────────
-const XP_CACHE_KEY = 'youxp-xp-cache-v2'
+// ── localStorage cache (stale-while-revalidate, keyed per user) ──
 const XP_CACHE_TTL = 5 * 60 * 1000
 
-export function getCachedXPData(): { totalXP: number; stats: AppStats } | null {
+function xpCacheKey(userId: string) { return `youxp-xp-cache-v2-${userId}` }
+
+export function getCachedXPData(userId: string): { totalXP: number; stats: AppStats } | null {
   try {
-    const raw = localStorage.getItem(XP_CACHE_KEY)
+    const raw = localStorage.getItem(xpCacheKey(userId))
     if (!raw) return null
     const { data, ts } = JSON.parse(raw)
     if (Date.now() - ts > XP_CACHE_TTL) return null
@@ -183,13 +184,13 @@ export function getCachedXPData(): { totalXP: number; stats: AppStats } | null {
   } catch { return null }
 }
 
-export function setCachedXPData(data: { totalXP: number; stats: AppStats }) {
-  try { localStorage.setItem(XP_CACHE_KEY, JSON.stringify({ data, ts: Date.now() })) } catch {}
+export function setCachedXPData(userId: string, data: { totalXP: number; stats: AppStats }) {
+  try { localStorage.setItem(xpCacheKey(userId), JSON.stringify({ data, ts: Date.now() })) } catch {}
 }
 
-export function getCachedXPTimestamp(): number | null {
+export function getCachedXPTimestamp(userId: string): number | null {
   try {
-    const raw = localStorage.getItem(XP_CACHE_KEY)
+    const raw = localStorage.getItem(xpCacheKey(userId))
     if (!raw) return null
     const { ts } = JSON.parse(raw)
     return typeof ts === 'number' ? ts : null
@@ -199,30 +200,30 @@ export function getCachedXPTimestamp(): number | null {
 /** Fetch XP, stats, and raw activity rows in one parallel batch.
  *  Raw rows are shared with useStreak and useAchievements to eliminate ~35 duplicate queries per session.
  */
-export async function fetchXPAndStats(supabase: SupabaseClient): Promise<{ totalXP: number; stats: AppStats; rawRows: RawActivityData }> {
+export async function fetchXPAndStats(supabase: SupabaseClient, userId: string): Promise<{ totalXP: number; stats: AppStats; rawRows: RawActivityData }> {
   const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess, volleyball, spikeball, pool] = await Promise.all([
-    supabase.from('lifting_log').select('date, lift, est_1rm, weight, sets, reps'),
-    supabase.from('skate_sessions').select('miles, date'),
-    supabase.from('pr_history').select('lift, est_1rm, date'),
-    supabase.from('books').select('date_finished, title').not('date_finished', 'is', null),
-    supabase.from('fortnite_games').select('win, kills, mode, date, accuracy'),
-    supabase.from('challenges').select('status, xp_reward'),
-    supabase.from('sleep_log').select('hours_slept, date').eq('is_nap', false),
-    supabase.from('cardio_sessions').select('distance_miles, activity, date'),
-    supabase.from('goals').select('xp_reward').eq('status', 'completed'),
-    supabase.from('mood_log').select('date, mood'),
-    supabase.from('body_measurements').select('date, weight_lbs, body_fat_pct').order('date', { ascending: false }),
-    supabase.from('water_log').select('date, oz'),
-    supabase.from('basketball_sessions').select('points, date, fg_made, fg_attempted'),
-    supabase.from('pickleball_games').select('win, date, my_score, opp_score'),
-    supabase.from('golf_rounds').select('score, par, date, holes, course'),
-    supabase.from('disc_golf_rounds').select('score, par, date, holes, course'),
-    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft, date, difficulty, trail'),
-    supabase.from('table_tennis_games').select('win, date, my_score, opp_score'),
-    supabase.from('chess_games').select('result, date, rating_after, opening'),
-    supabase.from('volleyball_sessions').select('win, date, format, kills'),
-    supabase.from('spikeball_games').select('win, date'),
-    supabase.from('pool_games').select('win, break_and_run, date, game_type'),
+    supabase.from('lifting_log').select('date, lift, est_1rm, weight, sets, reps').eq('user_id', userId),
+    supabase.from('skate_sessions').select('miles, date').eq('user_id', userId),
+    supabase.from('pr_history').select('lift, est_1rm, date').eq('user_id', userId),
+    supabase.from('books').select('date_finished, title').eq('user_id', userId).not('date_finished', 'is', null),
+    supabase.from('fortnite_games').select('win, kills, mode, date, accuracy').eq('user_id', userId),
+    supabase.from('challenges').select('status, xp_reward').eq('user_id', userId),
+    supabase.from('sleep_log').select('hours_slept, date').eq('user_id', userId).eq('is_nap', false),
+    supabase.from('cardio_sessions').select('distance_miles, activity, date').eq('user_id', userId),
+    supabase.from('goals').select('xp_reward').eq('user_id', userId).eq('status', 'completed'),
+    supabase.from('mood_log').select('date, mood').eq('user_id', userId),
+    supabase.from('body_measurements').select('date, weight_lbs, body_fat_pct').eq('user_id', userId).order('date', { ascending: false }),
+    supabase.from('water_log').select('date, oz').eq('user_id', userId),
+    supabase.from('basketball_sessions').select('points, date, fg_made, fg_attempted').eq('user_id', userId),
+    supabase.from('pickleball_games').select('win, date, my_score, opp_score').eq('user_id', userId),
+    supabase.from('golf_rounds').select('score, par, date, holes, course').eq('user_id', userId),
+    supabase.from('disc_golf_rounds').select('score, par, date, holes, course').eq('user_id', userId),
+    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft, date, difficulty, trail').eq('user_id', userId),
+    supabase.from('table_tennis_games').select('win, date, my_score, opp_score').eq('user_id', userId),
+    supabase.from('chess_games').select('result, date, rating_after, opening').eq('user_id', userId),
+    supabase.from('volleyball_sessions').select('win, date, format, kills').eq('user_id', userId),
+    supabase.from('spikeball_games').select('win, date').eq('user_id', userId),
+    supabase.from('pool_games').select('win, break_and_run, date, game_type').eq('user_id', userId),
   ])
 
   // ── XP ──────────────────────────────────────────────────────

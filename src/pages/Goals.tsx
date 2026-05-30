@@ -315,7 +315,9 @@ export function Goals() {
   const refreshXP = useStore(s => s.refreshXP)
 
   async function load() {
-    const { data } = await supabase.from('goals').select('*').order('created_at', { ascending: false })
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data } = await supabase.from('goals').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
     setGoals((data ?? []) as Goal[])
   }
 

@@ -67,13 +67,15 @@ export function Weekly() {
     let cancelled = false
     async function load() {
       setLoading(true)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
       const [lifting, prs, skate, books, games, sleep] = await Promise.all([
-        supabase.from('lifting_log').select('date, lift, weight, reps, est_1rm').gte('date', monday).lte('date', sunday),
-        supabase.from('pr_history').select('lift, est_1rm, date').gte('date', monday).lte('date', sunday),
-        supabase.from('skate_sessions').select('miles, date').gte('date', monday).lte('date', sunday),
-        supabase.from('books').select('title, date_finished').not('date_finished', 'is', null).gte('date_finished', monday).lte('date_finished', sunday),
-        supabase.from('fortnite_games').select('date, kills, win').gte('date', monday).lte('date', sunday),
-        supabase.from('sleep_log').select('date, hours_slept').gte('date', monday).lte('date', sunday),
+        supabase.from('lifting_log').select('date, lift, weight, reps, est_1rm').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
+        supabase.from('pr_history').select('lift, est_1rm, date').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
+        supabase.from('skate_sessions').select('miles, date').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
+        supabase.from('books').select('title, date_finished').eq('user_id', user.id).not('date_finished', 'is', null).gte('date_finished', monday).lte('date_finished', sunday),
+        supabase.from('fortnite_games').select('date, kills, win').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
+        supabase.from('sleep_log').select('date, hours_slept').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
       ])
 
       const liftRows  = lifting.data ?? []
