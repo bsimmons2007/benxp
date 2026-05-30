@@ -175,7 +175,8 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
               label="Goal Title"
               type="text"
               placeholder={`e.g. ${preset.label} ${preset.defaultTarget}`}
-              {...register('title')}
+              maxLength={120}
+              {...register('title', { maxLength: 120 })}
             />
             <div className="flex gap-3">
               <Input

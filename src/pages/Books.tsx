@@ -569,9 +569,9 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
               ))}
             </div>
 
-            <Input label="Title" type="text" placeholder="Book title" {...register('title', { required: true })} error={errors.title ? 'Required' : undefined} />
-            <Input label="Author" type="text" placeholder="Author name" {...register('author')} />
-            <Input label="Series (optional)" type="text" placeholder="e.g. The Stormlight Archive" {...register('series')} />
+            <Input label="Title" type="text" placeholder="Book title" maxLength={200} {...register('title', { required: true, maxLength: 200 })} error={errors.title ? 'Required' : undefined} />
+            <Input label="Author" type="text" placeholder="Author name" maxLength={100} {...register('author', { maxLength: 100 })} />
+            <Input label="Series (optional)" type="text" placeholder="e.g. The Stormlight Archive" maxLength={100} {...register('series', { maxLength: 100 })} />
 
             <div className="flex flex-col gap-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Genre</label>
@@ -580,7 +580,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
               </select>
             </div>
             {genre === 'Other' && (
-              <Input label="Custom genre" type="text" placeholder="e.g. Horror, Western…" {...register('customGenre')} />
+              <Input label="Custom genre" type="text" placeholder="e.g. Horror, Western…" maxLength={50} {...register('customGenre', { maxLength: 50 })} />
             )}
 
             <Input label="Pages (optional)" type="number" placeholder="350" {...register('pages')} />
@@ -650,10 +650,10 @@ function ToReadSection() {
       {showForm && (
         <Card className="mb-4 pop-in">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-          <Input label="Title" type="text" {...register('title', { required: true })} />
-          <Input label="Author" type="text" {...register('author')} />
+          <Input label="Title" type="text" maxLength={200} {...register('title', { required: true, maxLength: 200 })} />
+          <Input label="Author" type="text" maxLength={100} {...register('author', { maxLength: 100 })} />
           <div className="flex gap-2">
-            <Input label="Genre" type="text" className="flex-1" {...register('genre')} />
+            <Input label="Genre" type="text" className="flex-1" maxLength={50} {...register('genre', { maxLength: 50 })} />
             <div className="flex flex-col gap-1 flex-1">
               <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Priority</label>
               <select {...register('priority')} className="px-3 py-3 rounded-lg outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>

@@ -54,6 +54,7 @@ import { isTutorialDone } from './lib/tutorial'
 import { checkDailyReminder } from './lib/notifications'
 import { useAuth } from './hooks/useAuth'
 import { useStore } from './store/useStore'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 // Auth state is resolved once at the App root and shared via context so that
 // navigating between routes doesn't create a new getSession() call each time.

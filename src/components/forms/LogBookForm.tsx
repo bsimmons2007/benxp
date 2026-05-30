@@ -71,10 +71,11 @@ export function LogBookForm() {
         label="Title"
         type="text"
         placeholder="Book title"
-        {...register('title', { required: true })}
+        maxLength={200}
+        {...register('title', { required: true, maxLength: 200 })}
         error={errors.title ? 'Required' : undefined}
       />
-      <Input label="Author" type="text" placeholder="Author name" {...register('author')} />
+      <Input label="Author" type="text" placeholder="Author name" maxLength={100} {...register('author', { maxLength: 100 })} />
 
       <div className="flex flex-col gap-1">
         <label className="text-base font-medium" style={{ color: 'var(--text-muted)' }}>Genre</label>
@@ -92,7 +93,8 @@ export function LogBookForm() {
           label="Custom genre"
           type="text"
           placeholder="e.g. Horror, Western, Manga..."
-          {...register('customGenre')}
+          maxLength={50}
+          {...register('customGenre', { maxLength: 50 })}
           autoFocus
         />
       )}
