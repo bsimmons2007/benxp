@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, type FormEvent } from 'react'
+﻿import { useEffect, useState, type FormEvent, type CSSProperties } from 'react'
 import { useForm } from 'react-hook-form'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
@@ -275,57 +275,54 @@ function SleepDebtCard({ logs }: { logs: SleepLog[] }) {
 
   if (totalDebt < 0.1) {
     return (
-      <div className="rounded-xl p-4 mb-4 flex items-center gap-3" style={{ background: 'rgba(46,204,113,0.08)', border: '1px solid rgba(46,204,113,0.25)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, background: 'rgba(46,204,113,0.15)', flexShrink: 0 }}>
-          <CheckIcon size={18} color="#2ECC71" />
+      <div className="rounded-xl p-4 mb-4 flex items-center gap-3" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 9, background: 'var(--surface-2)', flexShrink: 0 }}>
+          <CheckIcon size={16} color="#4ade80" />
         </div>
         <div>
-          <p className="font-bold text-sm" style={{ color: '#2ECC71' }}>No sleep debt!</p>
-          <p style={{ color: '#888', fontSize: 12 }}>You've been hitting your sleep goals.</p>
+          <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>No sleep debt</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>You've been hitting your sleep goals.</p>
         </div>
       </div>
     )
   }
 
   const recoveryNights = Math.ceil(recentDebt / RECOVERY_EXTRA)
-  const debtColor = totalDebt >= 10 ? '#E94560' : totalDebt >= 5 ? '#E67E22' : '#F5A623'
+  const debtColor = totalDebt >= 10 ? '#ef4444' : totalDebt >= 5 ? '#f97316' : '#f59e0b'
   const maxBar = Math.max(totalDebt, 10)
 
   return (
-    <div className="rounded-xl p-4 mb-4" style={{ background: 'rgba(233,69,96,0.06)', border: `1px solid ${debtColor}33` }}>
-      <div className="flex items-center justify-between mb-3">
+    <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <MoonIcon size={18} color={debtColor} />
-          <p className="font-bold text-sm" style={{ color: debtColor }}>Sleep Debt</p>
+          <MoonIcon size={15} color={debtColor} />
+          <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Sleep Debt</span>
         </div>
-        <span className="font-bold text-lg" style={{ color: debtColor }}>
+        <span className="font-bold font-mono" style={{ color: debtColor, fontSize: 18 }}>
           {totalDebt.toFixed(1)}h
         </span>
       </div>
 
       {/* Debt bar */}
-      <div style={{ height: 6, borderRadius: 3, background: 'var(--input-bg)', overflow: 'hidden', marginBottom: 10 }}>
+      <div style={{ height: 5, borderRadius: 3, background: 'var(--surface-2)', overflow: 'hidden', marginBottom: 12 }}>
         <div style={{
           height: '100%', width: `${Math.min(100, (totalDebt / maxBar) * 100).toFixed(0)}%`,
-          background: `linear-gradient(90deg, ${debtColor}88, ${debtColor})`,
-          borderRadius: 3, transition: 'width 0.6s ease',
+          background: debtColor, borderRadius: 3, transition: 'width 0.6s ease',
         }} />
       </div>
 
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Last 7 nights: <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{recentDebt.toFixed(1)}h deficit</span></p>
-          <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>14-day rolling: <span style={{ color: debtColor, fontWeight: 700 }}>{totalDebt.toFixed(1)}h</span></p>
-        </div>
-        <div style={{
-          padding: '6px 12px', borderRadius: 8,
-          background: 'var(--input-bg)', border: '1px solid var(--border)',
-          textAlign: 'center', flexShrink: 0,
-        }}>
-          <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 18, lineHeight: 1 }}>{recoveryNights}</p>
-          <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>nights @ 9h</p>
-          <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>to recover</p>
-        </div>
+      {/* Three stat chips */}
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          { label: '7-night deficit', value: `${recentDebt.toFixed(1)}h`, color: debtColor },
+          { label: '14-day rolling',  value: `${totalDebt.toFixed(1)}h`,  color: debtColor },
+          { label: 'Nights to clear', value: String(recoveryNights),       color: 'var(--text-primary)' },
+        ].map(s => (
+          <div key={s.label} className="rounded-lg p-2.5 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}>
+            <p className="font-bold font-mono" style={{ color: s.color, fontSize: 17, lineHeight: 1 }}>{s.value}</p>
+            <p className="section-label mt-1" style={{ fontSize: 9 }}>{s.label}</p>
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -419,77 +416,75 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
       <button
         onClick={() => setOpen(true)}
         className="w-full rounded-xl p-4 mb-4 text-left"
-        style={{ background: 'rgba(245,166,35,0.06)', border: '1px solid rgba(245,166,35,0.2)', cursor: 'pointer' }}
+        style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', cursor: 'pointer' }}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-bold text-sm" style={{ color: 'var(--accent)' }}>Wake Time Trainer</p>
+            <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Wake Time Trainer</p>
             <p style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 2 }}>
               {avgWakeMins !== null
-                ? `Avg wake: ${fmtTime(avgWakeMins)} · Set a goal wake time`
+                ? `Avg wake: ${fmtTime(avgWakeMins)} · Tap to set a goal`
                 : 'Plan a gradual wake time shift with a day-by-day schedule'}
             </p>
           </div>
-          <span style={{ color: 'var(--accent)', fontSize: 18 }}>›</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 18 }}>›</span>
         </div>
       </button>
     )
   }
 
+  const inputStyle: CSSProperties = {
+    width: '100%', padding: '9px 12px', borderRadius: 8,
+    background: 'var(--surface-2)', border: '1px solid var(--border-subtle)',
+    color: 'var(--text-primary)', fontSize: 15, outline: 'none',
+    fontFamily: 'inherit',
+  }
+  const labelStyle2: CSSProperties = {
+    display: 'block', color: 'var(--text-muted)', fontSize: 10,
+    fontWeight: 700, textTransform: 'uppercase',
+    fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 6,
+  }
+
   return (
-    <Card className="mb-4 pop-in" style={{ border: '1px solid var(--accent-dim)' }}>
+    <Card className="mb-4 pop-in">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid var(--border-faint)' }}>
-        <p className="font-bold" style={{ color: 'var(--accent)', fontSize: 15 }}>Wake Time Trainer</p>
-        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 18 }}>✕</button>
+      <div className="flex items-center justify-between p-4 pb-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+        <p className="font-bold" style={{ color: 'var(--text-primary)', fontSize: 15 }}>Wake Time Trainer</p>
+        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✕</button>
       </div>
 
       <div className="p-4 flex flex-col gap-4">
 
         {/* Current vs target */}
         <div className="flex items-center gap-3">
-          <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 4 }}>
-              {avgWakeMins !== null ? `Current avg (${wakeTimeLogs.length} nights)` : 'Current (estimated)'}
+          <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.10em', marginBottom: 4 }}>
+              {avgWakeMins !== null ? `Avg (${wakeTimeLogs.length} nights)` : 'Current'}
             </p>
-            <p style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-serif)' }}>{fmtTime(currentWakeMins)}</p>
+            <p className="font-bold font-mono" style={{ color: 'var(--text-primary)', fontSize: 20 }}>{fmtTime(currentWakeMins)}</p>
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: 22, fontWeight: 300 }}>→</div>
-          <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.3)' }}>
-            <p style={{ color: 'var(--accent)', fontSize: 10, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', marginBottom: 4 }}>Goal</p>
-            <p style={{ color: 'var(--accent)', fontSize: 22, fontWeight: 700 }}>{fmtTime(targetWakeMins)}</p>
+          <div style={{ color: 'var(--text-muted)', fontSize: 18, fontWeight: 300 }}>→</div>
+          <div className="flex-1 rounded-lg p-3 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--accent)' }}>
+            <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.10em', marginBottom: 4 }}>Goal</p>
+            <p className="font-bold font-mono" style={{ color: 'var(--accent)', fontSize: 20 }}>{fmtTime(targetWakeMins)}</p>
           </div>
         </div>
 
         {/* Settings */}
         <div className="flex flex-col gap-3">
           <div>
-            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 6 }}>Target Wake Time</label>
-            <input
-              type="time"
-              value={targetWake}
-              onChange={e => setTargetWake(e.target.value)}
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 15, outline: 'none' }}
-            />
+            <label style={labelStyle2}>Target Wake Time</label>
+            <input type="time" value={targetWake} onChange={e => setTargetWake(e.target.value)} style={inputStyle} />
           </div>
 
           <div className="flex gap-3">
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 6 }}>Sleep Duration (hrs)</label>
-              <input
-                type="number" step="0.5" min="5" max="10"
-                value={sleepHours}
-                onChange={e => setSleepHours(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 15, outline: 'none' }}
-              />
+              <label style={labelStyle2}>Sleep Duration (hrs)</label>
+              <input type="number" step="0.5" min="5" max="10" value={sleepHours} onChange={e => setSleepHours(e.target.value)} style={inputStyle} />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 6 }}>Shift Speed</label>
-              <select
-                value={shiftMins}
-                onChange={e => setShiftMins(Number(e.target.value))}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, outline: 'none' }}
-              >
+              <label style={labelStyle2}>Shift Speed</label>
+              <select value={shiftMins} onChange={e => setShiftMins(Number(e.target.value))} style={{ ...inputStyle, fontSize: 13 }}>
                 <option value={10}>Slow (10 min/day)</option>
                 <option value={15}>Gentle (15 min/day)</option>
                 <option value={20}>Moderate (20 min/day)</option>
@@ -501,24 +496,24 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
         {/* Already at goal */}
         {deltaMinutes <= 0 && (
-          <div className="rounded-lg p-3 flex items-center gap-2" style={{ background: 'rgba(46,204,113,0.08)', border: '1px solid rgba(46,204,113,0.2)' }}>
-            <CheckIcon size={16} color="#2ECC71" />
-            <p style={{ color: '#2ECC71', fontSize: 13, fontWeight: 600 }}>You're already at or ahead of your goal!</p>
+          <div className="rounded-lg p-3 flex items-center gap-2" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}>
+            <CheckIcon size={16} color="#4ade80" />
+            <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>You're already at or ahead of your goal!</p>
           </div>
         )}
 
-        {/* Summary card */}
+        {/* Summary stats + schedule */}
         {deltaMinutes > 0 && (
           <>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { label: 'Days needed',   value: String(daysNeeded)               },
-                { label: 'Shift per day', value: `${shiftMins}m earlier`          },
-                { label: 'Goal by',       value: formatDate(goalDate)              },
+                { label: 'Days needed',   value: String(daysNeeded)      },
+                { label: 'Shift/day',     value: `${shiftMins}m`         },
+                { label: 'Goal by',       value: formatDate(goalDate)    },
               ].map(s => (
-                <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
-                  <p style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700, lineHeight: 1 }}>{s.value}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 9, marginTop: 4, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.10em', fontWeight: 600 }}>{s.label}</p>
+                <div key={s.label} className="rounded-lg p-2.5 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}>
+                  <p className="font-bold font-mono" style={{ color: 'var(--accent)', fontSize: 16, lineHeight: 1 }}>{s.value}</p>
+                  <p className="section-label mt-1" style={{ fontSize: 9 }}>{s.label}</p>
                 </div>
               ))}
             </div>
@@ -530,31 +525,31 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                   <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Progress</p>
                   <p style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700 }}>{daysOnTrack}/{daysNeeded} days on track</p>
                 </div>
-                <div style={{ height: 6, borderRadius: 999, background: 'var(--input-bg)', overflow: 'hidden' }}>
+                <div style={{ height: 5, borderRadius: 999, background: 'var(--surface-2)', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${progressPct}%`, background: 'var(--accent)', borderRadius: 999, transition: 'width 0.6s ease' }} />
                 </div>
               </div>
             )}
 
             {/* Tonight callout */}
-            <div className="rounded-lg p-3" style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.35)' }}>
-              <p style={{ color: 'var(--accent)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 4 }}>Tonight</p>
-              <div className="flex justify-between items-center">
+            <div className="rounded-lg p-3" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+              <p className="section-label mb-2">Tonight</p>
+              <div className="flex justify-between items-end">
                 <div>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Go to sleep by</p>
-                  <p style={{ color: 'var(--accent)', fontSize: 26, fontWeight: 700, lineHeight: 1.1 }}>{schedule[0]?.bed}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Go to sleep by</p>
+                  <p className="font-bold font-mono" style={{ color: 'var(--accent)', fontSize: 24, lineHeight: 1.1 }}>{schedule[0]?.bed}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Wake up at</p>
-                  <p style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700, lineHeight: 1.1 }}>{schedule[0]?.wake}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Wake up at</p>
+                  <p className="font-bold font-mono" style={{ color: 'var(--text-primary)', fontSize: 18, lineHeight: 1.1 }}>{schedule[0]?.wake}</p>
                 </div>
               </div>
             </div>
 
             {/* Day-by-day schedule */}
             <div>
-              <p style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 8 }}>Full Schedule</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 280, overflowY: 'auto' }}>
+              <p className="section-label mb-2">Full Schedule</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3, maxHeight: 280, overflowY: 'auto' }}>
                 {schedule.map((s, i) => {
                   const isToday    = s.date === todayStr
                   const isGoalDay  = i === daysNeeded
@@ -568,39 +563,37 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
                       key={s.date}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 10,
-                        padding: '8px 10px', borderRadius: 8,
-                        background: isToday ? 'rgba(245,166,35,0.08)' : isGoalDay ? 'rgba(46,204,113,0.06)' : 'transparent',
-                        border: isToday ? '1px solid rgba(245,166,35,0.3)' : isGoalDay ? '1px solid rgba(46,204,113,0.2)' : '1px solid transparent',
+                        padding: '7px 10px', borderRadius: 8,
+                        background: isToday ? 'var(--surface-2)' : 'transparent',
+                        border: isToday ? '1px solid var(--border-default)' : isGoalDay ? '1px solid var(--border-subtle)' : '1px solid transparent',
                       }}
                     >
-                      {/* Day number */}
-                      <div style={{ width: 28, textAlign: 'center', flexShrink: 0 }}>
-                        {isGoalDay
-                          ? <CheckIcon size={14} color="#2ECC71" />
-                          : onTrack === true
-                            ? <CheckIcon size={14} color="#2ECC71" />
-                            : <span style={{ color: isToday ? 'var(--accent)' : 'var(--text-muted)', fontSize: 11, fontWeight: 700 }}>D{i + 1}</span>
+                      {/* Status icon / day number */}
+                      <div style={{ width: 24, textAlign: 'center', flexShrink: 0 }}>
+                        {onTrack === true || isGoalDay
+                          ? <CheckIcon size={13} color="#4ade80" />
+                          : <span className="font-mono" style={{ color: isToday ? 'var(--accent)' : 'var(--text-muted)', fontSize: 10, fontWeight: 700 }}>D{i + 1}</span>
                         }
                       </div>
 
                       {/* Date */}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ color: isToday ? 'var(--accent)' : isGoalDay ? '#2ECC71' : 'var(--text-secondary)', fontSize: 12, fontWeight: isToday ? 700 : 500 }}>
+                        <p style={{ color: isGoalDay ? '#4ade80' : isToday ? 'var(--accent)' : 'var(--text-secondary)', fontSize: 12, fontWeight: isToday ? 700 : 500 }}>
                           {dayLabel(s.date)} · {formatDate(s.date)}
-                          {isToday && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(245,166,35,0.2)', color: 'var(--accent)', padding: '1px 6px', borderRadius: 4 }}>TODAY</span>}
-                          {isGoalDay && <span style={{ marginLeft: 6, fontSize: 10, background: 'rgba(46,204,113,0.15)', color: '#2ECC71', padding: '1px 6px', borderRadius: 4 }}>GOAL</span>}
+                          {isToday && <span className="font-mono" style={{ marginLeft: 6, fontSize: 9, background: 'var(--accent)', color: 'var(--base-bg)', padding: '1px 5px', borderRadius: 3 }}>TODAY</span>}
+                          {isGoalDay && <span className="font-mono" style={{ marginLeft: 6, fontSize: 9, background: 'var(--surface-2)', color: '#4ade80', padding: '1px 5px', borderRadius: 3, border: '1px solid var(--border-subtle)' }}>GOAL</span>}
                         </p>
                         {actualWake?.wake_time && (
-                          <p style={{ color: onTrack ? '#2ECC71' : '#E94560', fontSize: 10, marginTop: 1 }}>
-                            Actual wake: {fmtTime(parseTime(actualWake.wake_time))} {onTrack ? '✓' : '✗'}
+                          <p style={{ color: onTrack ? '#4ade80' : 'var(--text-muted)', fontSize: 10, marginTop: 1 }}>
+                            Actual: {fmtTime(parseTime(actualWake.wake_time))} {onTrack ? '✓' : '✗'}
                           </p>
                         )}
                       </div>
 
                       {/* Bedtime & Wake */}
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>Sleep <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{s.bed}</span></p>
-                        <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>Wake <span style={{ color: isGoalDay ? '#2ECC71' : 'var(--accent)', fontWeight: 700 }}>{s.wake}</span></p>
+                        <p className="font-mono" style={{ color: 'var(--text-muted)', fontSize: 10 }}>{s.bed}</p>
+                        <p className="font-mono" style={{ color: isGoalDay ? '#4ade80' : 'var(--accent)', fontSize: 11, fontWeight: 700 }}>{s.wake}</p>
                       </div>
                     </div>
                   )
@@ -608,10 +601,9 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
               </div>
             </div>
 
-            {/* Science note */}
-            <p style={{ color: 'var(--text-muted)', fontSize: 10, textAlign: 'center', lineHeight: 1.4 }}>
-              Based on chronobiology: shifting {shiftMins} min/day is within the body's natural circadian adaptation rate.
-              Consistency is key — try to hit your bedtime every night, including weekends.
+            <p style={{ color: 'var(--text-muted)', fontSize: 10, textAlign: 'center', lineHeight: 1.5 }}>
+              Shifting {shiftMins} min/day matches the body's natural circadian adaptation rate.
+              Consistency every night, including weekends, is key.
             </p>
           </>
         )}
