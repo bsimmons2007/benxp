@@ -271,6 +271,11 @@ input[type="range"]::-moz-range-thumb {
   from { width: 0%; }
   to   { width: 100%; }
 }
+@keyframes facepop {
+  0%   { transform: scale(0.88); }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
 @keyframes checkPop {
   0%   { transform: scale(0) rotate(-8deg); opacity: 0; }
   60%  { transform: scale(1.2) rotate(4deg); opacity: 1; }

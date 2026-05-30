@@ -16,6 +16,7 @@ import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
 import type { MoodLog } from '../types'
 import { HeartIcon, ZapIcon, ActivityIcon, EditIcon } from '../components/ui/Icon'
+import { MoodFaceGauge, moodFaceColor } from '../components/ui/MoodFace'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { EditModal } from '../components/ui/EditModal'
 import { ChartSkeleton, ChartEmptyState } from '../components/ui/Skeleton'
@@ -35,41 +36,14 @@ const TT_STYLE = {
   borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: 'var(--shadow-md)',
 }
 
+const MOOD_WORDS = ['', 'Really low', 'Low', 'Down', 'Off', 'Neutral', 'Okay', 'Good', 'Great', 'Excellent', 'Amazing']
+
 function moodLabel(v: number) {
   if (v >= 9) return 'Excellent'
   if (v >= 7) return 'Good'
   if (v >= 5) return 'Okay'
   if (v >= 3) return 'Low'
   return 'Rough'
-}
-
-// SVG face whose expression tracks mood 1–10
-function MoodFace({ value }: { value: number }) {
-  const t = (value - 1) / 9          // 0 = worst, 1 = best
-  const smileY = 62 + (1 - t) * 10  // mouth center Y: low=smiley, high=frown
-  // Smile: control points BELOW chord (higher Y) bows the curve down = corners up = smile
-  // Frown: control points ABOVE chord (lower Y) bows the curve up  = corners down = frown
-  const cp1y = t >= 0.5 ? smileY + 10 : smileY - 10
-  const cp2y = cp1y
-  const mouth = `M 34 ${smileY} C 40 ${cp1y}, 60 ${cp2y}, 66 ${smileY}`
-  // Eye brow lift: raised at high mood
-  const browDrop = (1 - t) * 5
-  const color = t >= 0.7 ? 'var(--accent)' : t >= 0.4 ? '#fbbf24' : '#f87171'
-
-  return (
-    <svg viewBox="0 0 100 100" width={72} height={72} style={{ display: 'block' }}>
-      <circle cx="50" cy="50" r="46" fill={color} opacity={0.12} />
-      <circle cx="50" cy="50" r="44" fill="none" stroke={color} strokeWidth={1.5} opacity={0.4} />
-      {/* Eyes */}
-      <circle cx="35" cy="42" r="4.5" fill={color} />
-      <circle cx="65" cy="42" r="4.5" fill={color} />
-      {/* Brows */}
-      <path d={`M 28 ${36 + browDrop} Q 35 ${33 + browDrop}, 42 ${36 + browDrop}`} stroke={color} strokeWidth={2.2} fill="none" strokeLinecap="round" />
-      <path d={`M 58 ${36 + browDrop} Q 65 ${33 + browDrop}, 72 ${36 + browDrop}`} stroke={color} strokeWidth={2.2} fill="none" strokeLinecap="round" />
-      {/* Mouth */}
-      <path d={mouth} stroke={color} strokeWidth={2.5} fill="none" strokeLinecap="round" />
-    </svg>
-  )
 }
 
 // Slider row with spring bounce on the value number when it changes
@@ -325,13 +299,31 @@ export function Mood() {
         )}
 
         {/* Log form */}
-        <Card className="mb-5">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <MoodFace value={moodVal} />
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em' }}>
-              {moodLabel(moodVal)} Daily Check-in
-            </p>
+        <Card className="mb-5" style={{ padding: 0, overflow: 'hidden' }}>
+          {/* Hero header — tinted by mood color */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 18,
+            padding: '18px 18px 14px',
+            background: `linear-gradient(180deg, ${moodFaceColor(moodVal)}1c, transparent)`,
+            transition: 'background 0.25s ease',
+          }}>
+            <div key={moodVal} style={{ flexShrink: 0, animation: 'facepop 0.28s ease both' }}>
+              <MoodFaceGauge value={moodVal} size={88} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 4 }}>
+                Daily Check-in
+              </p>
+              <p style={{ fontWeight: 800, fontSize: 26, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 6, letterSpacing: '-0.02em' }}>
+                {MOOD_WORDS[moodVal]}
+              </p>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-tertiary)' }}>
+                Mood <span style={{ color: moodFaceColor(moodVal), fontWeight: 700 }}>{moodVal}</span> / 10
+              </p>
+            </div>
           </div>
+
+          <div style={{ padding: '12px 18px 18px' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
@@ -356,6 +348,7 @@ export function Mood() {
               {isSubmitting ? 'Logging…' : 'Log Check-in'}
             </Button>
           </form>
+          </div>
         </Card>
 
         {/* Recent entries */}
