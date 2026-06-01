@@ -55,25 +55,7 @@
   <script src="src/scenes/UIScene.js"></script>
   <script src="src/scenes/ResultScene.js"></script>
 
-  <script>
-    window.__phaserGame = new Phaser.Game({
-      type:            Phaser.AUTO,
-      width:           ARENA.width,
-      height:          ARENA.height,
-      backgroundColor: '#0a0d0e',   // near-black alien rock ground
-      parent:          document.body,
-      // Render at the device's native pixel density so text is crisp on
-      // HiDPI / Retina screens instead of blurry from CSS up-scaling.
-      resolution:      window.devicePixelRatio || 1,
-      antialias:       true,
-      scale: {
-        mode:       Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-      },
-      // Scenes listed in the order they can be started; BootScene runs first.
-      scene: [BootScene, MenuScene, GameScene, UIScene, ResultScene],
-    });
-  </script>
+  <script src="src/main.js"></script>
 
 </body>
 </html>
