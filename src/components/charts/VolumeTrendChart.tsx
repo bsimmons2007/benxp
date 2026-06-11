@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
 import { supabase } from '../../lib/supabase'
+import { CHART_TOOLTIP_STYLE } from '../../lib/utils'
 
 interface WeekPoint {
   week:   string
@@ -18,15 +19,6 @@ function getMondayKey(dateStr: string): string {
 function formatWeekLabel(weekKey: string): string {
   const d = new Date(weekKey + 'T12:00:00')
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
-
-const TT_STYLE = {
-  background: 'var(--card-bg)',
-  border: '1px solid var(--border)',
-  borderRadius: 8,
-  color: 'var(--text-primary)',
-  fontSize: 11,
-  boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -101,7 +93,7 @@ export function VolumeTrendChart() {
           tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
         />
         <Tooltip
-          contentStyle={TT_STYLE}
+          contentStyle={CHART_TOOLTIP_STYLE}
           formatter={(v: number) => [`${v.toLocaleString()} lbs`, 'Volume']}
           cursor={{ fill: 'var(--border-subtle)' }}
         />

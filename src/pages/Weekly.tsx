@@ -209,7 +209,6 @@ export function Weekly() {
                           ? 'var(--accent)'
                           : 'var(--surface-2)',
                         border: isToday ? '1px solid var(--accent)' : '1px solid transparent',
-                        boxShadow: active ? '0 0 12px var(--accent-dim)' : 'none',
                         transition: 'all 0.2s ease',
                       }} />
                       <span style={{ fontSize: 9, color: isToday ? 'var(--accent)' : 'var(--text-tertiary)' }}>{day}</span>

@@ -9,7 +9,7 @@ import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
-import { today, formatDate } from '../lib/utils'
+import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
@@ -179,7 +179,7 @@ function EditPickleballModal({ game, onClose, onSaved }: { game: PickleballGame;
 
 // ── Main page ─────────────────────────────────────────────────────
 
-const ttStyle = { background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = CHART_TOOLTIP_STYLE
 
 export function Pickleball() {
   usePageTitle('Pickleball')

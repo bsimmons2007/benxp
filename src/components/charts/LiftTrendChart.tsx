@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
+import { CHART_TOOLTIP_STYLE, formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
 
 interface DataPoint {
   date:    string
@@ -31,15 +31,6 @@ function CustomDot(props: any) {
       <circle cx={cx} cy={cy} r={4} fill={c} />
     </g>
   )
-}
-
-const TT_STYLE = {
-  background: 'var(--card-bg)',
-  border: '1px solid var(--border)',
-  borderRadius: 8,
-  color: 'var(--text-primary)',
-  fontSize: 12,
-  boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
 
 function buildCompareData(data: DataPoint[], dataKey: 'est_1rm' | 'reps'): ComparePoint[] {
@@ -154,7 +145,7 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
               width={36}
             />
             <Tooltip
-              contentStyle={TT_STYLE}
+              contentStyle={CHART_TOOLTIP_STYLE}
               labelFormatter={(l: number) => `Day ${l}`}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(v: any, name: string) => [`${Number(v).toFixed(1)} ${unit}`, name === 'current' ? 'Last 30d' : 'Prior 30d']}
@@ -205,7 +196,7 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
             width={36}
           />
           <Tooltip
-            contentStyle={TT_STYLE}
+            contentStyle={CHART_TOOLTIP_STYLE}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             labelFormatter={(l: any) => (typeof l === 'string' ? formatDateTooltip(l) : l)}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -9,7 +9,7 @@ import { Toast } from '../components/ui/Toast'
 import { EmptyState } from '../components/ui/EmptyState'
 import { RulerIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
-import { today, formatDate, formatDateTooltip } from '../lib/utils'
+import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip } from '../lib/utils'
 import { XP_RATES } from '../lib/xp'
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -99,7 +99,7 @@ function MiniTrend({ data, color }: { data: { date: string; v: number }[]; color
         <XAxis dataKey="date" hide />
         <YAxis domain={['auto', 'auto']} hide />
         <Tooltip
-          contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, fontSize: 11, color: 'var(--text-primary)' }}
+          contentStyle={CHART_TOOLTIP_STYLE}
           labelFormatter={(l: string) => formatDateTooltip(l)}
           formatter={(v: number) => [v.toFixed(1), '']}
         />

@@ -129,8 +129,7 @@ function WeekDotStrip({ streak }: {
               border: day.isToday
                 ? '2px solid var(--accent)'
                 : '1.5px solid transparent',
-              boxShadow: day.isActive ? '0 0 10px color-mix(in srgb, var(--accent) 40%, transparent)' : 'none',
-              transition: 'background 0.2s ease, box-shadow 0.2s ease',
+              transition: 'background 0.2s ease',
             }} />
             <span style={{
               fontSize: 9, fontWeight: day.isToday ? 700 : 500, letterSpacing: '0.02em',
@@ -690,14 +689,14 @@ export function Home() {
               width: 32, height: 32, borderRadius: '50%',
               background: 'var(--surface-2)', border: '1px solid var(--border)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+              boxShadow: 'var(--shadow-md)',
             }}>
               {refreshing ? (
                 <div className="spin" style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--accent)', borderTopColor: 'transparent' }} />
               ) : (
                 <div style={{
                   width: 14, height: 14, borderRadius: '50%',
-                  border: `2px solid ${pullDistance >= threshold ? 'var(--accent)' : '#444'}`,
+                  border: `2px solid ${pullDistance >= threshold ? 'var(--accent)' : 'var(--border-strong)'}`,
                   borderTopColor: 'transparent',
                   transform: `rotate(${(pullDistance / threshold) * 360}deg)`,
                   transition: 'border-color 0.15s',

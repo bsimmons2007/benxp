@@ -301,8 +301,7 @@ export function Settings() {
         style={{
           width: 44, height: 26,
           background: value ? 'var(--accent)' : 'var(--border)',
-          boxShadow: value ? '0 0 8px var(--accent-dim)' : 'none',
-          transition: 'background 0.2s ease, box-shadow 0.2s ease',
+          transition: 'background 0.2s ease',
         }}
       >
         <div style={{
@@ -578,7 +577,7 @@ export function Settings() {
                           <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 600 }}>{scene.name}</p>
                           <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{scene.description}</p>
                         </div>
-                        {isActive && <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)', boxShadow: '0 0 6px var(--accent)', flexShrink: 0, animation: ambient ? 'glowPulse 2s ease-in-out infinite' : 'none' }} />}
+                        {isActive && <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0, animation: ambient ? 'glowPulse 2s ease-in-out infinite' : 'none' }} />}
                       </button>
                     )
                   })}

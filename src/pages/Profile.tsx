@@ -345,7 +345,7 @@ function BadgeTile({ badge }: { badge: Badge }) {
         border: badge.earned
           ? '1px solid var(--border)'
           : '1px solid var(--border-faint)',
-        boxShadow: badge.earned ? '0 4px 16px rgba(0,0,0,0.25)' : 'none',
+        boxShadow: badge.earned ? 'var(--shadow-md)' : 'none',
         filter: badge.earned ? 'none' : 'grayscale(1) brightness(0.55)',
         transition: 'transform 0.15s ease, box-shadow 0.15s ease',
         transform: hover && badge.earned ? 'translateY(-2px) scale(1.05)' : 'none',
@@ -644,8 +644,7 @@ function LevelAvatar({ level }: { level: number }) {
         }}>
           <div style={{
             position: 'absolute', inset: 0, borderRadius: '50%',
-            background: `radial-gradient(circle, ${tier.aura}33 0%, transparent 70%)`,
-            boxShadow: `0 0 24px ${tier.aura}55`,
+            background: `${tier.aura}1f`,
             animation: 'pulse 3s ease-in-out infinite',
           }} />
           <tier.Icon size={36} color={tier.aura} style={{ position: 'relative', zIndex: 1 }} />

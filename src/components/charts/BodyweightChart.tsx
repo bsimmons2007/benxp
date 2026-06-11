@@ -1,22 +1,13 @@
 import { useEffect, useState } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
+import { CHART_TOOLTIP_STYLE, formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
 
 const BW_GOAL_KEY = 'youxp-bw-goal'
 
 interface DataPoint {
   date:       string
   bodyweight: number
-}
-
-const TT_STYLE = {
-  background: 'var(--card-bg)',
-  border: '1px solid var(--border)',
-  borderRadius: 8,
-  color: 'var(--text-primary)',
-  fontSize: 12,
-  boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
 }
 
 const todayStr = localDateStr(new Date())
@@ -169,7 +160,7 @@ export function BodyweightChart() {
             width={40}
           />
           <Tooltip
-            contentStyle={TT_STYLE}
+            contentStyle={CHART_TOOLTIP_STYLE}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             labelFormatter={(label: any) => (typeof label === 'string' ? formatDateTooltip(label) : label)}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

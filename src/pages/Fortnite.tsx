@@ -13,7 +13,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EmptyState } from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
-import { today, formatDate, formatDateTooltip } from '../lib/utils'
+import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip } from '../lib/utils'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
@@ -35,7 +35,7 @@ const RANK_COLORS: Record<FnRank, string> = {
 const ACCENT_NORMAL = 'var(--accent)'
 const ACCENT_BLITZ  = '#a855f7'
 
-const ttStyle  = { background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: 'var(--shadow-md)' }
+const ttStyle  = CHART_TOOLTIP_STYLE
 const lblStyle = { color: 'var(--text-muted)' }
 const itmStyle = { color: 'var(--text-primary)' }
 

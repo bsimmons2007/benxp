@@ -12,7 +12,7 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { EditIcon, CheckIcon, BookIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
-import { today, formatDate } from '../lib/utils'
+import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playGoalComplete } from '../lib/sounds'
 import type { Book, ToRead } from '../types'
@@ -374,7 +374,7 @@ function CurrentlyReadingCard({ book, onUpdated }: { book: Book; onUpdated: () =
       <div className="rounded-xl p-4 mb-3 card-animate" style={{
         background: 'var(--surface-1)',
         border: '1px solid var(--accent-dim)',
-        boxShadow: '0 0 20px rgba(245,166,35,0.08)',
+        boxShadow: 'var(--shadow-sm)',
       }}>
         <div className="flex items-start gap-3">
           {/* Reading indicator */}
@@ -802,7 +802,7 @@ export function Books() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 11, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}
+                    contentStyle={CHART_TOOLTIP_STYLE}
                     formatter={(value: number, name: string) => [`${value} book${value !== 1 ? 's' : ''} · ${Math.round(value / finished.length * 100)}%`, name]}
                   />
                 </PieChart>

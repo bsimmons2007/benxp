@@ -10,7 +10,7 @@ import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
 import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
-import { today, formatDate } from '../lib/utils'
+import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
@@ -161,7 +161,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
                 style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
               />
               {showSuggestions && savedCourses.length > 0 && (
-                <div className="absolute top-full left-0 right-0 z-20 rounded-xl overflow-hidden" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', marginTop: 2, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                <div className="absolute top-full left-0 right-0 z-20 rounded-xl overflow-hidden" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', marginTop: 2, boxShadow: 'var(--shadow-lg)' }}>
                   {savedCourses.slice(0, 6).map(c => (
                     <button
                       key={c}
@@ -285,7 +285,7 @@ function EditGolfModal({ round, onClose, onSaved }: { round: GolfRound; onClose:
 
 // ── Main page ─────────────────────────────────────────────────────
 
-const ttStyle = { background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }
+const ttStyle = CHART_TOOLTIP_STYLE
 
 export function Golf() {
   usePageTitle('Golf')

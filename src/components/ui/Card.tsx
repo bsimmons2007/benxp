@@ -4,7 +4,7 @@ interface CardProps {
   children:    ReactNode
   className?:  string
   style?:      CSSProperties
-  /** Highlight with accent border + glow */
+  /** Highlight with accent border */
   accent?:     boolean
   /** @deprecated use accent */
   goldBorder?: boolean
@@ -20,7 +20,7 @@ export function Card({ children, className = '', style, accent = false, goldBord
       style={{
         background: 'var(--card-bg)',
         border:     highlighted ? '1px solid var(--accent)' : '1px solid var(--border)',
-        boxShadow:  highlighted ? '0 0 20px var(--accent-dim)' : 'var(--card-shadow)',
+        boxShadow:  highlighted ? 'var(--shadow-md)' : 'var(--card-shadow)',
         ...style,
       }}
     >

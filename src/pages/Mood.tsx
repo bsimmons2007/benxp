@@ -10,7 +10,7 @@ import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { supabase } from '../lib/supabase'
-import { today, formatDate, formatDateTooltip } from '../lib/utils'
+import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip } from '../lib/utils'
 import { playXPGain } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
@@ -30,11 +30,6 @@ interface MoodForm {
   notes: string
 }
 
-
-const TT_STYLE = {
-  background: 'var(--surface-1)', border: '1px solid var(--border-subtle)',
-  borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: 'var(--shadow-md)',
-}
 
 const MOOD_WORDS = ['', 'Really low', 'Low', 'Down', 'Off', 'Neutral', 'Okay', 'Good', 'Great', 'Excellent', 'Amazing']
 
@@ -266,7 +261,7 @@ export function Mood() {
                 />
                 <YAxis domain={[1, 10]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
                 <Tooltip
-                  contentStyle={TT_STYLE}
+                  contentStyle={CHART_TOOLTIP_STYLE}
                   labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any, name: string) => [v, name.charAt(0).toUpperCase() + name.slice(1)]}

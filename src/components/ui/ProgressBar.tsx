@@ -2,10 +2,9 @@ interface ProgressBarProps {
   value: number // 0 to 1
   color?: string
   height?: number
-  glow?: boolean
 }
 
-export function ProgressBar({ value, color = 'var(--accent)', height = 12, glow = false }: ProgressBarProps) {
+export function ProgressBar({ value, color = 'var(--accent)', height = 12 }: ProgressBarProps) {
   const pct = Math.min(Math.max(value * 100, 0), 100)
   return (
     <div
@@ -17,7 +16,6 @@ export function ProgressBar({ value, color = 'var(--accent)', height = 12, glow 
         style={{
           width: `${pct}%`,
           background: `linear-gradient(90deg, color-mix(in srgb, ${color} 55%, transparent) 0%, ${color} 100%)`,
-          boxShadow: glow ? `0 0 10px ${color}, 0 0 20px ${color}55` : undefined,
           transition: 'width 0.9s cubic-bezier(0.22,1,0.36,1)',
           minWidth: pct > 0 ? 4 : 0,
         }}

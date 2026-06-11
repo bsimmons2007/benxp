@@ -11,7 +11,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
-import { today, formatDate, localDateStr } from '../lib/utils'
+import { CHART_TOOLTIP_STYLE, today, formatDate, localDateStr } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
@@ -209,7 +209,7 @@ function TrendChart({ data, dataKey, label, color = 'var(--accent)' }: {
           <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
           <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} domain={[0, 100]} unit="%" />
           <Tooltip
-            contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, fontSize: 11 }}
+            contentStyle={CHART_TOOLTIP_STYLE}
             formatter={(v: unknown) => [`${v}%`, label]}
           />
           <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} fill={`url(#bb-grad-${dataKey})`} dot={{ r: 3, fill: color }} />
@@ -511,7 +511,7 @@ export function Basketball() {
                     <XAxis dataKey="label" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
                     <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
                     <Tooltip
-                      contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, fontSize: 11 }}
+                      contentStyle={CHART_TOOLTIP_STYLE}
                       formatter={(v: number) => [v, 'FGA']}
                     />
                     <Bar dataKey="shots" radius={[3, 3, 0, 0]}>

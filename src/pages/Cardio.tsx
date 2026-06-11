@@ -10,7 +10,7 @@ import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
-import { today, formatDate, formatDateTooltip } from '../lib/utils'
+import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain } from '../lib/sounds'
 import { ActivityIconComp, EditIcon, ZapIcon } from '../components/ui/Icon'
@@ -457,7 +457,7 @@ export function Cardio() {
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
               {chartData.map(d => (
                 <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#3b82f6', boxShadow: '0 0 8px #3b82f6' }} />
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#3b82f6' }} />
                   <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>{d.miles.toFixed(1)}</p>
                 </div>
               ))}
@@ -483,7 +483,7 @@ export function Cardio() {
                 <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.25)]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={30} />
                 <Tooltip
-                  contentStyle={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12, boxShadow: 'var(--shadow-md)' }}
+                  contentStyle={CHART_TOOLTIP_STYLE}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   labelFormatter={(l: any) => typeof l === 'string' ? formatDateTooltip(l) : l}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any

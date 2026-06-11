@@ -55,6 +55,7 @@ import { checkDailyReminder } from './lib/notifications'
 import { useAuth } from './hooks/useAuth'
 import { useStore } from './store/useStore'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { Wordmark } from './components/brand/Wordmark'
 
 // Auth state is resolved once at the App root and shared via context so that
 // navigating between routes doesn't create a new getSession() call each time.
@@ -136,7 +137,7 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
         style={{
           background: 'var(--surface-3)', border: '1px solid var(--border)',
           borderRadius: 16, padding: '20px 24px', minWidth: 220,
-          boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
+          boxShadow: 'var(--shadow-lg)',
         }}
       >
         <p style={{ color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', marginBottom: 12 }}>
@@ -189,19 +190,12 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
       animation: 'splashFadeOut 0.9s ease forwards',
       pointerEvents: 'none',
     }}>
-      {/* Glow orb */}
       <div style={{
-        position: 'absolute', width: 280, height: 280, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      <p style={{ fontSize: 42, fontWeight: 700,
-        color: 'var(--accent)', letterSpacing: '0.05em',
         animation: 'splashLogoIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
-        marginBottom: 8,
+        marginBottom: 10,
       }}>
-        YouXP
-      </p>
+        <Wordmark size={42} />
+      </div>
       <p style={{ fontSize: 14,
         color: 'var(--text-muted)', letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)',
         animation: 'splashSubIn 0.6s ease both',
@@ -248,7 +242,6 @@ function OfflineBanner() {
       <div style={{
         width: 7, height: 7, borderRadius: '50%',
         background: offline ? 'var(--red)' : 'var(--green)',
-        boxShadow: `0 0 8px ${offline ? 'var(--red)' : 'var(--green)'}`,
         flexShrink: 0,
       }} />
       <p style={{ fontSize: 12, fontWeight: 600, color: offline ? 'var(--red)' : 'var(--green)', letterSpacing: '0.04em' }}>

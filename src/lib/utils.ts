@@ -1,3 +1,13 @@
+/** Shared Recharts Tooltip contentStyle — theme-aware surface with flat shadow */
+export const CHART_TOOLTIP_STYLE = {
+  background:   'var(--surface-1)',
+  border:       '1px solid var(--border-subtle)',
+  borderRadius: 8,
+  color:        'var(--text-primary)',
+  fontSize:     12,
+  boxShadow:    'var(--shadow-lg)',
+} as const
+
 export function toRoman(n: number): string {
   if (n <= 0) return String(n)
   const vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1]

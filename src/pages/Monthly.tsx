@@ -187,7 +187,7 @@ export function Monthly() {
             {data.highlights.length > 0 && (
               <div className="grid grid-cols-3 gap-2 mb-4">
                 {data.highlights.map(h => (
-                  <div key={h.label} className="card-animate rounded-xl p-3" style={{ background: 'var(--surface-1)', border: h.accent ? '1px solid var(--accent)' : '1px solid var(--border-default)', boxShadow: h.accent ? '0 0 16px var(--accent-dim)' : 'var(--shadow-sm)' }}>
+                  <div key={h.label} className="card-animate rounded-xl p-3" style={{ background: 'var(--surface-1)', border: h.accent ? '1px solid var(--accent)' : '1px solid var(--border-default)', boxShadow: 'var(--shadow-sm)' }}>
                     <div style={{ marginBottom: 4 }}>{h.icon}</div>
                     <p style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 700, lineHeight: 1 }}>{h.value}</p>
                     <p style={{ color: 'var(--text-muted)', fontSize: 10, marginTop: 2 }}>{h.label}</p>

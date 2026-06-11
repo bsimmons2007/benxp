@@ -235,8 +235,8 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
     <Card
       className="mb-3"
       style={{
-        border: isAutoComplete ? '1px solid rgba(245,166,35,0.5)' : undefined,
-        boxShadow: isAutoComplete ? '0 0 20px rgba(245,166,35,0.15)' : 'none',
+        border: isAutoComplete ? '1px solid var(--accent)' : undefined,
+        boxShadow: isAutoComplete ? 'var(--shadow-sm)' : 'none',
       }}
     >
       <div className="flex items-start justify-between mb-2">
@@ -257,7 +257,7 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
             <span>{current.toFixed(current % 1 === 0 ? 0 : 1)} {goal.target_unit}</span>
             <span>{goal.target_value} {goal.target_unit}</span>
           </div>
-          <ProgressBar value={pct / 100} height={8} glow={isAutoComplete} />
+          <ProgressBar value={pct / 100} height={8} />
         </div>
       )}
 

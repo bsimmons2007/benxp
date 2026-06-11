@@ -12,7 +12,7 @@ import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState, FirstUseTip } from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
-import { today, formatDate, formatDateTooltip, localDateStr } from '../lib/utils'
+import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip, localDateStr } from '../lib/utils'
 import { playXPGain, playPR } from '../lib/sounds'
 import type { SleepLog } from '../types'
 import { MoonIcon, CheckIcon, EditIcon } from '../components/ui/Icon'
@@ -691,12 +691,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-const ttStyle = {
-  background: 'var(--surface-1)',
-  border: '1px solid var(--border-subtle)',
-  borderRadius: 8, color: 'var(--text-primary)', fontSize: 12,
-  boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-}
+const ttStyle = CHART_TOOLTIP_STYLE
 const labelStyle = { color: 'var(--text-muted)' }
 const itemStyle  = { color: 'var(--text-primary)' }
 
@@ -839,7 +834,7 @@ export function Sleep() {
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
               {sorted.map(d => (
                 <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#818cf8', boxShadow: '0 0 8px #818cf8' }} />
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#818cf8' }} />
                   <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>{d.hours_slept?.toFixed(1)}</p>
                 </div>
               ))}

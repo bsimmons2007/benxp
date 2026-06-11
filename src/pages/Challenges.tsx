@@ -84,7 +84,7 @@ function ChallengeCard({
       style={{
         background: 'var(--surface-1)',
         border: `1px solid ${isDone && !isClaimed ? accentColor + '66' : 'var(--border)'}`,
-        boxShadow: isDone && !isClaimed ? `0 0 16px ${accentColor}22` : 'none',
+        boxShadow: isDone && !isClaimed ? 'var(--shadow-sm)' : 'none',
         opacity: isClaimed ? 0.6 : 1,
       }}
     >
@@ -173,7 +173,7 @@ function ChallengeCard({
             background: accentColor,
             color: '#1A1A2E',
             fontSize: 15,
-            boxShadow: `0 4px 20px ${accentColor}44`,
+            boxShadow: 'var(--shadow-md)',
             letterSpacing: '0.01em',
           }}
         >
@@ -258,7 +258,7 @@ function BossCard({
       style={{
         background: 'var(--surface-1)',
         border: `1px solid ${isDone && !isClaimed ? BOSS_COLOR + '99' : 'var(--border-subtle)'}`,
-        boxShadow: isDone && !isClaimed ? `0 4px 24px ${BOSS_COLOR}28` : 'none',
+        boxShadow: isDone && !isClaimed ? 'var(--shadow-md)' : 'none',
         opacity: isClaimed ? 0.65 : 1,
       }}
     >

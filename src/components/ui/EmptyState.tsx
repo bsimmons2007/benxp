@@ -49,7 +49,7 @@ export function EmptyState({ icon, title, sub, action, dashed = true }: EmptySta
           style={{
             background: 'var(--accent)',
             color: 'var(--base-bg)',
-            boxShadow: '0 0 20px var(--accent-dim)',
+            boxShadow: 'var(--shadow-sm)',
             letterSpacing: '0.03em',
           }}
         >

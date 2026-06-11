@@ -80,17 +80,17 @@ src/
 │       ├── LiftTrendChart.tsx
 │       └── VolumeTrendChart.tsx
 ├── hooks/
-│   ├── useAchievements.ts   # 100+ badge evaluations across all activity types; 5-min TTL
+│   ├── useAchievements.ts   # 100+ badge evaluations — pure useMemo over store rawRows
 │   ├── useAuth.ts
 │   ├── useCountUp.ts        # Animated number counter
 │   ├── usePageTitle.ts
 │   ├── usePullToRefresh.ts
-│   ├── useSkills.ts         # 6 skill trees with per-skill XP + level
-│   ├── useStats.ts          # Aggregated stats for Home dashboard chips
-│   ├── useStreak.ts         # Workout streak (17 queries, 5-min TTL)
-│   ├── useStrengthSnapshot.ts # Body strength scores (5-min TTL)
-│   ├── useTrends.ts         # Trend direction arrows for stat chips
-│   └── useUserName.ts
+│   ├── useSkills.ts         # 6 skill trees with per-skill XP + level; module cache keyed userId+XP
+│   ├── useStats.ts          # Reads stats from the store — no fetching
+│   ├── useStreak.ts         # Streaks (overall + sleep/gym/cardio) — pure useMemo over store rawRows
+│   ├── useUserName.ts
+│   ├── useWellnessScore.ts  # 0–100 wellness composite (sleep/activity/mood/water)
+│   └── useXP.ts             # Triggers store init(); returns totalXP/level/progress
 ├── lib/
 │   ├── challengeTemplates.ts # All quest template definitions — scaleTarget(), xpForTarget(), PROGRESS_FNS
 │   ├── challenges.ts        # Quest sync logic — syncUserChallenges, syncBossChallenges, getProgress, getBossProgress, reroll helpers, date helpers
@@ -152,30 +152,32 @@ src/
 
 ## XP & Leveling (`src/lib/xp.ts`)
 
-### XP Rates (`XP_RATES`)
+### XP Rates (`XP_RATES`) — key values (full list in `xp.ts`)
 | Activity | XP |
 |---|---|
 | Gym set | 15 |
 | Workout day bonus | 60 |
-| New PR | 250 |
-| Skate mile | 40 |
+| New PR | 200 |
+| Skate mile | 12 |
 | Book finished | 250 |
-| Fortnite win | 100 |
+| Fortnite win / blitz win / kill | 100 / 30 / 3 |
 | Sleep log | 20 |
-| Sleep quality bonus (7h+) | 30 |
-| Cardio per mile | 50 |
-| Mood log | 10 |
-| Water log | 5 |
+| Sleep quality bonus | 35 |
+| Cardio per mile (run/bike/swim/walk) | 15 / 6 / 25 / 4 |
+| Mood log | 15 |
+| Water goal reached (64oz) | 50 |
 | Quest completed | varies (stored in DB) |
+
+Plus per-sport rates (basketball, pickleball, golf, disc golf, hiking, table tennis, chess, volleyball, spikeball, pool) — see `XP_RATES` in `xp.ts`.
 
 ### Level formula
 ```ts
-level = Math.floor(1 + Math.sqrt(totalXP / 200))
+level = Math.floor(1 + Math.sqrt(totalXP / 150))
 ```
 
-### Level titles (100 tiers)
-1–5 Newcomer → 6–10 Initiate → 11–15 Apprentice → … → 96–100 Godlike
-Full list in `getLevelTitle()` in `xp.ts`.
+### Level titles (every 5 levels)
+1 Newcomer → 5 Rookie → 10 Contender → 15 Grinder → 20 Athlete → … → 100 Godlike
+Full list in `LEVEL_TITLES` in `xp.ts`.
 
 ### `fetchXPAndStats()`
 Single parallel fetch across all 22 Supabase tables. Returns `{ totalXP, level, stats }`. Called by `useStore.init()` and `DevSettings`.
@@ -308,16 +310,8 @@ The `challenges` table `notes` column stores the template key (e.g. `lift_sets_w
 - `init()`: loads from localStorage cache immediately (stale-while-revalidate), then fetches fresh via `fetchXPAndStats()`
 - `levelUpPending`: set when XP crosses a level threshold → triggers `LevelUpOverlay`
 
-### Key hooks & caches
-| Hook | Queries | Cache TTL |
-|---|---|---|
-| `useStrengthSnapshot` | 4 | 5 min |
-| `useStreak` | 17 | 5 min |
-| `useAchievements` | 18 | 5 min (keyed on XP+revision) |
-| `useTrends` | independent fetch | none |
-| `useSkills` | 6 | none |
-
-**Known redundancy**: `useAchievements`, `useStreak`, and `useTrends` all overlap with `fetchXPAndStats`. Merging into the store fetch would eliminate ~35 duplicate queries per session.
+### Key hooks
+The old per-hook query redundancy was eliminated: the store's `fetchXPAndStats()` fetch keeps the raw table rows (`rawRows`), and `useStreak` / `useAchievements` are now pure `useMemo` derivations over them — zero extra queries. `useStats`/`useXP` just read the store. `useSkills` fetches once per userId+totalXP (module cache). `useWellnessScore` still does its own small fetch.
 
 ---
 
@@ -383,6 +377,7 @@ Fix with binary replacement — text editors cannot reliably match these sequenc
 ---
 
 ## Known issues / future work
-- `useAchievements`, `useStreak`, `useTrends` make ~35 queries that overlap with `fetchXPAndStats` — merging would reduce cold-load fetches significantly
+- Many pages still call Supabase directly instead of going through hooks (~29 pages) — works fine, but contradicts the hooks convention below
+- Charts share `CHART_TOOLTIP_STYLE` from `lib/utils.ts` — use it for any new Recharts `<Tooltip contentStyle>`
 - Pages not yet fully redesigned to session-2 component treatment: Records, Books, Measurements, Goals, Pickleball, Golf, DiscGolf, Hiking, Skate, TableTennis, Chess, Volleyball, Spikeball, Pool, Profile, XPHistory, PRFeed, More
 - TypeScript check: `npx` not in PowerShell PATH — run `node node_modules/typescript/bin/tsc --noEmit` or use Bash

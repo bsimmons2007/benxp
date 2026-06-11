@@ -18,7 +18,7 @@ export function SkillCard({ skill }: SkillCardProps) {
         border: '1px solid var(--border-faint)',
         borderRadius: 14,
         padding: '14px 16px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+        boxShadow: 'var(--shadow-md)',
       }}
     >
       <div className="flex items-center justify-between mb-2">
