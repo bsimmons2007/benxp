@@ -73,7 +73,7 @@ export function Monthly() {
         supabase.from('pr_history').select('lift, est_1rm, date').eq('user_id', user.id).gte('date', start).lte('date', end).order('est_1rm', { ascending: false }),
         supabase.from('skate_sessions').select('miles, date').eq('user_id', user.id).gte('date', start).lte('date', end).order('miles', { ascending: false }),
         supabase.from('books').select('title, date_finished').eq('user_id', user.id).not('date_finished', 'is', null).gte('date_finished', start).lte('date_finished', end),
-        supabase.from('fortnite_games').select('date, kills, win').eq('user_id', user.id).gte('date', start).lte('date', end).order('kills', { ascending: false }),
+        supabase.from('fortnite_games').select('date, kills, win, mode').eq('user_id', user.id).gte('date', start).lte('date', end).order('kills', { ascending: false }),
         supabase.from('sleep_log').select('date, hours_slept').eq('user_id', user.id).gte('date', start).lte('date', end),
       ])
 
@@ -100,7 +100,11 @@ export function Monthly() {
       const prXP     = newPRs.length * XP_RATES.new_pr
       const bookXP   = booksRead.length * XP_RATES.book_finished
       const skateXP  = milesSkated * XP_RATES.skate_per_mile
-      const fnXP     = wins * XP_RATES.fortnite_win
+      const fnXP     = gameRows.reduce((s: number, r: { win: boolean; kills: number; mode?: string | null }) => {
+        const isBlitz = typeof r.mode === 'string' && r.mode.startsWith('Blitz')
+        const winXP   = r.win ? (isBlitz ? XP_RATES.fortnite_blitz_win : XP_RATES.fortnite_win) : 0
+        return s + winXP + (r.kills ?? 0) * XP_RATES.fortnite_kill
+      }, 0)
       const sleepXP  = sleepRows.reduce((s: number, r: { hours_slept: number | null }) =>
         s + XP_RATES.sleep_log + ((r.hours_slept ?? 0) >= 7 ? XP_RATES.sleep_quality_bonus : 0), 0)
       const xpEarned = Math.round(setXP + dayXP + prXP + bookXP + skateXP + fnXP + sleepXP)

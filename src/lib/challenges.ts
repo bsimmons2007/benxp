@@ -113,7 +113,7 @@ export function getSeen(period: 'weekly' | 'monthly', userId: string): string[] 
 // ── Activity detection ────────────────────────────────────────────
 
 export async function detectActiveSections(supabase: SupabaseClient, userId: string): Promise<Set<ActivitySection>> {
-  const checks: Array<[ActivitySection, () => Promise<number>]> = [
+  const checks: Array<[ActivitySection, () => PromiseLike<number>]> = [
     ['lifting',      () => supabase.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
     ['run',          () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'run').then(r => r.count ?? 0)],
     ['bike',         () => supabase.from('cardio_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('activity', 'bike').then(r => r.count ?? 0)],
@@ -137,7 +137,7 @@ export async function detectActiveSections(supabase: SupabaseClient, userId: str
     ['volleyball',   () => supabase.from('volleyball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
   ]
 
-  const results = await Promise.all(checks.map(([, fn]) => fn().catch(() => 0)))
+  const results = await Promise.all(checks.map(([, fn]) => Promise.resolve(fn()).catch(() => 0)))
   const active = new Set<ActivitySection>()
   checks.forEach(([section], i) => { if (results[i] > 0) active.add(section) })
   return active
@@ -147,7 +147,7 @@ export async function detectActiveSections(supabase: SupabaseClient, userId: str
 
 export async function fetchUserStats(supabase: SupabaseClient, userId: string): Promise<UserStats> {
   const [
-    liftingDates, liftingSets,
+    liftingRows,
     cardioAll,
     skateSessions,
     sleepLogs,
@@ -166,7 +166,6 @@ export async function fetchUserStats(supabase: SupabaseClient, userId: string): 
     tableTennisGames,
     volleyballSessions,
   ] = await Promise.all([
-    supabase.from('lifting_log').select('date').eq('user_id', userId).then(r => r.data ?? []),
     supabase.from('lifting_log').select('date').eq('user_id', userId).then(r => r.data ?? []),
     supabase.from('cardio_sessions').select('date, activity, distance_miles').eq('user_id', userId).then(r => r.data ?? []),
     supabase.from('skate_sessions').select('date, miles').eq('user_id', userId).then(r => r.data ?? []),
@@ -208,10 +207,10 @@ export async function fetchUserStats(supabase: SupabaseClient, userId: string): 
   }
 
   // lifting
-  const liftWeeks = weeksSpan(liftingDates as { date: string }[])
-  const liftDistinctDates = new Set((liftingDates as { date: string }[]).map(r => r.date)).size
+  const liftWeeks = weeksSpan(liftingRows as { date: string }[])
+  const liftDistinctDates = new Set((liftingRows as { date: string }[]).map(r => r.date)).size
   const liftAvgDays = liftDistinctDates / liftWeeks
-  const liftAvgSets = (liftingSets as { date: string }[]).length / liftWeeks
+  const liftAvgSets = (liftingRows as { date: string }[]).length / liftWeeks
 
   // cardio subsets
   type CardioRow = { date: string; activity: string; distance_miles: number }
@@ -475,7 +474,6 @@ export async function rerollChallenge(
 ): Promise<boolean> {
   if (!consumeReroll(period, userId)) return false
 
-  const activeSections = await detectActiveSections(supabase, userId)
   const stats = await fetchUserStats(supabase, userId)
 
   const currentTemplate = CHALLENGE_TEMPLATES.find(t => t.key === currentTemplateKey)

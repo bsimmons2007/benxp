@@ -536,7 +536,6 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       const entry = valid[i]
       await (async () => {
         const isTimed = entry.isTimed || TIMED_EXERCISES.has(entry.liftName)
-        const sets    = parseInt(entry.sets) || 1
         const reps    = isTimed ? 0 : (parseInt(entry.reps) || 0)
         const est1rm  = row.est_1rm as number | null
         let isPR      = false
@@ -555,7 +554,8 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
 
         rowResults.push({
           isPR,
-          xp:       sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0),
+          // XP engine awards per logged entry (row), not per the sets column
+          xp:       XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0),
           milestone,
           liftName: entry.liftName,
         })

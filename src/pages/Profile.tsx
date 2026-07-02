@@ -579,9 +579,11 @@ function useLifetimeStats() {
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
-      const memberSince = user?.created_at
+      if (!user) return
+      const memberSince = user.created_at
         ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
         : ''
+
 
       const [sets, miles, wins, books, prs] = await Promise.all([
         supabase.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
@@ -826,7 +828,7 @@ export function Profile() {
               <span>Lv {displayLevel}</span>
               <span>{totalXP.toLocaleString()} XP · Lv {level + 1}</span>
             </div>
-            <ProgressBar value={progress} height={5} glow />
+            <ProgressBar value={progress} height={5} />
             <p style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 4, textAlign: 'right' }}>
               {toNext.toLocaleString()} XP to next level
             </p>

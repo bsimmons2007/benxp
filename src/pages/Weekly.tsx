@@ -74,7 +74,7 @@ export function Weekly() {
         supabase.from('pr_history').select('lift, est_1rm, date').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
         supabase.from('skate_sessions').select('miles, date').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
         supabase.from('books').select('title, date_finished').eq('user_id', user.id).not('date_finished', 'is', null).gte('date_finished', monday).lte('date_finished', sunday),
-        supabase.from('fortnite_games').select('date, kills, win').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
+        supabase.from('fortnite_games').select('date, kills, win, mode').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
         supabase.from('sleep_log').select('date, hours_slept').eq('user_id', user.id).gte('date', monday).lte('date', sunday),
       ])
 
@@ -109,7 +109,11 @@ export function Weekly() {
       const prXP         = prRows.length * XP_RATES.new_pr
       const bookXP       = bookRows.length * XP_RATES.book_finished
       const skateXP      = totalMiles * XP_RATES.skate_per_mile
-      const fnXP         = wins * XP_RATES.fortnite_win
+      const fnXP         = gameRows.reduce((s: number, r: { win: boolean; kills: number; mode?: string | null }) => {
+        const isBlitz = typeof r.mode === 'string' && r.mode.startsWith('Blitz')
+        const winXP   = r.win ? (isBlitz ? XP_RATES.fortnite_blitz_win : XP_RATES.fortnite_win) : 0
+        return s + winXP + (r.kills ?? 0) * XP_RATES.fortnite_kill
+      }, 0)
       const sleepXP      = sleepRows.reduce((s: number, r: { hours_slept: number | null }) =>
         s + XP_RATES.sleep_log + ((r.hours_slept ?? 0) >= 7 ? XP_RATES.sleep_quality_bonus : 0), 0)
       const xpEarned     = Math.round(setXP + dayXP + prXP + bookXP + skateXP + fnXP + sleepXP)
@@ -123,9 +127,9 @@ export function Weekly() {
         ...sleepRows.map((r: { date: string }) => r.date),
       ])
       const activeSorted = [...activeDays].filter(Boolean).sort()
-      let streak = 0, cur = 0
-      for (let i = 0; i < activeSorted.length; i++) {
-        if (i === 0) { cur = 1; continue }
+      let streak = activeSorted.length > 0 ? 1 : 0
+      let cur = 1
+      for (let i = 1; i < activeSorted.length; i++) {
         const diff = (new Date(activeSorted[i]).getTime() - new Date(activeSorted[i - 1]).getTime()) / 86400000
         cur = diff === 1 ? cur + 1 : 1
         streak = Math.max(streak, cur)

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useStore } from '../store/useStore'
-import { localDateStr } from '../lib/utils'
+import { localDateStr, today as appToday } from '../lib/utils'
 
 export interface StreakData {
   current: number
@@ -53,7 +53,8 @@ export function useStreak(): StreakData {
       return { current: 0, longest: 0, activeToday: false, activeDays: new Set<string>(), loading: true, sleepCurrent: 0, sleepLongest: 0, gymCurrent: 0, gymLongest: 0, cardioCurrent: 0, cardioLongest: 0 }
     }
 
-    const today = localDateStr(new Date())
+    // App-wide 1AM day boundary — keeps streaks consistent with WeekDotStrip
+    const today = appToday()
 
     const allDates = new Set<string>([
       ...rawRows.liftingRows.map(r => r.date),
@@ -76,24 +77,7 @@ export function useStreak(): StreakData {
     ])
 
     const activeToday = allDates.has(today)
-    const startFrom   = activeToday ? today : prevDay(today)
-    let current = 0
-    if (allDates.has(startFrom)) {
-      let d = startFrom
-      while (allDates.has(d)) { current++; d = prevDay(d) }
-    }
-
-    const sorted = Array.from(allDates).sort((a, b) => b.localeCompare(a))
-    let longest = 0; let run = 0; let prev: string | null = null
-    for (const d of sorted) {
-      if (prev === null) { run = 1 }
-      else {
-        const gap = (new Date(prev + 'T12:00:00').getTime() - new Date(d + 'T12:00:00').getTime()) / 86400000
-        run = gap === 1 ? run + 1 : 1
-      }
-      if (run > longest) longest = run
-      prev = d
-    }
+    const { cur: current, long: longest } = calcStreakPair(allDates, today)
 
     const sleepDates   = new Set(rawRows.sleepRows.map(r => r.date))
     const gymDates     = new Set(rawRows.liftingRows.map(r => r.date))

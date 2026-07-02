@@ -38,10 +38,6 @@ export function permissionGranted(): boolean {
   return notificationsSupported() && Notification.permission === 'granted'
 }
 
-// ── Daily reminder check ──────────────────────────────────────────────────────
-// Call this on app load. Shows a notification if it's within 5 min of the
-// user's chosen reminder time AND they haven't been notified today yet.
-
 // ── Streak-break warning ──────────────────────────────────────────────────────
 // Call this after the streak loads if the user hasn't logged today yet.
 // Only fires when: streak ≥ 3, it's 6pm or later, and we haven't already

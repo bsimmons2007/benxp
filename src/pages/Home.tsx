@@ -606,7 +606,7 @@ export function Home() {
       if (!challenges?.length) return
       const progresses = await Promise.all(
         challenges.map((c: { notes: string | null; tier: string }) =>
-          getProgress(supabase, c.notes ?? '', c.tier as 'Weekly' | 'Monthly')
+          getProgress(supabase, c.notes ?? '', c.tier as 'Weekly' | 'Monthly', user.id)
         )
       )
       const count = challenges.filter((c: { target: string | null }, i: number) => {

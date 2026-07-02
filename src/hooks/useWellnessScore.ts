@@ -29,7 +29,7 @@ export function useWellnessScore(): WellnessScore {
       if (!user) { setScore({ ...empty, loading: false, error: null }); return }
 
       const cached = cacheMap.get(user.id)
-      if (cached && Date.now() - cached.ts < TTL) { setScore(cached.data); return }
+      if (cached && Date.now() - cached.ts < TTL) { if (!cancelled) setScore(cached.data); return }
 
       const now   = new Date()
       const dow   = now.getDay()
@@ -39,7 +39,7 @@ export function useWellnessScore(): WellnessScore {
       const weekStart = localDateStr(monday)
 
       const [sleepRes, liftRes, moodRes, waterRes] = await Promise.all([
-        supabase.from('sleep_log').select('hours_slept, date').eq('user_id', user.id).gte('date', weekStart),
+        supabase.from('sleep_log').select('hours_slept, date').eq('user_id', user.id).eq('is_nap', false).gte('date', weekStart),
         supabase.from('lifting_log').select('date').eq('user_id', user.id).gte('date', weekStart),
         supabase.from('mood_log').select('mood, date').eq('user_id', user.id).gte('date', weekStart),
         supabase.from('water_log').select('oz, date').eq('user_id', user.id).gte('date', weekStart),
@@ -71,8 +71,12 @@ export function useWellnessScore(): WellnessScore {
         : 0
       const moodScore = Math.min(Math.round((moodAvg / 10) * 20), 20)
 
-      const waterAvg = waterRows.length
-        ? waterRows.reduce((s, r) => s + (r.oz ?? 0), 0) / waterRows.length
+      // Group by day — multiple logs per day must sum toward the 64oz goal, not dilute the average
+      const ozByDay: Record<string, number> = {}
+      for (const r of waterRows) ozByDay[r.date] = (ozByDay[r.date] ?? 0) + (r.oz ?? 0)
+      const waterDays = Object.values(ozByDay)
+      const waterAvg = waterDays.length
+        ? waterDays.reduce((s, oz) => s + oz, 0) / waterDays.length
         : 0
       const waterScore = Math.min(Math.round((waterAvg / 64) * 10), 10)
 

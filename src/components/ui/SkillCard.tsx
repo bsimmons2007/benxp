@@ -39,7 +39,7 @@ export function SkillCard({ skill }: SkillCardProps) {
         </div>
       </div>
 
-      <ProgressBar value={skill.progress} height={4} glow />
+      <ProgressBar value={skill.progress} height={4} />
 
       <div className="flex justify-between mt-1.5">
         <p style={{ color: 'var(--text-muted)', fontSize: 10 }}>{skill.xp.toLocaleString()} XP</p>

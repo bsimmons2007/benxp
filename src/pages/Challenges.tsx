@@ -654,7 +654,7 @@ export function Challenges() {
 
   useEffect(() => { load() }, [])
 
-  async function handleClaim(id: string, xp: number) {
+  async function handleClaim(id: string, _xp: number) {
     const { error } = await supabase.from('challenges')
       .update({ status: 'claimed', completed_at: new Date().toISOString() })
       .eq('id', id)

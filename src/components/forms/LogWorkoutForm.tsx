@@ -132,7 +132,8 @@ export function LogWorkoutForm() {
       .from('lifting_log').select('id', { count: 'exact', head: true })
       .eq('user_id', user.id).eq('date', data.date).neq('id', inserted.id)
     const isFirstSetToday = (prevTodaySets ?? 0) === 0
-    const xpEarned = sets * XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0) + (isFirstSetToday ? XP_RATES.workout_day : 0)
+    // XP engine awards per logged entry (row), not per the sets column — keep the toast honest
+    const xpEarned = XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0) + (isFirstSetToday ? XP_RATES.workout_day : 0)
     setToast(`+${xpEarned} XP${isPR ? ' — New PR!' : ''}${isFirstSetToday ? ' 🏋️' : ''}`)
     await refreshXP()
 

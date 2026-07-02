@@ -16,7 +16,11 @@ export function useAuth() {
     // auth state change (token refresh, sign-out) is missed between the
     // getSession() call and its resolution (P1-8 fix).
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) setSession(session)
+      if (!mounted) return
+      setSession(session)
+      // A session arriving late (e.g. after the timeout fired) supersedes any
+      // stale timeout error — otherwise ProtectedRoute bounces a valid session to /login
+      if (session) { setError(null); setLoading(false) }
     })
 
     const timeout = setTimeout(() => {
@@ -30,7 +34,7 @@ export function useAuth() {
       .then(({ data: { session }, error: err }) => {
         if (!mounted) return
         clearTimeout(timeout)
-        if (err) setError(err)
+        setError(err ?? null)
         setSession(session)
         setLoading(false)
       })

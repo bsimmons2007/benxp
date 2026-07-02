@@ -40,4 +40,7 @@ export function setupOfflineQueue() {
   window.addEventListener('online', () => {
     flushQueue().catch(console.error)
   })
+  // Flush anything queued from a previous offline session — the 'online'
+  // event never fires if the app starts already online
+  if (navigator.onLine) flushQueue().catch(console.error)
 }

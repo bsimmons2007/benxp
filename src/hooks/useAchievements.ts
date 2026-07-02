@@ -61,7 +61,7 @@ function evaluate(data: RawData): Badge[] {
   const totalWins         = gameRows.filter(r => r.win).length
   const totalGames        = gameRows.length
   const totalKills        = gameRows.reduce((s, r) => s + (r.kills ?? 0), 0)
-  const completedChallenges = challengeRows.filter(r => r.status === 'completed').length
+  const completedChallenges = challengeRows.filter(r => r.status === 'completed' || r.status === 'claimed').length
   const goodSleepNights   = sleepRows.filter(r => (r.hours_slept ?? 0) >= 7).length
   const totalSleepLogs    = sleepRows.length
   const totalSleepHours   = sleepRows.reduce((s, r) => s + (r.hours_slept ?? 0), 0)
@@ -127,12 +127,14 @@ function evaluate(data: RawData): Badge[] {
     ? accuracyGames.reduce((s, r) => s + (r.accuracy ?? 0), 0) / accuracyGames.length
     : 0
 
-  const firstLiftDate  = liftingRows[liftingRows.length - 1]?.date
-  const firstSkateDate = skateRows[skateRows.length - 1]?.date
+  const firstLiftDate  = liftingRows.length ? [...liftingRows].sort((a, b) => a.date.localeCompare(b.date))[0].date : undefined
+  const firstSkateDate = skateRows.length ? [...skateRows].sort((a, b) => a.date.localeCompare(b.date))[0].date : undefined
   const firstBookDate  = bookRows.filter(r => r.date_finished).sort((a, b) =>
     (a.date_finished ?? '').localeCompare(b.date_finished ?? ''))[0]?.date_finished ?? undefined
-  const firstGameDate  = gameRows[gameRows.length - 1]?.date
-  const firstSleepDate = sleepRows[sleepRows.length - 1]?.date
+  const firstGameDate  = gameRows.some(r => r.win)
+    ? [...gameRows.filter(r => r.win)].sort((a, b) => a.date.localeCompare(b.date))[0].date
+    : undefined
+  const firstSleepDate = sleepRows.length ? [...sleepRows].sort((a, b) => a.date.localeCompare(b.date))[0].date : undefined
 
   // ── Basketball ────────────────────────────────────────────────
   const bbSessions     = bbRows.length

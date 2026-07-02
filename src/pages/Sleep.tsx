@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, type FormEvent, type CSSProperties } from 'react'
+﻿import { useEffect, useState, type FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { XP_RATES } from '../lib/xp'
 import { useStore } from '../store/useStore'
