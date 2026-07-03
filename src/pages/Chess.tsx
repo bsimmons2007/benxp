@@ -9,8 +9,11 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
+import { HistoryControls, useHistoryFilter } from '../components/ui/HistoryControls'
 import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
+import { getLastUsed, setLastUsed } from '../lib/lastUsed'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
@@ -49,18 +52,20 @@ interface ChessForm {
 function LogChessPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
+  const [showDetails, setShowDetails] = useState(false)
   const [result, setResult] = useState<typeof RESULTS[number] | null>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<ChessForm>({
-    defaultValues: { date: today(), rating_after: '', time_control: 'Blitz', color: 'White', opponent: '', opening: '', notes: '' },
+    defaultValues: { date: today(), rating_after: '', time_control: getLastUsed('chess-time_control', 'Blitz'), color: getLastUsed('chess-color', 'White'), opponent: '', opening: '', notes: '' },
   })
 
   const onSubmit = async (data: ChessForm) => {
     if (!result) return
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error } = await supabase.from('chess_games').insert({
+    const { data: inserted, error } = await supabase.from('chess_games').insert({
       user_id:      user.id,
       date:         data.date,
       result,
@@ -70,17 +75,25 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
       opponent:     data.opponent || null,
       opening:      data.opening  || null,
       notes:        data.notes    || null,
-    })
-    if (error) { setToast('Failed to save — try again'); return }
+    }).select('id').single()
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
+    setLastUsed('chess-time_control', data.time_control)
+    setLastUsed('chess-color', data.color)
     const xp = XP_RATES.chess_game
       + (result === 'win'  ? XP_RATES.chess_win  : 0)
       + (result === 'draw' ? XP_RATES.chess_draw : 0)
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('chess_games').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     if (result === 'win')  { playPR();     setToast(`+${xp} XP — Checkmate!`) }
     else if (result === 'draw') { playXPGain(); setToast(`+${xp} XP — Draw logged`) }
     else                        { playXPGain(); setToast(`+${xp} XP — Game logged`) }
     await refreshXP(); refreshActivity()
-    reset({ date: today(), rating_after: '', time_control: 'Blitz', color: 'White', opponent: '', opening: '', notes: '' })
+    reset({ date: today(), rating_after: '', time_control: data.time_control, color: data.color, opponent: '', opening: '', notes: '' })
     setResult(null)
+    setShowDetails(false)
     setOpen(false); onLogged()
   }
 
@@ -97,8 +110,6 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
       {open && (
         <Card className="mt-3 pop-in">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <Input label="Date" type="date" {...register('date', { required: true })} />
-
             {/* Required result — no default */}
             <div className="flex flex-col gap-2">
               <label className="section-label">Result</label>
@@ -142,16 +153,29 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
               </div>
             </div>
 
-            <Input label="Rating after game (optional)" type="number" placeholder="1240" {...register('rating_after')} />
-            <Input label="Opponent (optional)" type="text" placeholder="GrandmasterFox" {...register('opponent')} />
-            <Input label="Opening (optional)" type="text" placeholder="Sicilian Defense" {...register('opening')} />
-            <Input label="Notes (optional)" type="text" placeholder="Blundered the queen on move 22…" {...register('notes')} />
+            <button
+              type="button"
+              onClick={() => setShowDetails(v => !v)}
+              style={{ alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', fontSize: 12, fontWeight: 600, padding: 0 }}
+            >
+              {showDetails ? 'Hide details' : 'Add details...'}
+            </button>
+
+            {showDetails && (
+              <>
+                <Input label="Date" type="date" {...register('date', { required: true })} />
+                <Input label="Rating after game (optional)" type="number" placeholder="1240" {...register('rating_after')} />
+                <Input label="Opponent (optional)" type="text" placeholder="GrandmasterFox" {...register('opponent')} />
+                <Input label="Opening (optional)" type="text" placeholder="Sicilian Defense" {...register('opening')} />
+                <Input label="Notes (optional)" type="text" placeholder="Blundered the queen on move 22…" {...register('notes')} />
+              </>
+            )}
 
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting || !result}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
         </Card>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }
@@ -215,17 +239,21 @@ export function Chess() {
   const [editing, setEditing] = useState<ChessGame | null>(null)
   const [tcFilter, setTcFilter] = useState<string | null>(null)
   const [visible, setVisible] = useState(PAGE_SIZE)
+  const [loadError, setLoadError] = useState(false)
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('chess_games').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    const { data, error } = await supabase.from('chess_games').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    if (error) { setLoadError(true); return }
     setGames(data ?? [])
   }
   useEffect(() => { load() }, [])
 
-  const filtered = tcFilter ? games.filter(g => g.time_control === tcFilter) : games
-  useEffect(() => { setVisible(PAGE_SIZE) }, [tcFilter])
+  const tcFiltered = tcFilter ? games.filter(g => g.time_control === tcFilter) : games
+  const { search, setSearch, range, setRange, filtered } = useHistoryFilter(tcFiltered, ['opponent', 'opening', 'notes', 'time_control'])
+  useEffect(() => { setVisible(PAGE_SIZE) }, [tcFilter, search, range])
   const wins     = filtered.filter(g => g.result === 'win').length
   const draws    = filtered.filter(g => g.result === 'draw').length
   const losses   = filtered.filter(g => g.result === 'loss').length
@@ -347,6 +375,9 @@ export function Chess() {
         )}
 
         {/* History */}
+        {games.length > 5 && (
+          <HistoryControls search={search} onSearch={setSearch} range={range} onRange={setRange} placeholder="Search opponent, opening, notes..." />
+        )}
         {filtered.length > 0 && <p className="section-label mb-3">Game History</p>}
         {shown.map(g => (
           <Card key={g.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
@@ -391,12 +422,25 @@ export function Chess() {
           </button>
         )}
 
-        {games.length === 0 && (
+        {loadError && games.length === 0 && (
+          <ErrorState
+            icon={<ChessIcon size={56} color="var(--text-muted)" />}
+            title="Could not load games"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+
+        {!loadError && games.length === 0 && (
           <EmptyState
             icon={<ChessIcon size={56} color="var(--text-muted)" />}
             title="No games logged yet"
             sub="Log games and your rating to track your ELO progression over time."
           />
+        )}
+
+        {!loadError && games.length > 0 && filtered.length === 0 && (
+          <p className="text-center py-8" style={{ color: 'var(--text-muted)', fontSize: 13 }}>No games match your search.</p>
         )}
 
         {editing && <EditChessModal game={editing} onClose={() => setEditing(null)} onSaved={load} />}

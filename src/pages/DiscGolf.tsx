@@ -8,6 +8,8 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
+import { HistoryControls, useHistoryFilter } from '../components/ui/HistoryControls'
 import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
@@ -158,14 +160,20 @@ export function DiscGolf() {
   const [rounds,  setRounds]  = useState<DiscGolfRound[]>([])
   const [editing, setEditing] = useState<DiscGolfRound | null>(null)
   const [visible, setVisible] = useState(PAGE_SIZE)
+  const [loadError, setLoadError] = useState(false)
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('disc_golf_rounds').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    const { data, error } = await supabase.from('disc_golf_rounds').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    if (error) { setLoadError(true); return }
     setRounds(data ?? [])
   }
   useEffect(() => { load() }, [])
+
+  const { search, setSearch, range, setRange, filtered } = useHistoryFilter(rounds, ['course', 'notes'])
+  useEffect(() => { setVisible(PAGE_SIZE) }, [search, range])
 
   const diffs    = rounds.map(r => r.score - r.par)
   const bestDiff = rounds.length ? Math.min(...diffs) : null
@@ -238,8 +246,11 @@ export function DiscGolf() {
         )}
 
         {/* History */}
-        {rounds.length > 0 && <p className="section-label mb-3">Round History</p>}
-        {rounds.slice(0, visible).map(r => {
+        {rounds.length > 5 && (
+          <HistoryControls search={search} onSearch={setSearch} range={range} onRange={setRange} placeholder="Search course, notes..." />
+        )}
+        {filtered.length > 0 && <p className="section-label mb-3">Round History</p>}
+        {filtered.slice(0, visible).map(r => {
           const diff = r.score - r.par
           return (
             <Card key={r.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
@@ -269,23 +280,36 @@ export function DiscGolf() {
           )
         })}
 
-        {rounds.length > visible && (
+        {filtered.length > visible && (
           <button
             type="button"
             onClick={() => setVisible(v => v + LOAD_MORE)}
             className="w-full py-3 rounded-xl font-semibold mt-1"
             style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
           >
-            Show more ({rounds.length - visible} left)
+            Show more ({filtered.length - visible} left)
           </button>
         )}
 
-        {rounds.length === 0 && (
+        {loadError && rounds.length === 0 && (
+          <ErrorState
+            icon={<DiscIcon size={56} color="var(--text-muted)" />}
+            title="Could not load rounds"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+
+        {!loadError && rounds.length === 0 && (
           <EmptyState
             icon={<DiscIcon size={56} color="var(--text-muted)" />}
             title="No rounds logged yet"
             sub="Log your first disc golf round to start tracking scores."
           />
+        )}
+
+        {!loadError && rounds.length > 0 && filtered.length === 0 && (
+          <p className="text-center py-8" style={{ color: 'var(--text-muted)', fontSize: 13 }}>No rounds match your search.</p>
         )}
 
         {editing && <EditDiscGolfModal round={editing} onClose={() => setEditing(null)} onSaved={load} />}

@@ -11,6 +11,7 @@ import { EditModal } from '../components/ui/EditModal'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip } from '../lib/utils'
+import { getLastUsed, setLastUsed } from '../lib/lastUsed'
 import { useStore } from '../store/useStore'
 import { playXPGain } from '../lib/sounds'
 import { ActivityIconComp, EditIcon, ZapIcon } from '../components/ui/Icon'
@@ -18,6 +19,8 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import { useStreak } from '../hooks/useStreak'
 import { ChartSkeleton, ChartEmptyState } from '../components/ui/Skeleton'
 import { FirstUseTip } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
+import { HistoryControls, useHistoryFilter } from '../components/ui/HistoryControls'
 
 const SPLITS_KEY = 'youxp-run-splits'
 function getSplitsMap(): Record<string, string[]> {
@@ -85,11 +88,12 @@ interface CardioForm {
 function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
   const [open, setOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo, setUndo]   = useState<(() => void) | null>(null)
   const refreshXP             = useStore(s => s.refreshXP)
   const refreshActivity       = useStore(s => s.refreshActivity)
   const addOptimisticActivity = useStore(s => s.addOptimisticActivity)
   const { register, handleSubmit, watch, reset, formState: { isSubmitting } } = useForm<CardioForm>({
-    defaultValues: { date: today(), activity: 'run', distance: '', duration_mins: '', fastest_mile: '', notes: '', splits: '' },
+    defaultValues: { date: today(), activity: getLastUsed('cardio-type', 'run') as ActivityKey, distance: '', duration_mins: '', fastest_mile: '', notes: '', splits: '' },
   })
   const activity = watch('activity')
   const isSkate  = activity === 'skate'
@@ -102,15 +106,19 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
     if (!isFinite(miles) || miles <= 0) return
     if (miles > 100) { setToast('⚠️ That distance looks unusually large — check the value before saving.'); return }
 
+    setLastUsed('cardio-type', data.activity)
+    let insertedTable = 'cardio_sessions'
+    let insertedId: string | null = null
     if (isSkate) {
-      const { error } = await supabase.from('skate_sessions').insert({
+      const { data: inserted, error } = await supabase.from('skate_sessions').insert({
         user_id: user.id,
         date: data.date,
         miles,
         duration: data.duration_mins ? `${data.duration_mins}m` : null,
         fastest_mile: data.fastest_mile ? parseFloat(data.fastest_mile) : null,
-      })
-      if (error) { setToast('Failed to save. Please try again.'); return }
+      }).select('id').single()
+      if (error || !inserted) { setToast('Failed to save. Please try again.'); return }
+      insertedTable = 'skate_sessions'; insertedId = inserted.id
     } else {
       const { data: inserted, error } = await supabase.from('cardio_sessions').insert({
         user_id: user.id,
@@ -120,8 +128,9 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
         duration_mins: data.duration_mins ? parseInt(data.duration_mins) : null,
         notes: data.notes || null,
       }).select('id').single()
-      if (error) { setToast('Failed to save. Please try again.'); return }
-      if (inserted && data.splits.trim() && data.activity === 'run') {
+      if (error || !inserted) { setToast('Failed to save. Please try again.'); return }
+      insertedId = inserted.id
+      if (data.splits.trim() && data.activity === 'run') {
         saveSplitsForSession(inserted.id, data.splits)
       }
     }
@@ -131,6 +140,10 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
       : Math.round(miles * cardioRate(data.activity))
     const { label } = activityMeta(data.activity)
     playXPGain()
+    setUndo(() => async () => {
+      await supabase.from(insertedTable).delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     setToast(`+${xp} XP — ${label} logged!`)
     addOptimisticActivity({ type: 'cardio', label: `${miles.toFixed(2)} mi ${label.toLowerCase()}`, date: data.date, icon: data.activity })
     await refreshXP()
@@ -196,7 +209,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }
@@ -319,7 +332,8 @@ export function Cardio() {
   useEffect(() => { load() }, [])
 
   const filtered  = filter === 'all' ? sessions : sessions.filter(s => s.activity === filter)
-  useEffect(() => { setVisible(10) }, [filter])
+  const hist      = useHistoryFilter(filtered, ['notes', 'activity'])
+  useEffect(() => { setVisible(10) }, [filter, hist.search, hist.range])
   const totalMiles = sessions.reduce((s, r) => s + r.distance, 0)
   const totalXP    = sessions.reduce((s, r) => s + sessionXP(r), 0)
 
@@ -350,16 +364,13 @@ export function Cardio() {
       <TopBar title="Cardio" />
       <PageWrapper>
 
-        {loadError && (
-          <div className="flex flex-col items-center py-12 gap-3 fade-in">
-            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Could not load sessions</p>
-            <button
-              onClick={load}
-              style={{ padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}
-            >
-              Try again
-            </button>
-          </div>
+        {loadError && sessions.length === 0 && (
+          <ErrorState
+            icon={<ActivityIconComp activityKey="run" size={56} color="var(--text-muted)" />}
+            title="Could not load sessions"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
         )}
 
         {/* Stats */}
@@ -501,10 +512,13 @@ export function Cardio() {
         )}
 
         {/* Session history */}
+        {sessions.length > 5 && (
+          <HistoryControls search={hist.search} onSearch={hist.setSearch} range={hist.range} onRange={hist.setRange} placeholder="Search notes, type..." />
+        )}
         {filtered.length > 0 ? (
           <Card noPadding className="overflow-hidden">
             <p className="px-4 pt-4 pb-2 font-bold" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Sessions</p>
-            {filtered.slice(0, visible).map(s => {
+            {hist.filtered.slice(0, visible).map(s => {
               const pace = s.duration_mins && s.distance ? (s.duration_mins / s.distance).toFixed(1) : null
               return (
                 <div key={`${s.source}-${s.id}`} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
@@ -548,15 +562,18 @@ export function Cardio() {
                 </div>
               )
             })}
-            {filtered.length > visible && (
+            {hist.filtered.length > visible && (
               <button
                 type="button"
                 onClick={() => setVisible(v => v + 20)}
                 className="w-full py-3 font-semibold"
                 style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: 'none', borderTop: '1px solid var(--border-faint)', fontSize: 14, cursor: 'pointer' }}
               >
-                Show more ({filtered.length - visible} left)
+                Show more ({hist.filtered.length - visible} left)
               </button>
+            )}
+            {hist.filtered.length === 0 && (
+              <p className="text-center py-6" style={{ color: 'var(--text-muted)', fontSize: 13 }}>No sessions match your search.</p>
             )}
           </Card>
         ) : (

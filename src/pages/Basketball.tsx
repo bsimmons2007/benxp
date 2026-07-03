@@ -18,6 +18,7 @@ import { XP_RATES } from '../lib/xp'
 import type { BasketballSession } from '../types'
 import { BasketballIcon, TrophyIcon, StarIcon, TrendingIcon, EditIcon } from '../components/ui/Icon'
 import { EditModal } from '../components/ui/EditModal'
+import { ErrorState } from '../components/ui/ErrorState'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const PAGE_SIZE = 10
@@ -306,23 +307,27 @@ export function Basketball() {
   usePageTitle('Basketball')
   const [sessions, setSessions] = useState<BasketballSession[]>([])
   const [loading,  setLoading]  = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [editing,  setEditing]  = useState<BasketballSession | null>(null)
   const [visible,  setVisible]  = useState(PAGE_SIZE)
 
   const load = async () => {
     setLoading(true)
+    setLoadError(false)
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('basketball_sessions')
         .select('*')
         .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(100)
+      if (error) { setLoadError(true); return }
       setSessions((data as BasketballSession[]) ?? [])
     } catch (e) {
       console.error('Basketball load error:', e)
+      setLoadError(true)
     } finally {
       setLoading(false)
     }
@@ -396,7 +401,16 @@ export function Basketball() {
           <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 40 }}>Loading…</p>
         )}
 
-        {!loading && totalSessions === 0 && (
+        {!loading && loadError && totalSessions === 0 && (
+          <ErrorState
+            icon={<BasketballIcon size={48} color="var(--text-muted)" />}
+            title="Could not load sessions"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+
+        {!loading && !loadError && totalSessions === 0 && (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
             <BasketballIcon size={48} color="var(--text-dim)" />
             <p style={{ color: 'var(--text-muted)', marginTop: 12, fontSize: 14 }}>No sessions yet — log your first game!</p>

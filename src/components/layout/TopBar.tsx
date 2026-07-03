@@ -1,18 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useNavStore } from '../../store/useNavStore'
 import { Wordmark } from '../brand/Wordmark'
-import { DumbbellIcon, MoonIcon, BrainIcon, DropletIcon, RunIcon, type IconComponent } from '../ui/Icon'
 
 const LOGO_ANIMATED_KEY = 'youxp-logo-animated'
-
-const LOG_MENU: { label: string; Icon: IconComponent; to: string }[] = [
-  { label: 'Lifting', Icon: DumbbellIcon, to: '/lifting' },
-  { label: 'Cardio',  Icon: RunIcon,      to: '/cardio'  },
-  { label: 'Sleep',   Icon: MoonIcon,     to: '/sleep'   },
-  { label: 'Mind',    Icon: BrainIcon,    to: '/mood'    },
-  { label: 'Water',   Icon: DropletIcon,  to: '/water'   },
-]
 
 interface TopBarProps {
   title?:        string
@@ -25,9 +16,9 @@ interface TopBarProps {
 export function TopBar({ title, hideSettings = false, back = false, backTo, logButton = false }: TopBarProps) {
   const navigate      = useNavigate()
   const toggleNav     = useNavStore(s => s.toggleNav)
+  const openQuickLog  = useNavStore(s => s.openQuickLog)
   const logoClickable = !title
 
-  const [showLogMenu,    setShowLogMenu]    = useState(false)
   const [logoShimmer,    setLogoShimmer]    = useState(false)
   const [logoShimmerKey, setLogoShimmerKey] = useState(0)
   const logoDrawIn = useMemo(() => {
@@ -35,21 +26,11 @@ export function TopBar({ title, hideSettings = false, back = false, backTo, logB
     if (!done) { sessionStorage.setItem(LOGO_ANIMATED_KEY, '1'); return true }
     return false
   }, [])
-  const logMenuRef = useRef<HTMLDivElement>(null)
 
   const [showHint, setShowHint] = useState(false)
   useEffect(() => {
     if (!back && !localStorage.getItem('youxp-nav-opened')) setShowHint(true)
   }, [back])
-
-  useEffect(() => {
-    if (!showLogMenu) return
-    function handle(e: MouseEvent) {
-      if (logMenuRef.current && !logMenuRef.current.contains(e.target as Node)) setShowLogMenu(false)
-    }
-    document.addEventListener('mousedown', handle)
-    return () => document.removeEventListener('mousedown', handle)
-  }, [showLogMenu])
 
   function handleLeft() {
     if (back) {
@@ -151,10 +132,11 @@ export function TopBar({ title, hideSettings = false, back = false, backTo, logB
 
       {/* Right */}
       {logButton ? (
-        <div ref={logMenuRef} style={{ position: 'relative', flexShrink: 0 }}>
+        <div style={{ position: 'relative', flexShrink: 0 }}>
           <button
-            onClick={() => setShowLogMenu(v => !v)}
-            aria-label="Log activity"
+            data-tutorial="log-btn"
+            onClick={() => openQuickLog('open')}
+            aria-label="Quick log activity"
             style={{
               width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: 'var(--accent)', border: 'none', cursor: 'pointer', borderRadius: 10,
@@ -164,33 +146,6 @@ export function TopBar({ title, hideSettings = false, back = false, backTo, logB
               <path d="M8 3v10M3 8h10" stroke="var(--base-bg)" strokeWidth="2.2" strokeLinecap="round" />
             </svg>
           </button>
-          {showLogMenu && (
-            <div className="pop-in" style={{
-              position: 'absolute', top: 44, right: 0, zIndex: 200,
-              background: 'var(--card-bg)', border: '1px solid var(--border)',
-              borderRadius: 14, padding: '6px', minWidth: 160,
-              boxShadow: 'var(--card-shadow)',
-            }}>
-              {LOG_MENU.map(item => (
-                <button
-                  key={item.to}
-                  onClick={() => { setShowLogMenu(false); navigate(item.to) }}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    width: '100%', padding: '10px 12px', borderRadius: 10,
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    color: 'var(--text-primary)', fontSize: 14, fontWeight: 500,
-                    textAlign: 'left',
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--input-bg)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-                >
-                  <item.Icon size={18} />
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       ) : !hideSettings ? (
         <button

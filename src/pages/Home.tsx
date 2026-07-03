@@ -26,6 +26,8 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { useWellnessScore } from '../hooks/useWellnessScore'
 import { getPref, setPref } from '../lib/prefs'
+import { TodayCard } from '../components/TodayCard'
+import { OnThisDayCard } from '../components/OnThisDayCard'
 
 // ── Types ─────────────────────────────────────────────────────
 type TrendDir = 'up' | 'down' | 'flat'
@@ -851,6 +853,12 @@ export function Home() {
 
         {/* ── Week Dot Strip ── */}
         <WeekDotStrip streak={streak} />
+
+        {/* ── Today checklist ── */}
+        <TodayCard />
+
+        {/* ── On This Day ── */}
+        <OnThisDayCard />
 
         {/* ── Weekly Wellness ── */}
         <WellnessWidget />
