@@ -204,7 +204,7 @@ function XPEngine() {
 
   const level   = calculateLevel(data.total)
   const toNext  = xpForLevel(level + 1) - data.total
-  const formula = `level = floor(1 + sqrt(totalXP / 200))`
+  const formula = `level = floor(1 + sqrt(totalXP / 150)), flat +8550/level past 30`
 
   const visibleEntries = filter
     ? data.entries.filter(e => e.category === filter)

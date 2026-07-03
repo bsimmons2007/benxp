@@ -6,11 +6,11 @@ import { useStore } from '../store/useStore'
  * All consumers share the same cached XP/level data.
  */
 export function useXP() {
-  const { totalXP, level, progress, loading, refreshXP, init, initialized } = useStore()
+  const { totalXP, seasonXP, level, progress, loading, refreshXP, init, initialized } = useStore()
 
   useEffect(() => {
     if (!initialized) init()
   }, [initialized, init])
 
-  return { totalXP, level, progress, loading, refreshXP }
+  return { totalXP, seasonXP, level, progress, loading, refreshXP }
 }

@@ -30,6 +30,7 @@ const DEFAULT_STATS: AppStats = {
 interface AppState {
   // XP / level
   totalXP:        number
+  seasonXP:       number
   level:          number
   progress:       number
   loading:        boolean
@@ -65,6 +66,7 @@ interface AppState {
 
 export const useStore = create<AppState>((set, get) => ({
   totalXP:        0,
+  seasonXP:       0,
   level:          1,
   progress:       0,
   loading:        true,
@@ -90,6 +92,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   reset: () => set({
     totalXP:        0,
+    seasonXP:       0,
     level:          1,
     progress:       0,
     loading:        true,
@@ -124,6 +127,7 @@ export const useStore = create<AppState>((set, get) => ({
       const cachedLevel = calculateLevel(cached.totalXP)
       set({
         totalXP:  cached.totalXP,
+        seasonXP: cached.seasonXP ?? 0,
         level:    cachedLevel,
         progress: levelProgress(cached.totalXP),
         stats:    cached.stats,
@@ -139,12 +143,12 @@ export const useStore = create<AppState>((set, get) => ({
     }, 10_000)
 
     try {
-      const [userData, { totalXP, stats, rawRows }] = await Promise.all([
+      const [userData, { totalXP, seasonXP, stats, rawRows }] = await Promise.all([
         fetchUser(),
         fetchXPAndStats(supabase, userId),
       ])
       clearTimeout(safetyTimer)
-      setCachedXPData(userId, { totalXP, stats })
+      setCachedXPData(userId, { totalXP, seasonXP, stats })
       const now = Date.now()
 
       const level    = calculateLevel(totalXP)
@@ -152,6 +156,7 @@ export const useStore = create<AppState>((set, get) => ({
 
       set({
         totalXP,
+        seasonXP,
         level,
         progress:       levelProgress(totalXP),
         loading:        false,
@@ -181,12 +186,13 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { set({ _refreshingXP: false }); return }
-      const { totalXP, stats, rawRows } = await fetchXPAndStats(supabase, user.id)
-      setCachedXPData(user.id, { totalXP, stats })
+      const { totalXP, seasonXP, stats, rawRows } = await fetchXPAndStats(supabase, user.id)
+      setCachedXPData(user.id, { totalXP, seasonXP, stats })
       const level    = calculateLevel(totalXP)
       const lastSeen = parseInt(localStorage.getItem(LS_LEVEL_KEY) ?? '1', 10) || 1
       set({
         totalXP,
+        seasonXP,
         level,
         progress:       levelProgress(totalXP),
         loading:        false,

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { animate } from 'animejs'
 import { animateStreakDots, animateWidgets } from '../lib/animations'
 import { StreakFire } from '../components/ui/StreakFire'
+import { FreezeTokens } from '../components/ui/FreezeTokens'
 import { Link } from 'react-router-dom'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { TopBar } from '../components/layout/TopBar'
@@ -15,7 +16,7 @@ import { useStore } from '../store/useStore'
 import { formatDate, toRoman, localDateStr, today as appToday } from '../lib/utils'
 import { ArrowUpIcon, ArrowDownIcon, ActivityIconComp, ZapIcon } from '../components/ui/Icon'
 import { SecondaryStatSkeleton, ActivityRowSkeleton } from '../components/ui/Skeleton'
-import { xpForLevel, getLevelTitle, XP_RATES, deriveTrendsFromRawRows } from '../lib/xp'
+import { xpForLevel, getLevelTitle, XP_RATES, deriveTrendsFromRawRows, seasonLevel } from '../lib/xp'
 import type { TrendResult } from '../lib/xp'
 import { checkStreakBreakWarning } from '../lib/notifications'
 import { supabase } from '../lib/supabase'
@@ -24,12 +25,12 @@ import { useStrengthSnapshot } from '../components/StrengthTab'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { useWellnessScore } from '../hooks/useWellnessScore'
+import { getPref, setPref } from '../lib/prefs'
 
 // ── Types ─────────────────────────────────────────────────────
 type TrendDir = 'up' | 'down' | 'flat'
 
 // ── Stat picker config ────────────────────────────────────────
-const HOME_STATS_KEY = 'youxp-home-stat-picks'
 const DEFAULT_STAT_PICKS = ['bench', 'squat', 'deadlift', 'sleep_avg', 'miles', 'wins']
 
 const STAT_DEFS = [
@@ -89,7 +90,7 @@ function useTrends(): TrendResult {
 
 // ── Week Dot Strip ────────────────────────────────────────────
 function WeekDotStrip({ streak }: {
-  streak: { current: number; longest: number; loading: boolean; activeDays: Set<string> }
+  streak: { current: number; longest: number; loading: boolean; activeDays: Set<string>; freezeTokens: number; tokenSaving: boolean }
 }) {
   const todayStr  = appToday()
   const todayDate = new Date(todayStr + 'T12:00:00')
@@ -158,6 +159,7 @@ function WeekDotStrip({ streak }: {
               best {streak.longest}
             </p>
           )}
+          <FreezeTokens count={streak.freezeTokens} saving={streak.tokenSaving} />
         </div>
       )}
     </div>
@@ -511,7 +513,7 @@ function WellnessWidget() {
 // ── Main page ─────────────────────────────────────────────────
 export function Home() {
   usePageTitle('Home')
-  const { totalXP, level, progress, loading } = useXP()
+  const { totalXP, seasonXP, level, progress, loading } = useXP()
   const { stats }       = useStats()
   const activity        = useStore(s => s.recentActivity)
   const refreshXP       = useStore(s => s.refreshXP)
@@ -530,10 +532,8 @@ export function Home() {
 
   // Stat picker / widget grid
   const [statPicks, setStatPicks] = useState<StatId[]>(() => {
-    try {
-      const saved = localStorage.getItem(HOME_STATS_KEY)
-      return saved ? JSON.parse(saved) : DEFAULT_STAT_PICKS
-    } catch { return DEFAULT_STAT_PICKS as StatId[] }
+    const saved = getPref<StatId[] | null>('homeStatPicks', null)
+    return Array.isArray(saved) ? saved : (DEFAULT_STAT_PICKS as StatId[])
   })
   const [editMode,       setEditMode]       = useState(false)
   const [showAddPanel,   setShowAddPanel]   = useState(false)
@@ -555,7 +555,7 @@ export function Home() {
 
   const savePicks = (picks: StatId[]) => {
     setStatPicks(picks)
-    localStorage.setItem(HOME_STATS_KEY, JSON.stringify(picks))
+    setPref('homeStatPicks', picks)
   }
   const removeWidget = (id: StatId) => savePicks(statPicks.filter(p => p !== id))
   const addWidget    = (id: StatId) => {
@@ -564,8 +564,8 @@ export function Home() {
   }
 
   useEffect(() => {
-    if (!streak.loading) checkStreakBreakWarning(streak.current, streak.activeToday)
-  }, [streak.loading, streak.current, streak.activeToday])
+    if (!streak.loading) checkStreakBreakWarning(streak.current, streak.activeToday, streak.freezeTokens)
+  }, [streak.loading, streak.current, streak.activeToday, streak.freezeTokens])
 
   useEffect(() => {
     const script = document.createElement('script')
@@ -624,7 +624,7 @@ export function Home() {
     refreshActivity()
   })
   const [levelStyle] = useState<'number' | 'roman'>(() =>
-    (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
+    getPref<'number' | 'roman'>('levelStyle', 'number')
   )
   const displayLevel = loading ? '—' : levelStyle === 'roman' ? toRoman(level) : String(level)
   const title        = getLevelTitle(level)
@@ -793,6 +793,11 @@ export function Home() {
                 {!loading && <span style={{ color: 'var(--text-dim)', marginLeft: 6 }}>· {toNext.toLocaleString()} to next</span>}
               </p>
               <ProgressBar value={progress} height={4} />
+              {!loading && seasonXP > 0 && (
+                <p className="font-mono" style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6 }}>
+                  <span style={{ color: 'var(--accent)' }}>SEASON</span> Lv {seasonLevel(seasonXP)} · {seasonXP.toLocaleString()} XP
+                </p>
+              )}
             </div>
           </div>
 

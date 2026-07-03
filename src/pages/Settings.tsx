@@ -12,6 +12,7 @@ import { logAuditEvent } from '../lib/audit'
 import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, SunIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon } from '../components/ui/Icon'
 import { getNotifPrefs, saveNotifPrefs, requestPermission, permissionGranted, notificationsSupported } from '../lib/notifications'
 import { toRoman } from '../lib/utils'
+import { getPref, setPref } from '../lib/prefs'
 import {
   SECTION_DEFS, DEFAULT_ORDER,
   loadSectionOrder, saveSectionOrder,
@@ -151,7 +152,7 @@ export function Settings() {
   const [activeTheme, setActiveTheme]   = useState<Theme>(loadTheme)
   const [lightMode, setLightModeState]  = useState(isLightMode)
   const [levelStyle, setLevelStyle] = useState<'number' | 'roman'>(
-    () => (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
+    () => getPref<'number' | 'roman'>('levelStyle', 'number')
   )
   const [sectionOrder, setSectionOrder] = useState<SectionKey[]>(loadSectionOrder)
   const [hiddenSections, setHiddenSections] = useState<SectionKey[]>(loadHiddenSections)
@@ -251,7 +252,7 @@ export function Settings() {
 
   function handleLevelStyle(style: 'number' | 'roman') {
     setLevelStyle(style)
-    localStorage.setItem('youxp-level-style', style)
+    setPref('levelStyle', style)
   }
 
   function toggleHidden(key: SectionKey) {

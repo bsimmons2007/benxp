@@ -11,7 +11,8 @@ import { useSkills } from '../hooks/useSkills'
 import { useUserName } from '../hooks/useUserName'
 import { SkillCard } from '../components/ui/SkillCard'
 import { supabase } from '../lib/supabase'
-import { getLevelTitle, xpForLevel } from '../lib/xp'
+import { getLevelTitle, xpForLevel, seasonLevel, seasonProgress } from '../lib/xp'
+import { getPref } from '../lib/prefs'
 import { toRoman, today as appToday, localDateStr } from '../lib/utils'
 import {
   PersonIcon, StarIcon, ZapIcon, FlameIcon, TrophyIcon, CheckIcon,
@@ -677,14 +678,17 @@ function LevelAvatar({ level }: { level: number }) {
 
 export function Profile() {
   usePageTitle('Profile')
-  const { totalXP, level, progress } = useXP()
+  const { totalXP, seasonXP, level, progress } = useXP()
+  const seasonLvl = seasonLevel(seasonXP)
+  const seasonPct = Math.round(seasonProgress(seasonXP) * 100)
+  const seasonYear = new Date().getFullYear()
   const { badges, earned, loading }  = useAchievements()
   const { skills, loading: skillsLoading } = useSkills()
   const userName   = useUserName()
   const stats      = useLifetimeStats()
   const title      = getLevelTitle(level)
   const toNext     = xpForLevel(level + 1) - totalXP
-  const levelStyle = (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
+  const levelStyle = getPref<'number' | 'roman'>('levelStyle', 'number')
   const displayLevel = levelStyle === 'roman' ? toRoman(level) : String(level)
 
   const { score: consistencyScore, activeDays } = useConsistencyScore()
@@ -832,6 +836,13 @@ export function Profile() {
             <p style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 4, textAlign: 'right' }}>
               {toNext.toLocaleString()} XP to next level
             </p>
+
+            {/* Season level — XP earned this calendar year */}
+            <div className="flex items-center justify-between mt-3" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              <span className="font-mono" style={{ color: 'var(--accent)' }}>SEASON {seasonYear}</span>
+              <span className="font-mono">Lv {seasonLvl} · {seasonXP.toLocaleString()} XP · {seasonPct}%</span>
+            </div>
+            <ProgressBar value={seasonProgress(seasonXP)} height={4} />
           </div>
         </div>
 

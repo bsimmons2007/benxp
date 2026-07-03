@@ -1,4 +1,5 @@
 import { getAmbientForTheme, ambientScene, setAmbientSceneId, ambientEnabled } from './sounds'
+import { getPref, setPref } from './prefs'
 
 export interface Theme {
   id: string
@@ -37,12 +38,12 @@ export function darkenForLight(hex: string): string {
 }
 
 export function isLightMode(): boolean {
-  const saved = localStorage.getItem('youxp-light-mode')
+  const saved = getPref<string | null>('lightMode', null)
   return saved === null ? true : saved === 'true'  // default: light mode for new users
 }
 
 export function setLightMode(on: boolean) {
-  localStorage.setItem('youxp-light-mode', String(on))
+  setPref('lightMode', String(on))
 }
 
 export const THEMES: Theme[] = [
@@ -879,7 +880,7 @@ export function applyTheme(theme: Theme, light = isLightMode()) {
 }
 
 export function loadTheme(): Theme {
-  const saved = localStorage.getItem('youxp-theme')
+  const saved = getPref<string | null>('theme', null)
   // Default theme: coral (YouXP brand color)
   return THEMES.find((t) => t.id === saved) ?? THEMES.find((t) => t.id === 'coral') ?? THEMES[0]
 }
@@ -895,11 +896,11 @@ const TOD_MAP: Array<{ from: number; to: number; id: string }> = [
 ]
 
 export function timeThemeEnabled(): boolean {
-  return localStorage.getItem('youxp-time-theme') === 'true'
+  return getPref<string | null>('timeTheme', null) === 'true'
 }
 
 export function setTimeThemeEnabled(on: boolean) {
-  localStorage.setItem('youxp-time-theme', String(on))
+  setPref('timeTheme', String(on))
 }
 
 /** Returns the theme override ID for the current hour, or null if no override. */
@@ -922,7 +923,7 @@ export function applyTimeOrSavedTheme() {
 }
 
 export function saveTheme(theme: Theme) {
-  localStorage.setItem('youxp-theme', theme.id)
+  setPref('theme', theme.id)
   applyTheme(theme)
   const recommended = getAmbientForTheme(theme.id)
   if (ambientScene() !== recommended) {

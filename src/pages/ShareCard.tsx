@@ -9,6 +9,7 @@ import type { Badge } from '../hooks/useAchievements'
 import { useSkills } from '../hooks/useSkills'
 import { getLevelTitle, xpForLevel } from '../lib/xp'
 import { toRoman } from '../lib/utils'
+import { getPref } from '../lib/prefs'
 import { loadTheme } from '../lib/theme'
 import {
   SectionIcon, StarIcon, ZapIcon, FlameIcon, TrophyIcon, CheckIcon,
@@ -66,7 +67,7 @@ function Card() {
   const { skills } = useSkills()
   const theme     = loadTheme()
   const title     = getLevelTitle(level)
-  const levelStyle = (localStorage.getItem('youxp-level-style') as 'number' | 'roman') ?? 'number'
+  const levelStyle = getPref<'number' | 'roman'>('levelStyle', 'number')
   const displayLevel = levelStyle === 'roman' ? toRoman(level) : String(level)
   const toNext    = xpForLevel(level + 1) - totalXP
   const pct       = Math.min(Math.max(progress * 100, 0), 100)
