@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
 import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
@@ -298,11 +299,14 @@ export function Volleyball() {
   const [all,     setAll]     = useState<VolleyballSession[]>([])
   const [editing, setEditing] = useState<VolleyballSession | null>(null)
   const [visible, setVisible] = useState(PAGE_SIZE)
+  const [loadError, setLoadError] = useState(false)
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('volleyball_sessions').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    const { data, error } = await supabase.from('volleyball_sessions').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    if (error) { setLoadError(true); return }
     setAll(data ?? [])
   }
   useEffect(() => { load() }, [])
@@ -453,7 +457,16 @@ export function Volleyball() {
           </button>
         )}
 
-        {games.length === 0 && (
+        {loadError && all.length === 0 && (
+          <ErrorState
+            icon={<VolleyballIcon size={56} color="var(--text-muted)" />}
+            title="Could not load games"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+
+        {!loadError && games.length === 0 && (
           <EmptyState
             icon={<VolleyballIcon size={56} color="var(--text-muted)" />}
             title="No games logged yet"

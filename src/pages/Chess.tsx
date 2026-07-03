@@ -9,6 +9,8 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
+import { HistoryControls, useHistoryFilter } from '../components/ui/HistoryControls'
 import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
 import { getLastUsed, setLastUsed } from '../lib/lastUsed'
@@ -237,17 +239,21 @@ export function Chess() {
   const [editing, setEditing] = useState<ChessGame | null>(null)
   const [tcFilter, setTcFilter] = useState<string | null>(null)
   const [visible, setVisible] = useState(PAGE_SIZE)
+  const [loadError, setLoadError] = useState(false)
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('chess_games').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    const { data, error } = await supabase.from('chess_games').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    if (error) { setLoadError(true); return }
     setGames(data ?? [])
   }
   useEffect(() => { load() }, [])
 
-  const filtered = tcFilter ? games.filter(g => g.time_control === tcFilter) : games
-  useEffect(() => { setVisible(PAGE_SIZE) }, [tcFilter])
+  const tcFiltered = tcFilter ? games.filter(g => g.time_control === tcFilter) : games
+  const { search, setSearch, range, setRange, filtered } = useHistoryFilter(tcFiltered, ['opponent', 'opening', 'notes', 'time_control'])
+  useEffect(() => { setVisible(PAGE_SIZE) }, [tcFilter, search, range])
   const wins     = filtered.filter(g => g.result === 'win').length
   const draws    = filtered.filter(g => g.result === 'draw').length
   const losses   = filtered.filter(g => g.result === 'loss').length
@@ -369,6 +375,9 @@ export function Chess() {
         )}
 
         {/* History */}
+        {games.length > 5 && (
+          <HistoryControls search={search} onSearch={setSearch} range={range} onRange={setRange} placeholder="Search opponent, opening, notes..." />
+        )}
         {filtered.length > 0 && <p className="section-label mb-3">Game History</p>}
         {shown.map(g => (
           <Card key={g.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
@@ -413,12 +422,25 @@ export function Chess() {
           </button>
         )}
 
-        {games.length === 0 && (
+        {loadError && games.length === 0 && (
+          <ErrorState
+            icon={<ChessIcon size={56} color="var(--text-muted)" />}
+            title="Could not load games"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+
+        {!loadError && games.length === 0 && (
           <EmptyState
             icon={<ChessIcon size={56} color="var(--text-muted)" />}
             title="No games logged yet"
             sub="Log games and your rating to track your ELO progression over time."
           />
+        )}
+
+        {!loadError && games.length > 0 && filtered.length === 0 && (
+          <p className="text-center py-8" style={{ color: 'var(--text-muted)', fontSize: 13 }}>No games match your search.</p>
         )}
 
         {editing && <EditChessModal game={editing} onClose={() => setEditing(null)} onSaved={load} />}

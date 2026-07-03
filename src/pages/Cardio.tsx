@@ -19,6 +19,8 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import { useStreak } from '../hooks/useStreak'
 import { ChartSkeleton, ChartEmptyState } from '../components/ui/Skeleton'
 import { FirstUseTip } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
+import { HistoryControls, useHistoryFilter } from '../components/ui/HistoryControls'
 
 const SPLITS_KEY = 'youxp-run-splits'
 function getSplitsMap(): Record<string, string[]> {
@@ -330,7 +332,8 @@ export function Cardio() {
   useEffect(() => { load() }, [])
 
   const filtered  = filter === 'all' ? sessions : sessions.filter(s => s.activity === filter)
-  useEffect(() => { setVisible(10) }, [filter])
+  const hist      = useHistoryFilter(filtered, ['notes', 'activity'])
+  useEffect(() => { setVisible(10) }, [filter, hist.search, hist.range])
   const totalMiles = sessions.reduce((s, r) => s + r.distance, 0)
   const totalXP    = sessions.reduce((s, r) => s + sessionXP(r), 0)
 
@@ -361,16 +364,13 @@ export function Cardio() {
       <TopBar title="Cardio" />
       <PageWrapper>
 
-        {loadError && (
-          <div className="flex flex-col items-center py-12 gap-3 fade-in">
-            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Could not load sessions</p>
-            <button
-              onClick={load}
-              style={{ padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}
-            >
-              Try again
-            </button>
-          </div>
+        {loadError && sessions.length === 0 && (
+          <ErrorState
+            icon={<ActivityIconComp activityKey="run" size={56} color="var(--text-muted)" />}
+            title="Could not load sessions"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
         )}
 
         {/* Stats */}
@@ -512,10 +512,13 @@ export function Cardio() {
         )}
 
         {/* Session history */}
+        {sessions.length > 5 && (
+          <HistoryControls search={hist.search} onSearch={hist.setSearch} range={hist.range} onRange={hist.setRange} placeholder="Search notes, type..." />
+        )}
         {filtered.length > 0 ? (
           <Card noPadding className="overflow-hidden">
             <p className="px-4 pt-4 pb-2 font-bold" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Sessions</p>
-            {filtered.slice(0, visible).map(s => {
+            {hist.filtered.slice(0, visible).map(s => {
               const pace = s.duration_mins && s.distance ? (s.duration_mins / s.distance).toFixed(1) : null
               return (
                 <div key={`${s.source}-${s.id}`} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
@@ -559,15 +562,18 @@ export function Cardio() {
                 </div>
               )
             })}
-            {filtered.length > visible && (
+            {hist.filtered.length > visible && (
               <button
                 type="button"
                 onClick={() => setVisible(v => v + 20)}
                 className="w-full py-3 font-semibold"
                 style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: 'none', borderTop: '1px solid var(--border-faint)', fontSize: 14, cursor: 'pointer' }}
               >
-                Show more ({filtered.length - visible} left)
+                Show more ({hist.filtered.length - visible} left)
               </button>
+            )}
+            {hist.filtered.length === 0 && (
+              <p className="text-center py-6" style={{ color: 'var(--text-muted)', fontSize: 13 }}>No sessions match your search.</p>
             )}
           </Card>
         ) : (

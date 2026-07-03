@@ -9,7 +9,8 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
-import { EditIcon, CheckIcon, BookIcon, CloseIcon, PlusIcon } from '../components/ui/Icon'
+import { ErrorState } from '../components/ui/ErrorState'
+import { EditIcon, CheckIcon, BookIcon, CloseIcon, PlusIcon, SearchIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
@@ -699,12 +700,16 @@ export function Books() {
   const [filterGenre, setFilterGenre] = useState('All')
   const [groupBySeries, setGroupBySeries] = useState(false)
   const [visible, setVisible] = useState(10)
+  const [search, setSearch]   = useState('')
+  const [loadError, setLoadError] = useState(false)
   const [seriesMap, setSeriesMap] = useState<Record<string, string>>(() => getSeriesMap())
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('books').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+    const { data, error } = await supabase.from('books').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+    if (error) { setLoadError(true); return }
     setAllBooks(data ?? [])
     setSeriesMap(getSeriesMap())
   }
@@ -715,8 +720,10 @@ export function Books() {
 
   const genres = ['All', ...Array.from(new Set(finished.map(b => b.genre).filter(Boolean) as string[]))]
 
+  const q = search.trim().toLowerCase()
   const sorted = [...finished]
     .filter(b => filterGenre === 'All' || b.genre === filterGenre)
+    .filter(b => !q || b.title.toLowerCase().includes(q) || (b.author ?? '').toLowerCase().includes(q))
     .sort((a, b) => {
       switch (sort) {
         case 'date_desc':   return (b.date_finished ?? '').localeCompare(a.date_finished ?? '')
@@ -845,8 +852,16 @@ export function Books() {
           </div>
         )}
 
-        {/* Empty state */}
-        {allBooks.length === 0 && (
+        {/* Error / empty state */}
+        {loadError && allBooks.length === 0 && (
+          <ErrorState
+            icon={<BookIcon size={56} color="var(--text-muted)" />}
+            title="Could not load books"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+        {!loadError && allBooks.length === 0 && (
           <EmptyState
             icon={<BookIcon size={64} color="var(--text-muted)" />}
             title="No books yet"
@@ -874,6 +889,22 @@ export function Books() {
                 </button>
               ))}
             </div>
+
+            {finished.length > 5 && (
+              <div style={{ position: 'relative', marginBottom: 12 }}>
+                <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+                  <SearchIcon size={14} color="var(--text-muted)" />
+                </span>
+                <input
+                  type="search"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search title or author..."
+                  aria-label="Search books"
+                  style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 10, fontSize: 13, background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none' }}
+                />
+              </div>
+            )}
 
             <div className="flex items-center justify-between mb-4 gap-2">
               <div className="flex items-center gap-2">

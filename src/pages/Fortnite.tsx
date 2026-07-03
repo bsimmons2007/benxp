@@ -12,6 +12,7 @@ import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EmptyState } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
 import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip } from '../lib/utils'
 import { XP_RATES } from '../lib/xp'
@@ -663,11 +664,14 @@ export function Fortnite() {
   const [tab,     setTab]     = useState<FnTab>('normal')
   const [games,   setGames]   = useState<FortniteGame[]>([])
   const [editing, setEditing] = useState<FortniteGame | null>(null)
+  const [loadError, setLoadError] = useState(false)
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('fortnite_games').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(1000)
+    const { data, error } = await supabase.from('fortnite_games').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(1000)
+    if (error) { setLoadError(true); return }
     setGames(data ?? [])
   }
   useEffect(() => { load() }, [])
@@ -699,7 +703,14 @@ export function Fortnite() {
           ))}
         </div>
 
-        {tab === 'normal'
+        {loadError && games.length === 0 ? (
+          <ErrorState
+            icon={<GamepadIcon size={56} color="var(--text-muted)" />}
+            title="Could not load games"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        ) : tab === 'normal'
           ? <NormalTab games={normalGames} onLogged={load} onEdit={setEditing} />
           : <BlitzTab  games={blitzGames}  onLogged={load} onEdit={setEditing} />
         }
