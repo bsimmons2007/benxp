@@ -65,6 +65,7 @@ interface SleepForm { date: string; bedtime: string; hours_slept: string; wake_t
 function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   const [open, setOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const [hadDream, setHadDream] = useState(false)
   const refreshXP             = useStore((s) => s.refreshXP)
   const refreshActivity       = useStore((s) => s.refreshActivity)
@@ -103,12 +104,17 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
       hours_slept: parsedHours,
       wake_time: data.wake_time || null,
     }).select('id').single()
-    if (error) { setToast('Failed to save — try again'); return }
-    if (inserted && hadDream) saveDreamForLog(inserted.id)
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
+    if (hadDream) saveDreamForLog(inserted.id)
     const hrs = parsedHours ?? 0
     const q   = sleepQuality(hrs)
     const xp  = XP_RATES.sleep_log + (hrs >= 7 ? XP_RATES.sleep_quality_bonus : 0)
     if (hrs >= 8.5) playPR(); else playXPGain()
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('sleep_log').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     setToast(`+${xp} XP — ${q.label} sleep!`)
     addOptimisticActivity({ type: 'sleep', label: `${hrs.toFixed(1)}h sleep`, date: data.date, icon: 'sleep' })
     await refreshXP()
@@ -158,7 +164,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </Card>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }

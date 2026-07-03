@@ -11,6 +11,7 @@ import { EditModal } from '../components/ui/EditModal'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip } from '../lib/utils'
+import { getLastUsed, setLastUsed } from '../lib/lastUsed'
 import { useStore } from '../store/useStore'
 import { playXPGain } from '../lib/sounds'
 import { ActivityIconComp, EditIcon, ZapIcon } from '../components/ui/Icon'
@@ -85,11 +86,12 @@ interface CardioForm {
 function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
   const [open, setOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo, setUndo]   = useState<(() => void) | null>(null)
   const refreshXP             = useStore(s => s.refreshXP)
   const refreshActivity       = useStore(s => s.refreshActivity)
   const addOptimisticActivity = useStore(s => s.addOptimisticActivity)
   const { register, handleSubmit, watch, reset, formState: { isSubmitting } } = useForm<CardioForm>({
-    defaultValues: { date: today(), activity: 'run', distance: '', duration_mins: '', fastest_mile: '', notes: '', splits: '' },
+    defaultValues: { date: today(), activity: getLastUsed('cardio-type', 'run') as ActivityKey, distance: '', duration_mins: '', fastest_mile: '', notes: '', splits: '' },
   })
   const activity = watch('activity')
   const isSkate  = activity === 'skate'
@@ -102,15 +104,19 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
     if (!isFinite(miles) || miles <= 0) return
     if (miles > 100) { setToast('⚠️ That distance looks unusually large — check the value before saving.'); return }
 
+    setLastUsed('cardio-type', data.activity)
+    let insertedTable = 'cardio_sessions'
+    let insertedId: string | null = null
     if (isSkate) {
-      const { error } = await supabase.from('skate_sessions').insert({
+      const { data: inserted, error } = await supabase.from('skate_sessions').insert({
         user_id: user.id,
         date: data.date,
         miles,
         duration: data.duration_mins ? `${data.duration_mins}m` : null,
         fastest_mile: data.fastest_mile ? parseFloat(data.fastest_mile) : null,
-      })
-      if (error) { setToast('Failed to save. Please try again.'); return }
+      }).select('id').single()
+      if (error || !inserted) { setToast('Failed to save. Please try again.'); return }
+      insertedTable = 'skate_sessions'; insertedId = inserted.id
     } else {
       const { data: inserted, error } = await supabase.from('cardio_sessions').insert({
         user_id: user.id,
@@ -120,8 +126,9 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
         duration_mins: data.duration_mins ? parseInt(data.duration_mins) : null,
         notes: data.notes || null,
       }).select('id').single()
-      if (error) { setToast('Failed to save. Please try again.'); return }
-      if (inserted && data.splits.trim() && data.activity === 'run') {
+      if (error || !inserted) { setToast('Failed to save. Please try again.'); return }
+      insertedId = inserted.id
+      if (data.splits.trim() && data.activity === 'run') {
         saveSplitsForSession(inserted.id, data.splits)
       }
     }
@@ -131,6 +138,10 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
       : Math.round(miles * cardioRate(data.activity))
     const { label } = activityMeta(data.activity)
     playXPGain()
+    setUndo(() => async () => {
+      await supabase.from(insertedTable).delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     setToast(`+${xp} XP — ${label} logged!`)
     addOptimisticActivity({ type: 'cardio', label: `${miles.toFixed(2)} mi ${label.toLowerCase()}`, date: data.date, icon: data.activity })
     await refreshXP()
@@ -196,7 +207,7 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }

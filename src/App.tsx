@@ -48,12 +48,14 @@ const Log          = lazy(() => import('./pages/Log').then(m => ({ default: m.Lo
 const NotFound     = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })))
 const LevelUpOverlay  = lazy(() => import('./components/ui/LevelUpOverlay').then(m => ({ default: m.LevelUpOverlay })))
 const TutorialOverlay = lazy(() => import('./components/ui/TutorialOverlay').then(m => ({ default: m.TutorialOverlay })))
+const QuickLogSheet   = lazy(() => import('./components/QuickLogSheet').then(m => ({ default: m.QuickLogSheet })))
 import { applyTimeOrSavedTheme } from './lib/theme'
 import { setupOfflineQueue } from './lib/offlineQueue'
 import { isTutorialDone } from './lib/tutorial'
 import { checkDailyReminder } from './lib/notifications'
 import { useAuth } from './hooks/useAuth'
 import { useStore } from './store/useStore'
+import { useNavStore } from './store/useNavStore'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { Wordmark } from './components/brand/Wordmark'
 
@@ -265,6 +267,33 @@ function TopLoadBar() {
   )
 }
 
+function QuickLogHost() {
+  const location   = useLocation()
+  const navigate   = useNavigate()
+  const open       = useNavStore(s => s.quickLogOpen)
+  const target     = useNavStore(s => s.quickLogTarget)
+  const openSheet  = useNavStore(s => s.openQuickLog)
+  const closeSheet = useNavStore(s => s.closeQuickLog)
+
+  // Deep-link: ?quicklog=<section> opens the sheet to that activity, then the
+  // param is stripped so a refresh/back doesn't re-trigger it.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const q = params.get('quicklog')
+    if (!q) return
+    openSheet(q)
+    params.delete('quicklog')
+    const qs = params.toString()
+    navigate(location.pathname + (qs ? `?${qs}` : ''), { replace: true })
+  }, [location.search, location.pathname, navigate, openSheet])
+
+  return (
+    <Suspense fallback={null}>
+      <QuickLogSheet open={open} initialActivity={target} onClose={closeSheet} />
+    </Suspense>
+  )
+}
+
 function AppInner() {
   const location = useLocation()
   const showNav = location.pathname !== '/login' && location.pathname !== '/reset-password' && location.pathname !== '/auth/callback'
@@ -371,6 +400,7 @@ function AppInner() {
       </Suspense>
       {showNav && <BottomNav />}
       {showNav && <SideNav />}
+      {showNav && <QuickLogHost />}
 
     </>
   )

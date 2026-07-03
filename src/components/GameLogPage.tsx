@@ -12,10 +12,12 @@ import { EmptyState } from './ui/EmptyState'
 import { Card } from './ui/Card'
 import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
+import { getLastUsed, setLastUsed } from '../lib/lastUsed'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
-import { EditIcon, TrophyIcon, CircleIcon } from './ui/Icon'
+import { EditIcon, TrophyIcon, CircleIcon, SearchIcon } from './ui/Icon'
 import type { IconComponent } from './ui/Icon'
+import { ErrorState } from './ui/ErrorState'
 
 const PAGE_SIZE = 10
 const LOAD_MORE = 20
@@ -116,14 +118,20 @@ function outcomeLabel(o: GameResult): string {
 function LogPanel<Row extends GameRowBase>({ cfg, onLogged }: { cfg: GameLogConfig<Row>; onLogged: () => void }) {
   const [open, setOpen]   = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo, setUndo]   = useState<(() => void) | null>(null)
   const [result, setResult] = useState<GameResult | null>(null)
   const [toggle, setToggle] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
 
+  // Optional fields collapse behind "Add details": the select (game type),
+  // extra text fields (opponent, notes), and the toggle stay hidden until asked.
+  const hasOptional = Boolean(cfg.selectField || cfg.textFields?.length || cfg.toggleField)
+
   const defaults = useMemo(() => {
     const d: Record<string, string> = { date: today() }
-    if (cfg.selectField) d[cfg.selectField.key] = cfg.selectField.options[0]
+    if (cfg.selectField) d[cfg.selectField.key] = getLastUsed(`${cfg.table}-${cfg.selectField.key}`, cfg.selectField.options[0])
     if (cfg.hasScores) { d.my_score = ''; d.opp_score = '' }
     cfg.textFields?.forEach(f => { d[f.key] = '' })
     return d
@@ -152,15 +160,22 @@ function LogPanel<Row extends GameRowBase>({ cfg, onLogged }: { cfg: GameLogConf
     if (cfg.toggleField) payload[cfg.toggleField.key] = toggle
     if (cfg.buildInsert) Object.assign(payload, cfg.buildInsert(data))
 
-    const { error } = await supabase.from(cfg.table).insert(payload)
-    if (error) { setToast('Failed to save — try again'); return }
+    const { data: inserted, error } = await supabase.from(cfg.table).insert(payload).select('id').single()
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
+    if (cfg.selectField) setLastUsed(`${cfg.table}-${cfg.selectField.key}`, data[cfg.selectField.key])
     const xp = cfg.xp(isWin, result, toggle)
     if (isWin) playPR(); else playXPGain()
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from(cfg.table).delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     setToast(`+${xp} XP — ${cfg.toast(result)}`)
     await refreshXP(); refreshActivity()
     reset(defaults)
     setResult(null)
     setToggle(false)
+    setShowDetails(false)
     setOpen(false)
     onLogged()
   }
@@ -178,29 +193,7 @@ function LogPanel<Row extends GameRowBase>({ cfg, onLogged }: { cfg: GameLogConf
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <Input label="Date" type="date" {...register('date', { required: true })} />
-
-            {cfg.selectField && (
-              <div className="flex flex-col gap-1">
-                <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>{cfg.selectField.label}</label>
-                <select {...register(cfg.selectField.key)} className="px-3 py-2.5 rounded-lg outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
-                  {cfg.selectField.options.map(o => <option key={o}>{o}</option>)}
-                </select>
-              </div>
-            )}
-
-            {cfg.hasScores && (
-              <div className="flex gap-3">
-                <Input label="My Score"  type="number" placeholder="11" className="flex-1" {...register('my_score')} />
-                <Input label="Opp Score" type="number" placeholder="9"  className="flex-1" {...register('opp_score')} />
-              </div>
-            )}
-
-            {cfg.textFields?.map(f => (
-              <Input key={f.key} label={f.label} type={f.type ?? 'text'} placeholder={f.placeholder} {...register(f.key)} />
-            ))}
-
-            {/* Required result — no default */}
+            {/* Required result — essentials first */}
             <div className="flex flex-col gap-2">
               <label className="section-label">Result</label>
               <div className="flex gap-2">
@@ -227,24 +220,60 @@ function LogPanel<Row extends GameRowBase>({ cfg, onLogged }: { cfg: GameLogConf
               </div>
             </div>
 
-            {cfg.toggleField && (
+            {cfg.hasScores && (
+              <div className="flex gap-3">
+                <Input label="My Score"  type="number" placeholder="11" className="flex-1" {...register('my_score')} />
+                <Input label="Opp Score" type="number" placeholder="9"  className="flex-1" {...register('opp_score')} />
+              </div>
+            )}
+
+            {hasOptional && (
               <button
                 type="button"
-                role="switch"
-                aria-checked={toggle}
-                aria-label={cfg.toggleField.label}
-                onClick={() => setToggle(t => !t)}
-                className="flex items-center gap-3"
-                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                onClick={() => setShowDetails(v => !v)}
+                style={{ alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', fontSize: 12, fontWeight: 600, padding: 0 }}
               >
-                <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: toggle ? 'var(--warning)' : 'var(--border)' }}>
-                  <div className="absolute top-0.5 w-5 h-5 rounded-full transition-transform" style={{ background: 'var(--surface-1)', transform: toggle ? 'translateX(26px)' : 'translateX(2px)' }} />
-                </div>
-                <span className="font-semibold" style={{ color: toggle ? 'var(--warning)' : 'var(--text-muted)', fontSize: 13 }}>
-                  {cfg.toggleField.label}
-                  {toggle && cfg.toggleField.hint && <span style={{ marginLeft: 6 }}>{cfg.toggleField.hint}</span>}
-                </span>
+                {showDetails ? 'Hide details' : 'Add details...'}
               </button>
+            )}
+
+            {showDetails && (
+              <>
+                <Input label="Date" type="date" {...register('date', { required: true })} />
+
+                {cfg.selectField && (
+                  <div className="flex flex-col gap-1">
+                    <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>{cfg.selectField.label}</label>
+                    <select {...register(cfg.selectField.key)} className="px-3 py-2.5 rounded-lg outline-none" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
+                      {cfg.selectField.options.map(o => <option key={o}>{o}</option>)}
+                    </select>
+                  </div>
+                )}
+
+                {cfg.textFields?.map(f => (
+                  <Input key={f.key} label={f.label} type={f.type ?? 'text'} placeholder={f.placeholder} {...register(f.key)} />
+                ))}
+
+                {cfg.toggleField && (
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={toggle}
+                    aria-label={cfg.toggleField.label}
+                    onClick={() => setToggle(t => !t)}
+                    className="flex items-center gap-3"
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                  >
+                    <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: toggle ? 'var(--warning)' : 'var(--border)' }}>
+                      <div className="absolute top-0.5 w-5 h-5 rounded-full transition-transform" style={{ background: 'var(--surface-1)', transform: toggle ? 'translateX(26px)' : 'translateX(2px)' }} />
+                    </div>
+                    <span className="font-semibold" style={{ color: toggle ? 'var(--warning)' : 'var(--text-muted)', fontSize: 13 }}>
+                      {cfg.toggleField.label}
+                      {toggle && cfg.toggleField.hint && <span style={{ marginLeft: 6 }}>{cfg.toggleField.hint}</span>}
+                    </span>
+                  </button>
+                )}
+              </>
             )}
 
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting || !result}>
@@ -253,7 +282,13 @@ function LogPanel<Row extends GameRowBase>({ cfg, onLogged }: { cfg: GameLogConf
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && (
+        <Toast
+          message={toast}
+          onUndo={undo ?? undefined}
+          onDone={() => { setToast(null); setUndo(null) }}
+        />
+      )}
     </div>
   )
 }
@@ -396,16 +431,29 @@ function MonthlyChart<Row extends GameRowBase>({ cfg, rows }: { cfg: GameLogConf
 
 // ── Main page ───────────────────────────────────────────────────────
 
+const RANGES = [
+  { key: '30d',  label: '30d',  days: 30 },
+  { key: '90d',  label: '90d',  days: 90 },
+  { key: 'year', label: 'Year', days: 365 },
+  { key: 'all',  label: 'All',  days: 0 },
+] as const
+type RangeKey = typeof RANGES[number]['key']
+
 export function GameLogPage<Row extends GameRowBase>({ cfg }: { cfg: GameLogConfig<Row> }) {
   const [rows,    setRows]    = useState<Row[]>([])
   const [editing, setEditing] = useState<Row | null>(null)
   const [filter,  setFilter]  = useState<string>('All')
   const [visible, setVisible] = useState(PAGE_SIZE)
+  const [loadError, setLoadError] = useState(false)
+  const [search,  setSearch]  = useState('')
+  const [range,   setRange]   = useState<RangeKey>('all')
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from(cfg.table).select('*').eq('user_id', user.id).order('date', { ascending: false })
+    const { data, error } = await supabase.from(cfg.table).select('*').eq('user_id', user.id).order('date', { ascending: false })
+    if (error) { setLoadError(true); return }
     setRows((data as Row[]) ?? [])
   }
   useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -417,11 +465,32 @@ export function GameLogPage<Row extends GameRowBase>({ cfg }: { cfg: GameLogConf
     return vals.length > 1 ? ['All', ...vals] : []
   }, [rows, filterKey])
 
-  const filtered = filterKey && filter !== 'All'
-    ? rows.filter(r => (r as Record<string, unknown>)[filterKey] === filter)
-    : rows
+  // Search matches opponent / notes / any select-field value; date chips window
+  // by recency. Both apply before the load-more slice.
+  const rangeCutoff = useMemo(() => {
+    const days = RANGES.find(r => r.key === range)?.days ?? 0
+    if (!days) return ''
+    const d = new Date(); d.setDate(d.getDate() - days)
+    return d.toISOString().slice(0, 10)
+  }, [range])
 
-  useEffect(() => { setVisible(PAGE_SIZE) }, [filter])
+  const filtered = useMemo(() => {
+    let out = rows
+    if (filterKey && filter !== 'All') out = out.filter(r => (r as Record<string, unknown>)[filterKey] === filter)
+    if (rangeCutoff) out = out.filter(r => r.date >= rangeCutoff)
+    const q = search.trim().toLowerCase()
+    if (q) {
+      out = out.filter(r => {
+        const rec = r as Record<string, unknown>
+        return ['opponent', 'notes', filterKey, cfg.selectField?.key]
+          .filter(Boolean)
+          .some(k => String(rec[k as string] ?? '').toLowerCase().includes(q))
+      })
+    }
+    return out
+  }, [rows, filterKey, filter, rangeCutoff, search, cfg.selectField])
+
+  useEffect(() => { setVisible(PAGE_SIZE) }, [filter, search, range])
 
   const wins    = filtered.filter(g => outcomeOf(g, cfg.resultMode) === 'win').length
   const losses  = filtered.filter(g => outcomeOf(g, cfg.resultMode) === 'loss').length
@@ -486,6 +555,43 @@ export function GameLogPage<Row extends GameRowBase>({ cfg }: { cfg: GameLogConf
 
         {filtered.length > 0 && <MonthlyChart cfg={cfg} rows={filtered} />}
 
+        {/* Search + date range — only once there's a meaningful history */}
+        {rows.length > 5 && (
+          <div className="mb-3">
+            <div style={{ position: 'relative', marginBottom: 8 }}>
+              <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+                <SearchIcon size={14} color="var(--text-muted)" />
+              </span>
+              <input
+                type="search"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search opponent, notes..."
+                aria-label="Search history"
+                style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 10, fontSize: 13, background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none' }}
+              />
+            </div>
+            <div className="flex gap-2">
+              {RANGES.map(r => (
+                <button
+                  key={r.key}
+                  type="button"
+                  onClick={() => setRange(r.key)}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                  style={{
+                    background: range === r.key ? 'var(--accent)' : 'var(--input-bg)',
+                    color: range === r.key ? 'var(--base-bg)' : 'var(--text-muted)',
+                    border: `1px solid ${range === r.key ? 'var(--accent)' : 'var(--border)'}`,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* History */}
         {filtered.length > 0 && <p className="section-label mb-3">History</p>}
         {shown.map(row => {
@@ -545,12 +651,27 @@ export function GameLogPage<Row extends GameRowBase>({ cfg }: { cfg: GameLogConf
           </button>
         )}
 
-        {rows.length === 0 && (
+        {loadError && rows.length === 0 && (
+          <ErrorState
+            icon={<cfg.Icon size={56} color="var(--text-muted)" />}
+            title="Could not load games"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+
+        {!loadError && rows.length === 0 && (
           <EmptyState
             icon={<cfg.Icon size={56} color="var(--text-muted)" />}
             title={cfg.emptyTitle}
             sub={cfg.emptySub}
           />
+        )}
+
+        {!loadError && rows.length > 0 && filtered.length === 0 && (
+          <p className="text-center py-8" style={{ color: 'var(--text-muted)', fontSize: 13 }}>
+            No games match your search.
+          </p>
         )}
 
         {editing && <EditGameModal cfg={cfg} row={editing} onClose={() => setEditing(null)} onSaved={load} />}
