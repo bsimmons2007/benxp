@@ -22,6 +22,8 @@ language sql
 security invoker
 stable
 as $$
+  -- jsonb_build_object caps at 100 arguments, so the doc is built in three
+  -- chunks concatenated with ||.
   with y as (select date_trunc('year', now())::date as jan1)
   select jsonb_build_object(
     -- lifting
@@ -49,7 +51,8 @@ as $$
     'sleep_nights',         (select count(*) from sleep_log where user_id = uid and not is_nap),
     'sleep_nights_season',  (select count(*) from sleep_log, y where user_id = uid and not is_nap and date >= y.jan1),
     'sleep_quality',        (select count(*) from sleep_log where user_id = uid and not is_nap and coalesce(hours_slept, 0) >= 7),
-    'sleep_quality_season', (select count(*) from sleep_log, y where user_id = uid and not is_nap and coalesce(hours_slept, 0) >= 7 and date >= y.jan1),
+    'sleep_quality_season', (select count(*) from sleep_log, y where user_id = uid and not is_nap and coalesce(hours_slept, 0) >= 7 and date >= y.jan1)
+  ) || jsonb_build_object(
     -- cardio miles by activity type
     'cardio_run_mi',        (select coalesce(sum(distance_miles), 0) from cardio_sessions where user_id = uid and activity = 'run'),
     'cardio_bike_mi',       (select coalesce(sum(distance_miles), 0) from cardio_sessions where user_id = uid and activity = 'bike'),
@@ -71,7 +74,8 @@ as $$
     'measurement_count',    (select count(*) from body_measurements where user_id = uid),
     -- water goal days (>=64oz aggregated per date)
     'water_goal_days',      (select count(*) from (select date from water_log where user_id = uid group by date having sum(oz) >= 64) w),
-    'water_goal_days_season', (select count(*) from (select date from water_log, y where user_id = uid and date >= y.jan1 group by date having sum(oz) >= 64) w),
+    'water_goal_days_season', (select count(*) from (select date from water_log, y where user_id = uid and date >= y.jan1 group by date having sum(oz) >= 64) w)
+  ) || jsonb_build_object(
     -- basketball: session count + total points
     'bb_sessions',          (select count(*) from basketball_sessions where user_id = uid),
     'bb_points',            (select coalesce(sum(points), 0) from basketball_sessions where user_id = uid),
