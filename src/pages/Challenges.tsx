@@ -171,13 +171,13 @@ function ChallengeCard({
           style={{
             padding: '13px 0',
             background: accentColor,
-            color: '#1A1A2E',
+            color: 'var(--base-bg)',
             fontSize: 15,
             boxShadow: 'var(--shadow-md)',
             letterSpacing: '0.01em',
           }}
         >
-          <ZapIcon size={16} color="#1A1A2E" />
+          <ZapIcon size={16} color="var(--base-bg)" />
           Claim {challenge.xp_reward} XP
         </button>
       )}
@@ -195,7 +195,7 @@ function ChallengeCard({
             <button
               onClick={() => { onReroll(challenge.id, templateKey); setShowRerollConfirm(false) }}
               className="flex-1 rounded-xl font-bold transition-all active:scale-95"
-              style={{ padding: '10px 0', background: accentColor, color: '#1A1A2E', fontSize: 13 }}
+              style={{ padding: '10px 0', background: accentColor, color: 'var(--base-bg)', fontSize: 13 }}
             >
               Yes, reroll
             </button>
@@ -365,13 +365,13 @@ function BossCard({
               style={{
                 padding: '15px 0',
                 background: `linear-gradient(135deg, ${BOSS_COLOR}ee, ${BOSS_COLOR})`,
-                color: '#1A1A2E',
+                color: 'var(--base-bg)',
                 fontSize: 16,
                 boxShadow: `0 6px 28px ${BOSS_COLOR}55`,
                 letterSpacing: '0.02em',
               }}
             >
-              <TrophyIcon size={18} color="#1A1A2E" />
+              <TrophyIcon size={18} color="var(--base-bg)" />
               {claiming ? 'Claiming…' : `Conquer — ${challenge.xp_reward} XP`}
             </button>
           </div>

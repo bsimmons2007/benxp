@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -14,11 +14,48 @@ import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
-import { VolleyballIcon, TrophyIcon, EditIcon } from '../components/ui/Icon'
+import { VolleyballIcon, TrophyIcon, EditIcon, CircleIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 import type { VolleyballSession } from '../types'
 
-const ACCENT = '#f472b6'
+const PAGE_SIZE = 10
+const LOAD_MORE = 20
+
+// ── Required Win/Loss control ─────────────────────────────────────
+
+function ResultPicker({ value, onChange }: { value: boolean | null; onChange: (v: boolean) => void }) {
+  const opts: { key: boolean; label: string; color: string }[] = [
+    { key: true,  label: 'Win',  color: 'var(--green)' },
+    { key: false, label: 'Loss', color: 'var(--red)' },
+  ]
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="section-label">Result</label>
+      <div className="flex gap-2">
+        {opts.map(o => {
+          const active = value === o.key
+          return (
+            <button
+              key={o.label}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(o.key)}
+              style={{
+                flex: 1, textAlign: 'center', padding: '10px 4px', borderRadius: 10, cursor: 'pointer',
+                background: active ? `color-mix(in srgb, ${o.color} 15%, transparent)` : 'var(--input-bg)',
+                border: `1px solid ${active ? o.color : 'var(--border)'}`,
+                color: active ? o.color : 'var(--text-muted)',
+                fontWeight: active ? 700 : 500, fontSize: 13, transition: 'all 0.15s',
+              }}
+            >
+              {o.label}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 // ── Indoor form ───────────────────────────────────────────────────
 
@@ -38,7 +75,7 @@ interface IndoorForm {
 function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
-  const [isWin, setIsWin] = useState(true)
+  const [win, setWin] = useState<boolean | null>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<IndoorForm>({
@@ -46,13 +83,14 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
   })
 
   const onSubmit = async (data: IndoorForm) => {
+    if (win === null) return
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const { error } = await supabase.from('volleyball_sessions').insert({
       user_id:   user.id,
       date:      data.date,
       format:    'Indoor',
-      win:       isWin,
+      win,
       sets_won:  data.sets_won  ? parseInt(data.sets_won)  : null,
       sets_lost: data.sets_lost ? parseInt(data.sets_lost) : null,
       aces:      data.aces      ? parseInt(data.aces)      : null,
@@ -64,22 +102,23 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes     || null,
     })
     if (error) { setToast('Failed to save — try again'); return }
-    const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — Spike!`) }
-    else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
+    const xp = XP_RATES.volleyball_game + (win ? XP_RATES.volleyball_win : 0)
+    if (win) { playPR();     setToast(`+${xp} XP — Spike!`) }
+    else      { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), sets_won: '', sets_lost: '', aces: '', kills: '', blocks: '', digs: '', assists: '', opponent: '', notes: '' })
-    setIsWin(true); setOpen(false); onLogged()
+    setWin(null); setOpen(false); onLogged()
   }
 
   return (
     <div className="mb-4">
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Game'}
+        {open ? 'Cancel' : 'Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -99,17 +138,9 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Opponent (optional)" type="text" placeholder="Team name…" {...register('opponent')} />
             <Input label="Notes (optional)"    type="text" placeholder="Gym, tournament…" {...register('notes')} />
 
-            {/* Win toggle */}
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
-              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT : 'var(--border)' }}>
-                <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
-              </div>
-              <span className="font-semibold" style={{ color: isWin ? ACCENT : 'var(--text-muted)', fontSize: 13 }}>
-                {isWin ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TrophyIcon size={14} color={ACCENT} /> Win</span> : 'Loss'}
-              </span>
-            </div>
+            <ResultPicker value={win} onChange={setWin} />
 
-            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting || win === null}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
         </div>
       )}
@@ -132,7 +163,7 @@ interface SandForm {
 function LogSandPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
-  const [isWin, setIsWin] = useState(true)
+  const [win, setWin] = useState<boolean | null>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<SandForm>({
@@ -140,13 +171,14 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
   })
 
   const onSubmit = async (data: SandForm) => {
+    if (win === null) return
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const { error } = await supabase.from('volleyball_sessions').insert({
       user_id:   user.id,
       date:      data.date,
       format:    'Sand',
-      win:       isWin,
+      win,
       my_score:  data.my_score  ? parseInt(data.my_score)  : null,
       opp_score: data.opp_score ? parseInt(data.opp_score) : null,
       partner:   data.partner   || null,
@@ -154,22 +186,23 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
       notes:     data.notes     || null,
     })
     if (error) { setToast('Failed to save — try again'); return }
-    const xp = XP_RATES.volleyball_game + (isWin ? XP_RATES.volleyball_win : 0)
-    if (isWin) { playPR();     setToast(`+${xp} XP — Beach winner!`) }
-    else        { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
+    const xp = XP_RATES.volleyball_game + (win ? XP_RATES.volleyball_win : 0)
+    if (win) { playPR();     setToast(`+${xp} XP — Beach winner!`) }
+    else      { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), my_score: '', opp_score: '', partner: '', opponent: '', notes: '' })
-    setIsWin(true); setOpen(false); onLogged()
+    setWin(null); setOpen(false); onLogged()
   }
 
   return (
     <div className="mb-4">
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Game'}
+        {open ? 'Cancel' : 'Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -183,17 +216,9 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Opponent (optional)" type="text" placeholder="Team…"   {...register('opponent')} />
             <Input label="Notes (optional)"    type="text" placeholder="Location, tournament…" {...register('notes')} />
 
-            {/* Win toggle */}
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
-              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT : 'var(--border)' }}>
-                <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
-              </div>
-              <span className="font-semibold" style={{ color: isWin ? ACCENT : 'var(--text-muted)', fontSize: 13 }}>
-                {isWin ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TrophyIcon size={14} color={ACCENT} /> Win</span> : 'Loss'}
-              </span>
-            </div>
+            <ResultPicker value={win} onChange={setWin} />
 
-            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting || win === null}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
         </div>
       )}
@@ -257,12 +282,7 @@ function EditVBModal({ session, onClose, onSaved }: { session: VolleyballSession
             </div>
           </div>
         )}
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => setWin(w => !w)}>
-          <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? ACCENT : 'var(--border)' }}>
-            <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: win ? 'translateX(26px)' : 'translateX(2px)' }} />
-          </div>
-          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Win</span>
-        </div>
+        <ResultPicker value={win} onChange={setWin} />
       </div>
     </EditModal>
   )
@@ -277,6 +297,7 @@ export function Volleyball() {
   const [tab,     setTab]     = useState<'Indoor' | 'Sand'>('Indoor')
   const [all,     setAll]     = useState<VolleyballSession[]>([])
   const [editing, setEditing] = useState<VolleyballSession | null>(null)
+  const [visible, setVisible] = useState(PAGE_SIZE)
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -287,6 +308,7 @@ export function Volleyball() {
   useEffect(() => { load() }, [])
 
   const games   = all.filter(g => g.format === tab)
+  useEffect(() => { setVisible(PAGE_SIZE) }, [tab])
   const wins    = games.filter(g => g.win).length
   const losses  = games.length - wins
   const winRate = games.length ? Math.round((wins / games.length) * 100) : 0
@@ -313,16 +335,18 @@ export function Volleyball() {
           {(['Indoor', 'Sand'] as const).map(t => (
             <button
               key={t}
+              type="button"
+              aria-pressed={tab === t}
               onClick={() => setTab(t)}
               style={{
                 flex: 1, padding: '10px 0', borderRadius: 12, fontWeight: 700, fontSize: 14,
-                background: tab === t ? ACCENT : 'var(--input-bg)',
-                color: tab === t ? '#0d0d1a' : 'var(--text-muted)',
-                border: `1px solid ${tab === t ? ACCENT : 'var(--border)'}`,
+                background: tab === t ? 'var(--accent)' : 'var(--input-bg)',
+                color: tab === t ? 'var(--base-bg)' : 'var(--text-muted)',
+                border: `1px solid ${tab === t ? 'var(--accent)' : 'var(--border)'}`,
                 cursor: 'pointer', transition: 'all 0.15s',
               }}
             >
-              {t === 'Indoor' ? 'Indoor' : 'Sand'}
+              {t}
             </button>
           ))}
         </div>
@@ -335,18 +359,18 @@ export function Volleyball() {
             { label: 'Streak',   value: streak || '—' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
-              <p style={{ fontSize: 22, fontWeight: 700, color: ACCENT, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
+              <p style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
               <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>
 
         {games.length > 0 && (
-          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: `${ACCENT}10`, border: `1px solid ${ACCENT}30` }}>
+          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'var(--accent-subtle)', border: '1px solid var(--accent-dim)' }}>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{games.length} games</span>
             <div className="flex items-center gap-4">
-              <span style={{ fontSize: 14, fontWeight: 700, color: ACCENT }}>{wins}W</span>
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#f87171' }}>{losses}L</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--green)' }}>{wins}W</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--red)' }}>{losses}L</span>
             </div>
           </div>
         )}
@@ -355,35 +379,41 @@ export function Volleyball() {
         {tab === 'Indoor' ? <LogIndoorPanel onLogged={load} /> : <LogSandPanel onLogged={load} />}
 
         {/* Chart */}
-        {chartData.length >= 2 && (
+        {games.length > 0 && (
           <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Monthly Record</p>
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={chartData} barGap={4}>
-                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
-                <XAxis dataKey="month" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis allowDecimals={false} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
-                <Tooltip contentStyle={ttStyle} cursor={{ fill: 'var(--border-subtle)' }} />
-                <Bar dataKey="wins"   name="Wins"   fill={ACCENT}   fillOpacity={0.85} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="losses" name="Losses" fill="#f87171"  fillOpacity={0.7}  radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {chartData.length >= 2 ? (
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={chartData} barGap={4}>
+                  <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis allowDecimals={false} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
+                  <Tooltip contentStyle={ttStyle} cursor={{ fill: 'var(--border-subtle)' }} />
+                  <Bar dataKey="wins"   name="Wins"   fill="var(--green)" fillOpacity={0.85} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="losses" name="Losses" fill="var(--red)"   fillOpacity={0.7}  radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', padding: '8px 0' }}>
+                Monthly chart unlocks after your second month of games.
+              </p>
+            )}
           </Card>
         )}
 
         {/* History */}
         {games.length > 0 && <p className="section-label mb-3">History</p>}
-        {games.map(g => (
+        {games.slice(0, visible).map(g => (
           <Card key={g.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
             <div className="flex items-center gap-3">
               <div style={{
                 width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                background: g.win ? `${ACCENT}20` : 'rgba(248,113,113,0.12)',
+                background: g.win ? 'color-mix(in srgb, var(--green) 15%, transparent)' : 'color-mix(in srgb, var(--red) 12%, transparent)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {g.win
-                  ? <TrophyIcon size={16} color={ACCENT} />
-                  : <VolleyballIcon size={16} color="var(--text-muted)" />}
+                  ? <TrophyIcon size={16} color="var(--green)" />
+                  : <CircleIcon size={15} color="var(--text-muted)" />}
               </div>
               <div>
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>{formatDate(g.date)}</p>
@@ -397,20 +427,31 @@ export function Volleyball() {
             <div className="flex items-center gap-3">
               <div style={{ textAlign: 'right' }}>
                 {g.format === 'Sand' && g.my_score != null && g.opp_score != null && (
-                  <p style={{ fontSize: 16, fontWeight: 700, color: g.win ? ACCENT : '#f87171' }}>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: g.win ? 'var(--green)' : 'var(--red)' }}>
                     {g.my_score}—{g.opp_score}
                   </p>
                 )}
-                <p style={{ fontSize: 11, fontWeight: 600, color: g.win ? ACCENT : '#f87171' }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: g.win ? 'var(--green)' : 'var(--red)' }}>
                   {g.win ? 'Win' : 'Loss'}
                 </p>
               </div>
-              <button onClick={() => setEditing(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
+              <button type="button" aria-label="Edit game" onClick={() => setEditing(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
           </Card>
         ))}
+
+        {games.length > visible && (
+          <button
+            type="button"
+            onClick={() => setVisible(v => v + LOAD_MORE)}
+            className="w-full py-3 rounded-xl font-semibold mt-1"
+            style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+          >
+            Show more ({games.length - visible} left)
+          </button>
+        )}
 
         {games.length === 0 && (
           <EmptyState

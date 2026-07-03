@@ -14,7 +14,7 @@ import { formatDate, today } from '../lib/utils'
 import { checkForPR, getMilestoneHit, LIFT_MILESTONES, XP_RATES, epleyEst1RM } from '../lib/xp'
 import { MilestoneOverlay } from '../components/ui/MilestoneOverlay'
 import { EmptyState } from '../components/ui/EmptyState'
-import { DumbbellIcon, RunIcon, ActivityIcon, ZapIcon, GridIcon, BookmarkIcon } from '../components/ui/Icon'
+import { DumbbellIcon, RunIcon, ActivityIcon, ZapIcon, GridIcon, BookmarkIcon, CloseIcon } from '../components/ui/Icon'
 import { useStore } from '../store/useStore'
 import type { LiftType, LiftingLog, PrHistory } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -102,9 +102,10 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
         {query && (
           <button
             type="button"
+            aria-label="Clear search"
             onClick={() => { setQuery(''); onChange('', false); setOpen(true) }}
-            style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 14 }}
-          >✕</button>
+            style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}
+          ><CloseIcon size={14} /></button>
         )}
       </div>
 
@@ -128,12 +129,12 @@ function ExercisePicker({ value, onChange, exercises }: ExercisePickerProps) {
                   style={{
                     padding: '3px 10px', borderRadius: 12, fontSize: 11, cursor: 'pointer',
                     background: activeGrp === g ? 'var(--accent)' : 'var(--input-bg)',
-                    color: activeGrp === g ? '#1A1A2E' : 'var(--text-muted)',
+                    color: activeGrp === g ? 'var(--base-bg)' : 'var(--text-muted)',
                     border: 'none',
                     fontWeight: activeGrp === g ? 700 : 400,
                   }}
                 >
-                  <MuscleGroupIcon group={g} color={activeGrp === g ? '#1A1A2E' : 'var(--text-muted)'} /> {g}
+                  <MuscleGroupIcon group={g} color={activeGrp === g ? 'var(--base-bg)' : 'var(--text-muted)'} /> {g}
                 </button>
               ))}
             </div>
@@ -604,13 +605,13 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
           style={{
             flex: 1, height: 44,
             background: open ? 'var(--input-bg)' : 'var(--accent)',
-            color: open ? 'var(--text-secondary)' : '#1A1A2E',
+            color: open ? 'var(--text-secondary)' : 'var(--base-bg)',
             border: open ? '1px solid var(--border)' : 'none',
             fontSize: 14, letterSpacing: '0.01em',
             boxShadow: open ? 'none' : '0 4px 16px var(--accent-dim)',
           }}
         >
-          {open ? '✕ Cancel' : '+ Log Workout'}
+          {open ? 'Cancel' : 'Log Workout'}
         </button>
         {!open && lastWorkout && (
           <button
@@ -679,7 +680,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                 }}
                 style={{
                   padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, flexShrink: 0,
-                  background: 'var(--accent)', color: '#1A1A2E', border: 'none', cursor: 'pointer',
+                  background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer',
                 }}
               >
                 Load
@@ -790,20 +791,21 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                   style={{
                     padding: '8px 14px', borderRadius: 8, flexShrink: 0,
                     background: tmplName.trim() ? 'var(--accent)' : 'var(--input-bg)',
-                    color: tmplName.trim() ? '#1A1A2E' : 'var(--text-muted)', border: 'none',
+                    color: tmplName.trim() ? 'var(--base-bg)' : 'var(--text-muted)', border: 'none',
                     fontSize: 12, fontWeight: 700, cursor: tmplName.trim() ? 'pointer' : 'not-allowed',
                   }}
                 >Save</button>
                 <button
                   type="button"
+                  aria-label="Cancel"
                   onClick={() => { setSavingTmpl(false); setTmplName('') }}
                   style={{
                     width: 32, height: 32, borderRadius: 8, flexShrink: 0,
                     background: 'var(--input-bg)', border: '1px solid var(--border)',
-                    color: 'var(--text-muted)', cursor: 'pointer', fontSize: 13,
+                    color: 'var(--text-muted)', cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
-                >✕</button>
+                ><CloseIcon size={13} /></button>
               </div>
             )}
 
@@ -826,7 +828,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
                 style={{
                   flex: 2, height: 42, borderRadius: 10, border: 'none',
                   background: submitting ? 'rgba(245,166,35,0.5)' : 'var(--accent)',
-                  color: '#1A1A2E', fontSize: 14, fontWeight: 700,
+                  color: 'var(--base-bg)', fontSize: 14, fontWeight: 700,
                   cursor: submitting ? 'not-allowed' : 'pointer',
                   boxShadow: submitting ? 'none' : '0 4px 16px var(--accent-dim)',
                 }}
@@ -1147,7 +1149,7 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
                         </span>
                       )}
                       {row.is_pr && (
-                        <span style={{ fontSize: 10, fontWeight: 700, color: '#1A1A2E', background: 'var(--accent)', padding: '2px 8px', borderRadius: 4 }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--base-bg)', background: 'var(--accent)', padding: '2px 8px', borderRadius: 4 }}>
                           PR
                         </span>
                       )}
@@ -1193,7 +1195,7 @@ function TabPill({ label, active, onClick }: { label: string; active: boolean; o
         flex: 1, padding: '8px 12px', borderRadius: 7,
         fontSize: 13, fontWeight: 600, cursor: 'pointer',
         background: active ? 'var(--accent)' : 'transparent',
-        color:      active ? '#1A1A2E' : 'var(--text-secondary)',
+        color:      active ? 'var(--base-bg)' : 'var(--text-secondary)',
         border:     'none',
         transition: 'all 0.15s ease',
         letterSpacing: '0.01em',
@@ -1321,7 +1323,7 @@ export function Records() {
                       flexShrink: 0, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
                       display: 'inline-flex', alignItems: 'center',
                       background: muscleFilter === null ? 'var(--accent)' : 'var(--surface-2)',
-                      color: muscleFilter === null ? '#1A1A2E' : 'var(--text-secondary)',
+                      color: muscleFilter === null ? 'var(--base-bg)' : 'var(--text-secondary)',
                       border: `1px solid ${muscleFilter === null ? 'var(--accent)' : 'var(--border-subtle)'}`,
                       cursor: 'pointer', transition: 'all 0.12s ease',
                     }}
@@ -1334,11 +1336,11 @@ export function Records() {
                         flexShrink: 0, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
                         display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
                         background: muscleFilter === grp ? 'var(--accent)' : 'var(--surface-2)',
-                        color: muscleFilter === grp ? '#1A1A2E' : 'var(--text-secondary)',
+                        color: muscleFilter === grp ? 'var(--base-bg)' : 'var(--text-secondary)',
                         border: `1px solid ${muscleFilter === grp ? 'var(--accent)' : 'var(--border-subtle)'}`,
                         cursor: 'pointer', transition: 'all 0.12s ease',
                       }}
-                    ><MuscleGroupIcon group={grp} color={muscleFilter === grp ? '#1A1A2E' : 'var(--text-secondary)'} /> {grp}</button>
+                    ><MuscleGroupIcon group={grp} color={muscleFilter === grp ? 'var(--base-bg)' : 'var(--text-secondary)'} /> {grp}</button>
                   ))}
                 </div>
               )}

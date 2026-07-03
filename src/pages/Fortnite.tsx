@@ -28,12 +28,12 @@ type FnRank = typeof FN_RANKS[number]
 
 const RANK_COLORS: Record<FnRank, string> = {
   Bronze: '#cd7f32', Silver: '#a8a9ad', Gold: '#ffd700',
-  Platinum: '#66d9e8', Diamond: '#5c85d6', Elite: '#9b59b6',
+  Platinum: '#66d9e8', Diamond: 'var(--cat-cardio)', Elite: '#9b59b6',
   Champion: '#e74c3c', Unreal: '#f5a623',
 }
 
 const ACCENT_NORMAL = 'var(--accent)'
-const ACCENT_BLITZ  = '#a855f7'
+const ACCENT_BLITZ  = 'var(--chart-alt)'
 
 const ttStyle  = CHART_TOOLTIP_STYLE
 const lblStyle = { color: 'var(--text-muted)' }
@@ -151,8 +151,8 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
             <AreaChart data={killsData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id={`${gradId}-kills`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#7B2FBE" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#7B2FBE" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="var(--chart-alt)" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="var(--chart-alt)" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
@@ -160,7 +160,7 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
               <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={20} />
               <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [v as number, 'Kills']} />
               <ReferenceLine y={avgKills} stroke={accent} strokeDasharray="4 2" strokeOpacity={0.4} />
-              <Area type="monotone" dataKey="kills" stroke="#7B2FBE" strokeWidth={2.5} fill={`url(#${gradId}-kills)`} dot={{ fill: '#7B2FBE', r: 3, fillOpacity: 0.7 }} activeDot={{ r: 5, fill: '#7B2FBE', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
+              <Area type="monotone" dataKey="kills" stroke="var(--chart-alt)" strokeWidth={2.5} fill={`url(#${gradId}-kills)`} dot={{ fill: 'var(--chart-alt)', r: 3, fillOpacity: 0.7 }} activeDot={{ r: 5, fill: 'var(--chart-alt)', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
           <p className="text-xs mt-1" style={{ color: accent }}>── avg {avgKills}K</p>
@@ -174,15 +174,15 @@ function FnCharts({ games, accent, gradId }: { games: FortniteGame[]; accent: st
             <AreaChart data={accuracyData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id={`${gradId}-acc`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#2ECC71" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#2ECC71" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="var(--green)" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="var(--green)" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
               <XAxis dataKey="date" tickFormatter={(d: string) => formatDate(d)} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} />
               <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
               <Tooltip contentStyle={ttStyle} labelStyle={lblStyle} itemStyle={itmStyle} cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1 }} labelFormatter={(l: unknown) => typeof l === 'string' ? formatDateTooltip(l) : String(l)} formatter={(v: unknown) => [`${v}%`, 'Accuracy']} />
-              <Area type="monotone" dataKey="accuracy" stroke="#2ECC71" strokeWidth={2.5} fill={`url(#${gradId}-acc)`} dot={false} activeDot={{ r: 4, fill: '#2ECC71', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
+              <Area type="monotone" dataKey="accuracy" stroke="var(--green)" strokeWidth={2.5} fill={`url(#${gradId}-acc)`} dot={false} activeDot={{ r: 4, fill: 'var(--green)', stroke: 'var(--base-bg)', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
         </Card>
@@ -230,15 +230,15 @@ function EditFortniteModal({ game, onClose, onSaved }: { game: FortniteGame; onC
           </div>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-base font-medium" style={{ color: '#AAAAAA' }}>Accuracy %</label>
+          <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Accuracy %</label>
           <input type="number" step="0.1" value={accuracy} onChange={e => setAccuracy(e.target.value)} className="px-3 py-3 rounded-lg outline-none text-base" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
         </div>
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => setWin(w => !w)}>
-          <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? '#27AE60' : 'var(--border)' }}>
-            <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: win ? 'translateX(26px)' : 'translateX(2px)' }} />
+        <button type="button" role="switch" aria-checked={win} aria-label="Win" onClick={() => setWin(w => !w)} className="flex items-center gap-3" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+          <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: win ? 'var(--green)' : 'var(--border)' }}>
+            <div className="absolute top-0.5 w-5 h-5 rounded-full transition-transform" style={{ background: 'var(--surface-1)', transform: win ? 'translateX(26px)' : 'translateX(2px)' }} />
           </div>
           <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Win</span>
-        </div>
+        </button>
       </div>
     </EditModal>
   )
@@ -304,7 +304,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? ACCENT_NORMAL : 'var(--input-bg)', color: open ? 'var(--base-bg)' : ACCENT_NORMAL, border: `1px solid ${ACCENT_NORMAL}`, fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Game'}
+        {open ? 'Cancel' : 'Log Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -329,28 +329,28 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Accuracy %" type="number" step="0.1" placeholder="24.5" {...register('accuracy')} />
 
             {/* Win toggle */}
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
+            <button type="button" role="switch" aria-checked={isWin} aria-label="Victory Royale" onClick={() => setIsWin(w => !w)} className="flex items-center gap-3" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? 'var(--accent)' : 'var(--border)' }}>
-                <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
+                <div className="absolute top-0.5 w-5 h-5 rounded-full transition-transform" style={{ background: 'var(--surface-1)', transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
               <span className="font-semibold" style={{ color: isWin ? 'var(--accent)' : 'var(--text-muted)', fontSize: 13 }}>
                 {isWin
                   ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TrophyIcon size={14} color="var(--accent)" /> Victory Royale</span>
                   : 'No win'}
               </span>
-            </div>
+            </button>
 
             {/* Ranked toggle */}
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsRanked(r => !r)}>
-              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isRanked ? '#5c85d6' : 'var(--border)' }}>
-                <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isRanked ? 'translateX(26px)' : 'translateX(2px)' }} />
+            <button type="button" role="switch" aria-checked={isRanked} aria-label="Ranked Match" onClick={() => setIsRanked(r => !r)} className="flex items-center gap-3" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+              <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isRanked ? 'var(--cat-cardio)' : 'var(--border)' }}>
+                <div className="absolute top-0.5 w-5 h-5 rounded-full transition-transform" style={{ background: 'var(--surface-1)', transform: isRanked ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
-              <span className="font-semibold" style={{ color: isRanked ? '#5c85d6' : 'var(--text-muted)', fontSize: 13 }}>
+              <span className="font-semibold" style={{ color: isRanked ? 'var(--cat-cardio)' : 'var(--text-muted)', fontSize: 13 }}>
                 {isRanked
-                  ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><StarIcon size={14} color="#5c85d6" /> Ranked Match</span>
+                  ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><StarIcon size={14} color="var(--cat-cardio)" /> Ranked Match</span>
                   : 'Casual / Pubs'}
               </span>
-            </div>
+            </button>
 
             {/* Rank selector */}
             {isRanked && (
@@ -432,9 +432,9 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT_BLITZ : 'rgba(168,85,247,0.08)', color: open ? '#fff' : ACCENT_BLITZ, border: `1px solid ${ACCENT_BLITZ}`, fontSize: 15 }}
+        style={{ background: open ? ACCENT_BLITZ : 'color-mix(in srgb, var(--chart-alt) 8%, transparent)', color: open ? 'var(--base-bg)' : ACCENT_BLITZ, border: `1px solid ${ACCENT_BLITZ}`, fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Blitz Game'}
+        {open ? 'Cancel' : 'Log Blitz Game'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -457,16 +457,16 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Accuracy %" type="number" step="0.1" placeholder="24.5" {...register('accuracy')} />
 
             {/* Win toggle */}
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsWin(w => !w)}>
+            <button type="button" role="switch" aria-checked={isWin} aria-label="Blitz Win" onClick={() => setIsWin(w => !w)} className="flex items-center gap-3" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
               <div className="w-12 h-6 rounded-full transition-colors relative" style={{ background: isWin ? ACCENT_BLITZ : 'var(--border)' }}>
-                <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform" style={{ transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
+                <div className="absolute top-0.5 w-5 h-5 rounded-full transition-transform" style={{ background: 'var(--surface-1)', transform: isWin ? 'translateX(26px)' : 'translateX(2px)' }} />
               </div>
               <span className="font-semibold" style={{ color: isWin ? ACCENT_BLITZ : 'var(--text-muted)', fontSize: 13 }}>
                 {isWin
                   ? <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><ZapIcon size={14} color={ACCENT_BLITZ} /> Blitz Win</span>
                   : 'No win'}
               </span>
-            </div>
+            </button>
 
             <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting} style={{ background: ACCENT_BLITZ }}>{isSubmitting ? 'Logging...' : 'Log Blitz Game'}</Button>
           </form>
@@ -480,6 +480,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
 // ── Normal tab ─────────────────────────────────────────────────────
 
 function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged: () => void; onEdit: (g: FortniteGame) => void }) {
+  const [visible, setVisible] = useState(10)
   const wins      = games.filter(g => g.win).length
   const avgKills  = games.length ? Math.round((games.reduce((s, g) => s + g.kills, 0) / games.length) * 10) / 10 : 0
   const bestKills = games.length ? Math.max(...games.map(g => g.kills)) : 0
@@ -494,12 +495,12 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
       ]} />
 
       {rankedWins > 0 && (
-        <div className="rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between" style={{ background: 'rgba(92,133,214,0.08)', border: '1px solid rgba(92,133,214,0.25)' }}>
+        <div className="rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between" style={{ background: 'color-mix(in srgb, var(--cat-cardio) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--cat-cardio) 25%, transparent)' }}>
           <div className="flex items-center gap-2">
-            <StarIcon size={14} color="#5c85d6" />
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#5c85d6' }}>Ranked Wins</span>
+            <StarIcon size={14} color="var(--cat-cardio)" />
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--cat-cardio)' }}>Ranked Wins</span>
           </div>
-          <span style={{ fontSize: 20, fontWeight: 700, color: '#5c85d6' }}>{rankedWins}</span>
+          <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--cat-cardio)' }}>{rankedWins}</span>
         </div>
       )}
 
@@ -510,13 +511,13 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
       {games.length > 0 && (
         <p className="section-label mb-3">History</p>
       )}
-      {games.map(g => {
+      {games.slice(0, visible).map(g => {
         const gExt = g as FortniteGame & { is_ranked?: boolean; rank_name?: string }
         return (
           <div
             key={g.id}
             className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
-            style={{ background: 'var(--surface-1)', border: `1px solid ${g.win ? 'rgba(245,166,35,0.3)' : 'var(--border-subtle)'}` }}
+            style={{ background: 'var(--surface-1)', border: `1px solid ${g.win ? 'var(--accent-dim)' : 'var(--border-subtle)'}` }}
           >
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: g.win ? ACCENT_NORMAL : 'var(--border-default)' }} />
@@ -545,13 +546,23 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
                 <p className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>{g.kills}K</p>
                 {g.accuracy != null && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{g.accuracy}%</p>}
               </div>
-              <button onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
+              <button type="button" aria-label="Edit game" onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
           </div>
         )
       })}
+      {games.length > visible && (
+        <button
+          type="button"
+          onClick={() => setVisible(v => v + 20)}
+          className="w-full py-3 rounded-xl font-semibold mt-1"
+          style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+        >
+          Show more ({games.length - visible} left)
+        </button>
+      )}
 
       {games.length === 0 && (
         <EmptyState
@@ -567,13 +578,14 @@ function NormalTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogge
 // ── Blitz tab ──────────────────────────────────────────────────────
 
 function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged: () => void; onEdit: (g: FortniteGame) => void }) {
+  const [visible, setVisible] = useState(10)
   const wins      = games.filter(g => g.win).length
   const avgKills  = games.length ? Math.round((games.reduce((s, g) => s + g.kills, 0) / games.length) * 10) / 10 : 0
   const bestKills = games.length ? Math.max(...games.map(g => g.kills)) : 0
 
   return (
     <>
-      <div className="rounded-xl px-4 py-3 mb-4 flex items-center gap-2" style={{ background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.18)' }}>
+      <div className="rounded-xl px-4 py-3 mb-4 flex items-center gap-2" style={{ background: 'color-mix(in srgb, var(--chart-alt) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--chart-alt) 18%, transparent)' }}>
         <ZapIcon size={14} color={ACCENT_BLITZ} />
         <p style={{ fontSize: 12, color: ACCENT_BLITZ, opacity: 0.85 }}>
           Blitz: fast-paced rounds with a shrinking storm. Solos, Duos and Squads only — no ranked.
@@ -593,11 +605,11 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
       {games.length > 0 && (
         <p className="section-label mb-3">History</p>
       )}
-      {games.map(g => (
+      {games.slice(0, visible).map(g => (
         <div
           key={g.id}
           className="flex items-center justify-between px-4 py-3 rounded-xl mb-2 card-animate"
-          style={{ background: 'var(--surface-1)', border: `1px solid ${g.win ? 'rgba(168,85,247,0.3)' : 'var(--border-subtle)'}` }}
+          style={{ background: 'var(--surface-1)', border: `1px solid ${g.win ? 'color-mix(in srgb, var(--chart-alt) 30%, transparent)' : 'var(--border-subtle)'}` }}
         >
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-10 rounded-full flex-shrink-0" style={{ background: g.win ? ACCENT_BLITZ : 'var(--border-default)' }} />
@@ -616,12 +628,22 @@ function BlitzTab({ games, onLogged, onEdit }: { games: FortniteGame[]; onLogged
               <p className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>{g.kills}K</p>
               {g.accuracy != null && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{g.accuracy}%</p>}
             </div>
-            <button onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
+            <button type="button" aria-label="Edit game" onClick={() => onEdit(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
               <EditIcon size={13} color="var(--text-muted)" />
             </button>
           </div>
         </div>
       ))}
+      {games.length > visible && (
+        <button
+          type="button"
+          onClick={() => setVisible(v => v + 20)}
+          className="w-full py-3 rounded-xl font-semibold mt-1"
+          style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+        >
+          Show more ({games.length - visible} left)
+        </button>
+      )}
 
       {games.length === 0 && (
         <EmptyState
@@ -669,7 +691,7 @@ export function Fortnite() {
                 fontWeight: 700, fontSize: 13,
                 cursor: 'pointer', transition: 'all 0.15s', border: 'none',
                 background: tab === t ? color : 'transparent',
-                color: tab === t ? (t === 'blitz' ? '#fff' : 'var(--base-bg)') : 'var(--text-muted)',
+                color: tab === t ? 'var(--base-bg)' : 'var(--text-muted)',
               }}
             >
               {label}

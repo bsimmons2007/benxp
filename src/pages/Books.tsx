@@ -9,7 +9,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
-import { EditIcon, CheckIcon, BookIcon } from '../components/ui/Icon'
+import { EditIcon, CheckIcon, BookIcon, CloseIcon, PlusIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
@@ -542,9 +542,9 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Add Book'}
+        {open ? 'Cancel' : 'Add Book'}
       </button>
 
       {open && (
@@ -639,11 +639,12 @@ function ToReadSection() {
       <div className="flex items-center justify-between mb-3">
         <p className="card-title">To-Read List</p>
         <button
+          type="button"
           onClick={() => setShowForm(s => !s)}
-          className="text-sm px-3 py-1.5 rounded-lg font-medium"
-          style={{ background: showForm ? 'var(--accent)' : 'var(--input-bg)', color: showForm ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)' }}
+          className="text-sm px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1"
+          style={{ background: showForm ? 'var(--accent)' : 'var(--input-bg)', color: showForm ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)' }}
         >
-          {showForm ? '✕' : '+ Add'}
+          {showForm ? <CloseIcon size={14} /> : <><PlusIcon size={14} /> Add</>}
         </button>
       </div>
 
@@ -680,7 +681,7 @@ function ToReadSection() {
               {b.priority && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: PRIORITY_COLORS[b.priority], color: 'var(--text-primary)' }}>{b.priority}</span>
               )}
-              <button onClick={() => remove(b.id)} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <button type="button" aria-label="Remove" onClick={() => remove(b.id)} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><CloseIcon size={16} /></button>
             </div>
           </Card>
         ))}
@@ -697,6 +698,7 @@ export function Books() {
   const [sort, setSort]           = useState<SortKey>('date_desc')
   const [filterGenre, setFilterGenre] = useState('All')
   const [groupBySeries, setGroupBySeries] = useState(false)
+  const [visible, setVisible] = useState(10)
   const [seriesMap, setSeriesMap] = useState<Record<string, string>>(() => getSeriesMap())
 
   async function load() {
@@ -865,7 +867,7 @@ export function Books() {
                   onClick={() => setFilterGenre(g)}
                   className="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0 transition-all"
                   style={filterGenre === g
-                    ? { background: 'var(--accent)', color: '#1A1A2E' }
+                    ? { background: 'var(--accent)', color: 'var(--base-bg)' }
                     : { background: 'var(--input-bg)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
                 >
                   {g}
@@ -924,7 +926,19 @@ export function Books() {
                 )}
               </>
             ) : (
-              sorted.map(book => <BookCard key={book.id} book={book} onEdited={load} />)
+              <>
+                {sorted.slice(0, visible).map(book => <BookCard key={book.id} book={book} onEdited={load} />)}
+                {sorted.length > visible && (
+                  <button
+                    type="button"
+                    onClick={() => setVisible(v => v + 20)}
+                    className="w-full py-3 rounded-xl font-semibold mt-1"
+                    style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+                  >
+                    Show more ({sorted.length - visible} left)
+                  </button>
+                )}
+              </>
             )}
           </>
         )}

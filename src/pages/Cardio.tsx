@@ -143,12 +143,13 @@ function LogCardioPanel({ onLogged }: { onLogged: () => void }) {
   return (
     <div className="mb-4">
       <button
+        type="button"
         data-tutorial="log-cardio-btn"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Session'}
+        {open ? 'Cancel' : 'Log Session'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -276,6 +277,7 @@ export function Cardio() {
   const [filter, setFilter]     = useState<ActivityKey | 'all'>('all')
   const [editing, setEditing]   = useState<Session | null>(null)
   const [loadError, setLoadError] = useState(false)
+  const [visible, setVisible]   = useState(10)
   const [chartLoading, setChartLoading] = useState(true)
   const [splitsMap, setSplitsMap] = useState<Record<string, string[]>>(() => getSplitsMap())
 
@@ -317,6 +319,7 @@ export function Cardio() {
   useEffect(() => { load() }, [])
 
   const filtered  = filter === 'all' ? sessions : sessions.filter(s => s.activity === filter)
+  useEffect(() => { setVisible(10) }, [filter])
   const totalMiles = sessions.reduce((s, r) => s + r.distance, 0)
   const totalXP    = sessions.reduce((s, r) => s + sessionXP(r), 0)
 
@@ -501,7 +504,7 @@ export function Cardio() {
         {filtered.length > 0 ? (
           <Card noPadding className="overflow-hidden">
             <p className="px-4 pt-4 pb-2 font-bold" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Sessions</p>
-            {filtered.map(s => {
+            {filtered.slice(0, visible).map(s => {
               const pace = s.duration_mins && s.distance ? (s.duration_mins / s.distance).toFixed(1) : null
               return (
                 <div key={`${s.source}-${s.id}`} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
@@ -510,8 +513,8 @@ export function Cardio() {
                       <ActivityIconComp activityKey={s.activity} size={14} color="var(--text-secondary)" />
                       {s.distance.toFixed(2)} mi
                       {s.fastest_mile && (
-                        <span className="flex items-center gap-1 ml-1 text-xs font-normal" style={{ color: '#2ECC71' }}>
-                          <ZapIcon size={11} color="#2ECC71" /> {s.fastest_mile.toFixed(2)} min/mi
+                        <span className="flex items-center gap-1 ml-1 text-xs font-normal" style={{ color: 'var(--green)' }}>
+                          <ZapIcon size={11} color="var(--green)" /> {s.fastest_mile.toFixed(2)} min/mi
                         </span>
                       )}
                       {pace && !s.fastest_mile && <span className="ml-1 text-xs font-normal" style={{ color: 'var(--text-muted)' }}>{pace} min/mi</span>}
@@ -524,7 +527,7 @@ export function Cardio() {
                     {splitsMap[s.id] && s.source === 'cardio' && s.activity === 'run' && (
                       <div className="flex flex-wrap gap-1 mt-1.5">
                         {splitsMap[s.id].map((split, i) => (
-                          <span key={i} className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--input-bg)', color: '#3b82f6', fontFamily: 'var(--font-sans)' }}>
+                          <span key={i} className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--input-bg)', color: 'var(--cat-cardio)', fontFamily: 'var(--font-sans)' }}>
                             {i + 1}: {split}
                           </span>
                         ))}
@@ -534,6 +537,8 @@ export function Cardio() {
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>+{sessionXP(s)} XP</span>
                     <button
+                      type="button"
+                      aria-label="Edit session"
                       onClick={() => setEditing(s)}
                       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
                     >
@@ -543,6 +548,16 @@ export function Cardio() {
                 </div>
               )
             })}
+            {filtered.length > visible && (
+              <button
+                type="button"
+                onClick={() => setVisible(v => v + 20)}
+                className="w-full py-3 font-semibold"
+                style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: 'none', borderTop: '1px solid var(--border-faint)', fontSize: 14, cursor: 'pointer' }}
+              >
+                Show more ({filtered.length - visible} left)
+              </button>
+            )}
           </Card>
         ) : (
           <p className="text-center py-8" style={{ color: 'var(--text-muted)' }}>

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { TopBar } from '../components/layout/TopBar'
@@ -18,15 +18,15 @@ import { ChessIcon, TrophyIcon, EditIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 import type { ChessGame } from '../types'
 
-const ACCENT = '#a78bfa'
-
+const PAGE_SIZE = 10
+const LOAD_MORE = 20
 const TIME_CONTROLS = ['Bullet', 'Blitz', 'Rapid', 'Classical'] as const
 const RESULTS = ['win', 'draw', 'loss'] as const
 
 function resultColor(r: string) {
-  if (r === 'win')  return '#34d399'
-  if (r === 'draw') return '#f59e0b'
-  return '#f87171'
+  if (r === 'win')  return 'var(--green)'
+  if (r === 'draw') return 'var(--warning)'
+  return 'var(--red)'
 }
 function resultLabel(r: string) {
   if (r === 'win')  return 'Win'
@@ -38,7 +38,6 @@ function resultLabel(r: string) {
 
 interface ChessForm {
   date: string
-  result: string
   rating_after: string
   time_control: string
   color: string
@@ -50,21 +49,21 @@ interface ChessForm {
 function LogChessPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [result, setResult] = useState<typeof RESULTS[number] | null>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
-  const { register, handleSubmit, reset, watch, formState: { isSubmitting } } = useForm<ChessForm>({
-    defaultValues: { date: today(), result: 'win', rating_after: '', time_control: 'Blitz', color: 'White', opponent: '', opening: '', notes: '' },
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<ChessForm>({
+    defaultValues: { date: today(), rating_after: '', time_control: 'Blitz', color: 'White', opponent: '', opening: '', notes: '' },
   })
 
-  const result = watch('result')
-
   const onSubmit = async (data: ChessForm) => {
+    if (!result) return
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const { error } = await supabase.from('chess_games').insert({
       user_id:      user.id,
       date:         data.date,
-      result:       data.result,
+      result,
       rating_after: data.rating_after ? parseInt(data.rating_after) : null,
       time_control: data.time_control,
       color:        data.color || null,
@@ -74,50 +73,56 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
     })
     if (error) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.chess_game
-      + (data.result === 'win'  ? XP_RATES.chess_win  : 0)
-      + (data.result === 'draw' ? XP_RATES.chess_draw : 0)
-    if (data.result === 'win')  { playPR();     setToast(`+${xp} XP — Checkmate!`) }
-    else if (data.result === 'draw') { playXPGain(); setToast(`+${xp} XP — Draw logged`) }
+      + (result === 'win'  ? XP_RATES.chess_win  : 0)
+      + (result === 'draw' ? XP_RATES.chess_draw : 0)
+    if (result === 'win')  { playPR();     setToast(`+${xp} XP — Checkmate!`) }
+    else if (result === 'draw') { playXPGain(); setToast(`+${xp} XP — Draw logged`) }
     else                        { playXPGain(); setToast(`+${xp} XP — Game logged`) }
     await refreshXP(); refreshActivity()
-    reset({ date: today(), result: 'win', rating_after: '', time_control: 'Blitz', color: 'White', opponent: '', opening: '', notes: '' })
+    reset({ date: today(), rating_after: '', time_control: 'Blitz', color: 'White', opponent: '', opening: '', notes: '' })
+    setResult(null)
     setOpen(false); onLogged()
   }
 
   return (
     <div className="mb-5">
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Game'}
+        {open ? 'Cancel' : 'Log Game'}
       </button>
       {open && (
         <Card className="mt-3 pop-in">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input label="Date" type="date" {...register('date', { required: true })} />
 
-            {/* Result selector */}
+            {/* Required result — no default */}
             <div className="flex flex-col gap-2">
               <label className="section-label">Result</label>
               <div className="flex gap-2">
-                {RESULTS.map(r => (
-                  <label
-                    key={r}
-                    style={{
-                      flex: 1, textAlign: 'center', padding: '8px 4px', borderRadius: 10, cursor: 'pointer',
-                      background: result === r ? `${resultColor(r)}20` : 'var(--input-bg)',
-                      border: `1px solid ${result === r ? resultColor(r) : 'var(--border)'}`,
-                      color: result === r ? resultColor(r) : 'var(--text-muted)',
-                      fontWeight: result === r ? 700 : 400, fontSize: 13,
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <input type="radio" value={r} {...register('result')} style={{ display: 'none' }} />
-                    {resultLabel(r)}
-                  </label>
-                ))}
+                {RESULTS.map(r => {
+                  const active = result === r
+                  return (
+                    <button
+                      key={r}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setResult(r)}
+                      style={{
+                        flex: 1, textAlign: 'center', padding: '10px 4px', borderRadius: 10, cursor: 'pointer',
+                        background: active ? `color-mix(in srgb, ${resultColor(r)} 15%, transparent)` : 'var(--input-bg)',
+                        border: `1px solid ${active ? resultColor(r) : 'var(--border)'}`,
+                        color: active ? resultColor(r) : 'var(--text-muted)',
+                        fontWeight: active ? 700 : 500, fontSize: 13, transition: 'all 0.15s',
+                      }}
+                    >
+                      {resultLabel(r)}
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
@@ -142,7 +147,7 @@ function LogChessPanel({ onLogged }: { onLogged: () => void }) {
             <Input label="Opening (optional)" type="text" placeholder="Sicilian Defense" {...register('opening')} />
             <Input label="Notes (optional)" type="text" placeholder="Blundered the queen on move 22…" {...register('notes')} />
 
-            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
+            <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting || !result}>{isSubmitting ? 'Logging...' : 'Log Game'}</Button>
           </form>
         </Card>
       )}
@@ -179,13 +184,14 @@ function EditChessModal({ game, onClose, onSaved }: { game: ChessGame; onClose: 
           {RESULTS.map(r => (
             <button
               key={r} type="button"
+              aria-pressed={result === r}
               onClick={() => setResult(r)}
               style={{
-                flex: 1, padding: '8px 4px', borderRadius: 10, cursor: 'pointer',
-                background: result === r ? `${resultColor(r)}20` : 'var(--input-bg)',
+                flex: 1, padding: '10px 4px', borderRadius: 10, cursor: 'pointer',
+                background: result === r ? `color-mix(in srgb, ${resultColor(r)} 15%, transparent)` : 'var(--input-bg)',
                 border: `1px solid ${result === r ? resultColor(r) : 'var(--border)'}`,
                 color: result === r ? resultColor(r) : 'var(--text-muted)',
-                fontWeight: result === r ? 700 : 400, fontSize: 13,
+                fontWeight: result === r ? 700 : 500, fontSize: 13,
               }}
             >{resultLabel(r)}</button>
           ))}
@@ -208,6 +214,7 @@ export function Chess() {
   const [games,   setGames]   = useState<ChessGame[]>([])
   const [editing, setEditing] = useState<ChessGame | null>(null)
   const [tcFilter, setTcFilter] = useState<string | null>(null)
+  const [visible, setVisible] = useState(PAGE_SIZE)
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -218,12 +225,12 @@ export function Chess() {
   useEffect(() => { load() }, [])
 
   const filtered = tcFilter ? games.filter(g => g.time_control === tcFilter) : games
+  useEffect(() => { setVisible(PAGE_SIZE) }, [tcFilter])
   const wins     = filtered.filter(g => g.result === 'win').length
   const draws    = filtered.filter(g => g.result === 'draw').length
   const losses   = filtered.filter(g => g.result === 'loss').length
   const winRate  = filtered.length ? Math.round((wins / filtered.length) * 100) : 0
 
-  // Rating trend — only games that have rating_after, chronological
   const ratingData = [...games]
     .filter(g => g.rating_after != null)
     .reverse()
@@ -233,10 +240,9 @@ export function Chess() {
   const currentRating = ratingData.length ? ratingData[ratingData.length - 1].rating : null
   const peakRating    = ratingData.length ? Math.max(...ratingData.map(d => d.rating)) : null
 
-  // Streak
   const streak = (() => { let s = 0; for (const g of games) { if (g.result === 'win') s++; else break } return s })()
-
   const usedControls = [...new Set(games.map(g => g.time_control))].filter(Boolean)
+  const shown = filtered.slice(0, visible)
 
   return (
     <>
@@ -246,18 +252,18 @@ export function Chess() {
         {/* Rating hero */}
         {currentRating && (
           <div className="rounded-2xl p-5 mb-4 text-center" style={{
-            background: `linear-gradient(135deg, rgba(167,139,250,0.12) 0%, rgba(139,92,246,0.08) 100%)`,
-            border: '1px solid rgba(167,139,250,0.25)',
+            background: 'var(--accent-subtle)',
+            border: '1px solid var(--accent-dim)',
           }}>
             <p className="section-label mb-1">Current Rating</p>
-            <p style={{ fontSize: 52, fontWeight: 700, color: ACCENT, lineHeight: 1 }}>
+            <p style={{ fontSize: 52, fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>
               {currentRating.toLocaleString()}
             </p>
             {peakRating && peakRating > currentRating && (
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Peak {peakRating.toLocaleString()}</p>
             )}
             {peakRating && peakRating === currentRating && (
-              <p style={{ fontSize: 12, color: '#f59e0b', marginTop: 4 }}>Personal best</p>
+              <p style={{ fontSize: 12, color: 'var(--warning)', marginTop: 4 }}>Personal best</p>
             )}
           </div>
         )}
@@ -265,10 +271,10 @@ export function Chess() {
         {/* Stat cards */}
         <div className="grid grid-cols-4 gap-2 mb-3">
           {[
-            { label: 'Wins',     value: wins,    color: '#34d399' },
-            { label: 'Draws',    value: draws,   color: '#f59e0b' },
-            { label: 'Losses',   value: losses,  color: '#f87171' },
-            { label: 'Win %',    value: filtered.length ? `${winRate}%` : '—', color: ACCENT },
+            { label: 'Wins',     value: wins,    color: 'var(--green)' },
+            { label: 'Draws',    value: draws,   color: 'var(--warning)' },
+            { label: 'Losses',   value: losses,  color: 'var(--red)' },
+            { label: 'Win %',    value: filtered.length ? `${winRate}%` : '—', color: 'var(--accent)' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-2 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
               <p style={{ fontSize: 20, fontWeight: 700, color: s.color, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
@@ -279,10 +285,10 @@ export function Chess() {
 
         {/* Streak + summary */}
         {games.length > 0 && (
-          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.2)' }}>
+          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'var(--accent-subtle)', border: '1px solid var(--accent-dim)' }}>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{games.length} games</span>
             {streak > 1 && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#34d399' }}>{streak} win streak</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>{streak} win streak</span>
             )}
           </div>
         )}
@@ -293,12 +299,13 @@ export function Chess() {
             {[null, ...usedControls].map(tc => (
               <button
                 key={tc ?? 'all'}
+                type="button"
                 onClick={() => setTcFilter(tc)}
                 style={{
                   flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                  background: tcFilter === tc ? ACCENT : 'var(--input-bg)',
-                  color: tcFilter === tc ? '#0d0d1a' : 'var(--text-secondary)',
-                  border: `1px solid ${tcFilter === tc ? ACCENT : 'var(--border-subtle)'}`,
+                  background: tcFilter === tc ? 'var(--accent)' : 'var(--input-bg)',
+                  color: tcFilter === tc ? 'var(--base-bg)' : 'var(--text-secondary)',
+                  border: `1px solid ${tcFilter === tc ? 'var(--accent)' : 'var(--border-subtle)'}`,
                   cursor: 'pointer', transition: 'all 0.12s',
                 }}
               >{tc ?? 'All'}</button>
@@ -316,8 +323,8 @@ export function Chess() {
               <AreaChart data={ratingData}>
                 <defs>
                   <linearGradient id="chess-rating-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stopColor={ACCENT} stopOpacity={0.18} />
-                    <stop offset="100%" stopColor={ACCENT} stopOpacity={0.02} />
+                    <stop offset="0%"   stopColor="var(--accent)" stopOpacity={0.18} />
+                    <stop offset="100%" stopColor="var(--accent)" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
@@ -325,13 +332,13 @@ export function Chess() {
                 <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={36}
                   domain={['auto', 'auto']} />
                 {peakRating && (
-                  <ReferenceLine y={peakRating} stroke="rgba(245,158,11,0.3)" strokeDasharray="4 4"
-                    label={{ value: 'Peak', fill: '#f59e0b', fontSize: 9, position: 'insideTopRight' }} />
+                  <ReferenceLine y={peakRating} stroke="color-mix(in srgb, var(--warning) 40%, transparent)" strokeDasharray="4 4"
+                    label={{ value: 'Peak', fill: 'var(--warning)', fontSize: 9, position: 'insideTopRight' }} />
                 )}
                 <Tooltip contentStyle={ttStyle} formatter={(v: number) => [v, 'Rating']} />
                 <Area
-                  type="monotone" dataKey="rating" stroke={ACCENT} strokeWidth={2.5} fill="url(#chess-rating-grad)"
-                  dot={{ r: 3, fill: ACCENT, strokeWidth: 0 }}
+                  type="monotone" dataKey="rating" stroke="var(--accent)" strokeWidth={2.5} fill="url(#chess-rating-grad)"
+                  dot={{ r: 3, fill: 'var(--accent)', strokeWidth: 0 }}
                   activeDot={{ r: 5 }}
                 />
               </AreaChart>
@@ -341,21 +348,21 @@ export function Chess() {
 
         {/* History */}
         {filtered.length > 0 && <p className="section-label mb-3">Game History</p>}
-        {filtered.map(g => (
+        {shown.map(g => (
           <Card key={g.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
             <div className="flex items-center gap-3">
               <div style={{
-                width: 36, height: 36, borderRadius: 10, flexShrink: 0, fontSize: 16,
-                background: g.result === 'win' ? 'rgba(52,211,153,0.15)' : g.result === 'draw' ? 'rgba(245,158,11,0.1)' : 'rgba(248,113,113,0.1)',
+                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                background: `color-mix(in srgb, ${resultColor(g.result)} 14%, transparent)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                {g.result === 'win' ? <TrophyIcon size={16} color="#34d399" /> : <ChessIcon size={16} color={resultColor(g.result)} />}
+                {g.result === 'win' ? <TrophyIcon size={16} color="var(--green)" /> : <ChessIcon size={16} color={resultColor(g.result)} />}
               </div>
               <div>
                 <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>
                   {formatDate(g.date)}
                   <span style={{ marginLeft: 8, fontSize: 11, color: 'var(--text-muted)' }}>{g.time_control}</span>
-                  {g.color && <span style={{ marginLeft: 6, fontSize: 10, color: g.color === 'White' ? 'var(--text-secondary)' : '#e5e5e5', background: g.color === 'White' ? 'var(--surface-2)' : 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: 4 }}>{g.color}</span>}
+                  {g.color && <span style={{ marginLeft: 6, fontSize: 10, color: 'var(--text-secondary)', background: 'var(--surface-2)', padding: '1px 5px', borderRadius: 4 }}>{g.color}</span>}
                 </p>
                 {g.opening && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{g.opening}</p>}
                 {g.opponent && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>vs {g.opponent}</p>}
@@ -366,12 +373,23 @@ export function Chess() {
                 <p style={{ fontSize: 14, fontWeight: 700, color: resultColor(g.result) }}>{resultLabel(g.result)}</p>
                 {g.rating_after && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{g.rating_after}</p>}
               </div>
-              <button onClick={() => setEditing(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
+              <button type="button" aria-label="Edit game" onClick={() => setEditing(g)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
           </Card>
         ))}
+
+        {filtered.length > visible && (
+          <button
+            type="button"
+            onClick={() => setVisible(v => v + LOAD_MORE)}
+            className="w-full py-3 rounded-xl font-semibold mt-1"
+            style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+          >
+            Show more ({filtered.length - visible} left)
+          </button>
+        )}
 
         {games.length === 0 && (
           <EmptyState

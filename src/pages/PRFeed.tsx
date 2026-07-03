@@ -78,7 +78,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
                 <div className="flex items-center gap-2">
                   <span style={{
                     fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)',
-                    color: isTop ? '#fbbf24' : 'var(--text-tertiary)',
+                    color: isTop ? 'var(--warning)' : 'var(--text-tertiary)',
                     minWidth: 24,
                   }}>
                     #{i + 1}
@@ -94,7 +94,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: 18, fontWeight: 700, color: isTop ? '#fbbf24' : 'var(--accent)', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: 18, fontWeight: 700, color: isTop ? 'var(--warning)' : 'var(--accent)', fontFamily: 'var(--font-mono)' }}>
                   {r.est1rm.toFixed(0)} <span style={{ color: 'var(--text-tertiary)', fontSize: 11, fontWeight: 400 }}>lbs</span>
                 </span>
               </div>
@@ -102,7 +102,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
                 <div style={{
                   height: '100%', width: `${pct}%`, borderRadius: 999,
                   background: isTop
-                    ? 'linear-gradient(90deg, #f59e0b, #fbbf24)'
+                    ? 'linear-gradient(90deg, #f59e0b, var(--warning))'
                     : 'linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 60%, transparent))',
                   transition: 'width 0.7s ease',
                 }} />
@@ -121,6 +121,7 @@ export function PRFeed() {
   const [prs,     setPrs]     = useState<PrHistory[]>([])
   const [loading, setLoading] = useState(true)
   const [filter,  setFilter]  = useState<LiftType | 'All'>('All')
+  const [visible, setVisible] = useState(10)
 
   useEffect(() => {
     supabase
@@ -134,6 +135,7 @@ export function PRFeed() {
   }, [])
 
   const filtered = filter === 'All' ? prs : prs.filter(r => r.lift === filter)
+  useEffect(() => { setVisible(10) }, [filter])
 
   // Best PR per lift
   const bestPerLift: Record<string, number> = {}
@@ -162,7 +164,7 @@ export function PRFeed() {
                   padding: '6px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600,
                   whiteSpace: 'nowrap', flexShrink: 0,
                   background: filter === l ? 'var(--accent)' : 'var(--surface-2)',
-                  color:      filter === l ? '#1A1A2E'       : 'var(--text-secondary)',
+                  color:      filter === l ? 'var(--base-bg)'       : 'var(--text-secondary)',
                   border: filter === l ? 'none' : '1px solid var(--border-subtle)',
                   cursor: 'pointer', transition: 'all 0.15s ease',
                 }}
@@ -191,7 +193,7 @@ export function PRFeed() {
           <EmptyState icon={<SearchIcon size={64} color="var(--text-muted)" />} title="No PRs for this lift" sub="Try a different filter above." />
         ) : (
           <div className="flex flex-col gap-1.5">
-            {filtered.map(pr => {
+            {filtered.slice(0, visible).map(pr => {
               const isBest = bestPerLift[pr.lift] === pr.est_1rm
               return (
                 <div
@@ -205,11 +207,11 @@ export function PRFeed() {
                   {/* Icon container */}
                   <div style={{
                     width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                    background: isBest ? 'rgba(251,191,36,0.14)' : 'var(--surface-2)',
+                    background: isBest ? 'color-mix(in srgb, var(--warning) 14%, transparent)' : 'var(--surface-2)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {isBest
-                      ? <ZapIcon size={16} color="#fbbf24" />
+                      ? <ZapIcon size={16} color="var(--warning)" />
                       : <DumbbellIcon size={16} color="var(--text-secondary)" />
                     }
                   </div>
@@ -220,7 +222,7 @@ export function PRFeed() {
                       {isBest && (
                         <span style={{
                           fontSize: 9, fontWeight: 700, letterSpacing: '0.08em',
-                          background: '#fbbf24', color: '#1A1A2E',
+                          background: 'var(--warning)', color: 'var(--base-bg)',
                           padding: '2px 5px', borderRadius: 4,
                         }}>
                           BEST
@@ -230,13 +232,23 @@ export function PRFeed() {
                     <span style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{formatDate(pr.date)}</span>
                   </div>
 
-                  <span style={{ fontWeight: 700, fontSize: 18, color: isBest ? '#fbbf24' : 'var(--accent)', fontFamily: 'var(--font-mono)', flexShrink: 0 }}>
+                  <span style={{ fontWeight: 700, fontSize: 18, color: isBest ? 'var(--warning)' : 'var(--accent)', fontFamily: 'var(--font-mono)', flexShrink: 0 }}>
                     {pr.est_1rm.toFixed(0)}
                     <span style={{ color: 'var(--text-tertiary)', fontSize: 11, fontWeight: 400, marginLeft: 3 }}>lbs</span>
                   </span>
                 </div>
               )
             })}
+            {filtered.length > visible && (
+              <button
+                type="button"
+                onClick={() => setVisible(v => v + 20)}
+                className="w-full py-3 rounded-xl font-semibold mt-1"
+                style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+              >
+                Show more ({filtered.length - visible} left)
+              </button>
+            )}
           </div>
         )}
       </PageWrapper>

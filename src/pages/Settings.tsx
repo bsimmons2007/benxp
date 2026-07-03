@@ -9,7 +9,7 @@ import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme, isLightMode, setLightMode, applyTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
 import { logAuditEvent } from '../lib/audit'
-import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, SunIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon } from '../components/ui/Icon'
+import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, SunIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon, ChevronIcon, CloseIcon } from '../components/ui/Icon'
 import { getNotifPrefs, saveNotifPrefs, requestPermission, permissionGranted, notificationsSupported } from '../lib/notifications'
 import { toRoman } from '../lib/utils'
 import {
@@ -289,7 +289,7 @@ export function Settings() {
 
   // Reusable chevron
   function Chevron({ open }: { open: boolean }) {
-    return <span style={{ color: 'var(--text-muted)', fontSize: 12, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', display: 'block', flexShrink: 0 }}>▾</span>
+    return <span style={{ transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', display: 'block', flexShrink: 0 }}><ChevronIcon size={14} color="var(--text-muted)" /></span>
   }
 
   // Reusable toggle pill
@@ -341,7 +341,7 @@ export function Settings() {
                   : (userName ? userName[0].toUpperCase() : '?')
                 }
                 {avatarLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                  <div className="absolute inset-0 flex items-center justify-center rounded-full" style={{ background: 'var(--overlay)' }}>
                     <span style={{ color: "var(--text-primary)", fontSize: "0.75rem" }}>...</span>
                   </div>
                 )}
@@ -365,7 +365,7 @@ export function Settings() {
                   <button onClick={saveName} disabled={nameSaving} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{ background: 'var(--accent)', color: 'var(--base-bg)' }}>
                     {nameSaving ? '...' : 'Save'}
                   </button>
-                  <button onClick={() => setEditingName(false)} className="px-2 py-1.5 rounded-lg text-xs" style={{ color: 'var(--text-muted)', background: 'var(--input-bg)' }}>✕</button>
+                  <button type="button" aria-label="Cancel" onClick={() => setEditingName(false)} className="px-2 py-1.5 rounded-lg text-xs inline-flex items-center" style={{ color: 'var(--text-muted)', background: 'var(--input-bg)' }}><CloseIcon size={13} /></button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">

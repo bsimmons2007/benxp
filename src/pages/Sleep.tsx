@@ -15,7 +15,7 @@ import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip, localDateStr } from '../lib/utils'
 import { playXPGain, playPR } from '../lib/sounds'
 import type { SleepLog } from '../types'
-import { MoonIcon, CheckIcon, EditIcon } from '../components/ui/Icon'
+import { MoonIcon, CheckIcon, EditIcon, CloseIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { ChartSkeleton, ChartEmptyState } from '../components/ui/Skeleton'
 
@@ -122,12 +122,13 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
   return (
     <div className="mb-5">
       <button
+        type="button"
         data-tutorial="log-sleep-btn"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? '#1A1A2E' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Sleep'}
+        {open ? 'Cancel' : 'Log Sleep'}
       </button>
       {open && (
         <Card className="mt-3 pop-in">
@@ -197,7 +198,7 @@ function LogNapPanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all"
         style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', fontSize: 14 }}
       >
-        {open ? '✕ Cancel' : 'Log Nap'}
+        {open ? 'Cancel' : 'Log Nap'}
       </button>
       {open && (
         <Card className="mt-3 pop-in">
@@ -520,7 +521,7 @@ function WakeTimeTrainer({ logs }: { logs: SleepLog[] }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
         <p className="font-bold" style={{ color: 'var(--text-primary)', fontSize: 15 }}>Wake Time Trainer</p>
-        <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16 }}>✕</button>
+        <button type="button" aria-label="Close" onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><CloseIcon size={16} /></button>
       </div>
 
       <div className="p-4 flex flex-col gap-4">
@@ -699,6 +700,7 @@ export function Sleep() {
   usePageTitle('Sleep')
   const [logs,      setLogs]      = useState<SleepLog[]>([])
   const [editing,   setEditing]   = useState<SleepLog | null>(null)
+  const [visible,   setVisible]   = useState(10)
   const [loadError, setLoadError] = useState(false)
   const [chartLoading, setChartLoading] = useState(true)
   const [dreamsMap, setDreamsMap] = useState<Record<string, boolean>>(() => getDreamsMap())
@@ -907,7 +909,7 @@ export function Sleep() {
 
         {/* History */}
         <p className="card-title mb-3">History</p>
-        {logs.map(entry => {
+        {logs.slice(0, visible).map(entry => {
           const isNap    = entry.is_nap
           const q        = isNap ? { label: 'Nap', color: '#888' } : sleepQuality(entry.hours_slept)
           const dayLabel = DAYS[new Date(entry.date + 'T12:00:00').getDay()]
@@ -967,6 +969,16 @@ export function Sleep() {
             </Card>
           )
         })}
+        {logs.length > visible && (
+          <button
+            type="button"
+            onClick={() => setVisible(v => v + 20)}
+            className="w-full py-3 rounded-xl font-semibold mt-1"
+            style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+          >
+            Show more ({logs.length - visible} left)
+          </button>
+        )}
         {nightLogs.length === 0 && (
           <EmptyState icon={<MoonIcon size={64} color="var(--text-muted)" />} title="No sleep logged"
             sub="Start tracking your sleep to unlock trends, weekly averages, and quality scores." />

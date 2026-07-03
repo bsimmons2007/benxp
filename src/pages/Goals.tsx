@@ -12,7 +12,7 @@ import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
 import { playGoalComplete } from '../lib/sounds'
 import type { Goal } from '../types'
-import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, TrophyIcon, TrashIcon, MoonIcon } from '../components/ui/Icon'
+import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, TrophyIcon, TrashIcon, MoonIcon, ArrowUpRightIcon } from '../components/ui/Icon'
 import { localDateStr } from '../lib/utils'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -153,7 +153,7 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ New Goal'}
+        {open ? 'Cancel' : 'New Goal'}
       </button>
       {open && (
         <Card className="mt-3 pop-in">
@@ -270,12 +270,13 @@ function GoalCard({ goal, current, onComplete, onDelete, onNavigate }: {
           <>
             {linkedPage && (
               <button
+                type="button"
                 onClick={() => onNavigate(linkedPage)}
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1"
                 style={{ background: 'var(--input-bg)', color: 'var(--accent)', border: '1px solid var(--border)', flexShrink: 0 }}
                 title="View history for this metric"
               >
-                History ↗
+                History <ArrowUpRightIcon size={12} color="var(--accent)" />
               </button>
             )}
             <button

@@ -254,6 +254,18 @@ export interface SpikeballGame {
   notes: string | null
 }
 
+export interface PickleballGame {
+  id: string
+  created_at: string
+  date: string
+  win: boolean
+  my_score: number | null
+  opp_score: number | null
+  game_type: string
+  opponent: string | null
+  notes: string | null
+}
+
 export interface PoolGame {
   id: string
   created_at: string

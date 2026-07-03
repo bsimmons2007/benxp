@@ -9,6 +9,7 @@ import {
   DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, GamepadIcon, MoonIcon, TargetIcon,
   ActivityIconComp, BasketballIcon, GolfIcon, DiscIcon, MountainIcon, TableTennisIcon,
   ChessIcon, PoolIcon, VolleyballIcon, SpikeballIcon, BrainIcon, DropletIcon, RulerIcon,
+  ZapIcon,
 } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -446,7 +447,7 @@ export function XPHistory() {
           <p style={{ color: 'var(--text-tertiary)', textAlign: 'center', paddingTop: 40 }}>Loading…</p>
         ) : events.length === 0 ? (
           <div className="flex flex-col items-center py-16 fade-in" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 48, marginBottom: 16, opacity: 0.3 }}>⚡</div>
+            <div style={{ marginBottom: 16, opacity: 0.3 }}><ZapIcon size={48} color="var(--text-secondary)" /></div>
             <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8 }}>No XP earned yet</p>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 240, lineHeight: 1.6 }}>
               Log a workout, finish a book, or get some sleep — every action earns XP.

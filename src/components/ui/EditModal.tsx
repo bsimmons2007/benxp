@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CloseIcon } from './Icon'
 
 interface EditModalProps {
@@ -11,10 +12,27 @@ interface EditModalProps {
 }
 
 export function EditModal({ title, onClose, onDelete, onSave, saving, children }: EditModalProps) {
+  const [deleteArmed, setDeleteArmed] = useState(false)
+  const armTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => { if (armTimer.current) clearTimeout(armTimer.current) }, [])
+
+  function handleDelete() {
+    if (!onDelete) return
+    if (deleteArmed) {
+      if (armTimer.current) clearTimeout(armTimer.current)
+      setDeleteArmed(false)
+      onDelete()
+      return
+    }
+    setDeleteArmed(true)
+    armTimer.current = setTimeout(() => setDeleteArmed(false), 3000)
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+      style={{ background: 'var(--overlay)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
@@ -62,16 +80,16 @@ export function EditModal({ title, onClose, onDelete, onSave, saving, children }
           <div className="flex gap-3 mt-6">
             {onDelete && (
               <button
-                onClick={onDelete}
+                onClick={handleDelete}
                 className="flex-1 py-3 rounded-xl font-semibold transition-all"
                 style={{
-                  background: 'color-mix(in srgb, var(--red) 10%, transparent)',
-                  color:      'var(--red)',
-                  border:     '1px solid color-mix(in srgb, var(--red) 25%, transparent)',
+                  background: deleteArmed ? 'var(--red)' : 'color-mix(in srgb, var(--red) 10%, transparent)',
+                  color:      deleteArmed ? 'var(--base-bg)' : 'var(--red)',
+                  border:     deleteArmed ? '1px solid var(--red)' : '1px solid color-mix(in srgb, var(--red) 25%, transparent)',
                   fontSize:   14,
                 }}
               >
-                Delete
+                {deleteArmed ? 'Tap again to confirm' : 'Delete'}
               </button>
             )}
             {onSave && (

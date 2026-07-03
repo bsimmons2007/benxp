@@ -50,6 +50,10 @@
   --success: #22c55e;
   --warning: #f97316;
 
+  /* Modal scrim + secondary chart series */
+  --overlay:   rgba(0,0,0,0.45);
+  --chart-alt: #8b5cf6;
+
   /* Brand — fixed, never overridden by theme or mode */
   --color-coral:    #e5443f;
   --color-ink:      #0d0d1a;
@@ -118,6 +122,9 @@ html[data-mode="dark"] {
   --error:   #f87171;
   --success: #4ade80;
   --warning: #fb923c;
+
+  --overlay:   rgba(0,0,0,0.65);
+  --chart-alt: #a78bfa;
 }
 
 
@@ -143,6 +150,19 @@ body {
 
 button, a {
   touch-action: manipulation;
+}
+
+/* Keyboard focus ring — only shows for keyboard nav, not pointer */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 input[type="range"] {

@@ -17,6 +17,9 @@ import type { SkateSession } from '../types'
 import { ZapIcon, EditIcon, SkateIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 
+const PAGE_SIZE = 10
+const LOAD_MORE = 20
+
 // ── Log form ─────────────────────────────────────────────────
 
 interface SkateForm { date: string; miles: string; duration: string; fastest_mile: string }
@@ -62,7 +65,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log a Session'}
+        {open ? 'Cancel' : 'Log a Session'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -127,6 +130,7 @@ export function Skate() {
   usePageTitle('Skate')
   const [sessions, setSessions] = useState<SkateSession[]>([])
   const [editing, setEditing] = useState<SkateSession | null>(null)
+  const [visible, setVisible] = useState(PAGE_SIZE)
 
   async function load() {
     const { data } = await supabase
@@ -260,14 +264,14 @@ export function Skate() {
         {sessions.length > 0 && (
           <Card noPadding className="overflow-hidden">
             <p className="px-4 pt-4 pb-2 font-bold" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Sessions</p>
-            {sessions.map((s) => (
+            {sessions.slice(0, visible).map((s) => (
               <div key={s.id} className="flex items-center justify-between px-4 py-3" style={{ borderTop: '1px solid var(--border-faint)' }}>
                 <div>
                   <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
                     {s.miles.toFixed(2)} mi
                     {s.fastest_mile && (
-                      <span className="ml-2 flex items-center gap-1 text-xs font-normal" style={{ color: '#2ECC71' }}>
-                        <ZapIcon size={11} color="#2ECC71" /> {s.fastest_mile.toFixed(2)} min/mi
+                      <span className="ml-2 flex items-center gap-1 text-xs font-normal" style={{ color: 'var(--green)' }}>
+                        <ZapIcon size={11} color="var(--green)" /> {s.fastest_mile.toFixed(2)} min/mi
                       </span>
                     )}
                   </p>
@@ -280,6 +284,8 @@ export function Skate() {
                     +{Math.round(s.miles * XP_RATES.skate_per_mile)} XP
                   </span>
                   <button
+                    type="button"
+                    aria-label="Edit session"
                     onClick={() => setEditing(s)}
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
                   >
@@ -288,6 +294,16 @@ export function Skate() {
                 </div>
               </div>
             ))}
+            {sessions.length > visible && (
+              <button
+                type="button"
+                onClick={() => setVisible(v => v + LOAD_MORE)}
+                className="w-full py-3 font-semibold"
+                style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: 'none', borderTop: '1px solid var(--border-faint)', fontSize: 14, cursor: 'pointer' }}
+              >
+                Show more ({sessions.length - visible} left)
+              </button>
+            )}
           </Card>
         )}
 

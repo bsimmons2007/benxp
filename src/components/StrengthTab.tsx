@@ -8,6 +8,7 @@ import { Card } from './ui/Card'
 import { BodyMap } from './BodyMap'
 import { playRankUp } from '../lib/sounds'
 import { loadStrengthData } from '../lib/strengthData'
+import { ChevronIcon } from './ui/Icon'
 import {
   computeMuscleScores, computeStrengthQuotient, detectImbalances,
   MUSCLES, RANKS, IMBALANCE_PAIRS,
@@ -251,7 +252,7 @@ function RankDropdown() {
         borderBottom: '1px solid var(--border-subtle)', userSelect: 'none',
       }}>
         <span>Rank Tiers</span>
-        <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>▾ tap to expand</span>
+        <span style={{ fontSize: 10, color: 'var(--text-tertiary)', display: 'inline-flex', alignItems: 'center', gap: 3 }}><ChevronIcon size={11} color="var(--text-tertiary)" /> tap to expand</span>
       </summary>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 10 }}>
         {ranked.map(rank => {

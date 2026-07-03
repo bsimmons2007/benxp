@@ -793,7 +793,7 @@ export function Profile() {
                 background: 'var(--accent)', borderRadius: 10,
                 padding: '2px 7px', border: '2px solid var(--base-bg)',
               }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#1A1A2E' }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--base-bg)' }}>
                   {displayLevel}
                 </span>
               </div>

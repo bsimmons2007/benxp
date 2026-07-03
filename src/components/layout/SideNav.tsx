@@ -162,7 +162,7 @@ export function SideNav() {
         className="md:hidden"
         style={{
           position: 'fixed', inset: 0, zIndex: 48,
-          background: 'rgba(0,0,0,0.5)',
+          background: 'var(--overlay)',
           opacity: isOpen ? 1 : 0,
           pointerEvents: isOpen ? 'auto' : 'none',
           transition: 'opacity 0.25s ease',

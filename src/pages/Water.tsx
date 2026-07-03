@@ -278,11 +278,11 @@ export function Water() {
                 style={{
                   position: 'relative', overflow: 'hidden',
                   padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 700,
-                  background: 'rgba(41,182,246,0.12)', border: '1.5px solid rgba(41,182,246,0.3)',
-                  color: '#29b6f6', cursor: 'pointer', transition: 'all 0.12s ease',
+                  background: 'var(--accent-subtle)', border: '1.5px solid var(--accent-dim)',
+                  color: 'var(--accent)', cursor: 'pointer', transition: 'all 0.12s ease',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(41,182,246,0.25)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(41,182,246,0.12)')}
+                onMouseEnter={e => (e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 25%, transparent)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent-subtle)')}
               >
                 +{oz}oz
               </button>
@@ -304,9 +304,9 @@ export function Water() {
               disabled={!customOz || parseFloat(customOz) <= 0}
               style={{
                 padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 700,
-                background: customOz && parseFloat(customOz) > 0 ? 'rgba(41,182,246,0.2)' : 'var(--input-bg)',
-                border: '1.5px solid rgba(41,182,246,0.3)',
-                color: '#29b6f6', cursor: 'pointer',
+                background: customOz && parseFloat(customOz) > 0 ? 'color-mix(in srgb, var(--accent) 20%, transparent)' : 'var(--input-bg)',
+                border: '1.5px solid var(--accent-dim)',
+                color: 'var(--accent)', cursor: 'pointer',
               }}
             >
               Add
@@ -321,9 +321,9 @@ export function Water() {
             {entries.map(e => (
               <Card key={e.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
                 <div className="flex items-center gap-3">
-                  <DropletIcon size={18} color="#29b6f6" />
+                  <DropletIcon size={18} color="var(--accent)" />
                   <div>
-                    <p className="font-bold" style={{ color: '#29b6f6', fontSize: 15 }}>{Number(e.oz).toFixed(0)}oz</p>
+                    <p className="font-bold" style={{ color: 'var(--accent)', fontSize: 15 }}>{Number(e.oz).toFixed(0)}oz</p>
                     <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>{formatTime(e.created_at)}</p>
                   </div>
                 </div>

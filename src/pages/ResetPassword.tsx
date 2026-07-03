@@ -154,7 +154,7 @@ export function ResetPassword() {
               disabled={status === 'loading'}
               style={{
                 width: '100%', padding: '13px 0', borderRadius: 13, border: 'none',
-                background: 'var(--accent)', color: '#1A1A2E', fontSize: 14, fontWeight: 700,
+                background: 'var(--accent)', color: 'var(--base-bg)', fontSize: 14, fontWeight: 700,
                 cursor: status === 'loading' ? 'not-allowed' : 'pointer',
                 opacity: status === 'loading' ? 0.75 : 1,
                 boxShadow: '0 4px 24px var(--accent-dim)',

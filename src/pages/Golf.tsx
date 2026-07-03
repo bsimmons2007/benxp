@@ -14,11 +14,12 @@ import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain, playPR } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
-import { GolfIcon, EditIcon, TrophyIcon } from '../components/ui/Icon'
+import { GolfIcon, EditIcon, TrophyIcon, ChevronIcon, ChevronRightIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 import type { GolfRound } from '../types'
 
-const ACCENT = '#34d399'
+const PAGE_SIZE = 10
+const LOAD_MORE = 20
 const COURSES_KEY = 'youxp-golf-courses'
 const SCORECARDS_KEY = 'youxp-golf-scorecards'
 
@@ -48,9 +49,9 @@ function vsParLabel(diff: number): string {
   return diff > 0 ? `+${diff}` : String(diff)
 }
 function vsParColor(diff: number): string {
-  if (diff < 0) return '#34d399'   // under par → green
-  if (diff === 0) return '#f5a623' // even → gold
-  return '#f87171'                  // over par → red
+  if (diff < 0) return 'var(--green)'    // under par
+  if (diff === 0) return 'var(--warning)' // even
+  return 'var(--red)'                     // over par
 }
 function defaultPar(holes: number) {
   return holes === 9 ? 36 : 72
@@ -125,7 +126,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
     }
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.golf_under_par : 0
     const xp = XP_RATES.golf_round + underParBonus
-    if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} 🌿 Under par!`) }
+    if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} Under par!`) }
     else          { playXPGain(); setToast(`+${xp} XP — Round logged (${vsParLabel(diff)})`) }
     await refreshXP(); refreshActivity()
     reset({ date: today(), course: '', holes: '18', score: '', par: '72', putts: '', fairways_hit: '', fairways_possible: '', notes: '' })
@@ -137,11 +138,12 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
   return (
     <div className="mb-5">
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Round'}
+        {open ? 'Cancel' : 'Log Round'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -194,10 +196,12 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
             <button
               type="button"
               onClick={() => setShowScorecard(s => !s)}
-              className="text-sm font-semibold text-left"
+              className="text-sm font-semibold text-left inline-flex items-center gap-1"
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: showScorecard ? 'var(--accent)' : 'var(--text-muted)', padding: 0 }}
             >
-              {showScorecard ? '▾ Hide scorecard' : '▸ Enter per-hole scores'}
+              {showScorecard
+                ? <><ChevronIcon size={14} color="var(--accent)" /> Hide scorecard</>
+                : <><ChevronRightIcon size={14} color="var(--text-muted)" /> Enter per-hole scores</>}
             </button>
             {showScorecard && (
               <div className="rounded-xl p-3" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)' }}>
@@ -291,6 +295,7 @@ export function Golf() {
   usePageTitle('Golf')
   const [rounds,  setRounds]  = useState<GolfRound[]>([])
   const [editing, setEditing] = useState<GolfRound | null>(null)
+  const [visible, setVisible] = useState(PAGE_SIZE)
   const [scorecardMap, setScorecardMap] = useState<Record<string, number[]>>(() => getScorecardsMap())
 
   async function load() {
@@ -331,7 +336,7 @@ export function Golf() {
             { label: 'Avg',      value: avgDiff  !== null ? vsParLabel(Math.round(avgDiff)) : '—', color: avgDiff !== null ? vsParColor(Math.round(avgDiff)) : undefined },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
-              <p style={{ fontSize: 22, fontWeight: 700, color: s.color ?? ACCENT, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
+              <p style={{ fontSize: 22, fontWeight: 700, color: s.color ?? 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
               <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
@@ -339,11 +344,11 @@ export function Golf() {
 
         {/* Summary bar */}
         {rounds.length > 0 && (
-          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(52,211,153,0.07)', border: `1px solid rgba(52,211,153,0.2)` }}>
+          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'var(--accent-subtle)', border: '1px solid var(--accent-dim)' }}>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{rounds.length} round{rounds.length !== 1 ? 's' : ''}</span>
             <div className="flex items-center gap-4">
               {fwyPct !== null && <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>FWY {fwyPct}%</span>}
-              {latestWithFwy?.putts != null && <span style={{ fontSize: 13, color: ACCENT, fontWeight: 700 }}>{latestWithFwy.putts} putts</span>}
+              {latestWithFwy?.putts != null && <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 700 }}>{latestWithFwy.putts} putts</span>}
             </div>
           </div>
         )}
@@ -351,40 +356,46 @@ export function Golf() {
         <LogGolfPanel onLogged={load} />
 
         {/* Score vs Par trend */}
-        {chartData.length >= 2 && (
+        {rounds.length > 0 && (
           <Card className="mb-4">
             <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Score vs Par</p>
             <p className="section-label mb-3">Lower is better · green = under par</p>
-            <ResponsiveContainer width="100%" height={140}>
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="golf-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stopColor={ACCENT} stopOpacity={0.18} />
-                    <stop offset="100%" stopColor={ACCENT} stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={24}
-                  tickFormatter={v => vsParLabel(v)} />
-                <ReferenceLine y={0} stroke="rgba(245,166,35,0.4)" strokeDasharray="4 4" />
-                <Tooltip
-                  contentStyle={ttStyle}
-                  formatter={(v: number) => [vsParLabel(v), 'vs Par']}
-                />
-                <Area
-                  type="monotone" dataKey="vsPar" stroke={ACCENT} strokeWidth={2} fill="url(#golf-grad)"
-                  dot={{ r: 3, fill: ACCENT, strokeWidth: 0 }}
-                  activeDot={{ r: 5, fill: ACCENT }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {chartData.length >= 2 ? (
+              <ResponsiveContainer width="100%" height={140}>
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="golf-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%"   stopColor="var(--accent)" stopOpacity={0.18} />
+                      <stop offset="100%" stopColor="var(--accent)" stopOpacity={0.02} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                  <XAxis dataKey="label" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={24}
+                    tickFormatter={v => vsParLabel(v)} />
+                  <ReferenceLine y={0} stroke="color-mix(in srgb, var(--warning) 40%, transparent)" strokeDasharray="4 4" />
+                  <Tooltip
+                    contentStyle={ttStyle}
+                    formatter={(v: number) => [vsParLabel(v), 'vs Par']}
+                  />
+                  <Area
+                    type="monotone" dataKey="vsPar" stroke="var(--accent)" strokeWidth={2} fill="url(#golf-grad)"
+                    dot={{ r: 3, fill: 'var(--accent)', strokeWidth: 0 }}
+                    activeDot={{ r: 5, fill: 'var(--accent)' }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', padding: '8px 0' }}>
+                Score vs par trend unlocks after your second round.
+              </p>
+            )}
           </Card>
         )}
 
         {/* Round history */}
         {rounds.length > 0 && <p className="section-label mb-3">Round History</p>}
-        {rounds.map(r => {
+        {rounds.slice(0, visible).map(r => {
           const diff = r.score - r.par
           return (
             <Card
@@ -395,11 +406,11 @@ export function Golf() {
               <div className="flex items-center gap-3">
                 <div style={{
                   width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                  background: diff <= 0 ? `${ACCENT}20` : 'rgba(248,113,113,0.1)',
+                  background: diff <= 0 ? 'color-mix(in srgb, var(--green) 15%, transparent)' : 'color-mix(in srgb, var(--red) 10%, transparent)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   {diff <= 0
-                    ? <TrophyIcon size={16} color={ACCENT} />
+                    ? <TrophyIcon size={16} color="var(--green)" />
                     : <GolfIcon size={16} color="var(--text-muted)" />}
                 </div>
                 <div>
@@ -427,6 +438,8 @@ export function Golf() {
                   <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{r.score} / {r.par}</p>
                 </div>
                 <button
+                  type="button"
+                  aria-label="Edit round"
                   onClick={() => setEditing(r)}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}
                 >
@@ -436,6 +449,17 @@ export function Golf() {
             </Card>
           )
         })}
+
+        {rounds.length > visible && (
+          <button
+            type="button"
+            onClick={() => setVisible(v => v + LOAD_MORE)}
+            className="w-full py-3 rounded-xl font-semibold mt-1"
+            style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+          >
+            Show more ({rounds.length - visible} left)
+          </button>
+        )}
 
         {rounds.length === 0 && (
           <EmptyState

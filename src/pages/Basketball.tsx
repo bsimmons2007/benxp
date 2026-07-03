@@ -20,6 +20,9 @@ import { BasketballIcon, TrophyIcon, StarIcon, TrendingIcon, EditIcon } from '..
 import { EditModal } from '../components/ui/EditModal'
 import { usePageTitle } from '../hooks/usePageTitle'
 
+const PAGE_SIZE = 10
+const LOAD_MORE = 20
+
 // ── XP reward ────────────────────────────────────────────────────
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -104,22 +107,23 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
     padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: 'pointer',
     border: '1px solid var(--accent)',
     background: active ? 'var(--accent)' : 'transparent',
-    color: active ? '#1A1A2E' : 'var(--accent)',
+    color: active ? 'var(--base-bg)' : 'var(--accent)',
     transition: 'all 0.15s',
   } as React.CSSProperties)
 
   return (
     <div className="mb-5">
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
         style={{
           background: open ? 'var(--accent)' : 'var(--input-bg)',
-          color: open ? '#1A1A2E' : 'var(--accent)',
+          color: open ? 'var(--base-bg)' : 'var(--accent)',
           border: '1px solid var(--accent)', fontSize: 15,
         }}
       >
-        {open ? '✕ Cancel' : '+ Log Session'}
+        {open ? 'Cancel' : 'Log Session'}
       </button>
 
       {open && (
@@ -303,6 +307,7 @@ export function Basketball() {
   const [sessions, setSessions] = useState<BasketballSession[]>([])
   const [loading,  setLoading]  = useState(true)
   const [editing,  setEditing]  = useState<BasketballSession | null>(null)
+  const [visible,  setVisible]  = useState(PAGE_SIZE)
 
   const load = async () => {
     setLoading(true)
@@ -417,7 +422,7 @@ export function Basketball() {
                   { label: 'FT%',  val: ftPct,    made: totalFTM, att: totalFTA },
                 ].map(s => (
                   <div key={s.label} style={{ textAlign: 'center', padding: '10px 0' }}>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: s.val >= 40 ? '#2ECC71' : s.val >= 30 ? '#F5A623' : 'var(--accent)' }}>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: s.val >= 40 ? 'var(--green)' : s.val >= 30 ? 'var(--warning)' : 'var(--accent)' }}>
                       {fmt(s.val)}%
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{s.label}</div>
@@ -451,7 +456,7 @@ export function Basketball() {
 
             {/* ── Best game ── */}
             {best && (
-              <Card style={{ marginBottom: 16, borderColor: 'rgba(233,69,96,0.3)' }}>
+              <Card style={{ marginBottom: 16, borderColor: 'var(--accent-dim)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                   <TrophyIcon size={16} color="var(--accent)" />
                   <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em' }}>Best Game</p>
@@ -479,11 +484,11 @@ export function Basketball() {
 
             {/* ── Weakest skill ── */}
             {weakest && (
-              <Card style={{ marginBottom: 16, borderColor: 'rgba(245,166,35,0.25)' }}>
+              <Card style={{ marginBottom: 16, borderColor: 'color-mix(in srgb, var(--warning) 25%, transparent)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <StarIcon size={16} color="#F5A623" />
+                  <StarIcon size={16} color="var(--warning)" />
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#F5A623' }}>Focus Area: {weakest.name}</p>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--warning)' }}>Focus Area: {weakest.name}</p>
                     <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                       Your {weakest.name} is {fmt(weakest.val)}% — lowest of your shooting categories. Put in extra reps here.
                     </p>
@@ -500,8 +505,8 @@ export function Basketball() {
                   <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em' }}>Trends</p>
                 </div>
                 <TrendChart data={fgTrend}   dataKey="fg"    label="FG% trend"   color="var(--accent)" />
-                <TrendChart data={threeTrend} dataKey="three" label="3PT% trend"  color="#9B59B6" />
-                <TrendChart data={ftTrend}   dataKey="ft"    label="FT% trend"   color="#27AE60" />
+                <TrendChart data={threeTrend} dataKey="three" label="3PT% trend"  color="var(--chart-alt)" />
+                <TrendChart data={ftTrend}   dataKey="ft"    label="FT% trend"   color="var(--green)" />
 
                 {/* Shot volume bar chart */}
                 <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: 0.5 }}>Shots per Session</p>
@@ -516,7 +521,7 @@ export function Basketball() {
                     />
                     <Bar dataKey="shots" radius={[3, 3, 0, 0]}>
                       {shotVolume.map((_, i) => (
-                        <Cell key={i} fill={i === shotVolume.length - 1 ? 'var(--accent)' : 'rgba(233,69,96,0.4)'} />
+                        <Cell key={i} fill={i === shotVolume.length - 1 ? 'var(--accent)' : 'color-mix(in srgb, var(--accent) 40%, transparent)'} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -528,7 +533,7 @@ export function Basketball() {
             <Card>
               <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em' }}>Session History</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {sessions.map(s => (
+                {sessions.slice(0, visible).map(s => (
                   <div key={s.id} style={{
                     padding: '12px 14px', borderRadius: 10,
                     background: 'var(--input-bg)',
@@ -538,7 +543,7 @@ export function Basketball() {
                       <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{formatDate(s.date)}</span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)' }}>{s.points} PTS</span>
-                        <button onClick={() => setEditing(s)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.5 }}>
+                        <button type="button" aria-label="Edit session" onClick={() => setEditing(s)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.5 }}>
                           <EditIcon size={14} color="var(--text-muted)" />
                         </button>
                       </div>
@@ -566,6 +571,16 @@ export function Basketball() {
                   </div>
                 ))}
               </div>
+              {sessions.length > visible && (
+                <button
+                  type="button"
+                  onClick={() => setVisible(v => v + LOAD_MORE)}
+                  className="w-full py-3 rounded-xl font-semibold mt-3"
+                  style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+                >
+                  Show more ({sessions.length - visible} left)
+                </button>
+              )}
             </Card>
             {editing && <EditBbModal session={editing} onClose={() => setEditing(null)} onSaved={load} />}
           </>

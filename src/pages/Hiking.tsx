@@ -14,21 +14,22 @@ import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { playXPGain } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
-import { MountainIcon, EditIcon } from '../components/ui/Icon'
+import { MountainIcon, EditIcon, ArrowUpIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 import type { HikingSession } from '../types'
 
-const ACCENT = '#84cc16'
+const PAGE_SIZE = 10
+const LOAD_MORE = 20
 
 // ── Helpers ───────────────────────────────────────────────────────
 
 const DIFFICULTIES = ['Easy', 'Moderate', 'Hard', 'Expert'] as const
 function diffColor(d: string | null): string {
-  if (d === 'Easy')     return '#34d399'
-  if (d === 'Moderate') return '#f59e0b'
-  if (d === 'Hard')     return '#f87171'
-  if (d === 'Expert')   return '#e879f9'
-  return ACCENT
+  if (d === 'Easy')     return 'var(--green)'
+  if (d === 'Moderate') return 'var(--warning)'
+  if (d === 'Hard')     return 'var(--red)'
+  if (d === 'Expert')   return 'var(--chart-alt)'
+  return 'var(--accent)'
 }
 function fmtDuration(mins: number | null): string {
   if (!mins) return ''
@@ -87,11 +88,12 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
   return (
     <div className="mb-5">
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Hike'}
+        {open ? 'Cancel' : 'Log Hike'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -177,6 +179,7 @@ export function Hiking() {
   usePageTitle('Hiking')
   const [sessions, setSessions] = useState<HikingSession[]>([])
   const [editing,  setEditing]  = useState<HikingSession | null>(null)
+  const [visible,  setVisible]  = useState(PAGE_SIZE)
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -214,17 +217,17 @@ export function Hiking() {
             { label: 'Total ft', value: totalElev > 0 ? `${(totalElev / 1000).toFixed(1)}k` : '—' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
-              <p style={{ fontSize: 22, fontWeight: 700, color: ACCENT, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
+              <p style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
               <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>
 
         {sessions.length > 0 && (
-          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(132,204,22,0.07)', border: '1px solid rgba(132,204,22,0.2)' }}>
+          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'var(--accent-subtle)', border: '1px solid var(--accent-dim)' }}>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{sessions.length} hike{sessions.length !== 1 ? 's' : ''}</span>
             {longestHike !== null && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: ACCENT }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>
                 Longest {longestHike.toFixed(1)} mi
               </span>
             )}
@@ -234,24 +237,30 @@ export function Hiking() {
         <LogHikingPanel onLogged={load} />
 
         {/* Monthly miles chart */}
-        {chartData.length >= 2 && (
+        {sessions.length > 0 && (
           <Card className="mb-4">
             <p className="font-bold mb-3" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Miles / Month</p>
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={chartData} barSize={24}>
-                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
-                <XAxis dataKey="month" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
-                <Tooltip contentStyle={ttStyle} formatter={(v: number) => [`${v} mi`, 'Miles']} />
-                <Bar dataKey="miles" fill={ACCENT} fillOpacity={0.8} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {chartData.length >= 2 ? (
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={chartData} barSize={24}>
+                  <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
+                  <Tooltip contentStyle={ttStyle} formatter={(v: number) => [`${v} mi`, 'Miles']} />
+                  <Bar dataKey="miles" fill="var(--accent)" fillOpacity={0.8} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', padding: '8px 0' }}>
+                Monthly miles chart unlocks after your second month of hikes.
+              </p>
+            )}
           </Card>
         )}
 
         {/* History */}
         {sessions.length > 0 && <p className="section-label mb-3">Hike Log</p>}
-        {sessions.map(h => (
+        {sessions.slice(0, visible).map(h => (
           <Card key={h.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
             <div className="flex items-center gap-3 min-w-0">
               <div style={{
@@ -273,20 +282,31 @@ export function Hiking() {
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 17, fontWeight: 700, color: ACCENT, lineHeight: 1 }}>
+                <p style={{ fontSize: 17, fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>
                   {Number(h.distance_miles).toFixed(1)}
                   <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 2 }}>mi</span>
                 </p>
                 {h.elevation_gain_ft != null && (
-                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>↑ {h.elevation_gain_ft.toLocaleString()} ft</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1, display: 'inline-flex', alignItems: 'center', gap: 2 }}><ArrowUpIcon size={11} color="var(--text-muted)" /> {h.elevation_gain_ft.toLocaleString()} ft</p>
                 )}
               </div>
-              <button onClick={() => setEditing(h)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
+              <button type="button" aria-label="Edit hike" onClick={() => setEditing(h)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                 <EditIcon size={13} color="var(--text-muted)" />
               </button>
             </div>
           </Card>
         ))}
+
+        {sessions.length > visible && (
+          <button
+            type="button"
+            onClick={() => setVisible(v => v + LOAD_MORE)}
+            className="w-full py-3 rounded-xl font-semibold mt-1"
+            style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+          >
+            Show more ({sessions.length - visible} left)
+          </button>
+        )}
 
         {sessions.length === 0 && (
           <EmptyState

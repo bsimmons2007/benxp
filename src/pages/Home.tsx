@@ -277,8 +277,10 @@ function StatWidget({ label, value, unit, trendDir, delta, to, color, editMode, 
       </div>
       {unit && <p style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.10em', marginTop: 2 }}>{unit}</p>}
       {delta != null && (
-        <p style={{ fontSize: 10, color: delta > 0 ? 'var(--green)' : 'var(--red)', marginTop: 4 }}>
-          {delta > 0 ? `↑ ${delta} lbs` : `↓ ${Math.abs(delta)} lbs`}
+        <p style={{ fontSize: 10, color: delta > 0 ? 'var(--green)' : 'var(--red)', marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+          {delta > 0
+            ? <><ArrowUpIcon size={10} color="var(--green)" /> {delta} lbs</>
+            : <><ArrowDownIcon size={10} color="var(--red)" /> {Math.abs(delta)} lbs</>}
         </p>
       )}
     </div>

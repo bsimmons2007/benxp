@@ -231,7 +231,7 @@ export function Measurements() {
         {/* Add button */}
         <div className="flex justify-end mb-3">
           <Button onClick={() => setShowForm(s => !s)} className="text-sm px-3 py-1.5">
-            {showForm ? '✕ Cancel' : '+ Log measurements'}
+            {showForm ? 'Cancel' : 'Log measurements'}
           </Button>
         </div>
 
@@ -316,7 +316,7 @@ export function Measurements() {
                     className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
                     style={{
                       background: activeChart === o.key ? 'var(--accent)' : 'var(--surface-2)',
-                      color:      activeChart === o.key ? '#1A1A2E' : 'var(--text-muted)',
+                      color:      activeChart === o.key ? 'var(--base-bg)' : 'var(--text-muted)',
                     }}
                   >
                     {o.label}

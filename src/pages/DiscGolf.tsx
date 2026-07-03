@@ -18,7 +18,8 @@ import { DiscIcon, EditIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 import type { DiscGolfRound } from '../types'
 
-const ACCENT = '#f59e0b'
+const PAGE_SIZE = 10
+const LOAD_MORE = 20
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -27,9 +28,9 @@ function vsParLabel(diff: number): string {
   return diff > 0 ? `+${diff}` : String(diff)
 }
 function vsParColor(diff: number): string {
-  if (diff < 0) return '#34d399'
-  if (diff === 0) return ACCENT
-  return '#f87171'
+  if (diff < 0) return 'var(--green)'
+  if (diff === 0) return 'var(--warning)'
+  return 'var(--red)'
 }
 function defaultPar(holes: number) { return holes === 9 ? 27 : 54 }
 
@@ -86,11 +87,12 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
   return (
     <div className="mb-5">
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all"
-        style={{ background: open ? ACCENT : 'var(--input-bg)', color: open ? '#0d0d1a' : ACCENT, border: `1px solid ${ACCENT}`, fontSize: 15 }}
+        style={{ background: open ? 'var(--accent)' : 'var(--input-bg)', color: open ? 'var(--base-bg)' : 'var(--accent)', border: '1px solid var(--accent)', fontSize: 15 }}
       >
-        {open ? '✕ Cancel' : '+ Log Round'}
+        {open ? 'Cancel' : 'Log Round'}
       </button>
       {open && (
         <div className="mt-3 rounded-xl p-4 pop-in" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -155,6 +157,7 @@ export function DiscGolf() {
   usePageTitle('Disc Golf')
   const [rounds,  setRounds]  = useState<DiscGolfRound[]>([])
   const [editing, setEditing] = useState<DiscGolfRound | null>(null)
+  const [visible, setVisible] = useState(PAGE_SIZE)
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -184,17 +187,17 @@ export function DiscGolf() {
           {[
             { label: 'Rounds',    value: rounds.length || '—' },
             { label: 'Best',      value: bestDiff !== null ? vsParLabel(bestDiff) : '—', color: bestDiff !== null ? vsParColor(bestDiff) : undefined },
-            { label: 'Under Par', value: underPar || '—', color: '#34d399' },
+            { label: 'Under Par', value: underPar || '—', color: 'var(--green)' },
           ].map(s => (
             <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
-              <p style={{ fontSize: 22, fontWeight: 700, color: s.color ?? ACCENT, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
+              <p style={{ fontSize: 22, fontWeight: 700, color: s.color ?? 'var(--accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{s.value}</p>
               <p className="section-label mt-1">{s.label}</p>
             </div>
           ))}
         </div>
 
         {rounds.length > 0 && (
-          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)' }}>
+          <div className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'var(--accent-subtle)', border: '1px solid var(--accent-dim)' }}>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{rounds.length} round{rounds.length !== 1 ? 's' : ''}</span>
             {avgDiff !== null && (
               <span style={{ fontSize: 14, fontWeight: 700, color: vsParColor(Math.round(avgDiff)) }}>
@@ -207,40 +210,46 @@ export function DiscGolf() {
         <LogDiscGolfPanel onLogged={load} />
 
         {/* Score vs Par chart */}
-        {chartData.length >= 2 && (
+        {rounds.length > 0 && (
           <Card className="mb-4">
             <p className="font-bold mb-1" style={{ fontSize: 15, color: 'var(--text-primary)' }}>Score vs Par</p>
             <p className="section-label mb-3">Green = under par</p>
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={chartData} barSize={22}>
-                <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={24} tickFormatter={v => vsParLabel(v)} />
-                <ReferenceLine y={0} stroke="rgba(245,158,11,0.4)" strokeDasharray="4 4" />
-                <Tooltip contentStyle={ttStyle} formatter={(v: number) => [vsParLabel(v), 'vs Par']} />
-                <Bar dataKey="vsPar" radius={[4, 4, 4, 4]}>
-                  {chartData.map((d, i) => (
-                    <Cell key={i} fill={d.vsPar < 0 ? '#34d399' : d.vsPar === 0 ? ACCENT : '#f87171'} fillOpacity={0.8} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {chartData.length >= 2 ? (
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={chartData} barSize={22}>
+                  <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
+                  <XAxis dataKey="label" tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 9 }} axisLine={false} tickLine={false} width={24} tickFormatter={v => vsParLabel(v)} />
+                  <ReferenceLine y={0} stroke="color-mix(in srgb, var(--warning) 40%, transparent)" strokeDasharray="4 4" />
+                  <Tooltip contentStyle={ttStyle} formatter={(v: number) => [vsParLabel(v), 'vs Par']} />
+                  <Bar dataKey="vsPar" radius={[4, 4, 4, 4]}>
+                    {chartData.map((d, i) => (
+                      <Cell key={i} fill={d.vsPar < 0 ? 'var(--green)' : d.vsPar === 0 ? 'var(--warning)' : 'var(--red)'} fillOpacity={0.8} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', padding: '8px 0' }}>
+                Score vs par trend unlocks after your second round.
+              </p>
+            )}
           </Card>
         )}
 
         {/* History */}
         {rounds.length > 0 && <p className="section-label mb-3">Round History</p>}
-        {rounds.map(r => {
+        {rounds.slice(0, visible).map(r => {
           const diff = r.score - r.par
           return (
             <Card key={r.id} className="flex items-center justify-between mb-2" style={{ padding: '12px 16px' }}>
               <div className="flex items-center gap-3">
                 <div style={{
                   width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                  background: diff <= 0 ? 'rgba(52,211,153,0.15)' : 'var(--input-bg)',
+                  background: diff <= 0 ? 'color-mix(in srgb, var(--green) 15%, transparent)' : 'var(--input-bg)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <DiscIcon size={18} color={diff <= 0 ? '#34d399' : 'var(--text-muted)'} />
+                  <DiscIcon size={18} color={diff <= 0 ? 'var(--green)' : 'var(--text-muted)'} />
                 </div>
                 <div>
                   <p style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>{r.course}</p>
@@ -252,13 +261,24 @@ export function DiscGolf() {
                   <p style={{ fontSize: 18, fontWeight: 700, color: vsParColor(diff), lineHeight: 1 }}>{vsParLabel(diff)}</p>
                   <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{r.score} / {r.par}</p>
                 </div>
-                <button onClick={() => setEditing(r)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
+                <button type="button" aria-label="Edit round" onClick={() => setEditing(r)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer' }}>
                   <EditIcon size={13} color="var(--text-muted)" />
                 </button>
               </div>
             </Card>
           )
         })}
+
+        {rounds.length > visible && (
+          <button
+            type="button"
+            onClick={() => setVisible(v => v + LOAD_MORE)}
+            className="w-full py-3 rounded-xl font-semibold mt-1"
+            style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+          >
+            Show more ({rounds.length - visible} left)
+          </button>
+        )}
 
         {rounds.length === 0 && (
           <EmptyState

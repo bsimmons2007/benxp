@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
+import { LightbulbIcon, CloseIcon } from './Icon'
 
 interface EmptyStateProps {
   icon:    ReactNode
@@ -77,12 +78,14 @@ export function FirstUseTip({ formKey, tip }: { formKey: string; tip: string }) 
     <div className="flex items-start gap-3 rounded-xl px-3 py-2.5 mb-1 fade-in" style={{
       background: 'var(--accent-subtle)', border: '1px solid var(--accent-dim)',
     }}>
-      <span style={{ fontSize: 14, flexShrink: 0 }}>💡</span>
+      <span style={{ flexShrink: 0, display: 'flex' }}><LightbulbIcon size={14} color="var(--accent)" /></span>
       <p style={{ fontSize: 11, color: 'var(--accent)', lineHeight: 1.5, flex: 1 }}>{tip}</p>
       <button
+        type="button"
+        aria-label="Dismiss tip"
         onClick={dismiss}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', fontSize: 14, lineHeight: 1, flexShrink: 0, padding: 0, opacity: 0.7 }}
-      >✕</button>
+        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', lineHeight: 1, flexShrink: 0, padding: 0, opacity: 0.7, display: 'flex', alignItems: 'center' }}
+      ><CloseIcon size={14} /></button>
     </div>
   )
 }
