@@ -12,6 +12,8 @@ export default defineConfig({
       manifest: false,
       includeAssets: ['favicon.svg', 'icons.svg', 'favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       workbox: {
+        // Push + notificationclick handlers, imported into the generated SW.
+        importScripts: ['push-sw.js'],
         globPatterns: ['**/*.{css,html,ico,png,svg}', 'assets/*.js'],
         skipWaiting: false,
         clientsClaim: false,

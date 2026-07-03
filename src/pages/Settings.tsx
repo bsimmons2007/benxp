@@ -13,6 +13,7 @@ import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, Run
 import { getNotifPrefs, saveNotifPrefs, requestPermission, permissionGranted, notificationsSupported } from '../lib/notifications'
 import { toRoman } from '../lib/utils'
 import { getPref, setPref } from '../lib/prefs'
+import { PushNotificationsSection } from '../components/settings/PushNotificationsSection'
 import {
   SECTION_DEFS, DEFAULT_ORDER,
   loadSectionOrder, saveSectionOrder,
@@ -682,6 +683,9 @@ export function Settings() {
             )}
           </Card>
         )}
+
+        {/* ── Push Notifications (Phase 5) ──────────────────────────── */}
+        <PushNotificationsSection />
 
         {/* ── XP Rates card ─────────────────────────────────────────── */}
         <Card className="mb-2">
