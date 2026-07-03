@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { getPref, setPref } from './prefs'
 import {
   CHALLENGE_TEMPLATES, PROGRESS_FNS, SECTION_DISPLAY,
   type ActivitySection, type UserStats, type ChallengeTemplate,
@@ -70,7 +71,7 @@ function rerollStorageKey(period: 'weekly' | 'monthly', userId: string): string 
 
 export function getRerollsRemaining(period: 'weekly' | 'monthly', userId: string): number {
   const key = rerollStorageKey(period, userId)
-  const stored = localStorage.getItem(key)
+  const stored = getPref<string | null>(key, null)
   if (stored === null) return MAX_REROLLS
   const used = parseInt(stored, 10)
   return isNaN(used) ? MAX_REROLLS : Math.max(0, MAX_REROLLS - used)
@@ -80,9 +81,9 @@ export function consumeReroll(period: 'weekly' | 'monthly', userId: string): boo
   const remaining = getRerollsRemaining(period, userId)
   if (remaining <= 0) return false
   const key = rerollStorageKey(period, userId)
-  const stored = localStorage.getItem(key)
+  const stored = getPref<string | null>(key, null)
   const used = stored ? parseInt(stored, 10) || 0 : 0
-  localStorage.setItem(key, String(used + 1))
+  setPref(key, String(used + 1))
   return true
 }
 
@@ -97,12 +98,12 @@ function seenStorageKey(period: 'weekly' | 'monthly', userId: string): string {
 export function addSeen(period: 'weekly' | 'monthly', key: string, userId: string): void {
   const seen = getSeen(period, userId)
   const updated = [key, ...seen.filter(k => k !== key)].slice(0, SEEN_MAX)
-  localStorage.setItem(seenStorageKey(period, userId), JSON.stringify(updated))
+  setPref(seenStorageKey(period, userId), JSON.stringify(updated))
 }
 
 export function getSeen(period: 'weekly' | 'monthly', userId: string): string[] {
   try {
-    const raw = localStorage.getItem(seenStorageKey(period, userId))
+    const raw = getPref<string | null>(seenStorageKey(period, userId), null)
     if (!raw) return []
     const parsed = JSON.parse(raw)
     if (Array.isArray(parsed)) return parsed as string[]
@@ -556,7 +557,7 @@ export interface TutorialStep {
 }
 
 export async function getTutorialSteps(supabase: SupabaseClient, userId: string): Promise<TutorialStep[]> {
-  const theme = localStorage.getItem('youxp-theme')
+  const theme = getPref<string | null>('theme', null)
   const [lifting, mood, water, sleep] = await Promise.all([
     supabase.from('lifting_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => (r.count ?? 0) > 0),
     supabase.from('mood_log').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => (r.count ?? 0) > 0),

@@ -97,12 +97,26 @@ export const XP_RATES = {
   pool_break_and_run:   25,   // bonus for break and run
 }
 
-export function calculateLevel(totalXP: number): number {
-  return Math.floor(1 + Math.sqrt(totalXP / 150))
+// ── Leveling curve ────────────────────────────────────────────
+// Sqrt curve through level 30, then a flat cost per level beyond it.
+// The flat step equals the level 29->30 increment so the curve stays
+// continuous at the transition. Precomputed:
+//   xpForLevel(30) = 29^2 * 150 = 126150
+//   xpForLevel(29) = 28^2 * 150 = 117600
+//   step           = 8550
+const LEVEL_CAP = 30
+const CAP_XP    = (LEVEL_CAP - 1) ** 2 * 150             // XP to reach level 30 = 126150
+const FLAT_STEP = CAP_XP - (LEVEL_CAP - 2) ** 2 * 150    // 8550 XP per level past 30
+
+/** XP required to reach a given level (the floor of that level). */
+export function xpForLevel(level: number): number {
+  if (level <= LEVEL_CAP) return (level - 1) ** 2 * 150
+  return CAP_XP + (level - LEVEL_CAP) * FLAT_STEP
 }
 
-export function xpForLevel(level: number): number {
-  return (level - 1) ** 2 * 150
+export function calculateLevel(totalXP: number): number {
+  if (totalXP < CAP_XP) return Math.floor(1 + Math.sqrt(totalXP / 150))
+  return LEVEL_CAP + Math.floor((totalXP - CAP_XP) / FLAT_STEP)
 }
 
 export function levelProgress(totalXP: number): number {
@@ -110,6 +124,198 @@ export function levelProgress(totalXP: number): number {
   const floor = xpForLevel(level)
   const ceiling = xpForLevel(level + 1)
   return (totalXP - floor) / (ceiling - floor)
+}
+
+// ── Seasonal level ────────────────────────────────────────────
+// XP earned since Jan 1 of the current year, on a faster curve so a very
+// active year lands around level 40-60. Resets naturally on Jan 1 (date-based).
+export function seasonLevel(seasonXP: number): number {
+  return Math.floor(Math.sqrt(Math.max(0, seasonXP) / 100))
+}
+
+export function seasonXpForLevel(level: number): number {
+  return level * level * 100
+}
+
+export function seasonProgress(seasonXP: number): number {
+  const level = seasonLevel(seasonXP)
+  const floor = seasonXpForLevel(level)
+  const ceiling = seasonXpForLevel(level + 1)
+  if (ceiling === floor) return 0
+  return Math.max(0, Math.min(1, (seasonXP - floor) / (ceiling - floor)))
+}
+
+// ── XP aggregates ─────────────────────────────────────────────
+// Per-table counts/sums needed to compute total XP. Produced either by the
+// get_xp_aggregates Postgres RPC (server-side math) or derived from rawRows as
+// a fallback. XP is always multiplied by XP_RATES in TS so rates stay retroactive.
+export interface XPAggregates {
+  set_count: number;            workout_days: number
+  pr_count: number
+  book_count: number
+  skate_miles: number
+  fn_wins: number;              fn_blitz_wins: number;    fn_kills: number
+  sleep_nights: number;         sleep_quality: number
+  cardio_run_mi: number;        cardio_bike_mi: number;   cardio_swim_mi: number
+  cardio_walk_mi: number;       cardio_other_mi: number
+  challenge_xp: number;         goal_xp: number
+  mood_count: number;           measurement_count: number
+  water_goal_days: number
+  bb_sessions: number;          bb_points: number
+  pb_games: number;             pb_wins: number
+  golf_rounds: number;          golf_under_par: number
+  dg_rounds: number;            dg_under_par: number
+  hike_miles: number;           hike_elev_buckets: number
+  tt_games: number;             tt_wins: number
+  chess_games: number;          chess_wins: number;       chess_draws: number
+  vb_games: number;             vb_wins: number
+  sb_games: number;             sb_wins: number
+  pool_games: number;           pool_wins: number;        pool_bnr: number
+}
+
+/** Total XP from aggregates × XP_RATES — the single source of XP truth. */
+export function xpFromAggregates(a: XPAggregates): number {
+  const cardioXP =
+      a.cardio_run_mi  * XP_RATES.cardio_run_per_mile
+    + a.cardio_bike_mi * XP_RATES.cardio_bike_per_mile
+    + a.cardio_swim_mi * XP_RATES.cardio_swim_per_mile
+    + a.cardio_walk_mi * XP_RATES.cardio_walk_per_mile
+    + a.cardio_other_mi * XP_RATES.cardio_per_mile
+  return Math.round(
+      a.set_count      * XP_RATES.per_set
+    + a.workout_days   * XP_RATES.workout_day
+    + a.pr_count       * XP_RATES.new_pr
+    + a.book_count     * XP_RATES.book_finished
+    + a.skate_miles    * XP_RATES.skate_per_mile
+    + a.fn_wins        * XP_RATES.fortnite_win
+    + a.fn_blitz_wins  * XP_RATES.fortnite_blitz_win
+    + a.fn_kills       * XP_RATES.fortnite_kill
+    + a.sleep_nights   * XP_RATES.sleep_log
+    + a.sleep_quality  * XP_RATES.sleep_quality_bonus
+    + cardioXP
+    + a.challenge_xp
+    + a.goal_xp
+    + a.mood_count        * XP_RATES.mood_log
+    + a.measurement_count * XP_RATES.measurement_log
+    + a.water_goal_days   * XP_RATES.water_goal_reached
+    + a.bb_sessions   * XP_RATES.basketball_session
+    + a.bb_points     * XP_RATES.basketball_per_point
+    + a.pb_games      * XP_RATES.pickleball_game
+    + a.pb_wins       * XP_RATES.pickleball_win
+    + a.golf_rounds   * XP_RATES.golf_round
+    + a.golf_under_par * XP_RATES.golf_under_par
+    + a.dg_rounds     * XP_RATES.disc_golf_round
+    + a.dg_under_par  * XP_RATES.disc_golf_under_par
+    + a.hike_miles        * XP_RATES.hiking_per_mile
+    + a.hike_elev_buckets * XP_RATES.hiking_per_500ft
+    + a.tt_games      * XP_RATES.table_tennis_game
+    + a.tt_wins       * XP_RATES.table_tennis_win
+    + a.chess_games   * XP_RATES.chess_game
+    + a.chess_wins    * XP_RATES.chess_win
+    + a.chess_draws   * XP_RATES.chess_draw
+    + a.vb_games      * XP_RATES.volleyball_game
+    + a.vb_wins       * XP_RATES.volleyball_win
+    + a.sb_games      * XP_RATES.spikeball_game
+    + a.sb_wins       * XP_RATES.spikeball_win
+    + a.pool_games    * XP_RATES.pool_game
+    + a.pool_wins     * XP_RATES.pool_win
+    + a.pool_bnr      * XP_RATES.pool_break_and_run
+  )
+}
+
+/** Pull the `_season` variants out of the RPC payload into an XPAggregates.
+ *  Season-agnostic dimensions (goal XP, challenge XP, measurements, sport
+ *  counts) are only ever all-time in the aggregates RPC, so they contribute 0
+ *  to season XP — season XP is dominated by activity-count/mileage dimensions.
+ */
+export function seasonAggregatesFromRpc(raw: Record<string, number>): XPAggregates {
+  const s = (k: string) => Number(raw[`${k}_season`] ?? 0)
+  return {
+    set_count: s('set_count'), workout_days: s('workout_days'),
+    pr_count: s('pr_count'), book_count: s('book_count'),
+    skate_miles: s('skate_miles'),
+    fn_wins: s('fn_wins'), fn_blitz_wins: s('fn_blitz_wins'), fn_kills: s('fn_kills'),
+    sleep_nights: s('sleep_nights'), sleep_quality: s('sleep_quality'),
+    cardio_run_mi: s('cardio_run_mi'), cardio_bike_mi: s('cardio_bike_mi'),
+    cardio_swim_mi: s('cardio_swim_mi'), cardio_walk_mi: s('cardio_walk_mi'),
+    cardio_other_mi: s('cardio_other_mi'),
+    challenge_xp: 0, goal_xp: 0,
+    mood_count: s('mood_count'), measurement_count: 0,
+    water_goal_days: s('water_goal_days'),
+    bb_sessions: 0, bb_points: 0, pb_games: 0, pb_wins: 0,
+    golf_rounds: 0, golf_under_par: 0, dg_rounds: 0, dg_under_par: 0,
+    hike_miles: 0, hike_elev_buckets: 0, tt_games: 0, tt_wins: 0,
+    chess_games: 0, chess_wins: 0, chess_draws: 0, vb_games: 0, vb_wins: 0,
+    sb_games: 0, sb_wins: 0, pool_games: 0, pool_wins: 0, pool_bnr: 0,
+  }
+}
+
+function isBlitz(mode?: string | null): boolean {
+  return mode === 'Blitz' || (typeof mode === 'string' && mode.startsWith('Blitz '))
+}
+
+/** Derive XP aggregates from already-fetched rawRows — the client-side fallback
+ *  when the RPC is unavailable, and the source of season XP (pass a `since` date
+ *  to count only rows on/after it). Mirrors get_xp_aggregates exactly. */
+export function aggregatesFromRawRows(r: RawActivityData, since?: string): XPAggregates {
+  const on = (d: string | null | undefined) => !since || (!!d && d >= since)
+  const lift  = r.liftingRows.filter(x => on(x.date))
+  const skate = r.skateRows.filter(x => on(x.date))
+  const pr    = r.prRows.filter(x => on(x.date))
+  const book  = r.bookRows.filter(x => x.date_finished && on(x.date_finished))
+  const game  = r.gameRows.filter(x => on(x.date))
+  const sleep = r.sleepRows.filter(x => on(x.date))
+  const cardio = r.cardioRows.filter(x => on(x.date))
+  const mood  = r.moodRows.filter(x => on(x.date))
+  const water = r.waterRows.filter(x => on(x.date))
+  const bb = r.bbRows.filter(x => on(x.date)); const pb = r.pbRows.filter(x => on(x.date))
+  const golf = r.golfRows.filter(x => on(x.date)); const dg = r.dgRows.filter(x => on(x.date))
+  const hike = r.hikeRows.filter(x => on(x.date)); const tt = r.ttRows.filter(x => on(x.date))
+  const chess = r.chessRows.filter(x => on(x.date)); const vb = r.vbRows.filter(x => on(x.date))
+  const sb = r.sbRows.filter(x => on(x.date)); const pool = r.poolRows.filter(x => on(x.date))
+
+  const waterByDate: Record<string, number> = {}
+  for (const w of water) waterByDate[w.date] = (waterByDate[w.date] ?? 0) + Number(w.oz)
+
+  return {
+    set_count: lift.length,
+    workout_days: new Set(lift.map(x => x.date)).size,
+    pr_count: pr.length,
+    book_count: book.length,
+    skate_miles: skate.reduce((s, x) => s + (x.miles ?? 0), 0),
+    fn_wins: game.filter(x => x.win && !isBlitz(x.mode)).length,
+    fn_blitz_wins: game.filter(x => x.win && isBlitz(x.mode)).length,
+    fn_kills: game.reduce((s, x) => s + (x.kills ?? 0), 0),
+    sleep_nights: sleep.length,
+    sleep_quality: sleep.filter(x => (x.hours_slept ?? 0) >= 7).length,
+    cardio_run_mi:  cardio.filter(x => x.activity === 'run').reduce((s, x) => s + (x.distance_miles ?? 0), 0),
+    cardio_bike_mi: cardio.filter(x => x.activity === 'bike').reduce((s, x) => s + (x.distance_miles ?? 0), 0),
+    cardio_swim_mi: cardio.filter(x => x.activity === 'swim').reduce((s, x) => s + (x.distance_miles ?? 0), 0),
+    cardio_walk_mi: cardio.filter(x => x.activity === 'walk').reduce((s, x) => s + (x.distance_miles ?? 0), 0),
+    cardio_other_mi: cardio.filter(x => !['run','bike','swim','walk'].includes(x.activity)).reduce((s, x) => s + (x.distance_miles ?? 0), 0),
+    challenge_xp: since ? 0 : r.challengeRows.filter(x => x.status === 'completed' || x.status === 'claimed').reduce((s, x) => s + (x.xp_reward ?? 0), 0),
+    goal_xp: 0,   // goals not in rawRows; RPC path supplies goal XP
+    mood_count: mood.length,
+    measurement_count: 0,   // measurements not in rawRows; RPC path supplies it
+    water_goal_days: Object.values(waterByDate).filter(oz => oz >= 64).length,
+    bb_sessions: bb.length,
+    bb_points: bb.reduce((s, x) => s + (x.points ?? 0), 0),
+    pb_games: pb.length, pb_wins: pb.filter(x => x.win).length,
+    golf_rounds: golf.length,
+    golf_under_par: golf.reduce((s, x) => s + Math.max(x.par - x.score, 0), 0),
+    dg_rounds: dg.length,
+    dg_under_par: dg.reduce((s, x) => s + Math.max(x.par - x.score, 0), 0),
+    hike_miles: hike.reduce((s, x) => s + (x.distance_miles ?? 0), 0),
+    hike_elev_buckets: hike.reduce((s, x) => s + Math.floor((x.elevation_gain_ft ?? 0) / 500), 0),
+    tt_games: tt.length, tt_wins: tt.filter(x => x.win).length,
+    chess_games: chess.length,
+    chess_wins: chess.filter(x => x.result === 'win').length,
+    chess_draws: chess.filter(x => x.result === 'draw').length,
+    vb_games: vb.length, vb_wins: vb.filter(x => x.win).length,
+    sb_games: sb.length, sb_wins: sb.filter(x => x.win).length,
+    pool_games: pool.length, pool_wins: pool.filter(x => x.win).length,
+    pool_bnr: pool.filter(x => x.break_and_run).length,
+  }
 }
 
 export interface AppStats {
@@ -172,9 +378,9 @@ export interface RawActivityData {
 // ── localStorage cache (stale-while-revalidate, keyed per user) ──
 const XP_CACHE_TTL = 5 * 60 * 1000
 
-function xpCacheKey(userId: string) { return `youxp-xp-cache-v2-${userId}` }
+function xpCacheKey(userId: string) { return `youxp-xp-cache-v3-${userId}` }
 
-export function getCachedXPData(userId: string): { totalXP: number; stats: AppStats } | null {
+export function getCachedXPData(userId: string): { totalXP: number; seasonXP?: number; stats: AppStats } | null {
   try {
     const raw = localStorage.getItem(xpCacheKey(userId))
     if (!raw) return null
@@ -184,7 +390,7 @@ export function getCachedXPData(userId: string): { totalXP: number; stats: AppSt
   } catch { return null }
 }
 
-export function setCachedXPData(userId: string, data: { totalXP: number; stats: AppStats }) {
+export function setCachedXPData(userId: string, data: { totalXP: number; seasonXP: number; stats: AppStats }) {
   try { localStorage.setItem(xpCacheKey(userId), JSON.stringify({ data, ts: Date.now() })) } catch {}
 }
 
@@ -200,7 +406,12 @@ export function getCachedXPTimestamp(userId: string): number | null {
 /** Fetch XP, stats, and raw activity rows in one parallel batch.
  *  Raw rows are shared with useStreak and useAchievements to eliminate ~35 duplicate queries per session.
  */
-export async function fetchXPAndStats(supabase: SupabaseClient, userId: string): Promise<{ totalXP: number; stats: AppStats; rawRows: RawActivityData }> {
+export async function fetchXPAndStats(supabase: SupabaseClient, userId: string): Promise<{ totalXP: number; seasonXP: number; stats: AppStats; rawRows: RawActivityData }> {
+  // Server-side XP aggregates (Phase 4a). Runs in parallel with the row fetches.
+  // If the RPC is missing (migration not yet run) rpc.error is set and we fall
+  // back to computing XP from rawRows below — same numbers, more bytes.
+  const aggPromise = supabase.rpc('get_xp_aggregates', { uid: userId })
+
   const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess, volleyball, spikeball, pool] = await Promise.all([
     supabase.from('lifting_log').select('date, lift, est_1rm, weight, sets, reps').eq('user_id', userId),
     supabase.from('skate_sessions').select('miles, date').eq('user_id', userId),
@@ -226,104 +437,77 @@ export async function fetchXPAndStats(supabase: SupabaseClient, userId: string):
     supabase.from('pool_games').select('win, break_and_run, date, game_type').eq('user_id', userId),
   ])
 
-  // ── XP ──────────────────────────────────────────────────────
+  // Rows reused by the Stats section below
   const liftRows  = lifting.data  ?? []
   const skateRows = skate.data    ?? []
   const prRows    = prs.data      ?? []
   const bookRows  = books.data    ?? []
   const gameRows  = games.data    ?? []
 
-  const setXP       = liftRows.length * XP_RATES.per_set
-  const uniqueDays  = new Set(liftRows.map((r: { date: string }) => r.date)).size
-  const dayXP       = uniqueDays * XP_RATES.workout_day
-  const prXP        = prRows.length * XP_RATES.new_pr
-  const bookXP      = bookRows.length * XP_RATES.book_finished
-  const skateXP     = skateRows.reduce((s: number, r: { miles: number }) => s + (r.miles ?? 0), 0) * XP_RATES.skate_per_mile
-  const fnXP        = gameRows.reduce((s: number, r: { win: boolean; kills: number; mode?: string | null }) => {
-    const isBlitz = r.mode === 'Blitz' || (typeof r.mode === 'string' && r.mode.startsWith('Blitz '))
-    const winXP   = r.win ? (isBlitz ? XP_RATES.fortnite_blitz_win : XP_RATES.fortnite_win) : 0
-    return s + winXP + ((r.kills ?? 0) * XP_RATES.fortnite_kill)
-  }, 0)
-  const challengeXP = (challenges.data ?? []).filter((r: { status: string }) => r.status === 'completed' || r.status === 'claimed').reduce((s: number, r: { xp_reward: number }) => s + (r.xp_reward ?? 0), 0)
-  const sleepXP     = (sleepLogs.data ?? []).reduce(
-    (s: number, r: { hours_slept: number | null }) =>
-      s + XP_RATES.sleep_log + ((r.hours_slept ?? 0) >= 7 ? XP_RATES.sleep_quality_bonus : 0),
-    0
-  )
-  const cardioXP      = (cardio.data ?? []).reduce((s: number, r: { distance_miles: number; activity: string }) => {
-    const rate = r.activity === 'run'  ? XP_RATES.cardio_run_per_mile
-               : r.activity === 'bike' ? XP_RATES.cardio_bike_per_mile
-               : r.activity === 'swim' ? XP_RATES.cardio_swim_per_mile
-               : r.activity === 'walk' ? XP_RATES.cardio_walk_per_mile
-               : XP_RATES.cardio_per_mile
-    return s + (r.distance_miles ?? 0) * rate
-  }, 0)
-  const goalXP        = (goals.data ?? []).reduce((s: number, r: { xp_reward: number }) => s + (r.xp_reward ?? 0), 0)
-  const moodXP        = (moodLogs.data ?? []).length * XP_RATES.mood_log
-  const measurementXP = (measurements.data ?? []).length * XP_RATES.measurement_log
-  const waterGoalXP   = (() => {
-    const byDate: Record<string, number> = {}
-    for (const r of (waterLog.data ?? []) as { date: string; oz: number }[]) {
-      byDate[r.date] = (byDate[r.date] ?? 0) + Number(r.oz)
+  // ── Raw rows (needed regardless for streak/achievements/trends/stats) ──
+  const rawRows: RawActivityData = {
+    liftingRows:   liftRows as RawActivityData['liftingRows'],
+    prRows:        prRows as RawActivityData['prRows'],
+    skateRows:     skateRows as RawActivityData['skateRows'],
+    bookRows:      bookRows as RawActivityData['bookRows'],
+    gameRows:      gameRows as RawActivityData['gameRows'],
+    challengeRows: (challenges.data ?? []) as RawActivityData['challengeRows'],
+    sleepRows:     (sleepLogs.data ?? []) as RawActivityData['sleepRows'],
+    cardioRows:    (cardio.data ?? []) as RawActivityData['cardioRows'],
+    bbRows:        (basketball.data ?? []) as RawActivityData['bbRows'],
+    pbRows:        (pickleball.data ?? []) as RawActivityData['pbRows'],
+    golfRows:      (golf.data ?? []) as RawActivityData['golfRows'],
+    dgRows:        (discGolf.data ?? []) as RawActivityData['dgRows'],
+    hikeRows:      (hiking.data ?? []) as RawActivityData['hikeRows'],
+    ttRows:        (tableTennis.data ?? []) as RawActivityData['ttRows'],
+    chessRows:     (chess.data ?? []) as RawActivityData['chessRows'],
+    poolRows:      (pool.data ?? []) as RawActivityData['poolRows'],
+    vbRows:        (volleyball.data ?? []) as RawActivityData['vbRows'],
+    sbRows:        (spikeball.data ?? []) as RawActivityData['sbRows'],
+    moodRows:      (moodLogs.data ?? []) as RawActivityData['moodRows'],
+    waterRows:     (waterLog.data ?? []) as RawActivityData['waterRows'],
+  }
+
+  // ── XP: prefer server-side aggregates, fall back to rawRows ────
+  const jan1 = `${new Date().getFullYear()}-01-01`
+  let totalXP: number
+  let seasonXP: number
+  const agg = await aggPromise
+  if (!agg.error && agg.data) {
+    const raw = agg.data as Record<string, number>
+    const allAgg: XPAggregates = {
+      set_count: Number(raw.set_count ?? 0), workout_days: Number(raw.workout_days ?? 0),
+      pr_count: Number(raw.pr_count ?? 0), book_count: Number(raw.book_count ?? 0),
+      skate_miles: Number(raw.skate_miles ?? 0),
+      fn_wins: Number(raw.fn_wins ?? 0), fn_blitz_wins: Number(raw.fn_blitz_wins ?? 0), fn_kills: Number(raw.fn_kills ?? 0),
+      sleep_nights: Number(raw.sleep_nights ?? 0), sleep_quality: Number(raw.sleep_quality ?? 0),
+      cardio_run_mi: Number(raw.cardio_run_mi ?? 0), cardio_bike_mi: Number(raw.cardio_bike_mi ?? 0),
+      cardio_swim_mi: Number(raw.cardio_swim_mi ?? 0), cardio_walk_mi: Number(raw.cardio_walk_mi ?? 0),
+      cardio_other_mi: Number(raw.cardio_other_mi ?? 0),
+      challenge_xp: Number(raw.challenge_xp ?? 0), goal_xp: Number(raw.goal_xp ?? 0),
+      mood_count: Number(raw.mood_count ?? 0), measurement_count: Number(raw.measurement_count ?? 0),
+      water_goal_days: Number(raw.water_goal_days ?? 0),
+      bb_sessions: Number(raw.bb_sessions ?? 0), bb_points: Number(raw.bb_points ?? 0),
+      pb_games: Number(raw.pb_games ?? 0), pb_wins: Number(raw.pb_wins ?? 0),
+      golf_rounds: Number(raw.golf_rounds ?? 0), golf_under_par: Number(raw.golf_under_par ?? 0),
+      dg_rounds: Number(raw.dg_rounds ?? 0), dg_under_par: Number(raw.dg_under_par ?? 0),
+      hike_miles: Number(raw.hike_miles ?? 0), hike_elev_buckets: Number(raw.hike_elev_buckets ?? 0),
+      tt_games: Number(raw.tt_games ?? 0), tt_wins: Number(raw.tt_wins ?? 0),
+      chess_games: Number(raw.chess_games ?? 0), chess_wins: Number(raw.chess_wins ?? 0), chess_draws: Number(raw.chess_draws ?? 0),
+      vb_games: Number(raw.vb_games ?? 0), vb_wins: Number(raw.vb_wins ?? 0),
+      sb_games: Number(raw.sb_games ?? 0), sb_wins: Number(raw.sb_wins ?? 0),
+      pool_games: Number(raw.pool_games ?? 0), pool_wins: Number(raw.pool_wins ?? 0), pool_bnr: Number(raw.pool_bnr ?? 0),
     }
-    return Object.values(byDate).filter(oz => oz >= 64).length * XP_RATES.water_goal_reached
-  })()
-  const basketballXP  = (basketball.data ?? []).reduce(
-    (s: number, r: { points: number }) =>
-      s + XP_RATES.basketball_session + ((r.points ?? 0) * XP_RATES.basketball_per_point),
-    0
-  )
-  const pickleballXP  = (pickleball.data ?? []).reduce(
-    (s: number, r: { win: boolean }) =>
-      s + XP_RATES.pickleball_game + (r.win ? XP_RATES.pickleball_win : 0),
-    0
-  )
-  const golfXP = (golf.data ?? []).reduce(
-    (s: number, r: { score: number; par: number }) => {
-      const vsP = r.score - r.par
-      const underParBonus = vsP < 0 ? Math.abs(vsP) * XP_RATES.golf_under_par : 0
-      return s + XP_RATES.golf_round + underParBonus
-    }, 0
-  )
-  const discGolfXP = (discGolf.data ?? []).reduce(
-    (s: number, r: { score: number; par: number }) => {
-      const vsP = r.score - r.par
-      const underParBonus = vsP < 0 ? Math.abs(vsP) * XP_RATES.disc_golf_under_par : 0
-      return s + XP_RATES.disc_golf_round + underParBonus
-    }, 0
-  )
-  const hikingXP = (hiking.data ?? []).reduce(
-    (s: number, r: { distance_miles: number; elevation_gain_ft: number | null }) => {
-      const milesXP = (r.distance_miles ?? 0) * XP_RATES.hiking_per_mile
-      const elevXP  = Math.floor((r.elevation_gain_ft ?? 0) / 500) * XP_RATES.hiking_per_500ft
-      return s + milesXP + elevXP
-    }, 0
-  )
-  const tableTennisXP = (tableTennis.data ?? []).reduce(
-    (s: number, r: { win: boolean }) =>
-      s + XP_RATES.table_tennis_game + (r.win ? XP_RATES.table_tennis_win : 0), 0
-  )
-  const chessXP = (chess.data ?? []).reduce(
-    (s: number, r: { result: string }) =>
-      s + XP_RATES.chess_game
-        + (r.result === 'win'  ? XP_RATES.chess_win  : 0)
-        + (r.result === 'draw' ? XP_RATES.chess_draw : 0), 0
-  )
-  const volleyballXP = (volleyball.data ?? []).reduce(
-    (s: number, r: { win: boolean }) =>
-      s + XP_RATES.volleyball_game + (r.win ? XP_RATES.volleyball_win : 0), 0
-  )
-  const spikeballXP = (spikeball.data ?? []).reduce(
-    (s: number, r: { win: boolean }) =>
-      s + XP_RATES.spikeball_game + (r.win ? XP_RATES.spikeball_win : 0), 0
-  )
-  const poolXP = (pool.data ?? []).reduce(
-    (s: number, r: { win: boolean; break_and_run: boolean }) =>
-      s + XP_RATES.pool_game
-        + (r.win ? XP_RATES.pool_win : 0)
-        + (r.break_and_run ? XP_RATES.pool_break_and_run : 0), 0
-  )
-  const totalXP = Math.round(setXP + dayXP + prXP + bookXP + skateXP + fnXP + challengeXP + sleepXP + cardioXP + goalXP + moodXP + measurementXP + waterGoalXP + basketballXP + pickleballXP + golfXP + discGolfXP + hikingXP + tableTennisXP + chessXP + volleyballXP + spikeballXP + poolXP)
+    totalXP  = xpFromAggregates(allAgg)
+    seasonXP = xpFromAggregates(seasonAggregatesFromRpc(raw))
+  } else {
+    // Fallback: goals + measurements aren't in rawRows, so fold their XP in here
+    // to match the RPC path exactly.
+    const goalXP = (goals.data ?? []).reduce((s: number, r: { xp_reward: number }) => s + (r.xp_reward ?? 0), 0)
+    const measurementXP = (measurements.data ?? []).length * XP_RATES.measurement_log
+    totalXP  = xpFromAggregates(aggregatesFromRawRows(rawRows)) + Math.round(goalXP + measurementXP)
+    seasonXP = xpFromAggregates(aggregatesFromRawRows(rawRows, jan1))
+  }
 
   // ── Stats ────────────────────────────────────────────────────
   const prMap: Record<string, number> = {}
@@ -398,30 +582,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient, userId: string):
     latestBodyFat:  latestMeas?.body_fat_pct ?? null,
   }
 
-  const rawRows: RawActivityData = {
-    liftingRows:   liftRows as RawActivityData['liftingRows'],
-    prRows:        prRows as RawActivityData['prRows'],
-    skateRows:     skateRows as RawActivityData['skateRows'],
-    bookRows:      bookRows as RawActivityData['bookRows'],
-    gameRows:      gameRows as RawActivityData['gameRows'],
-    challengeRows: (challenges.data ?? []) as RawActivityData['challengeRows'],
-    sleepRows:     (sleepLogs.data ?? []) as RawActivityData['sleepRows'],
-    cardioRows:    cardioRows as RawActivityData['cardioRows'],
-    bbRows:        (basketball.data ?? []) as RawActivityData['bbRows'],
-    pbRows:        (pickleball.data ?? []) as RawActivityData['pbRows'],
-    golfRows:      (golf.data ?? []) as RawActivityData['golfRows'],
-    dgRows:        (discGolf.data ?? []) as RawActivityData['dgRows'],
-    hikeRows:      (hiking.data ?? []) as RawActivityData['hikeRows'],
-    ttRows:        (tableTennis.data ?? []) as RawActivityData['ttRows'],
-    chessRows:     (chess.data ?? []) as RawActivityData['chessRows'],
-    poolRows:      (pool.data ?? []) as RawActivityData['poolRows'],
-    vbRows:        (volleyball.data ?? []) as RawActivityData['vbRows'],
-    sbRows:        (spikeball.data ?? []) as RawActivityData['sbRows'],
-    moodRows:      (moodLogs.data ?? []) as RawActivityData['moodRows'],
-    waterRows:     (waterLog.data ?? []) as RawActivityData['waterRows'],
-  }
-
-  return { totalXP, stats, rawRows }
+  return { totalXP, seasonXP, stats, rawRows }
 }
 
 /** Derive the activity feed from rawRows — eliminates 14 duplicate Supabase queries. */

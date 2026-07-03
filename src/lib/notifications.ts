@@ -45,7 +45,7 @@ export function permissionGranted(): boolean {
 
 const STREAK_WARN_KEY = 'youxp-streak-warn-date'
 
-export function checkStreakBreakWarning(currentStreak: number, activeToday: boolean): void {
+export function checkStreakBreakWarning(currentStreak: number, activeToday: boolean, freezeTokens = 0): void {
   if (!permissionGranted()) return
   if (activeToday) return                     // already logged — streak safe
   if (currentStreak < 3) return               // streak not long enough to care about
@@ -56,9 +56,12 @@ export function checkStreakBreakWarning(currentStreak: number, activeToday: bool
   if (now.getHours() < 18) return             // wait until 6pm
 
   localStorage.setItem(STREAK_WARN_KEY, today)
+  const body = freezeTokens > 0
+    ? `You haven't logged today — but a freeze token will cover your ${currentStreak}-day streak. Log something to save the token!`
+    : `Your ${currentStreak}-day streak will reset at midnight. Log something to keep it alive!`
   try {
     new Notification('YouXP — Streak at risk!', {
-      body: `Your ${currentStreak}-day streak will reset at midnight. Log something to keep it alive!`,
+      body,
       icon: '/favicon.svg',
       badge: '/favicon.svg',
     })

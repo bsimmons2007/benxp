@@ -6,8 +6,14 @@ import './index.css'
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { initSentry } from './lib/sentry'
+import { seedPrefsFromLegacy, hydratePrefs } from './lib/prefs'
 
 initSentry()
+
+// Migrate existing youxp-* prefs into the prefs doc synchronously (so theme /
+// stat picks read seeded values on first paint), then pull the server doc.
+seedPrefsFromLegacy()
+void hydratePrefs()
 
 // Auto-reload on stale chunk errors (old bundle hash after a new deploy)
 window.addEventListener('vite:preloadError', () => {
