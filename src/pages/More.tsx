@@ -4,7 +4,7 @@ import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
 import {
   PersonIcon, TargetIcon, RulerIcon, CalendarIcon, GridIcon,
-  TrophyIcon, ShareIcon, TrendingIcon, ChevronRightIcon, TerminalIcon, CrownIcon,
+  TrophyIcon, ShareIcon, TrendingIcon, ChevronRightIcon, TerminalIcon, CrownIcon, FlameIcon,
 } from '../components/ui/Icon'
 import type { CSSProperties } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -17,6 +17,7 @@ const NAV_LINKS: { to: string; Icon: IconFn; label: string; sub: string; sidebar
   { to: '/measurements', Icon: RulerIcon,    label: 'Measurements',       sub: 'Body composition over time'   },
   { to: '/weekly',       Icon: CalendarIcon, label: 'Weekly Review',      sub: 'XP & highlights this week',    sidebarOnly: true },
   { to: '/monthly',      Icon: GridIcon,     label: 'Monthly Reel',       sub: 'Your best moments this month' },
+  { to: '/yearly',       Icon: FlameIcon,    label: 'Yearly Heatmap',     sub: 'Your full year at a glance'   },
   { to: '/pr-feed',      Icon: TrophyIcon,   label: 'PR Feed',            sub: "Every record you've set"      },
   { to: '/share',        Icon: ShareIcon,    label: 'Share Card',         sub: 'Export your progress card'    },
   { to: '/xp-history',   Icon: TrendingIcon, label: 'XP History',        sub: 'Every XP event, ever'         },

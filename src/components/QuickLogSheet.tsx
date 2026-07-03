@@ -232,7 +232,8 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
     if (hrs == null && bedtime && wake) {
       const [bh, bm] = bedtime.split(':').map(Number)
       const [wh, wm] = wake.split(':').map(Number)
-      let bed = bh * 60 + bm, up = wh * 60 + wm
+      const bed = bh * 60 + bm
+      let up = wh * 60 + wm
       if (up <= bed) up += 24 * 60
       hrs = Math.round(((up - bed) / 60) * 10) / 10
     }

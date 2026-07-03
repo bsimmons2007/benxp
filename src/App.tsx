@@ -20,6 +20,7 @@ const Settings     = lazy(() => import('./pages/Settings').then(m => ({ default:
 const Profile      = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })))
 const Weekly       = lazy(() => import('./pages/Weekly').then(m => ({ default: m.Weekly })))
 const Monthly      = lazy(() => import('./pages/Monthly').then(m => ({ default: m.Monthly })))
+const Yearly       = lazy(() => import('./pages/Yearly').then(m => ({ default: m.Yearly })))
 const Mood         = lazy(() => import('./pages/Mood').then(m => ({ default: m.Mood })))
 const DevSettings  = lazy(() => import('./pages/DevSettings').then(m => ({ default: m.DevSettings })))
 const ShareCard    = lazy(() => import('./pages/ShareCard').then(m => ({ default: m.ShareCard })))
@@ -370,6 +371,7 @@ function AppInner() {
         <Route path="/profile"    element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/weekly"     element={<ProtectedRoute><Weekly /></ProtectedRoute>} />
         <Route path="/monthly"    element={<ProtectedRoute><Monthly /></ProtectedRoute>} />
+        <Route path="/yearly"     element={<ProtectedRoute><Yearly /></ProtectedRoute>} />
         <Route path="/mood"       element={<ProtectedRoute><Mood /></ProtectedRoute>} />
         <Route path="/dev"        element={<ProtectedRoute><DevSettings /></ProtectedRoute>} />
         <Route path="/share"      element={<ProtectedRoute><ShareCard /></ProtectedRoute>} />
