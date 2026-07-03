@@ -54,6 +54,7 @@ import { applyTimeOrSavedTheme } from './lib/theme'
 import { setupOfflineQueue } from './lib/offlineQueue'
 import { isTutorialDone } from './lib/tutorial'
 import { checkDailyReminder } from './lib/notifications'
+import { autoSubscribeIfGranted } from './lib/push'
 import { useAuth } from './hooks/useAuth'
 import { useStore } from './store/useStore'
 import { useNavStore } from './store/useNavStore'
@@ -410,6 +411,10 @@ function AppInner() {
 
 export default function App() {
   const auth = useAuth()
+
+  useEffect(() => {
+    if (auth.session) autoSubscribeIfGranted()
+  }, [auth.session])
 
   useEffect(() => {
     applyTimeOrSavedTheme()

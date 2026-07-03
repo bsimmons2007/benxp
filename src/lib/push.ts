@@ -99,6 +99,18 @@ export async function subscribeToPush(): Promise<{ ok: boolean; reason?: string 
   return { ok: true }
 }
 
+/**
+ * If the browser permission is already granted, (re)subscribe silently — no
+ * prompt is shown. Safe to call on every app load; it's idempotent (reuses an
+ * existing subscription and upserts on endpoint conflict). Does nothing until
+ * the user has granted permission once via the Settings toggle.
+ */
+export async function autoSubscribeIfGranted(): Promise<void> {
+  if (!pushSupported() || !pushConfigured()) return
+  if (Notification.permission !== 'granted') return
+  await subscribeToPush().catch(() => {})
+}
+
 /** Unsubscribe from push + remove the row from Supabase. */
 export async function unsubscribeFromPush(): Promise<void> {
   try {
