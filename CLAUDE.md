@@ -1,7 +1,7 @@
 # YouXP — Full Project Reference
 
 ## What it is
-A personal life-tracking PWA for one user (Ben). Everything real-life earns XP — gym sets, miles run, books finished, games won, hours slept. XP accumulates into a level and title (1–100+). Built mobile-first, deployed on Vercel, works offline as a PWA.
+A personal life-tracking PWA for one user (Ben). Everything real-life earns XP — gym sets, miles run, books finished, games won, hours slept. XP accumulates into a lifetime level + title, plus a seasonal level that resets Jan 1. Built mobile-first, deployed on Vercel, works offline as a PWA, sends web-push notifications.
 
 ---
 
@@ -10,18 +10,20 @@ A personal life-tracking PWA for one user (Ben). Everything real-life earns XP �
 |---|---|
 | UI | React 19 + TypeScript + Vite (code-split lazy routes) |
 | Styling | Tailwind CSS v4 + inline styles for dynamic/themed values |
-| Data | Supabase (auth + PostgreSQL) |
+| Data | Supabase (auth + PostgreSQL + Edge Functions) |
 | State | Zustand (`useStore.ts`, `useNavStore.ts`) |
 | Charts | Recharts |
 | Forms | react-hook-form |
 | Routing | react-router-dom v7 |
-| Icons | lucide-react 1.16.0 |
-| PWA | vite-plugin-pwa |
+| Icons | lucide-react 1.16.0 (via `ui/Icon.tsx` wrappers only) |
+| Animation | animejs (`lib/animations.ts`) |
+| PWA | vite-plugin-pwa (generateSW) + `public/push-sw.js` for push |
+| Errors | Sentry (behind `VITE_SENTRY_DSN`) |
 | Hosting | Vercel (auto-deploys `main`) |
 
 **Fonts**: Space Grotesk (display/headings) + JetBrains Mono (stats, numbers, labels) — loaded via Google Fonts in `index.html`
 
-**Env vars** (`.env.local`): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+**Env vars** (`.env.local` + Vercel): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_VAPID_PUBLIC_KEY` (push; UI hides without it), `VITE_SENTRY_DSN` (optional)
 
 **GitHub**: https://github.com/bsimmons2007/benxp
 
@@ -37,115 +39,96 @@ git pull --rebase origin main   # only if remote has commits you don't have loca
 git push origin main
 ```
 
+Always run `npm run typecheck` before pushing (bare `tsc --noEmit` from root checks nothing — solution tsconfig).
+
+**Database changes** ship as SQL files in `migrations/` that Ben pastes into the Supabase SQL Editor (no CLI/MCP access). One-time infra setup steps live in `DEPLOY.md`. All client code must degrade gracefully when a migration hasn't run yet (feature-detect missing table/function → silent fallback).
+
 ---
 
 ## Repository layout
 ```
+migrations/                  # SQL files for Supabase SQL Editor (numbered by phase)
+DEPLOY.md                    # One-time setup: migrations, VAPID keys, edge function, cron
+supabase/functions/
+└── send-notifications/      # Scheduled push sender (Deno, deployed via dashboard)
+public/
+├── manifest.webmanifest     # PWA manifest incl. shortcuts (Quick Log, Water, Workout, Today)
+└── push-sw.js               # push + notificationclick handlers (importScripts'd into Workbox SW)
 src/
-├── App.tsx                  # Router, auth guard, TutorialOverlay, LevelUpOverlay
-├── index.css                # All CSS variables, keyframes, utility classes
-├── main.tsx
+├── App.tsx                  # Router, auth guard, TutorialOverlay, LevelUpOverlay, QuickLogHost
+│                            #   (?quicklog=<id|open> deep-link), auto-subscribe push on load
+├── index.css                # All CSS variables, keyframes, utility classes, :focus-visible
+├── main.tsx                 # seedPrefsFromLegacy() before first paint, then hydratePrefs()
 ├── components/
+│   ├── GameLogPage.tsx      # Config-driven W/L sport page (see "GameLogPage" section)
+│   ├── QuickLogSheet.tsx    # Universal quick-log bottom sheet (TopBar + button)
+│   ├── TodayCard.tsx        # Home: today checklist (sleep/water/mood/activity) + top quest
+│   ├── OnThisDayCard.tsx    # Home: events exactly 1/2/3 years ago (renders nothing if none)
 │   ├── BodyMap.tsx          # SVG muscle diagram — colored by rank/recency
 │   ├── StrengthTab.tsx      # Lifting log UI (sets table, PRs, trends)
-│   ├── layout/
-│   │   ├── TopBar.tsx       # Header: hamburger/back, LogoMark → /monthly, + log menu (Lucide icons), settings gear; md:left-16 sidebar offset
-│   │   ├── BottomNav.tsx    # Mobile tab bar; 60px + safe-area; pill bg on active tab; md:hidden
-│   │   ├── SideNav.tsx      # Desktop: persistent 64px icon strip (md:flex) + CSS fly-out labels; exports LogoMark; Mobile: slide-in drawer (md:hidden)
-│   │   └── PageWrapper.tsx  # Wraps every page; paddingBottom: calc(80px + safe-area); pageEnter animation on inner div
+│   ├── ErrorBoundary.tsx
+│   ├── brand/Wordmark.tsx
+│   ├── settings/PushNotificationsSection.tsx  # hidden unless pushSupported+pushConfigured
+│   ├── layout/              # TopBar (opens QuickLogSheet), BottomNav, SideNav, PageWrapper
 │   ├── ui/
-│   │   ├── Badge.tsx        # Pill label — whiteSpace:nowrap + flexShrink:0 to prevent flex squeeze
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   ├── EditModal.tsx
-│   │   ├── EmptyState.tsx
-│   │   ├── Icon.tsx         # lucide-react wrappers — 54 named exports via adapt() shim; IconProps API (size, color, style, className); strokeWidth 1.6
-│   │   ├── Input.tsx
-│   │   ├── LevelUpOverlay.tsx   # Full-screen level-up celebration (auto-dismiss 4s)
-│   │   ├── MilestoneOverlay.tsx # Strength milestone card (auto-dismiss 5s)
-│   │   ├── ProgressBar.tsx
-│   │   ├── Skeleton.tsx
-│   │   ├── SkillCard.tsx
-│   │   ├── StatCard.tsx
-│   │   ├── Toast.tsx        # Bottom toast with drain bar; plays XP/PR sound
-│   │   └── TutorialOverlay.tsx  # 9-step onboarding tour with spotlight, caret, pulse rings
-│   ├── forms/
-│   │   ├── LogBookForm.tsx
-│   │   ├── LogFortniteForm.tsx
-│   │   ├── LogSkateForm.tsx
-│   │   ├── LogSleepForm.tsx
-│   │   └── LogWorkoutForm.tsx
-│   └── charts/
-│       ├── BodyweightChart.tsx
-│       ├── LiftTrendChart.tsx
-│       └── VolumeTrendChart.tsx
+│   │   ├── Icon.tsx         # lucide-react wrappers via adapt() shim — ALL icons come from here
+│   │   ├── EditModal.tsx    # Two-tap delete confirm (armed 3s), --overlay scrim
+│   │   ├── Toast.tsx        # Drain bar + optional Undo action (deletes inserted row)
+│   │   ├── HistoryControls.tsx  # Shared search + 30d/90d/Year/All range hook+UI
+│   │   ├── ErrorState.tsx   # EmptyState-shaped error card with Retry
+│   │   ├── FreezeTokens.tsx # Snowflake + token count next to Home streak
+│   │   ├── EmptyState.tsx / Badge / Button / Card / Input (auto inputMode) / ProgressBar
+│   │   ├── Skeleton / SkillCard / StatCard / StreakFire / XPCoins / MoodFace / Confetti
+│   │   └── LevelUpOverlay / MilestoneOverlay / BossConqueredOverlay / TutorialOverlay
+│   ├── forms/               # LogBookForm, LogFortniteForm, LogSkateForm, LogSleepForm, LogWorkoutForm
+│   └── charts/              # BodyweightChart, LiftTrendChart, VolumeTrendChart
 ├── hooks/
-│   ├── useAchievements.ts   # 100+ badge evaluations — pure useMemo over store rawRows
-│   ├── useAuth.ts
-│   ├── useCountUp.ts        # Animated number counter
-│   ├── usePageTitle.ts
-│   ├── usePullToRefresh.ts
-│   ├── useSkills.ts         # 6 skill trees with per-skill XP + level; module cache keyed userId+XP
+│   ├── useXP.ts             # store init(); totalXP/seasonXP/level/progress
 │   ├── useStats.ts          # Reads stats from the store — no fetching
-│   ├── useStreak.ts         # Streaks (overall + sleep/gym/cardio) — pure useMemo over store rawRows
-│   ├── useUserName.ts
-│   ├── useWellnessScore.ts  # 0–100 wellness composite (sleep/activity/mood/water)
-│   └── useXP.ts             # Triggers store init(); returns totalXP/level/progress
+│   ├── useStreak.ts         # Pure useMemo over rawRows; freeze-token-aware streak walk,
+│   │                        #   returns freezeTokens + tokenSaving
+│   ├── useAchievements.ts   # 100+ badges — pure useMemo over rawRows
+│   ├── useSkills.ts         # 6 skill trees; module cache keyed userId+XP
+│   ├── useWellnessScore.ts  # 0–100 composite (still does its own small fetch)
+│   └── useAuth / useCountUp / usePageTitle / usePullToRefresh / useUserName
 ├── lib/
-│   ├── challengeTemplates.ts # All quest template definitions — scaleTarget(), xpForTarget(), PROGRESS_FNS
-│   ├── challenges.ts        # Quest sync logic — syncUserChallenges, syncBossChallenges, getProgress, getBossProgress, reroll helpers, date helpers
-│   ├── muscleScore.ts       # Per-muscle rank scoring
-│   ├── notifications.ts
-│   ├── sections.ts          # Section definitions + order/hide persistence
-│   ├── skills.ts            # Skill tree definitions + XP calculation
-│   ├── sounds.ts            # XP gain / PR / level-up audio
-│   ├── supabase.ts          # Supabase client
-│   ├── theme.ts             # 40+ themes, auto-switch by time of day, CSS var injection
-│   ├── tutorial.ts          # 9-step TUTORIAL_STEPS array + done/reset helpers
-│   ├── utils.ts
-│   └── xp.ts               # XP_RATES, fetchXPAndStats(), level/title calc
+│   ├── xp.ts                # XP_RATES, level math (capped curve), season level, aggregates,
+│   │                        #   fetchXPAndStats(), milestones, PR detection — see XP section
+│   ├── prefs.ts             # Cross-device prefs: getPref/setPref over JSONB doc — see Prefs
+│   ├── push.ts              # Web-push client plumbing — see Push section
+│   ├── streakTokens.ts      # Freeze token earn/spend math — see Streak tokens
+│   ├── lastUsed.ts          # getLastUsed/setLastUsed form defaults (youxp-lastused-*)
+│   ├── challenges.ts        # Quest sync; rerolls + seen templates via prefs (synced)
+│   ├── challengeTemplates.ts# Quest template defs — scaleTarget(), xpForTarget(), PROGRESS_FNS
+│   ├── sections.ts          # SectionKey defs + order/hide persistence (drives QuickLogSheet)
+│   ├── theme.ts             # 40+ themes; auto-switch by hour; persisted via prefs (synced)
+│   ├── notifications.ts     # In-app daily reminder + streak-break warning (token-aware)
+│   ├── offlineQueue.ts      # Queues writes made offline
+│   ├── animations.ts / sounds.ts / muscleScore.ts / skills.ts / tutorial.ts / utils.ts
+│   ├── audit.ts / sentry.ts / validation.ts / changelog.ts / strengthData.ts
+│   └── supabase.ts          # Supabase client
 ├── pages/                   # All lazy-loaded in App.tsx
-│   ├── Home.tsx             # Dashboard: XP hero card (level ring, rank, progress bar, category breakdown), editable widget grid (2-col, max 8, localStorage), week dots, wellness score, activity feed
-│   ├── Records.tsx          # Lifting log — log sets, view PRs, body map, strength tab
-│   ├── Cardio.tsx           # Distance sessions — runs, bikes, swims; miles + trend chart
-│   ├── Sleep.tsx            # Sleep log — bedtime/wake, debt, quality score, streak
-│   ├── Books.tsx            # Reading log — title, author, date; year count; donut genre chart
-│   ├── Water.tsx            # Water intake log — oz per day
-│   ├── Mood.tsx             # Mood rating log — 1–10 scale; 30-day avg
-│   ├── Measurements.tsx     # Body measurements — weight, body fat, etc.
-│   ├── Goals.tsx            # User-defined goals with progress bars
-│   ├── Challenges.tsx       # Quests page — Weekly/Monthly/Boss quests, adaptive targets, reroll system, auto-progress tracking, tutorial onboarding mode
-│   ├── Basketball.tsx       # Game log — wins/losses, points
-│   ├── Pickleball.tsx       # Game log — wins/losses
-│   ├── Golf.tsx             # Round log — score, course, par
-│   ├── DiscGolf.tsx         # Round log — score, course
-│   ├── Hiking.tsx           # Hike log — miles, elevation, trail
-│   ├── Skate.tsx            # Skate session log — miles
-│   ├── TableTennis.tsx      # Game log
-│   ├── Chess.tsx            # Game log — result, opponent type
-│   ├── Volleyball.tsx       # Game log
-│   ├── Spikeball.tsx        # Game log
-│   ├── Pool.tsx             # Game log
-│   ├── Fortnite.tsx         # Game log — kills, placement, win; charts
-│   ├── Hobbies.tsx          # Misc hobbies hub
-│   ├── Profile.tsx          # Level, title, skills, badges/achievements
-│   ├── Settings.tsx         # ThemeSwatch grid (64×56px); section order/hide, nav reorder, about
-│   ├── Weekly.tsx           # Weekly XP recap with highlights
-│   ├── Monthly.tsx          # Monthly reel — best moments, PRs, stats
-│   ├── XPHistory.tsx        # Full XP event log with category breakdown
-│   ├── PRFeed.tsx           # All-time personal records feed
-│   ├── ShareCard.tsx        # Export a progress card image
-│   ├── More.tsx             # Hub for Profile, Goals, Measurements, Weekly, Monthly, etc.
-│   ├── Log.tsx              # Quick-log landing
-│   ├── Strength.tsx         # Strength overview (wraps StrengthTab)
-│   ├── DevSettings.tsx      # XP engine debugger — PIN gated (1337), dev-only in More
-│   ├── Login.tsx            # Email/password auth; coral brand hero; generic error messages (no enumeration)
-│   └── ResetPassword.tsx
+│   ├── Home.tsx             # XP hero (level ring, season line, progress), TodayCard,
+│   │                        #   OnThisDayCard, week dots + FreezeTokens, widgets, feed
+│   ├── Records.tsx          # Lifting log — route /lifting (/records redirects)
+│   ├── Yearly.tsx           # /yearly — 53×7 activity heatmap, year totals, month bars,
+│   │                        #   year switcher (linked from More)
+│   ├── Weekly.tsx / Monthly.tsx / XPHistory.tsx / PRFeed.tsx
+│   ├── Pickleball / Pool / Spikeball / TableTennis  # thin configs over GameLogPage
+│   ├── Basketball / Chess / Golf / DiscGolf / Volleyball  # bespoke (box scores, ELO,
+│   │                        #   scorecards, dual formats) but share all conventions
+│   ├── Cardio / Sleep / Books / Water / Mood / Skate / Hiking / Fortnite / Measurements
+│   ├── Challenges.tsx       # /challenges (/quests redirects) — quests + tutorial mode
+│   ├── Goals / Hobbies / Profile / Leaderboard (public_profiles) / More / Log / Strength
+│   ├── Settings.tsx         # Theme grid, sections, PushNotificationsSection, XP rates,
+│   │                        #   privacy, CSV export (all tables), account deletion
+│   ├── DevSettings.tsx      # /dev — XP engine debugger, PIN 1337
+│   ├── Login / ResetPassword / AuthCallback / Terms / Privacy / NotFound
 ├── store/
-│   ├── useStore.ts          # Zustand: XP, level, stats, levelUpPending; stale-while-revalidate cache
-│   └── useNavStore.ts       # Sidebar open/close state
-└── types/
-    └── index.ts             # All Supabase row types — check here before adding interfaces
+│   ├── useStore.ts          # XP/seasonXP/level/stats/rawRows/activity, levelUpPending,
+│   │                        #   stale-while-revalidate cache (youxp-xp-cache-v3)
+│   └── useNavStore.ts       # Sidebar + quickLogOpen/quickLogTarget state
+└── types/index.ts           # All Supabase row types — check here before adding interfaces
 ```
 
 ---
@@ -162,191 +145,171 @@ src/
 | Book finished | 250 |
 | Fortnite win / blitz win / kill | 100 / 30 / 3 |
 | Sleep log | 20 |
-| Sleep quality bonus | 35 |
+| Sleep quality bonus (≥7h) | 35 |
 | Cardio per mile (run/bike/swim/walk) | 15 / 6 / 25 / 4 |
 | Mood log | 15 |
 | Water goal reached (64oz) | 50 |
 | Quest completed | varies (stored in DB) |
 
-Plus per-sport rates (basketball, pickleball, golf, disc golf, hiking, table tennis, chess, volleyball, spikeball, pool) — see `XP_RATES` in `xp.ts`.
+Plus per-sport rates (basketball, pickleball, golf, disc golf, hiking, table tennis, chess, volleyball, spikeball, pool) — see `XP_RATES`.
 
-### Level formula
+### Level formula — capped curve
 ```ts
-level = Math.floor(1 + Math.sqrt(totalXP / 150))
+// sqrt curve through level 30, flat cost per level after (continuous):
+// LEVEL_CAP = 30, CAP_XP = 126,150, FLAT_STEP = 8,550
+xpForLevel(L)  = L <= 30 ? (L-1)² * 150 : CAP_XP + (L-30) * 8550
+calculateLevel = inverse of the above
 ```
+Always go through `calculateLevel` / `xpForLevel` / `levelProgress` — never inline sqrt math.
+
+### Seasonal level
+`seasonLevel(seasonXP) = floor(sqrt(seasonXP / 100))` — XP since Jan 1, resets naturally by date. Shown on Home hero + Profile. Exposed as `seasonXP` via the store/`useXP`.
 
 ### Level titles (every 5 levels)
-1 Newcomer → 5 Rookie → 10 Contender → 15 Grinder → 20 Athlete → … → 100 Godlike
-Full list in `LEVEL_TITLES` in `xp.ts`.
+1 Newcomer → 5 Rookie → 10 Contender → 15 Grinder → 20 Athlete → … → 100 Godlike. Full list in `LEVEL_TITLES`.
 
-### `fetchXPAndStats()`
-Single parallel fetch across all 22 Supabase tables. Returns `{ totalXP, level, stats }`. Called by `useStore.init()` and `DevSettings`.
+### How XP is computed — recompute-from-source (retroactive by design)
+XP is always re-derived from raw activity data × `XP_RATES`, so changing a rate retroactively rewrites history/level everywhere (XPHistory included). `fetchXPAndStats()`:
+1. Calls the `get_xp_aggregates(uid)` Postgres RPC (server-side counts/sums, incl. `_season` variants) and computes XP client-side via `xpFromAggregates()` — rates stay in TS.
+2. **Fallback**: if the RPC is missing (migration not run), computes identical numbers from full rows via `aggregatesFromRawRows()`.
+3. Also returns `rawRows` (slim column sets) for streaks/achievements/trends/activity feed.
 
-### Strength milestones (`STRENGTH_MILESTONES`)
-Triggered when a lift hits a threshold (e.g., 135, 225, 315 bench). Shows `MilestoneOverlay`.
+Returns `{ totalXP, seasonXP, stats, rawRows }`. Cache key `youxp-xp-cache-v3`.
 
----
-
-## Skills system (`src/lib/skills.ts`, `src/hooks/useSkills.ts`)
-6 independent skill trees, each with their own XP and level curve:
-- `level = Math.floor(Math.sqrt(xp / 50))`
-
-| Skill | Source data |
-|---|---|
-| Lifting | lifting_log sets |
-| Skating | skate_sessions miles |
-| Reading | books finished |
-| Fortnite | fortnite wins + kills |
-| Sleep | sleep_log nights |
-| Cardio | cardio_sessions miles |
-
-Each skill has a title progression (e.g., Lifting: Untrained → Novice → Intermediate → … → Elite).
-Displayed on Profile page via `SkillCard`.
+### Strength milestones
+`LIFT_MILESTONES` — lift thresholds (135/225/315 bench etc.) → `MilestoneOverlay`. `checkForPR()` handles PR detection.
 
 ---
 
-## Achievements (`src/hooks/useAchievements.ts`)
-100+ badges evaluated client-side from raw activity data. Categories: Lifting, Cardio, Sleep, Sports, Gaming, Reading, Lifestyle. Each badge has an icon, name, description, and earned boolean. Displayed on Profile page. 5-min TTL cache keyed on `totalXP + revision`.
+## GameLogPage (`src/components/GameLogPage.tsx`)
+Config-driven page for win/loss sports. A sport page is just a `GameLogConfig<Row>`: table name, title, backTo, select/text/toggle fields (essential vs optional), stat cards (`StatDef`), monthly W/L chart, XP rate keys, toast copy. Provides for free: required Win/Loss segmented pick (no default, submit disabled until chosen), two-tier form ("Add details…"), last-used select defaults, undo toast, search + date-range filters (HistoryControls), load-more (10 + 20/tap), monthly chart placeholder (<2 months), edit modal, ErrorState, EmptyState.
+
+**Current consumers**: Pickleball, Pool, Spikeball, TableTennis. Basketball/Chess/Golf/DiscGolf/Volleyball stayed bespoke (box scores, ELO trend, scorecards, Indoor/Sand dual forms) but implement the same conventions manually. **New W/L sport → write a config, not a page.**
 
 ---
 
-## Quests system (`src/lib/challenges.ts` + `src/lib/challengeTemplates.ts`)
+## Quick-log system
+- **QuickLogSheet** (bottom sheet off TopBar +): activity tiles from user's active sections (`sections.ts` + rawRows), recency-sorted; inline minimal forms (water +8/+16/+24oz, mood 1–10 row, sleep, cardio, skate/hiking miles, W/L sports); complex pages (Lifting, Books, etc.) link out. Saves insert → XP toast with **Undo** → refreshXP/refreshActivity.
+- **Deep links**: `?quicklog=<sectionId|open>` opens the sheet (used by PWA manifest shortcuts). Handled by `QuickLogHost` in App.tsx; param stripped after opening.
+- **Undo**: Toast's optional undo callback deletes the inserted row (id from `.insert().select()`) and refreshes. Available until the drain bar empties.
+
+---
+
+## Prefs — cross-device sync (`src/lib/prefs.ts`)
+Single JSONB doc per user in `user_preferences`, mirrored in localStorage (`youxp-prefs-cache`) for instant load. `getPref`/`setPref` are synchronous; writes debounce (1.5s) then upsert (last-write-wins). Missing table (migration not run) → localStorage-only, silently. `seedPrefsFromLegacy()` runs once (flag `youxp-prefs-seeded`) migrating old `youxp-*` keys; `hydratePrefs()` merges the server doc on boot (both called in `main.tsx`).
+
+**Synced through prefs**: theme/mode/time-theme, Home stat picks + level style, quest rerolls + seen templates, streak-freeze spent dates, notification settings. **Device-local by design**: `youxp-lastused-*` form defaults, tutorial-done, nav hints, XP cache.
+
+---
+
+## Streak freeze tokens (`src/lib/streakTokens.ts`, `useStreak.ts`)
+- **Earn**: max **1 token per calendar month** — granted if ANY category has logs in ≥3 distinct ISO weeks that month (consistency in five categories still = 1; no stacking). Deterministically recomputed from rawRows history.
+- **Spend**: only spent dates are persisted (prefs key `streakFreezeSpent`); balance = earned − spent. `useStreak`'s walk auto-bridges an exactly-one-day gap when balance > 0 and records the spend idempotently.
+- **UI**: `FreezeTokens` (snowflake + count) next to the Home streak; `checkStreakBreakWarning` copy is token-aware.
+
+---
+
+## Push notifications
+- **Client** (`lib/push.ts`): `subscribeToPush()` (permission → SW subscription → upsert row), `autoSubscribeIfGranted()` (silent re-arm on every app load once permission granted — called from App.tsx), `unsubscribeFromPush()`, settings (4 type toggles all default **on**, quiet hours 22:00–08:00, IANA timezone) in prefs under `notificationSettings`. Whole feature hidden unless `pushSupported() && pushConfigured()` (needs `VITE_VAPID_PUBLIC_KEY` baked into the build — Vercel env + redeploy).
+- **SW**: `public/push-sw.js` (push + notificationclick) imported into the Workbox SW via `workbox.importScripts` in `vite.config.ts`.
+- **Sender**: `supabase/functions/send-notifications` (Deno + web-push), deployed via dashboard with JWT verification OFF; secrets `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT`. Triggered hourly by pg_cron + pg_net (`migrations/phase5-cron.sql`); decides per-user local time. Sends: evening nothing-logged reminder + streak-at-risk (19–22 local), quest expiring ≤48h at ≥70% progress, Monday recap (07–10). Dedup via `last_sent` JSONB per type/day; deletes 404/410 subscriptions.
+- **iOS**: push requires the PWA installed to the Home Screen.
+
+---
+
+## Skills system (`src/lib/skills.ts`, `useSkills.ts`)
+6 independent trees — Lifting, Skating, Reading, Fortnite, Sleep, Cardio — each `level = floor(sqrt(xp / 50))` with its own title progression. Displayed on Profile via `SkillCard`.
+
+## Achievements (`useAchievements.ts`)
+100+ badges evaluated client-side from rawRows. Pure useMemo, 5-min TTL cache keyed on `totalXP + revision`. Profile page.
+
+---
+
+## Quests system (`lib/challenges.ts` + `lib/challengeTemplates.ts`)
 
 ### Three tiers
 | Tier | Reset | Slots | Color |
 |---|---|---|---|
-| Weekly | Every Monday | 5–10 (scales with active sections) | `var(--accent)` coral |
-| Monthly | 1st of month | 3–6 (scales with active sections) | `#7c3aed` violet |
-| Boss | Every Jan 1 | 4 fixed | `#f5a623` gold |
+| Weekly | Every Monday | 5–10 (scales with active sections) | `var(--accent)` |
+| Monthly | 1st of month | 3–6 | violet |
+| Boss | Every Jan 1 | 4 fixed | gold |
 
-### Adaptive system (Weekly + Monthly)
-- `syncUserChallenges` — detects which activity sections have data, fetches per-section stats, round-robins template picks across sections so no category dominates
-- Templates live in `challengeTemplates.ts` — each has `key`, `section`, `period`, `name(target)`, `scaleTarget(stats)`, `xpForTarget(target)`, `progressKey`
-- `PROGRESS_FNS` — maps progress keys to live Supabase queries (since/week or since/month)
-- Seen-template tracking in localStorage prevents repeating quests for up to 30 past picks
-- **Reroll**: 3 per cycle per tier, tracked in localStorage keyed by week/month. `rerollChallenge()` expires old, inserts new from same section
-
-### Boss quests
-- 4 fixed keys: `boss_bench`, `boss_squat`, `boss_deadlift`, `boss_skate`
-- Targets scale from current PR × 1.1 (lifts) or current total miles rounded to next 100 (skate)
-- On completion: next harder target spawns immediately (chains within the year)
-- On Jan 1: all active boss quests expire, fresh targets spawn from current PRs
-- `syncBossChallenges` runs deduplication on every load — if multiple active quests share a key, oldest are expired
-- `getBossProgress` — returns `{ current, target }` live from `pr_history` or `skate_sessions`
-
-### Tutorial mode
-If user has zero data in all tracked tables, `Challenges.tsx` shows an onboarding checklist instead of quests. Once all steps done, "Unlock My Quests" triggers a fresh sync.
-
-### Key exports from `challenges.ts`
-```ts
-syncUserChallenges(supabase, userId)   // adaptive weekly + monthly sync
-syncBossChallenges(supabase, userId)   // boss sync + yearly reset + dedup
-getProgress(supabase, key, tier)       // live progress for weekly/monthly quest
-getBossProgress(supabase, key, target) // live progress for boss quest
-rerollChallenge(supabase, userId, id, period, key)
-getRerollsRemaining(period)            // reads localStorage
-startOfWeekDate() / startOfMonthDate() / startOfYearDate()
-nextMondayLabel() / daysUntilMonthEnd() / daysUntilYearEnd()
-```
+- `syncUserChallenges` — section detection → per-section stats → round-robin template picks. Templates in `challengeTemplates.ts` (`key`, `section`, `period`, `name(target)`, `scaleTarget`, `xpForTarget`, `progressKey`); `PROGRESS_FNS` maps keys to live queries.
+- Seen-template history (30 picks) + **rerolls (3/cycle/tier)** — stored via **prefs** (synced), same key strings as the old localStorage.
+- **Boss**: `boss_bench/squat/deadlift/skate`; targets from PR × 1.1 or miles rounded to next 100; completion chains next target; Jan 1 full reset; dedup on every load. `getBossProgress` live from `pr_history`/`skate_sessions`.
+- **Tutorial mode**: zero data in all tables → onboarding checklist instead of quests.
+- The `challenges` table `notes` column stores the template key — this routes progress queries.
 
 ---
 
-## Theme system & brand (`src/lib/theme.ts`)
-- **Default theme: Coral** — accent `#e5443f`, Paper background `#f3efe6`
-- 40+ named themes (Crimson, Ocean, Forest, Neon, Sakura, etc.)
-- Auto-switch mode: changes theme by hour of day
-- **Light mode is the default**; dark mode opt-in via Settings
-- All colors injected as CSS variables on `<html>`: `--accent`, `--base-bg`, `--card-bg`, `--nav-bg`, etc.
-- Dark mode: `html[data-mode="dark"]` in `index.css`; no attribute = light
-- User preference in localStorage (`youxp-theme`, `youxp-mode`)
+## Theme system & design tokens
+- **Default: Coral** — accent `#e5443f`, Paper bg `#f3efe6`. 40+ themes in `theme.ts`, auto-switch by hour optional, preference synced via prefs. Light default; dark via `html[data-mode="dark"]`.
+- Surface scale `--surface-0..3`; text `--text-primary/secondary/tertiary/disabled` (+ `--text-muted`); borders `--border-subtle/default/strong`; shadows/radius tokens; `--green`, `--red`, `--accent`, `--overlay` (modal scrims), `--chart-alt` (second chart series). Legacy aliases: `--card-bg`, `--base-bg`, `--input-bg`, `--nav-bg`, `--border`, `--border-faint`.
+- **Rule — no hardcoded colors in components** (`#hex`/`rgba(...)`): use CSS vars + `color-mix(in srgb, var(--x) N%, transparent)` for tints. The full sweep was completed July 2026. **Intentional exceptions** (do not "fix"): Login hero gradient, Books `GENRE_COLORS` + `hexContrast()`, Mood's 3 chart series, Hobbies hub per-tile accents, ShareCard (image export), Confetti/MoodFace/BossConquered/Tutorial overlay effects, `index.css`/`theme.ts` themselves.
 
 ---
 
-## Design token system (`src/index.css`)
-- Surface scale: `--surface-0` (page bg) → `--surface-1` (card) → `--surface-2` (input/raised) → `--surface-3` (overlay)
-- Text scale: `--text-primary`, `--text-secondary`, `--text-tertiary`, `--text-disabled`
-- Borders: `--border-subtle`, `--border-default`, `--border-strong`
-- Shadows: `--shadow-sm`, `--shadow-md`, `--shadow-lg`
-- Radius: `--radius-sm/md/lg/xl`
-- Legacy aliases preserved: `--card-bg → var(--surface-1)`, `--base-bg → var(--surface-0)`, `--input-bg → var(--surface-2)`, `--nav-bg → var(--surface-1)`, `--border → var(--border-default)`, `--border-faint → var(--border-subtle)`
-- **Rule**: never hardcode `rgba(255,255,255,x)`, `#fff`, or `#000` in components — always use CSS vars
+## Supabase
 
----
-
-## Supabase tables (22)
+### Activity tables (22)
 ```
-lifting_log        — lift, sets, reps, weight, date
-pr_history         — lift, est_1rm, date
-skate_sessions     — miles, date
-fortnite_games     — kills, placement, win, date
-books              — title, author, date_finished
-sleep_log          — bedtime, wake_time, hours_slept, quality, date
-cardio_sessions    — type, distance, duration, date
-goals              — title, target, current, unit, icon, status
-challenges         — user_id, tier, challenge_name, category, xp_reward, status, notes (template key), target, auto_verified
-mood_log           — score (1–10), note, date
-body_measurements  — weight, body_fat, waist, chest, arms, date
-water_log          — oz, date
-basketball_sessions
-pickleball_games
-golf_rounds        — score, par, course, date
-disc_golf_rounds   — score, course, date
-hiking_sessions    — miles, elevation, trail, date
-table_tennis_games
-chess_games        — result, opponent_type, date
-volleyball_sessions
-spikeball_games
-pool_games
+lifting_log, pr_history, skate_sessions, fortnite_games, books, sleep_log,
+cardio_sessions, goals, challenges, mood_log, body_measurements, water_log,
+basketball_sessions, pickleball_games, golf_rounds, disc_golf_rounds,
+hiking_sessions, table_tennis_games, chess_games, volleyball_sessions,
+spikeball_games, pool_games
 ```
 
-The `challenges` table `notes` column stores the template key (e.g. `lift_sets_week`, `boss_bench`) — this is how progress queries are routed.
+### Infra tables
+```
+user_preferences    — user_id PK, prefs jsonb, updated_at (owner-only RLS)
+push_subscriptions  — endpoint unique, p256dh, auth, timezone, last_sent jsonb (owner-only RLS)
+user_audit_log, user_privacy_settings, user_follows, user_blocks, public_profiles  — security/social
+```
+
+### Functions
+- `get_xp_aggregates(uid)` RPC — SECURITY INVOKER, returns JSONB counts/sums (+`_season` variants). Client falls back to full-row math if absent.
+- Edge Functions: `send-notifications` (scheduled), `upload-avatar`, `rate-limit-login`, `log-audit-event`.
 
 ---
 
 ## State architecture
-
-### `useStore` (Zustand)
-- Holds `totalXP`, `level`, `stats`, `activity[]`, `levelUpPending`
-- `init()`: loads from localStorage cache immediately (stale-while-revalidate), then fetches fresh via `fetchXPAndStats()`
-- `levelUpPending`: set when XP crosses a level threshold → triggers `LevelUpOverlay`
-
-### Key hooks
-The old per-hook query redundancy was eliminated: the store's `fetchXPAndStats()` fetch keeps the raw table rows (`rawRows`), and `useStreak` / `useAchievements` are now pure `useMemo` derivations over them — zero extra queries. `useStats`/`useXP` just read the store. `useSkills` fetches once per userId+totalXP (module cache). `useWellnessScore` still does its own small fetch.
+- **`useStore`**: `totalXP`, `seasonXP`, `level`, `stats`, `rawRows`, `activity[]`, `levelUpPending`; `init()` loads cache instantly then revalidates via `fetchXPAndStats()`; `refreshXP`/`refreshActivity` after writes.
+- **`useNavStore`**: sidebar + quick-log sheet open/target.
+- `useStreak`/`useAchievements`/trends are pure derivations over `rawRows` — zero extra queries. `useSkills` fetches once per userId+XP. `useWellnessScore` still fetches its own.
 
 ---
 
 ## Conventions
-- All pages in `src/pages/`, lazy-loaded in `App.tsx`
-- Shared UI in `src/components/ui/`
-- All data hooks in `src/hooks/` — never call Supabase directly in components
-- **Inline styles** for dynamic/themed values (CSS variables, computed values)
-- **Tailwind** for layout, spacing, flex/grid, responsive
-- No comments unless the WHY is non-obvious
-- All `localStorage` keys prefixed `youxp-`
-- All colors must use CSS variables — no hardcoded `rgba(255,255,255,x)` or `#fff` in components (breaks light mode)
-- Check `src/types/index.ts` before adding any new TypeScript interfaces
-- Tutorial `data-tutorial="..."` attributes on target elements for onboarding spotlight
-- `font-mono` class (JetBrains Mono) on all numerical stats, XP values, progress counts
+- Pages in `src/pages/`, lazy-loaded in App.tsx. Shared UI in `src/components/ui/`.
+- New W/L sport = `GameLogConfig`, not a new page implementation.
+- Data hooks in `src/hooks/` — avoid new direct Supabase calls in components (legacy pages still do).
+- **Inline styles** for themed/dynamic values; **Tailwind** for layout/spacing/responsive.
+- All colors via CSS vars (see exceptions above). All icons via `ui/Icon.tsx` — no raw lucide imports, no unicode/emoji glyphs as UI.
+- History lists: 10 rows + "Show more" (+20); search/range via `HistoryControls`; failed loads render `ErrorState` (with retry), never a fake empty state.
+- Log forms: essentials visible, optionals under "Add details…"; select defaults via `lastUsed.ts`; `Input.tsx` auto-sets `inputMode`; every insert shows an undo toast.
+- Synced user state → `prefs.ts` (`getPref`/`setPref`); truly device-local state → localStorage with `youxp-` prefix.
+- Check `src/types/index.ts` before adding interfaces. `font-mono` on all numeric stats.
+- Real `<button>`/`<input>` for interactive elements; `aria-label` on icon-only buttons (global `:focus-visible` styling exists).
+- Charts: use `CHART_TOOLTIP_STYLE` from `lib/utils.ts` for `<Tooltip contentStyle>`; `var(--chart-alt)` for a second series.
+- No comments unless the WHY is non-obvious. `data-tutorial="..."` attributes for onboarding spotlight targets.
 
 ---
 
-## Tutorial system (`src/lib/tutorial.ts`, `src/components/ui/TutorialOverlay.tsx`)
-9-step onboarding tour. Each step: `id`, `title`, `body`, `tip`, optional `target` (CSS selector), `tooltipPosition`, `navigateTo`. Spotlight effect cuts out 4 divs around the target element. Pulse rings, caret arrows, keyboard nav (Escape/arrows), scroll lock, progress dots. Done state in localStorage (`youxp-tutorial-done`). Reset via `resetTutorial()` or Settings → About.
+## Tutorial system (`lib/tutorial.ts`, `ui/TutorialOverlay.tsx`)
+9-step tour: `id`, `title`, `body`, `tip`, optional `target`/`tooltipPosition`/`navigateTo`. Spotlight cutout, pulse rings, keyboard nav, progress dots. Done flag `youxp-tutorial-done`; reset via Settings → About.
 
 ---
 
 ## Security (implemented)
-- **Login** — generic error messages (no email enumeration); 5-attempt lockout with exponential backoff; 13+ age gate
-- **CSP + security headers** — in `vercel.json`: HSTS 2yr+preload, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy
-- **OAuth** — Google + Apple via Supabase PKCE flow; `/auth/callback` route; `AuthCallback.tsx`
-- **Sentry** — behind `VITE_SENTRY_DSN` env var; PII stripped before sending
-- **Account deletion** — 3-step confirmation (type email to confirm)
-- **Edge Functions** — upload-avatar (magic-byte validation), rate-limit-login (15-min IP window), log-audit-event (JWT-verified)
-- **Supabase Storage** — avatars bucket: public read, auth write, 5MB cap, JPEG/PNG/WebP only
-- **SQL** — user_audit_log, user_privacy_settings, user_follows, user_blocks, public_profiles tables
-
-### Pending env var
-`VITE_SENTRY_DSN` — add to Vercel + `.env.local` after creating a project at sentry.io
+- **Login** — generic errors (no enumeration); 5-attempt lockout w/ backoff; 13+ age gate
+- **CSP + headers** — `vercel.json`: HSTS 2yr+preload, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy
+- **OAuth** — Google + Apple (Supabase PKCE); `/auth/callback`
+- **Sentry** — PII stripped; behind `VITE_SENTRY_DSN`
+- **Account deletion** — 3-step confirm (type email)
+- **Edge Functions** — upload-avatar (magic-byte validation), rate-limit-login, log-audit-event (JWT-verified)
+- **Storage** — avatars bucket: public read, auth write, 5MB, JPEG/PNG/WebP
+- VAPID private key lives ONLY in edge function secrets — never in `VITE_*` vars or the repo
 
 ---
 
@@ -372,12 +335,14 @@ for dirpath, _, files in os.walk('src'):
         hits = [(lbl,c.count(p)) for p,lbl in PATTERNS.items() if c.count(p)]
         if hits: print(f, hits)
 ```
-Fix with binary replacement — text editors cannot reliably match these sequences.
+Fix with binary replacement — text editors cannot reliably match these sequences. Prevention: write plain ASCII in code; icons come from `ui/Icon.tsx`.
 
 ---
 
 ## Known issues / future work
-- Many pages still call Supabase directly instead of going through hooks (~29 pages) — works fine, but contradicts the hooks convention below
-- Charts share `CHART_TOOLTIP_STYLE` from `lib/utils.ts` — use it for any new Recharts `<Tooltip contentStyle>`
-- Pages not yet fully redesigned to session-2 component treatment: Records, Books, Measurements, Goals, Pickleball, Golf, DiscGolf, Hiking, Skate, TableTennis, Chess, Volleyball, Spikeball, Pool, Profile, XPHistory, PRFeed, More
-- TypeScript check: `npx` not in PowerShell PATH — run `node node_modules/typescript/bin/tsc --noEmit` or use Bash
+- Many legacy pages still call Supabase directly instead of via hooks — works, but contradicts the hooks convention
+- Bespoke sport pages (Basketball, Chess, Golf, DiscGolf, Volleyball) could migrate to GameLogPage variants if their special features are ever generalized
+- `useWellnessScore` still does its own fetch (could derive from rawRows)
+- Main JS chunk is >500 kB minified (pre-existing Vite warning — cosmetic for a solo PWA)
+- TypeScript check: `npx` not in PowerShell PATH — use `npm run typecheck` / `npm run build`, or Bash
+- Agent worktrees branch from `origin/main`, not local HEAD — push prerequisite commits before spawning parallel agents
