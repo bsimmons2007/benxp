@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { animateRipple } from '../lib/animations'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
@@ -6,9 +6,10 @@ import { Card } from '../components/ui/Card'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { ErrorState } from '../components/ui/ErrorState'
+import { HistoryControls, useHistoryFilter } from '../components/ui/HistoryControls'
 import { EditIcon, DropletIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
-import { today as appToday } from '../lib/utils'
+import { today as appToday, formatDate } from '../lib/utils'
 import { useStore } from '../store/useStore'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -17,6 +18,8 @@ const GOAL_LS_KEY     = 'youxp-water-goal-oz'
 const QUICK_ADDS      = [8, 12, 16, 20, 24] // oz presets
 
 interface WaterEntry { id: string; oz: number; created_at: string }
+interface WaterLogRow { id: string; oz: number; created_at: string; date: string }
+interface DayGroup { date: string; entries: WaterLogRow[]; totalOz: number }
 
 // ── Water glass SVG ───────────────────────────────────────────────────────────
 
@@ -157,7 +160,7 @@ export function Water() {
   const [userId,      setUserId]      = useState<string | null>(null)
   const [loading,     setLoading]     = useState(true)
   const [loadError,   setLoadError]   = useState(false)
-  const [editEntry,   setEditEntry]   = useState<WaterEntry | null>(null)
+  const [editEntry,   setEditEntry]   = useState<WaterEntry | WaterLogRow | null>(null)
   const [editOz,      setEditOz]      = useState('')
   const [saving,      setSaving]      = useState(false)
   const [goalOz,      setGoalOz]      = useState<number>(() => {
@@ -166,6 +169,9 @@ export function Water() {
   })
   const [editingGoal, setEditingGoal] = useState(false)
   const [goalInput,   setGoalInput]   = useState('')
+  const [allEntries,   setAllEntries]   = useState<WaterLogRow[]>([])
+  const [historyError, setHistoryError] = useState(false)
+  const [visibleGroups, setVisibleGroups] = useState(10)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
 
@@ -198,7 +204,37 @@ export function Water() {
 
   useEffect(() => { load() }, [load])
 
+  const loadHistory = useCallback(async () => {
+    setHistoryError(false)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data, error } = await supabase
+      .from('water_log')
+      .select('id, oz, created_at, date')
+      .eq('user_id', user.id)
+      .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
+    if (error) { setHistoryError(true); return }
+    setAllEntries(data ?? [])
+  }, [])
+
+  useEffect(() => { loadHistory() }, [loadHistory])
+
   const totalOz = entries.reduce((s, e) => s + Number(e.oz), 0)
+
+  const { search: historySearch, setSearch: setHistorySearch, range: historyRange, setRange: setHistoryRange, filtered: historyFiltered } = useHistoryFilter(allEntries, [])
+
+  const dayGroups = useMemo<DayGroup[]>(() => {
+    const byDate: Record<string, WaterLogRow[]> = {}
+    for (const e of historyFiltered) (byDate[e.date] ??= []).push(e)
+    return Object.entries(byDate)
+      .sort(([a], [b]) => b.localeCompare(a))
+      .map(([date, dayEntries]) => ({
+        date,
+        entries: dayEntries,
+        totalOz: dayEntries.reduce((s, e) => s + Number(e.oz), 0),
+      }))
+  }, [historyFiltered])
 
   async function addWater(oz: number) {
     if (!userId || oz <= 0) return
@@ -209,6 +245,7 @@ export function Water() {
     setToastUndo(() => async () => {
       await supabase.from('water_log').delete().eq('id', insertedId)
       await load()
+      loadHistory()
       refreshXP()
       refreshActivity()
     })
@@ -222,11 +259,12 @@ export function Water() {
     }
     refreshActivity()
     load()
+    loadHistory()
   }
 
   async function deleteEntry(id: string) {
     const { error } = await supabase.from('water_log').delete().eq('id', id)
-    if (!error) load()
+    if (!error) { load(); loadHistory() }
   }
 
   async function saveEdit() {
@@ -234,7 +272,7 @@ export function Water() {
     setSaving(true)
     const { error } = await supabase.from('water_log').update({ oz: parseFloat(editOz) || editEntry.oz }).eq('id', editEntry.id)
     setSaving(false)
-    if (!error) { setEditEntry(null); load() }
+    if (!error) { setEditEntry(null); load(); loadHistory() }
   }
 
   function formatTime(iso: string) {
@@ -373,6 +411,80 @@ export function Water() {
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Tap a quick add button to get started</p>
           </div>
         )}
+
+        {/* History */}
+        <div className="mt-5">
+          <p className="card-title mb-3">History</p>
+
+          {historyError && allEntries.length === 0 && (
+            <ErrorState
+              icon={<DropletIcon size={56} color="var(--text-muted)" />}
+              title="Could not load history"
+              sub="Check your connection and try again."
+              onRetry={loadHistory}
+            />
+          )}
+
+          {!historyError && allEntries.length === 0 && (
+            <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', padding: '16px 0' }}>
+              No water history yet.
+            </p>
+          )}
+
+          {allEntries.length > 0 && (
+            <>
+              <HistoryControls search={historySearch} onSearch={setHistorySearch} range={historyRange} onRange={setHistoryRange} placeholder="Search history..." />
+
+              {dayGroups.length === 0 && (
+                <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', padding: '20px 0' }}>
+                  No entries match your filters.
+                </p>
+              )}
+
+              <div className="flex flex-col gap-3">
+                {dayGroups.slice(0, visibleGroups).map(g => (
+                  <Card key={g.date} noPadding>
+                    <div className="flex items-center justify-between" style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-faint)' }}>
+                      <div className="flex items-center gap-2">
+                        <DropletIcon size={14} color="var(--accent)" />
+                        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{formatDate(g.date)}</span>
+                      </div>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-tertiary)' }}>
+                        {g.totalOz.toFixed(0)}oz
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      {g.entries.map(e => (
+                        <button
+                          key={e.id}
+                          onClick={() => { setEditEntry(e); setEditOz(String(e.oz)) }}
+                          className="flex items-center justify-between text-left"
+                          style={{ padding: '8px 14px', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{formatTime(e.created_at)}</span>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-tertiary)', flexShrink: 0, marginLeft: 8 }}>
+                            {Number(e.oz).toFixed(0)}oz
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+
+              {dayGroups.length > visibleGroups && (
+                <button
+                  type="button"
+                  onClick={() => setVisibleGroups(v => v + 20)}
+                  className="w-full py-3 rounded-xl font-semibold mt-3"
+                  style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
+                >
+                  Show more
+                </button>
+              )}
+            </>
+          )}
+        </div>
 
       </PageWrapper>
       {toast && <Toast message={toast} onUndo={toastUndo} onDone={() => { setToast(null); setToastUndo(undefined) }} />}

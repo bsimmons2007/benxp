@@ -88,6 +88,11 @@
   --badge-sleep:    #3498db;
   --badge-habits:   #e67e22;
 
+  /* Medal tiers — same in light + dark */
+  --gold:   #ffd700;
+  --silver: #c0c0c0;
+  --bronze: #cd7f32;
+
   /* Z-index scale */
   --z-banner:  9997;
   --z-loadbar: 9998;

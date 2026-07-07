@@ -10,7 +10,7 @@ import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
-import { EditIcon, CheckIcon, BookIcon, CloseIcon, PlusIcon, SearchIcon } from '../components/ui/Icon'
+import { EditIcon, CheckIcon, BookIcon, CloseIcon, PlusIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
@@ -19,6 +19,7 @@ import { playGoalComplete } from '../lib/sounds'
 import type { Book, ToRead } from '../types'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { FirstUseTip } from '../components/ui/EmptyState'
+import { HistoryControls, useHistoryFilter } from '../components/ui/HistoryControls'
 
 // ── Types ────────────────────────────────────────────────────
 type SortKey = 'date_desc' | 'date_asc' | 'title_asc' | 'title_desc' | 'rating_desc' | 'rating_asc' | 'pages_desc' | 'pages_asc'
@@ -707,7 +708,6 @@ export function Books() {
   const [filterGenre, setFilterGenre] = useState('All')
   const [groupBySeries, setGroupBySeries] = useState(false)
   const [visible, setVisible] = useState(10)
-  const [search, setSearch]   = useState('')
   const [loadError, setLoadError] = useState(false)
   const [seriesMap, setSeriesMap] = useState<Record<string, string>>(() => getSeriesMap())
 
@@ -724,13 +724,14 @@ export function Books() {
 
   const reading  = allBooks.filter(b => !b.date_finished)
   const finished = allBooks.filter(b => !!b.date_finished)
+  const finishedWithDate = finished.map(b => ({ ...b, date: b.date_finished as string }))
 
   const genres = ['All', ...Array.from(new Set(finished.map(b => b.genre).filter(Boolean) as string[]))]
 
-  const q = search.trim().toLowerCase()
-  const sorted = [...finished]
+  const { search, setSearch, range, setRange, filtered: historyFiltered } = useHistoryFilter(finishedWithDate, ['title', 'author', 'genre'])
+
+  const sorted = [...historyFiltered]
     .filter(b => filterGenre === 'All' || b.genre === filterGenre)
-    .filter(b => !q || b.title.toLowerCase().includes(q) || (b.author ?? '').toLowerCase().includes(q))
     .sort((a, b) => {
       switch (sort) {
         case 'date_desc':   return (b.date_finished ?? '').localeCompare(a.date_finished ?? '')
@@ -898,19 +899,7 @@ export function Books() {
             </div>
 
             {finished.length > 5 && (
-              <div style={{ position: 'relative', marginBottom: 12 }}>
-                <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
-                  <SearchIcon size={14} color="var(--text-muted)" />
-                </span>
-                <input
-                  type="search"
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="Search title or author..."
-                  aria-label="Search books"
-                  style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 10, fontSize: 13, background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', outline: 'none' }}
-                />
-              </div>
+              <HistoryControls search={search} onSearch={setSearch} range={range} onRange={setRange} placeholder="Search title, author, genre..." />
             )}
 
             <div className="flex items-center justify-between mb-4 gap-2">

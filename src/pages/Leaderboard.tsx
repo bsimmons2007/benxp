@@ -5,6 +5,7 @@ import { Card } from '../components/ui/Card'
 import { Toast } from '../components/ui/Toast'
 import { TrophyIcon, CrownIcon, ZapIcon, PersonIcon } from '../components/ui/Icon'
 import { ErrorState } from '../components/ui/ErrorState'
+import { EmptyState } from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
 import { getLevelTitle } from '../lib/xp'
 import { useStore } from '../store/useStore'
@@ -41,11 +42,15 @@ interface PublicProfile {
   is_public: boolean
 }
 
-const MEDAL_COLORS = ['#ffd700', '#c0c0c0', '#cd7f32']
-const RANK_BG      = ['rgba(255,215,0,0.12)', 'rgba(192,192,192,0.1)', 'rgba(205,127,50,0.1)']
+const MEDAL_COLORS = ['var(--gold)', 'var(--silver)', 'var(--bronze)']
+const RANK_BG      = [
+  'color-mix(in srgb, var(--gold) 12%, transparent)',
+  'color-mix(in srgb, var(--silver) 10%, transparent)',
+  'color-mix(in srgb, var(--bronze) 10%, transparent)',
+]
 
 function RankBadge({ rank }: { rank: number }) {
-  if (rank === 1) return <CrownIcon size={20} color="#ffd700" />
+  if (rank === 1) return <CrownIcon size={20} color="var(--gold)" />
   if (rank <= 3)  return <TrophyIcon size={16} color={MEDAL_COLORS[rank - 1]} />
   return (
     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', minWidth: 20, textAlign: 'center' }}>
@@ -71,14 +76,19 @@ export function Leaderboard() {
   const [toast,       setToast]       = useState<string | null>(null)
   const [nameError,   setNameError]   = useState<string | null>(null)
 
+  const [tab,            setTab]           = useState<'global' | 'following'>('global')
+  const [followingIds,   setFollowingIds]  = useState<string[] | null>(null)   // null = unavailable
+  const [followsChecked, setFollowsChecked] = useState(false)
+
   async function load() {
     setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [ownRes, boardRes] = await Promise.all([
+    const [ownRes, boardRes, followsRes] = await Promise.all([
       supabase.from('public_profiles').select('*').eq('user_id', user.id).maybeSingle(),
       supabase.from('public_profiles').select('*').eq('is_public', true).order('total_xp', { ascending: false }).limit(50),
+      supabase.from('user_follows').select('following_id').eq('follower_id', user.id),
     ])
 
     if (ownRes.error?.code === '42P01' || boardRes.error?.code === '42P01') {
@@ -92,6 +102,13 @@ export function Leaderboard() {
       setLoading(false)
       return
     }
+
+    if (!followsRes.error) {
+      setFollowingIds((followsRes.data ?? []).map(r => r.following_id))
+    } else {
+      setFollowingIds(null)
+    }
+    setFollowsChecked(true)
 
     setOwnProfile(ownRes.data ?? null)
     setEditName(ownRes.data?.display_name ?? userName ?? '')
@@ -145,6 +162,11 @@ export function Leaderboard() {
   const ownRank = ownProfile?.is_public
     ? leaderboard.findIndex(p => p.user_id === ownProfile?.user_id) + 1
     : null
+
+  const followsAvailable = followsChecked && followingIds !== null
+  const visibleBoard = tab === 'following' && followingIds
+    ? leaderboard.filter(p => followingIds.includes(p.user_id))
+    : leaderboard
 
   return (
     <>
@@ -215,7 +237,7 @@ export function Leaderboard() {
                     </button>
                   )}
                 </div>
-                {nameError && <p style={{ color: '#ef4444', fontSize: 11, marginTop: 4 }}>{nameError}</p>}
+                {nameError && <p style={{ color: 'var(--red)', fontSize: 11, marginTop: 4 }}>{nameError}</p>}
               </div>
 
               {/* XP row */}
@@ -229,7 +251,7 @@ export function Leaderboard() {
                 {ownProfile && (
                   <div style={{ textAlign: 'right' }}>
                     <p className="section-label">On board</p>
-                    <p className="font-bold text-sm" style={{ color: ownProfile.total_xp === totalXP ? 'var(--text-muted)' : '#f59e0b' }}>
+                    <p className="font-bold text-sm" style={{ color: ownProfile.total_xp === totalXP ? 'var(--text-muted)' : 'var(--warning)' }}>
                       {ownProfile.total_xp.toLocaleString()}
                       {ownProfile.total_xp !== totalXP && ' (stale)'}
                     </p>
@@ -258,7 +280,7 @@ export function Leaderboard() {
                   <button
                     onClick={syncXP}
                     disabled={syncing}
-                    style={{ padding: '10px 16px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)', cursor: 'pointer' }}
+                    style={{ padding: '10px 16px', borderRadius: 10, fontSize: 12, fontWeight: 700, background: 'color-mix(in srgb, var(--warning) 15%, transparent)', color: 'var(--warning)', border: '1px solid color-mix(in srgb, var(--warning) 30%, transparent)', cursor: 'pointer' }}
                   >
                     {syncing ? '…' : 'Sync XP'}
                   </button>
@@ -266,8 +288,56 @@ export function Leaderboard() {
               </div>
             </Card>
 
+            {/* Global / Following tabs */}
+            {followsAvailable && (
+              <div
+                className="flex gap-1 mb-4"
+                role="tablist"
+                style={{ background: 'var(--surface-1)', borderRadius: 12, padding: 4 }}
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === 'global'}
+                  aria-label="Show global leaderboard"
+                  onClick={() => setTab('global')}
+                  className="flex-1 py-2 rounded-lg font-bold text-sm transition-all"
+                  style={{
+                    background: tab === 'global' ? 'var(--accent)' : 'transparent',
+                    color: tab === 'global' ? 'var(--base-bg)' : 'var(--text-muted)',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Global
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === 'following'}
+                  aria-label="Show leaderboard for people you follow"
+                  onClick={() => setTab('following')}
+                  className="flex-1 py-2 rounded-lg font-bold text-sm transition-all"
+                  style={{
+                    background: tab === 'following' ? 'var(--accent)' : 'transparent',
+                    color: tab === 'following' ? 'var(--base-bg)' : 'var(--text-muted)',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Following
+                </button>
+              </div>
+            )}
+
             {/* Leaderboard list */}
-            {leaderboard.length === 0 ? (
+            {tab === 'following' && visibleBoard.length === 0 ? (
+              <EmptyState
+                icon={<PersonIcon size={40} color="var(--text-muted)" />}
+                title="No one to show"
+                sub="Follow people from their profile to see them here."
+              />
+            ) : visibleBoard.length === 0 ? (
               <Card className="text-center" style={{ padding: 32 }}>
                 <TrophyIcon size={40} color="var(--text-muted)" />
                 <p className="font-bold mt-3" style={{ color: 'var(--text-primary)', fontSize: 15 }}>No one here yet</p>
@@ -275,8 +345,8 @@ export function Leaderboard() {
               </Card>
             ) : (
               <>
-                <p className="section-label mb-3">{leaderboard.length} players ranked</p>
-                {leaderboard.map((p, i) => {
+                <p className="section-label mb-3">{visibleBoard.length} players ranked</p>
+                {visibleBoard.map((p, i) => {
                   const rank    = i + 1
                   const isMe    = p.user_id === ownProfile?.user_id
                   const isTop3  = rank <= 3
@@ -287,7 +357,7 @@ export function Leaderboard() {
                       style={{
                         padding: '12px 16px',
                         background: isMe ? 'var(--surface-2)' : undefined,
-                        border: isMe ? '1px solid var(--accent)' : isTop3 ? `1px solid ${MEDAL_COLORS[rank - 1]}40` : undefined,
+                        border: isMe ? '1px solid var(--accent)' : isTop3 ? `1px solid color-mix(in srgb, ${MEDAL_COLORS[rank - 1]} 40%, transparent)` : undefined,
                         backgroundColor: isTop3 && !isMe ? RANK_BG[rank - 1] : undefined,
                       }}
                     >

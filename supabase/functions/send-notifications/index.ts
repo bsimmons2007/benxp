@@ -7,6 +7,8 @@
 //   - evening reminder (~20:00 local) if nothing logged today
 //   - streak-at-risk if overall streak >= 3 and nothing logged today
 //   - quest expiring within 48h with progress >= 70%
+//   - meal reminder if an active nutrition tracker skipped logging today
+//   - PR encouragement (weekdays, once/week) if last PR was 14-45 days ago
 //   - Monday-morning weekly recap (XP earned last week + level)
 //
 // Secrets required (set via `supabase secrets set`):
@@ -58,11 +60,12 @@ interface Sub {
 
 interface Settings {
   evening: boolean; streak: boolean; quest: boolean; weekly: boolean
+  meals: boolean; pr: boolean
   quietStart: string; quietEnd: string; timezone: string
 }
 
 const DEFAULT_SETTINGS: Settings = {
-  evening: true, streak: true, quest: true, weekly: true,
+  evening: true, streak: true, quest: true, weekly: true, meals: true, pr: true,
   quietStart: '22:00', quietEnd: '08:00', timezone: 'America/Chicago',
 }
 
@@ -280,6 +283,38 @@ async function expiringQuest(userId: string): Promise<string | null> {
   return null
 }
 
+function isoWeekKey(date: Date): string {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+  const dayNum = d.getUTCDay() || 7
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum)
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+  const weekNum = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
+  return `${d.getUTCFullYear()}-W${String(weekNum).padStart(2, '0')}`
+}
+
+async function isActiveMealTracker(userId: string, date: string): Promise<{ active: boolean; loggedToday: boolean }> {
+  const since = new Date(date); since.setDate(since.getDate() - 6)
+  const sinceStr = since.toISOString().slice(0, 10)
+  const { data } = await admin.from('meals').select('date').eq('user_id', userId).gte('date', sinceStr).lte('date', date)
+  const dates = new Set((data ?? []).map((r: { date: string }) => r.date))
+  return { active: dates.size >= 3, loggedToday: dates.has(date) }
+}
+
+async function daysSinceLastPR(userId: string, date: string): Promise<number | null> {
+  const since = new Date(date); since.setDate(since.getDate() - 30)
+  const sinceStr = since.toISOString().slice(0, 10)
+  const { count: liftCount } = await admin.from('lifting_log').select('id', { count: 'exact', head: true })
+    .eq('user_id', userId).gte('date', sinceStr)
+  if (!liftCount) return null
+
+  const { data } = await admin.from('pr_history').select('date').eq('user_id', userId)
+    .order('date', { ascending: false }).limit(1)
+  const lastPr = data?.[0]?.date as string | undefined
+  if (!lastPr) return null
+  const diffDays = Math.floor((new Date(date).getTime() - new Date(lastPr).getTime()) / 86400000)
+  return diffDays
+}
+
 async function send(sub: Sub, title: string, body: string, url: string, tag: string): Promise<void> {
   const payload = JSON.stringify({ title, body, url, tag })
   try {
@@ -353,7 +388,7 @@ Deno.serve(async (req: Request) => {
       continue
     }
 
-    // Evening block (19:00–22:00 local): reminder / streak / quest.
+    // Evening block (19:00–22:00 local): reminder / streak / quest / meals / PR.
     if (hour >= 19 && hour < 22) {
       const loggedToday = await anyActivityOn(sub.user_id, date)
 
@@ -372,6 +407,27 @@ Deno.serve(async (req: Request) => {
           await send(sub, 'Quest expiring soon', `"${quest}" expires within 48 hours. Finish it for the XP!`, '/challenges', 'quest')
           await markSent(sub, 'quest', date); sent++
           continue
+        }
+      }
+
+      if (settings.meals && lastSent.meals !== date) {
+        const { active, loggedToday: mealsToday } = await isActiveMealTracker(sub.user_id, date)
+        if (active && !mealsToday) {
+          await send(sub, 'Log your meals', 'No meals logged today - keep your nutrition streak alive.', '/nutrition', 'meals')
+          await markSent(sub, 'meals', date); sent++
+          continue
+        }
+      }
+
+      if (settings.pr && weekday >= 1 && weekday <= 5) {
+        const weekKey = isoWeekKey(new Date(date))
+        if (lastSent.pr !== weekKey) {
+          const daysSince = await daysSinceLastPR(sub.user_id, date)
+          if (daysSince !== null && daysSince >= 14 && daysSince <= 45) {
+            await send(sub, 'PR window open', `It's been ${daysSince} days since your last PR — time to test a heavy single?`, '/lifting', 'pr')
+            await markSent(sub, 'pr', weekKey); sent++
+            continue
+          }
         }
       }
 

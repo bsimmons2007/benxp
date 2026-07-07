@@ -13,6 +13,7 @@ import { HistoryControls, useHistoryFilter } from '../components/ui/HistoryContr
 import { UtensilsIcon, EditIcon, ChevronIcon, FlameIcon } from '../components/ui/Icon'
 import { CalorieVolumeChart } from '../components/charts/CalorieVolumeChart'
 import { SurplusWeightChart } from '../components/charts/SurplusWeightChart'
+import { NutritionWellnessChart } from '../components/charts/NutritionWellnessChart'
 import { supabase } from '../lib/supabase'
 import { today as appToday, formatDate, isMissingTableError } from '../lib/utils'
 import { getLastUsed, setLastUsed } from '../lib/lastUsed'
@@ -417,6 +418,11 @@ export function Nutrition() {
         <Card className="mb-4">
           <p className="card-title mb-2">Surplus vs Bodyweight</p>
           <SurplusWeightChart target={targets ? targets.target : null} />
+        </Card>
+
+        <Card className="mb-4">
+          <p className="card-title mb-2">Fuel vs Recovery</p>
+          <NutritionWellnessChart />
         </Card>
 
         {/* HISTORY */}

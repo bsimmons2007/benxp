@@ -19,6 +19,7 @@ import type { SleepLog } from '../types'
 import { MoonIcon, CheckIcon, EditIcon, CloseIcon } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { ChartSkeleton, ChartEmptyState } from '../components/ui/Skeleton'
+import { HistoryControls, useHistoryFilter } from '../components/ui/HistoryControls'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -780,6 +781,8 @@ export function Sleep() {
     avg: dayTotals[i] ? Math.round((dayTotals[i].sum / dayTotals[i].count) * 10) / 10 : 0,
   }))
 
+  const { search: historySearch, setSearch: setHistorySearch, range: historyRange, setRange: setHistoryRange, filtered: historyFiltered } = useHistoryFilter(logs, ['bedtime', 'wake_time'])
+
   return (
     <>
       <TopBar title="Sleep" />
@@ -913,7 +916,8 @@ export function Sleep() {
 
         {/* History */}
         <p className="card-title mb-3">History</p>
-        {logs.slice(0, visible).map(entry => {
+        <HistoryControls search={historySearch} onSearch={setHistorySearch} range={historyRange} onRange={setHistoryRange} placeholder="Search bedtime, wake time..." />
+        {historyFiltered.slice(0, visible).map(entry => {
           const isNap    = entry.is_nap
           const q        = isNap ? { label: 'Nap', color: '#888' } : sleepQuality(entry.hours_slept)
           const dayLabel = DAYS[new Date(entry.date + 'T12:00:00').getDay()]
@@ -973,14 +977,14 @@ export function Sleep() {
             </Card>
           )
         })}
-        {logs.length > visible && (
+        {historyFiltered.length > visible && (
           <button
             type="button"
             onClick={() => setVisible(v => v + 20)}
             className="w-full py-3 rounded-xl font-semibold mt-1"
             style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', fontSize: 14 }}
           >
-            Show more ({logs.length - visible} left)
+            Show more ({historyFiltered.length - visible} left)
           </button>
         )}
         {nightLogs.length === 0 && (

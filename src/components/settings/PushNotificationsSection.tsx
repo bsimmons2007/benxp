@@ -28,6 +28,8 @@ const TYPES: { key: keyof NotificationSettings; label: string; desc: string }[] 
   { key: 'streak',  label: 'Streak at risk',    desc: 'When a 3+ day streak could break' },
   { key: 'quest',   label: 'Quest expiring',    desc: 'A quest close to done is about to expire' },
   { key: 'weekly',  label: 'Weekly recap',      desc: 'Monday morning: last week\'s XP + level' },
+  { key: 'meals',   label: 'Meal reminder',     desc: 'No meals logged today' },
+  { key: 'pr',      label: 'PR nudge',          desc: 'A while since your last PR' },
 ]
 
 /** Self-contained push-notifications settings section. Additive: render once in

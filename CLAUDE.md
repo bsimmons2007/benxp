@@ -244,8 +244,8 @@ Single JSONB doc per user in `user_preferences`, mirrored in localStorage (`youx
 
 ## Theme system & design tokens
 - **Default: Coral** — accent `#e5443f`, Paper bg `#f3efe6`. 40+ themes in `theme.ts`, auto-switch by hour optional, preference synced via prefs. Light default; dark via `html[data-mode="dark"]`.
-- Surface scale `--surface-0..3`; text `--text-primary/secondary/tertiary/disabled` (+ `--text-muted`); borders `--border-subtle/default/strong`; shadows/radius tokens; `--green`, `--red`, `--accent`, `--overlay` (modal scrims), `--chart-alt` (second chart series). Legacy aliases: `--card-bg`, `--base-bg`, `--input-bg`, `--nav-bg`, `--border`, `--border-faint`.
-- **Rule — no hardcoded colors in components** (`#hex`/`rgba(...)`): use CSS vars + `color-mix(in srgb, var(--x) N%, transparent)` for tints. The full sweep was completed July 2026. **Intentional exceptions** (do not "fix"): Login hero gradient, Books `GENRE_COLORS` + `hexContrast()`, Mood's 3 chart series, Hobbies hub per-tile accents, ShareCard (image export), Confetti/MoodFace/BossConquered/Tutorial overlay effects, `index.css`/`theme.ts` themselves.
+- Surface scale `--surface-0..3`; text `--text-primary/secondary/tertiary/disabled` (+ `--text-muted`); borders `--border-subtle/default/strong`; shadows/radius tokens; `--green`, `--red`, `--accent`, `--overlay` (modal scrims), `--chart-alt` (second chart series). Legacy aliases: `--card-bg`, `--base-bg`, `--input-bg`, `--nav-bg`, `--border`, `--border-faint`. Shared medal tiers: `--gold`/`--silver`/`--bronze` (same in both modes).
+- **Rule — no hardcoded colors in components** (`#hex`/`rgba(...)`): use CSS vars + `color-mix(in srgb, var(--x) N%, transparent)` for tints. The full sweep was completed July 2026. **Intentional exceptions** (do not "fix"): Login hero gradient, Books `GENRE_COLORS` + `hexContrast()`, Mood's 3 chart series, Hobbies hub per-tile accents, ShareCard (image export), Confetti/MoodFace/BossConquered/Tutorial overlay effects, Fortnite's `RANK_COLORS` rank/placement-tier palette, `index.css`/`theme.ts` themselves.
 
 ---
 

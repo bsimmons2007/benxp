@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useStore } from '../store/useStore'
 import { localDateStr, today as appToday } from '../lib/utils'
 import { tokensEarned, getSpentDates, recordSpend } from '../lib/streakTokens'
+import { walkStreak } from '../lib/streakWalk'
 
 export interface StreakData {
   current: number
@@ -45,57 +46,6 @@ function calcStreakPair(dates: Set<string>, todayStr: string): { cur: number; lo
     prev = d
   }
   return { cur, long }
-}
-
-/** Walk the overall streak back from today, bridging single-day gaps with freeze
- *  tokens when a balance is available. Pure: returns which gap dates it covered
- *  so the caller can persist them (idempotently) in an effect. */
-function calcTokenStreak(
-  dates: Set<string>,
-  todayStr: string,
-  earned: number,
-  spent: string[],
-): { current: number; freezeTokens: number; tokenSaving: boolean; toCover: string[] } {
-  const spentSet = new Set(spent)
-  let remaining = Math.max(0, earned - spent.length)   // fresh tokens available
-  const toCover: string[] = []
-  let tokenSaving = false
-
-  const activeToday = dates.has(todayStr)
-  let d = activeToday ? todayStr : prevDay(todayStr)
-  let current = 0
-
-  // If today isn't active and yesterday isn't either, there's no live streak to
-  // preserve (a token only bridges a *single* missing day, never today itself).
-  while (true) {
-    if (dates.has(d)) {
-      current++
-      d = prevDay(d)
-      continue
-    }
-    // d is missing. Only a single-day gap can be bridged: the day before d must
-    // be an active day for the streak to continue past it.
-    const before = prevDay(d)
-    if (!dates.has(before)) break
-    if (spentSet.has(d)) {
-      // already covered on a prior run — counts, no new token consumed
-      current++
-      tokenSaving = true
-      d = before
-      continue
-    }
-    if (remaining > 0) {
-      remaining--
-      toCover.push(d)
-      tokenSaving = true
-      current++
-      d = before
-      continue
-    }
-    break
-  }
-
-  return { current, freezeTokens: remaining, tokenSaving, toCover }
 }
 
 export function useStreak(): StreakData {
@@ -145,7 +95,7 @@ export function useStreak(): StreakData {
     ])
     const spent = getSpentDates()
     const { current, freezeTokens, tokenSaving, toCover } =
-      calcTokenStreak(allDates, today, earned, spent)
+      walkStreak(allDates, today, earned, spent)
 
     const { cur: sleepCurrent,  long: sleepLongest }   = calcStreakPair(sleepDates,  today)
     const { cur: gymCurrent,    long: gymLongest }     = calcStreakPair(gymDates,    today)

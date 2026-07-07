@@ -613,15 +613,15 @@ function useLifetimeStats() {
 
 // ── Level avatar tiers ────────────────────────────────────────
 const AVATAR_TIERS: { minLevel: number; Icon: IconComponent; title: string; desc: string; aura: string }[] = [
-  { minLevel:  1, Icon: SproutIcon,  title: 'Seedling',  desc: 'Just starting out. Every rep counts.',   aura: '#4ade80' },
-  { minLevel:  6, Icon: SwordIcon,   title: 'Warrior',   desc: 'You fight for every gain.',              aura: '#94a3b8' },
+  { minLevel:  1, Icon: SproutIcon,  title: 'Seedling',  desc: 'Just starting out. Every rep counts.',   aura: 'var(--green)' },
+  { minLevel:  6, Icon: SwordIcon,   title: 'Warrior',   desc: 'You fight for every gain.',              aura: 'var(--silver)' },
   { minLevel: 11, Icon: ShieldIcon,  title: 'Knight',    desc: 'Discipline is your armor.',              aura: '#60a5fa' },
   { minLevel: 21, Icon: FlameIcon,   title: 'Blazer',    desc: 'Momentum catches fire.',                 aura: '#fb923c' },
   { minLevel: 31, Icon: ZapIcon,     title: 'Striker',   desc: 'You move with electric purpose.',        aura: '#facc15' },
   { minLevel: 41, Icon: SwimIcon,    title: 'Tidal',     desc: 'Unstoppable, consistent force.',         aura: '#38bdf8' },
   { minLevel: 51, Icon: BirdIcon,    title: 'Apex',      desc: 'Above the grind. Soaring.',              aura: '#a78bfa' },
-  { minLevel: 66, Icon: StarIcon,    title: 'Legend',    desc: 'Your name echoes in the gym.',           aura: '#fbbf24' },
-  { minLevel: 81, Icon: CrownIcon,   title: 'Sovereign', desc: 'You rule your domain.',                  aura: '#f59e0b' },
+  { minLevel: 66, Icon: StarIcon,    title: 'Legend',    desc: 'Your name echoes in the gym.',           aura: 'var(--gold)' },
+  { minLevel: 81, Icon: CrownIcon,   title: 'Sovereign', desc: 'You rule your domain.',                  aura: 'var(--bronze)' },
   { minLevel: 96, Icon: DiamondIcon, title: 'Godlike',   desc: 'Transcendent. Few reach this height.',   aura: '#e879f9' },
 ]
 
@@ -649,7 +649,7 @@ function LevelAvatar({ level }: { level: number }) {
         }}>
           <div style={{
             position: 'absolute', inset: 0, borderRadius: '50%',
-            background: `${tier.aura}1f`,
+            background: `color-mix(in srgb, ${tier.aura} 12%, transparent)`,
             animation: 'pulse 3s ease-in-out infinite',
           }} />
           <tier.Icon size={36} color={tier.aura} style={{ position: 'relative', zIndex: 1 }} />
@@ -805,7 +805,7 @@ export function Profile() {
               </div>
             </div>
             {avatarError && (
-              <p style={{ position: 'absolute', fontSize: 11, color: '#ef4444', marginTop: 2 }}>
+              <p style={{ position: 'absolute', fontSize: 11, color: 'var(--red)', marginTop: 2 }}>
                 {avatarError}
               </p>
             )}
@@ -863,7 +863,7 @@ export function Profile() {
               </div>
               <span style={{
                 fontSize: 32, fontWeight: 700,
-                color: consistencyScore >= 70 ? '#4ade80' : consistencyScore >= 40 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1,
+                color: consistencyScore >= 70 ? 'var(--green)' : consistencyScore >= 40 ? 'var(--accent)' : 'var(--text-muted)', lineHeight: 1,
               }}>
                 {consistencyScore}%
               </span>
@@ -874,9 +874,9 @@ export function Profile() {
                 width: `${consistencyScore}%`,
                 borderRadius: 999,
                 background: consistencyScore >= 70
-                  ? 'linear-gradient(90deg, #16a34a, #4ade80)'
+                  ? 'linear-gradient(90deg, color-mix(in srgb, var(--green) 70%, black), var(--green))'
                   : consistencyScore >= 40
-                  ? 'linear-gradient(90deg, var(--accent), #fbbf24)'
+                  ? 'linear-gradient(90deg, var(--accent), var(--gold))'
                   : 'var(--border-default)',
                 transition: 'width 0.8s ease',
               }} />

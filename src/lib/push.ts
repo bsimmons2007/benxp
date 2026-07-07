@@ -14,13 +14,15 @@ export interface NotificationSettings {
   streak: boolean        // streak-at-risk
   quest: boolean         // quest expiring soon
   weekly: boolean        // Monday weekly recap
+  meals: boolean         // nutrition reminder if active tracker skipped today
+  pr: boolean            // PR encouragement nudge
   quietStart: string     // "HH:MM"
   quietEnd: string       // "HH:MM"
   timezone: string       // IANA tz
 }
 
 const DEFAULT_SETTINGS: NotificationSettings = {
-  evening: true, streak: true, quest: true, weekly: true,
+  evening: true, streak: true, quest: true, weekly: true, meals: true, pr: true,
   quietStart: '22:00', quietEnd: '08:00',
   timezone: (typeof Intl !== 'undefined' && Intl.DateTimeFormat().resolvedOptions().timeZone) || 'America/Chicago',
 }

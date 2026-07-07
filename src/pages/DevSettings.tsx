@@ -179,8 +179,8 @@ async function fetchXPEntries(): Promise<{ entries: XPEntry[]; total: number }> 
 
 const CATEGORY_ORDER = ['Lifting', 'Skate', 'Books', 'Fortnite', 'Sleep', 'Challenges']
 const CATEGORY_COLORS: Record<string, string> = {
-  Lifting: '#f87171', Skate: '#4ade80', Books: '#60a5fa',
-  Fortnite: '#a78bfa', Sleep: '#34d399', Challenges: 'var(--accent)',
+  Lifting: 'var(--red)', Skate: 'var(--green)', Books: 'var(--cat-cardio)',
+  Fortnite: 'var(--cat-gaming)', Sleep: 'var(--cat-wellness)', Challenges: 'var(--accent)',
 }
 
 function XPEngine() {
@@ -193,7 +193,7 @@ function XPEngine() {
     fetchXPEntries().then(d => { setData(d); setLoading(false) })
   }, [])
 
-  if (loading) return <p style={{ color: '#444', textAlign: 'center', padding: 40 }}>Loading XP engine…</p>
+  if (loading) return <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 40 }}>Loading XP engine…</p>
   if (!data) return null
 
   const byCategory = CATEGORY_ORDER.map(cat => ({
@@ -214,7 +214,7 @@ function XPEngine() {
     <div>
       {/* Total + formula */}
       <Card className="mb-4" goldBorder>
-        <p className="text-xs uppercase tracking-widest font-mono mb-1" style={{ color: '#888' }}>Total XP</p>
+        <p className="text-xs uppercase tracking-widest font-mono mb-1" style={{ color: 'var(--text-muted)' }}>Total XP</p>
         <p className="text-4xl font-bold mb-1" style={{ color: 'var(--accent)' }}>
           {data.total.toLocaleString()}
         </p>
@@ -338,7 +338,7 @@ export function DevSettings() {
                   style={{
                     padding: '7px 16px', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer',
                     background: activeTab === t.id ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
-                    color: activeTab === t.id ? 'var(--base-bg)' : '#888',
+                    color: activeTab === t.id ? 'var(--base-bg)' : 'var(--text-muted)',
                     border: 'none',
                   }}
                 >
