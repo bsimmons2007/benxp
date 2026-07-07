@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { CHART_TOOLTIP_STYLE, formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
+import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK_COLOR, formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
 
 interface DataPoint {
   date:    string
@@ -68,7 +68,6 @@ function buildCompareData(data: DataPoint[], dataKey: 'est_1rm' | 'reps'): Compa
 export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; pr: number; isBWLift?: boolean }) {
   const [data, setData]         = useState<DataPoint[]>([])
   const [compare, setCompare]   = useState(false)
-  const tickColor = () => getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#888'
 
   useEffect(() => {
     if (isBWLift) {
@@ -132,14 +131,14 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
             <XAxis
               dataKey="day"
               tickFormatter={(d: number) => `D${d}`}
-              tick={{ fill: tickColor(), fontSize: 9 }}
+              tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
               axisLine={false}
               tickLine={false}
               interval={4}
             />
             <YAxis
               domain={['auto', 'auto']}
-              tick={{ fill: tickColor(), fontSize: 9 }}
+              tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
               axisLine={false}
               tickLine={false}
               width={36}
@@ -184,13 +183,13 @@ export function LiftTrendChart({ lift, pr, isBWLift = false }: { lift: string; p
           <XAxis
             dataKey="date"
             tickFormatter={(d: string) => formatDate(d)}
-            tick={{ fill: tickColor(), fontSize: 9 }}
+            tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             domain={['auto', 'auto']}
-            tick={{ fill: tickColor(), fontSize: 9 }}
+            tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
             axisLine={false}
             tickLine={false}
             width={36}

@@ -54,6 +54,7 @@ interface BbForm {
 function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
   const [open,        setOpen]        = useState(false)
   const [toast,       setToast]       = useState<string | null>(null)
+  const [undo,        setUndo]        = useState<(() => void) | null>(null)
   const [showShooting, setShowShooting] = useState(true)
   const [showBox,      setShowBox]      = useState(true)
   const refreshXP       = useStore(s => s.refreshXP)
@@ -73,7 +74,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
     if (!user) return
     if (!showShooting && !showBox) { setToast('Enable at least one section'); return }
     const pts = int(data.points)
-    const { error } = await supabase.from('basketball_sessions').insert({
+    const { data: inserted, error } = await supabase.from('basketball_sessions').insert({
       user_id:         user.id,
       date:            data.date,
       fg_made:         showShooting ? int(data.fg_made)        : 0,
@@ -89,9 +90,14 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
       blocks:          showBox ? int(data.blocks)   : 0,
       turnovers:       showBox ? int(data.turnovers): 0,
       notes:           data.notes || null,
-    })
-    if (error) { setToast('Error saving session'); return }
+    }).select('id').single()
+    if (error || !inserted) { setToast('Error saving session'); return }
     const xp = XP_RATES.basketball_session + pts * XP_RATES.basketball_per_point
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('basketball_sessions').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     if (pts >= 20) playPR(); else playXPGain()
     setToast(`+${xp} XP — session logged!`)
     await refreshXP()
@@ -172,7 +178,7 @@ function LogBasketballPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }

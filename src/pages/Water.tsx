@@ -5,6 +5,7 @@ import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
+import { ErrorState } from '../components/ui/ErrorState'
 import { EditIcon, DropletIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { today as appToday } from '../lib/utils'
@@ -152,8 +153,10 @@ export function Water() {
   const [entries,     setEntries]     = useState<WaterEntry[]>([])
   const [customOz,    setCustomOz]    = useState('')
   const [toast,       setToast]       = useState<string | null>(null)
+  const [toastUndo,   setToastUndo]   = useState<(() => void) | undefined>(undefined)
   const [userId,      setUserId]      = useState<string | null>(null)
   const [loading,     setLoading]     = useState(true)
+  const [loadError,   setLoadError]   = useState(false)
   const [editEntry,   setEditEntry]   = useState<WaterEntry | null>(null)
   const [editOz,      setEditOz]      = useState('')
   const [saving,      setSaving]      = useState(false)
@@ -163,7 +166,8 @@ export function Water() {
   })
   const [editingGoal, setEditingGoal] = useState(false)
   const [goalInput,   setGoalInput]   = useState('')
-  const refreshXP = useStore(s => s.refreshXP)
+  const refreshXP       = useStore(s => s.refreshXP)
+  const refreshActivity = useStore(s => s.refreshActivity)
 
   function saveGoal() {
     const v = parseInt(goalInput, 10)
@@ -177,15 +181,17 @@ export function Water() {
   const todayStr = appToday()
 
   const load = useCallback(async () => {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     setUserId(user.id)
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('water_log')
       .select('id, oz, created_at')
       .eq('user_id', user.id)
       .eq('date', todayStr)
       .order('created_at', { ascending: false })
+    if (error) { setLoadError(true); setLoading(false); return }
     setEntries(data ?? [])
     setLoading(false)
   }, [todayStr])
@@ -197,8 +203,15 @@ export function Water() {
   async function addWater(oz: number) {
     if (!userId || oz <= 0) return
     const wasGoalMet = totalOz >= goalOz
-    const { error } = await supabase.from('water_log').insert({ user_id: userId, date: todayStr, oz })
-    if (error) { setToast('Failed to log — try again'); return }
+    const { data: inserted, error } = await supabase.from('water_log').insert({ user_id: userId, date: todayStr, oz }).select('id').single()
+    if (error || !inserted) { setToast('Failed to log — try again'); setToastUndo(undefined); return }
+    const insertedId = inserted.id
+    setToastUndo(() => async () => {
+      await supabase.from('water_log').delete().eq('id', insertedId)
+      await load()
+      refreshXP()
+      refreshActivity()
+    })
     const newTotal = totalOz + oz
     const goalJustMet = !wasGoalMet && newTotal >= goalOz
     if (goalJustMet) {
@@ -207,6 +220,7 @@ export function Water() {
     } else {
       setToast(`+${oz}oz logged`)
     }
+    refreshActivity()
     load()
   }
 
@@ -343,7 +357,16 @@ export function Water() {
           </div>
         )}
 
-        {entries.length === 0 && !loading && (
+        {loadError && entries.length === 0 && (
+          <ErrorState
+            icon={<DropletIcon size={56} color="var(--text-muted)" />}
+            title="Could not load today's log"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+
+        {!loadError && entries.length === 0 && !loading && (
           <div style={{ textAlign: 'center', padding: '32px 0' }}>
             <DropletIcon size={36} color="var(--text-muted)" />
             <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)' }}>No water logged yet today</p>
@@ -352,7 +375,7 @@ export function Water() {
         )}
 
       </PageWrapper>
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={toastUndo} onDone={() => { setToast(null); setToastUndo(undefined) }} />}
       {editEntry && (
         <EditModal
           title={`Edit — ${formatTime(editEntry.created_at)}`}

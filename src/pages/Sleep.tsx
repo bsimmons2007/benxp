@@ -11,6 +11,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState, FirstUseTip } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
 import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip, localDateStr } from '../lib/utils'
 import { playXPGain, playPR } from '../lib/sounds'
@@ -785,15 +786,12 @@ export function Sleep() {
       <PageWrapper>
 
         {loadError && (
-          <div className="flex flex-col items-center py-12 gap-3 fade-in">
-            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Could not load sleep logs</p>
-            <button
-              onClick={load}
-              style={{ padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer' }}
-            >
-              Try again
-            </button>
-          </div>
+          <ErrorState
+            icon={<MoonIcon size={56} color="var(--text-muted)" />}
+            title="Could not load sleep logs"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
         )}
 
         {/* Stats row */}

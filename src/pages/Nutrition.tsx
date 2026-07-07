@@ -14,7 +14,7 @@ import { UtensilsIcon, EditIcon, ChevronIcon, FlameIcon } from '../components/ui
 import { CalorieVolumeChart } from '../components/charts/CalorieVolumeChart'
 import { SurplusWeightChart } from '../components/charts/SurplusWeightChart'
 import { supabase } from '../lib/supabase'
-import { today as appToday, formatDate } from '../lib/utils'
+import { today as appToday, formatDate, isMissingTableError } from '../lib/utils'
 import { getLastUsed, setLastUsed } from '../lib/lastUsed'
 import { playXPGain } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
@@ -32,13 +32,6 @@ const GOALS: { key: GoalMode; label: string }[] = [
   { key: 'maintain', label: 'Maintain' },
   { key: 'bulk',     label: 'Bulk' },
 ]
-
-function isMissingTableError(err: { code?: string; message?: string } | null): boolean {
-  if (!err) return false
-  if (err.code === '42P01') return true
-  const msg = (err.message ?? '').toLowerCase()
-  return msg.includes('does not exist') || msg.includes('schema cache')
-}
 
 function n(v: number | null | undefined): number { return typeof v === 'number' && isFinite(v) ? v : 0 }
 

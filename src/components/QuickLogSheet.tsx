@@ -6,6 +6,7 @@ import { XP_RATES } from '../lib/xp'
 import { today } from '../lib/utils'
 import { getLastUsed, setLastUsed } from '../lib/lastUsed'
 import { playXPGain, playPR } from '../lib/sounds'
+import { enqueueWrite } from '../lib/offlineQueue'
 import { Toast } from './ui/Toast'
 import {
   DumbbellIcon, RunIcon, MoonIcon, BrainIcon, DropletIcon, BookIcon,
@@ -173,7 +174,7 @@ const inputStyle: React.CSSProperties = {
 const labelCls = 'section-label'
 
 // ── Inline form per activity ───────────────────────────────────────
-function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: string, undo: () => Promise<void>, isPR: boolean) => void }) {
+function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: string, undo: (() => Promise<void>) | undefined, isPR: boolean) => void }) {
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
 
@@ -216,12 +217,22 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
     onSaved(msg, undo, isPR)
   }
 
+  // Offline fallback: queues the write and surfaces a toast with no undo
+  // (the row has no id yet). Online failures keep the prior silent-return behavior.
+  function queueIfOffline(table: string, payload: Record<string, unknown>): boolean {
+    if (navigator.onLine) return false
+    enqueueWrite(table, payload)
+    onSaved('Saved offline - will sync when online', undefined, false)
+    return true
+  }
+
   // ── Water ──
   async function addWater(oz: number) {
     await withUser(async uid => {
+      const payload = { user_id: uid, date: today(), oz }
       const { data, error } = await supabase.from('water_log')
-        .insert({ user_id: uid, date: today(), oz }).select('id').single()
-      if (error || !data) return
+        .insert(payload).select('id').single()
+      if (error || !data) { queueIfOffline('water_log', payload); return }
       finish(`+${oz}oz logged`, 'water_log', data.id, false)
     })
   }
@@ -229,9 +240,10 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
   // ── Mood ──
   async function saveMood(score: number) {
     await withUser(async uid => {
+      const payload = { user_id: uid, date: today(), mood: score, notes: notes || null }
       const { data, error } = await supabase.from('mood_log')
-        .insert({ user_id: uid, date: today(), mood: score, notes: notes || null }).select('id').single()
-      if (error || !data) return
+        .insert(payload).select('id').single()
+      if (error || !data) { queueIfOffline('mood_log', payload); return }
       finish(`+${XP_RATES.mood_log} XP - Mood logged`, 'mood_log', data.id, false)
     })
   }
@@ -249,9 +261,10 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
     }
     if (hrs == null || !isFinite(hrs) || hrs <= 0) return
     await withUser(async uid => {
+      const payload = { user_id: uid, date: today(), hours_slept: hrs, bedtime: bedtime || null, wake_time: wake || null }
       const { data, error } = await supabase.from('sleep_log')
-        .insert({ user_id: uid, date: today(), hours_slept: hrs, bedtime: bedtime || null, wake_time: wake || null }).select('id').single()
-      if (error || !data) return
+        .insert(payload).select('id').single()
+      if (error || !data) { queueIfOffline('sleep_log', payload); return }
       const xp = XP_RATES.sleep_log + ((hrs ?? 0) >= 7 ? XP_RATES.sleep_quality_bonus : 0)
       finish(`+${xp} XP - ${hrs}h sleep`, 'sleep_log', data.id, (hrs ?? 0) >= 8.5)
     })
@@ -264,9 +277,10 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
     setLastUsed('cardio-type', cardioType)
     const rate = CARDIO_TYPES.find(c => c.key === cardioType)?.rate ?? XP_RATES.cardio_per_mile
     await withUser(async uid => {
+      const payload = { user_id: uid, date: today(), activity: cardioType, distance_miles: m, notes: notes || null }
       const { data, error } = await supabase.from('cardio_sessions')
-        .insert({ user_id: uid, date: today(), activity: cardioType, distance_miles: m, notes: notes || null }).select('id').single()
-      if (error || !data) return
+        .insert(payload).select('id').single()
+      if (error || !data) { queueIfOffline('cardio_sessions', payload); return }
       finish(`+${Math.round(m * rate)} XP - ${m} mi logged`, 'cardio_sessions', data.id, false)
     })
   }
@@ -276,9 +290,10 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
     const m = parseFloat(miles)
     if (!isFinite(m) || m <= 0) return
     await withUser(async uid => {
+      const payload = { user_id: uid, date: today(), miles: m }
       const { data, error } = await supabase.from('skate_sessions')
-        .insert({ user_id: uid, date: today(), miles: m }).select('id').single()
-      if (error || !data) return
+        .insert(payload).select('id').single()
+      if (error || !data) { queueIfOffline('skate_sessions', payload); return }
       finish(`+${Math.round(m * XP_RATES.skate_per_mile)} XP - ${m} mi skated`, 'skate_sessions', data.id, false)
     })
   }
@@ -288,9 +303,10 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
     const m = parseFloat(miles)
     if (!isFinite(m) || m <= 0) return
     await withUser(async uid => {
+      const payload = { user_id: uid, date: today(), distance_miles: m }
       const { data, error } = await supabase.from('hiking_sessions')
-        .insert({ user_id: uid, date: today(), distance_miles: m }).select('id').single()
-      if (error || !data) return
+        .insert(payload).select('id').single()
+      if (error || !data) { queueIfOffline('hiking_sessions', payload); return }
       finish(`+${Math.round(m * XP_RATES.hiking_per_mile)} XP - ${m} mi hiked`, 'hiking_sessions', data.id, false)
     })
   }
@@ -301,13 +317,14 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
     if (!isFinite(cals) || cals <= 0) return
     setLastUsed('meal_type', mealType)
     await withUser(async uid => {
+      const payload = {
+        user_id: uid, date: today(), meal_type: mealType, name: mealName || null,
+        calories: Math.round(cals), protein_g: protein ? Math.round(parseFloat(protein)) : null,
+        carbs_g: carbs ? Math.round(parseFloat(carbs)) : null, fat_g: fat ? Math.round(parseFloat(fat)) : null,
+      }
       const { data, error } = await supabase.from('meals')
-        .insert({
-          user_id: uid, date: today(), meal_type: mealType, name: mealName || null,
-          calories: Math.round(cals), protein_g: protein ? Math.round(parseFloat(protein)) : null,
-          carbs_g: carbs ? Math.round(parseFloat(carbs)) : null, fat_g: fat ? Math.round(parseFloat(fat)) : null,
-        }).select('id').single()
-      if (error || !data) return
+        .insert(payload).select('id').single()
+      if (error || !data) { queueIfOffline('meals', payload); return }
       finish(`+${Math.round(cals)} cal logged`, 'meals', data.id, false)
     })
   }
@@ -320,7 +337,7 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
     await withUser(async uid => {
       payload.user_id = uid
       const { data, error } = await supabase.from(act.table!).insert(payload).select('id').single()
-      if (error || !data) return
+      if (error || !data) { queueIfOffline(act.table!, payload); return }
       const xp = act.winXP!(result)
       finish(`+${xp} XP - ${result ? 'Win' : 'Loss'} logged`, act.table!, data.id, result)
     })
@@ -551,7 +568,7 @@ export function QuickLogSheet({ open, onClose, initialActivity }: {
   const navigate    = useNavigate()
   const activities  = useQuickActivities()
   const [expanded, setExpanded] = useState<string | null>(null)
-  const [toast, setToast] = useState<{ msg: string; undo: () => Promise<void> } | null>(null)
+  const [toast, setToast] = useState<{ msg: string; undo?: () => Promise<void> } | null>(null)
   const scrimRef = useRef<HTMLDivElement>(null)
 
   // Deep-link: open a specific activity (or just the sheet) when asked.
@@ -579,7 +596,7 @@ export function QuickLogSheet({ open, onClose, initialActivity }: {
     setExpanded(prev => (prev === a.id ? null : a.id))
   }
 
-  function handleSaved(msg: string, undo: () => Promise<void>) {
+  function handleSaved(msg: string, undo?: () => Promise<void>) {
     setToast({ msg, undo })
     onClose()
   }
@@ -668,7 +685,7 @@ export function QuickLogSheet({ open, onClose, initialActivity }: {
       {toast && (
         <Toast
           message={toast.msg}
-          onUndo={() => toast.undo()}
+          onUndo={toast.undo ? () => toast.undo!() : undefined}
           onDone={() => setToast(null)}
         />
       )}

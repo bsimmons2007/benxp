@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
 import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
@@ -27,6 +28,7 @@ interface SkateForm { date: string; miles: string; duration: string; fastest_mil
 function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
   const [open, setOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<SkateForm>({
     defaultValues: { date: today(), miles: '', duration: '', fastest_mile: '' },
   })
@@ -38,19 +40,24 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
     if (!user) return
     const miles = parseFloat(data.miles)
     if (!miles || miles <= 0) return
-    const { error } = await supabase.from('skate_sessions').insert({
+    const { data: inserted, error } = await supabase.from('skate_sessions').insert({
       user_id: user.id,
       date: data.date,
       miles,
       duration: data.duration || null,
       fastest_mile: data.fastest_mile ? parseFloat(data.fastest_mile) : null,
-    })
-    if (error) {
+    }).select('id').single()
+    if (error || !inserted) {
       setToast('Failed to save session. Please try again.')
       return
     }
     const xp = Math.round(miles * XP_RATES.skate_per_mile)
     setToast(`+${xp} XP — Session logged!`)
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('skate_sessions').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     await refreshXP()
     refreshActivity()
     reset({ date: today(), miles: '', duration: '', fastest_mile: '' })
@@ -82,7 +89,7 @@ function LogSkatePanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }
@@ -131,12 +138,15 @@ export function Skate() {
   const [sessions, setSessions] = useState<SkateSession[]>([])
   const [editing, setEditing] = useState<SkateSession | null>(null)
   const [visible, setVisible] = useState(PAGE_SIZE)
+  const [loadError, setLoadError] = useState(false)
 
   async function load() {
-    const { data } = await supabase
+    setLoadError(false)
+    const { data, error } = await supabase
       .from('skate_sessions')
       .select('*')
       .order('date', { ascending: false })
+    if (error) { setLoadError(true); return }
     setSessions(data ?? [])
   }
 
@@ -252,7 +262,16 @@ export function Skate() {
           </Card>
         )}
 
-        {sessions.length === 0 && (
+        {loadError && sessions.length === 0 && (
+          <ErrorState
+            icon={<SkateIcon size={64} color="var(--text-muted)" />}
+            title="Could not load sessions"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+
+        {!loadError && sessions.length === 0 && (
           <EmptyState
             icon={<SkateIcon size={64} color="var(--text-muted)" />}
             title="No sessions yet"

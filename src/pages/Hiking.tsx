@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EditModal } from '../components/ui/EditModal'
 import { EmptyState } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
 import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate } from '../lib/utils'
@@ -53,6 +54,7 @@ interface HikeForm {
 function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<HikeForm>({
@@ -64,7 +66,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
     if (!user) return
     const miles  = parseFloat(data.distance_miles) || 0
     const elevFt = data.elevation_gain_ft ? parseInt(data.elevation_gain_ft) : null
-    const { error } = await supabase.from('hiking_sessions').insert({
+    const { data: inserted, error } = await supabase.from('hiking_sessions').insert({
       user_id:           user.id,
       date:              data.date,
       trail:             data.trail,
@@ -73,13 +75,18 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
       duration_mins:     data.duration_mins ? parseInt(data.duration_mins) : null,
       difficulty:        data.difficulty || null,
       notes:             data.notes || null,
-    })
-    if (error) { setToast('Failed to save — try again'); return }
+    }).select('id').single()
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
     const milesXP = miles * XP_RATES.hiking_per_mile
     const elevXP  = Math.floor((elevFt ?? 0) / 500) * XP_RATES.hiking_per_500ft
     const xp = Math.round(milesXP + elevXP)
     playXPGain()
     setToast(`+${xp} XP — ${miles} mi${elevFt ? ` · ${elevFt.toLocaleString()} ft gain` : ''}`)
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('hiking_sessions').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     await refreshXP(); refreshActivity()
     reset({ date: today(), trail: '', distance_miles: '', elevation_gain_ft: '', duration_mins: '', difficulty: 'Moderate', notes: '' })
     setOpen(false); onLogged()
@@ -121,7 +128,7 @@ function LogHikingPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }
@@ -180,11 +187,14 @@ export function Hiking() {
   const [sessions, setSessions] = useState<HikingSession[]>([])
   const [editing,  setEditing]  = useState<HikingSession | null>(null)
   const [visible,  setVisible]  = useState(PAGE_SIZE)
+  const [loadError, setLoadError] = useState(false)
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('hiking_sessions').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    const { data, error } = await supabase.from('hiking_sessions').select('*').eq('user_id', user.id).order('date', { ascending: false })
+    if (error) { setLoadError(true); return }
     setSessions(data ?? [])
   }
   useEffect(() => { load() }, [])
@@ -308,7 +318,16 @@ export function Hiking() {
           </button>
         )}
 
-        {sessions.length === 0 && (
+        {loadError && sessions.length === 0 && (
+          <ErrorState
+            icon={<MountainIcon size={56} color="var(--text-muted)" />}
+            title="Could not load hikes"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        )}
+
+        {!loadError && sessions.length === 0 && (
           <EmptyState
             icon={<MountainIcon size={56} color="var(--text-muted)" />}
             title="No hikes logged yet"

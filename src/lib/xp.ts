@@ -53,6 +53,16 @@ export function getLevelTitle(level: number): string {
   return title
 }
 
+// Adding a new XP category — checklist (5 places to touch):
+//   1. XP_RATES below — the rate itself.
+//   2. xpFromAggregates() — fold the new aggregate × rate into the total.
+//   3. aggregatesFromRawRows() — client-side fallback computation (+ its
+//      XPAggregates field, + RawActivityData shape if it needs new columns).
+//   4. migrations/phaseN-*.sql — add the column to get_xp_aggregates' SQL
+//      (all-time key + matching _season key, in a chunk with <100 args),
+//      and update seasonAggregatesFromRpc()'s RPC parsing below.
+//   5. supabase/functions/send-notifications — XP table copy, if the
+//      notification copy references XP totals/categories.
 export const XP_RATES = {
   per_set:              15,   // each set requires real physical effort
   workout_day:          60,   // consistency bonus
@@ -229,9 +239,11 @@ export function xpFromAggregates(a: XPAggregates): number {
 }
 
 /** Pull the `_season` variants out of the RPC payload into an XPAggregates.
- *  Season-agnostic dimensions (goal XP, challenge XP, measurements, sport
- *  counts) are only ever all-time in the aggregates RPC, so they contribute 0
- *  to season XP — season XP is dominated by activity-count/mileage dimensions.
+ *  `?? 0` on every field means an OLD RPC (pre phase8-season-and-indexes
+ *  migration) that lacks these `_season` keys degrades gracefully to 0 for
+ *  that dimension rather than throwing — the migration adds the missing
+ *  keys but callers on the old function still get a valid (if incomplete)
+ *  season total.
  */
 export function seasonAggregatesFromRpc(raw: Record<string, number>): XPAggregates {
   const s = (k: string) => Number(raw[`${k}_season`] ?? 0)
@@ -244,14 +256,19 @@ export function seasonAggregatesFromRpc(raw: Record<string, number>): XPAggregat
     cardio_run_mi: s('cardio_run_mi'), cardio_bike_mi: s('cardio_bike_mi'),
     cardio_swim_mi: s('cardio_swim_mi'), cardio_walk_mi: s('cardio_walk_mi'),
     cardio_other_mi: s('cardio_other_mi'),
-    challenge_xp: 0, goal_xp: 0,
-    mood_count: s('mood_count'), measurement_count: 0,
+    challenge_xp: s('challenge_xp'), goal_xp: s('goal_xp'),
+    mood_count: s('mood_count'), measurement_count: s('measurement_count'),
     water_goal_days: s('water_goal_days'),
-    bb_sessions: 0, bb_points: 0, pb_games: 0, pb_wins: 0,
-    golf_rounds: 0, golf_under_par: 0, dg_rounds: 0, dg_under_par: 0,
-    hike_miles: 0, hike_elev_buckets: 0, tt_games: 0, tt_wins: 0,
-    chess_games: 0, chess_wins: 0, chess_draws: 0, vb_games: 0, vb_wins: 0,
-    sb_games: 0, sb_wins: 0, pool_games: 0, pool_wins: 0, pool_bnr: 0,
+    bb_sessions: s('bb_sessions'), bb_points: s('bb_points'),
+    pb_games: s('pb_games'), pb_wins: s('pb_wins'),
+    golf_rounds: s('golf_rounds'), golf_under_par: s('golf_under_par'),
+    dg_rounds: s('dg_rounds'), dg_under_par: s('dg_under_par'),
+    hike_miles: s('hike_miles'), hike_elev_buckets: s('hike_elev_buckets'),
+    tt_games: s('tt_games'), tt_wins: s('tt_wins'),
+    chess_games: s('chess_games'), chess_wins: s('chess_wins'), chess_draws: s('chess_draws'),
+    vb_games: s('vb_games'), vb_wins: s('vb_wins'),
+    sb_games: s('sb_games'), sb_wins: s('sb_wins'),
+    pool_games: s('pool_games'), pool_wins: s('pool_wins'), pool_bnr: s('pool_bnr'),
     meals_logged: s('meals_logged'), nutrition_full_days: s('nutrition_full_days'),
   }
 }
@@ -303,10 +320,14 @@ export function aggregatesFromRawRows(r: RawActivityData, since?: string): XPAgg
     cardio_swim_mi: cardio.filter(x => x.activity === 'swim').reduce((s, x) => s + (x.distance_miles ?? 0), 0),
     cardio_walk_mi: cardio.filter(x => x.activity === 'walk').reduce((s, x) => s + (x.distance_miles ?? 0), 0),
     cardio_other_mi: cardio.filter(x => !['run','bike','swim','walk'].includes(x.activity)).reduce((s, x) => s + (x.distance_miles ?? 0), 0),
+    // challengeRows carries no date (only status + xp_reward), so unlike every
+    // other dimension here the fallback can't replicate the SQL's season cutoff
+    // (coalesce(completed_at, created_at) >= jan1) — season contribution stays 0
+    // pre-migration/RPC-fallback. All-time is unaffected and exact.
     challenge_xp: since ? 0 : r.challengeRows.filter(x => x.status === 'completed' || x.status === 'claimed').reduce((s, x) => s + (x.xp_reward ?? 0), 0),
-    goal_xp: 0,   // goals not in rawRows; RPC path supplies goal XP
+    goal_xp: 0,   // goals not in rawRows at all; RPC path supplies goal XP (all-time and season)
     mood_count: mood.length,
-    measurement_count: 0,   // measurements not in rawRows; RPC path supplies it
+    measurement_count: 0,   // measurements not in rawRows; RPC path supplies it (all-time and season)
     water_goal_days: Object.values(waterByDate).filter(oz => oz >= 64).length,
     bb_sessions: bb.length,
     bb_points: bb.reduce((s, x) => s + (x.points ?? 0), 0),

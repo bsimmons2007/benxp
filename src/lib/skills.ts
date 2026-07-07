@@ -1,6 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { RawActivityData } from './xp'
 
-export type SkillKey = 'lifting' | 'sports' | 'reading' | 'fortnite' | 'sleep' | 'cardio'
+export type SkillKey = 'lifting' | 'sports' | 'reading' | 'fortnite' | 'sleep' | 'cardio' | 'nutrition'
 
 export interface SkillDef {
   key:         SkillKey
@@ -10,13 +10,30 @@ export interface SkillDef {
 }
 
 export const SKILL_DEFS: Record<SkillKey, SkillDef> = {
-  lifting:  { key: 'lifting',  label: 'Lifting',  icon: 'lifting',  description: 'Consistency and strength in the gym' },
-  sports:   { key: 'sports',   label: 'Sports',   icon: 'trophy',   description: 'Wins and sessions across all sports' },
-  reading:  { key: 'reading',  label: 'Reading',  icon: 'books',    description: 'Books consumed and knowledge gained' },
-  fortnite: { key: 'fortnite', label: 'Fortnite', icon: 'fortnite', description: 'Victory Royales and eliminations' },
-  sleep:    { key: 'sleep',    label: 'Sleep',    icon: 'sleep',    description: 'Consistency and quality of rest' },
-  cardio:   { key: 'cardio',   label: 'Cardio',   icon: 'cardio',   description: 'Miles of running, cycling, and swimming' },
+  lifting:   { key: 'lifting',   label: 'Lifting',   icon: 'lifting',   description: 'Consistency and strength in the gym' },
+  sports:    { key: 'sports',    label: 'Sports',    icon: 'trophy',    description: 'Wins and sessions across all sports' },
+  reading:   { key: 'reading',   label: 'Reading',   icon: 'books',     description: 'Books consumed and knowledge gained' },
+  fortnite:  { key: 'fortnite',  label: 'Fortnite',  icon: 'fortnite',  description: 'Victory Royales and eliminations' },
+  sleep:     { key: 'sleep',     label: 'Sleep',     icon: 'sleep',     description: 'Consistency and quality of rest' },
+  cardio:    { key: 'cardio',    label: 'Cardio',    icon: 'cardio',    description: 'Miles of running, cycling, and swimming' },
+  nutrition: { key: 'nutrition', label: 'Nutrition', icon: 'nutrition', description: 'Meals logged and full days tracked' },
 }
+
+// Food/discipline-themed titles for the Nutrition skill
+const NUTRITION_TITLES: [number, string][] = [
+  [1,   'Snacker'],
+  [5,   'Meal Prepper'],
+  [10,  'Macro Tracker'],
+  [15,  'Disciplined Eater'],
+  [20,  'Nutrition Nerd'],
+  [25,  'Clean Eater'],
+  [30,  'Dialed In'],
+  [40,  'Diet Machine'],
+  [50,  'Iron Stomach'],
+  [65,  'Metabolic Master'],
+  [80,  'Nutrition Sage'],
+  [100, 'Godlike'],
+]
 
 // Skill titles — tiered progression from Beginner to Godlike
 const SKILL_TITLES: [number, string][] = [
@@ -34,9 +51,10 @@ const SKILL_TITLES: [number, string][] = [
   [100, 'Godlike'],
 ]
 
-export function getSkillTitle(level: number): string {
-  let title = SKILL_TITLES[0][1]
-  for (const [threshold, name] of SKILL_TITLES) {
+export function getSkillTitle(level: number, key?: SkillKey): string {
+  const table = key === 'nutrition' ? NUTRITION_TITLES : SKILL_TITLES
+  let title = table[0][1]
+  for (const [threshold, name] of table) {
     if (level >= threshold) title = name
     else break
   }
@@ -68,86 +86,63 @@ export interface SkillState {
   nextXP:   number
 }
 
-export async function fetchSkillXP(supabase: SupabaseClient, userId: string): Promise<Record<SkillKey, number>> {
-  const [lifting, books, games, sleep, cardio, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess, volleyball, spikeball, pool] = await Promise.all([
-    supabase.from('lifting_log').select('date').eq('user_id', userId),
-    supabase.from('books').select('id').eq('user_id', userId).not('date_finished', 'is', null),
-    supabase.from('fortnite_games').select('kills, win').eq('user_id', userId),
-    supabase.from('sleep_log').select('hours_slept').eq('user_id', userId).eq('is_nap', false),
-    supabase.from('cardio_sessions').select('distance_miles').eq('user_id', userId),
-    supabase.from('basketball_sessions').select('points').eq('user_id', userId),
-    supabase.from('pickleball_games').select('win').eq('user_id', userId),
-    supabase.from('golf_rounds').select('score, par').eq('user_id', userId),
-    supabase.from('disc_golf_rounds').select('score, par').eq('user_id', userId),
-    supabase.from('hiking_sessions').select('distance_miles, elevation_gain_ft').eq('user_id', userId),
-    supabase.from('table_tennis_games').select('win').eq('user_id', userId),
-    supabase.from('chess_games').select('result').eq('user_id', userId),
-    supabase.from('volleyball_sessions').select('win').eq('user_id', userId),
-    supabase.from('spikeball_games').select('win').eq('user_id', userId),
-    supabase.from('pool_games').select('win, break_and_run').eq('user_id', userId),
-  ])
-
+/** Derive every skill's XP from the store's already-fetched rawRows — zero extra
+ *  queries. Mirrors the app-wide XP_RATES so skill levels feel consistent with
+ *  the global level. Replaces the old ~15-query fetchSkillXP. */
+export function skillXPFromRawRows(r: RawActivityData): Record<SkillKey, number> {
   // Lifting XP: 15/set + 60/workout day
-  const liftRows  = lifting.data ?? []
-  const sets      = liftRows.length
-  const days      = new Set(liftRows.map((r: { date: string }) => r.date)).size
+  const sets      = r.liftingRows.length
+  const days      = new Set(r.liftingRows.map(x => x.date)).size
   const liftingXP = sets * 15 + days * 60
 
   // Reading XP: 250/book
-  const readingXP = (books.data?.length ?? 0) * 250
+  const readingXP = r.bookRows.filter(x => x.date_finished).length * 250
 
   // Fortnite XP: 100/win + 5/kill
-  const gameRows = games.data ?? []
-  const fnXP = gameRows.reduce((s: number, r: { kills: number; win: boolean }) =>
-    s + (r.win ? 100 : 0) + (r.kills ?? 0) * 5, 0)
+  const fnXP = r.gameRows.reduce((s, x) => s + (x.win ? 100 : 0) + (x.kills ?? 0) * 5, 0)
 
   // Sleep XP: 20/night + 35 bonus for 7+ hrs
-  const sleepXP = (sleep.data ?? []).reduce((s: number, r: { hours_slept: number | null }) =>
-    s + 20 + ((r.hours_slept ?? 0) >= 7 ? 35 : 0), 0)
+  const sleepXP = r.sleepRows.reduce((s, x) => s + 20 + ((x.hours_slept ?? 0) >= 7 ? 35 : 0), 0)
 
-  // Cardio XP: 12/mile
-  const cardioXP = (cardio.data ?? []).reduce((s: number, r: { distance_miles: number }) =>
-    s + (r.distance_miles ?? 0) * 12, 0)
+  // Cardio XP: 12/mile (flat rate across all cardio activities for the skill tree)
+  const cardioXP = r.cardioRows.reduce((s, x) => s + (x.distance_miles ?? 0) * 12, 0)
 
   // Sports XP: aggregate across all sport tables, mirroring global XP rates
-  const bbXP = (basketball.data ?? []).reduce(
-    (s: number, r: { points: number }) => s + 25 + (r.points ?? 0), 0)
-  const pbXP = (pickleball.data ?? []).reduce(
-    (s: number, r: { win: boolean }) => s + 15 + (r.win ? 20 : 0), 0)
-  const golfXP = (golf.data ?? []).reduce(
-    (s: number, r: { score: number; par: number }) => {
-      const vsP = r.score - r.par
-      return s + 50 + (vsP < 0 ? Math.abs(vsP) * 25 : 0)
-    }, 0)
-  const dgXP = (discGolf.data ?? []).reduce(
-    (s: number, r: { score: number; par: number }) => {
-      const vsP = r.score - r.par
-      return s + 30 + (vsP < 0 ? Math.abs(vsP) * 15 : 0)
-    }, 0)
-  const hikeXP = (hiking.data ?? []).reduce(
-    (s: number, r: { distance_miles: number; elevation_gain_ft: number | null }) =>
-      s + (r.distance_miles ?? 0) * 20 + Math.floor((r.elevation_gain_ft ?? 0) / 500) * 15, 0)
-  const ttXP = (tableTennis.data ?? []).reduce(
-    (s: number, r: { win: boolean }) => s + 10 + (r.win ? 15 : 0), 0)
-  const chessXP = (chess.data ?? []).reduce(
-    (s: number, r: { result: string }) =>
-      s + 15 + (r.result === 'win' ? 25 : 0) + (r.result === 'draw' ? 8 : 0), 0)
-  const vbXP = (volleyball.data ?? []).reduce(
-    (s: number, r: { win: boolean }) => s + 15 + (r.win ? 20 : 0), 0)
-  const sbXP = (spikeball.data ?? []).reduce(
-    (s: number, r: { win: boolean }) => s + 15 + (r.win ? 20 : 0), 0)
-  const poolXP = (pool.data ?? []).reduce(
-    (s: number, r: { win: boolean; break_and_run: boolean }) =>
-      s + 10 + (r.win ? 15 : 0) + (r.break_and_run ? 25 : 0), 0)
+  const bbXP = r.bbRows.reduce((s, x) => s + 25 + (x.points ?? 0), 0)
+  const pbXP = r.pbRows.reduce((s, x) => s + 15 + (x.win ? 20 : 0), 0)
+  const golfXP = r.golfRows.reduce((s, x) => {
+    const vsP = x.score - x.par
+    return s + 50 + (vsP < 0 ? Math.abs(vsP) * 25 : 0)
+  }, 0)
+  const dgXP = r.dgRows.reduce((s, x) => {
+    const vsP = x.score - x.par
+    return s + 30 + (vsP < 0 ? Math.abs(vsP) * 15 : 0)
+  }, 0)
+  const hikeXP = r.hikeRows.reduce((s, x) =>
+    s + (x.distance_miles ?? 0) * 20 + Math.floor((x.elevation_gain_ft ?? 0) / 500) * 15, 0)
+  const ttXP = r.ttRows.reduce((s, x) => s + 10 + (x.win ? 15 : 0), 0)
+  const chessXP = r.chessRows.reduce((s, x) =>
+    s + 15 + (x.result === 'win' ? 25 : 0) + (x.result === 'draw' ? 8 : 0), 0)
+  const vbXP = r.vbRows.reduce((s, x) => s + 15 + (x.win ? 20 : 0), 0)
+  const sbXP = r.sbRows.reduce((s, x) => s + 15 + (x.win ? 20 : 0), 0)
+  const poolXP = r.poolRows.reduce((s, x) => s + 10 + (x.win ? 15 : 0) + (x.break_and_run ? 25 : 0), 0)
   const sportsXP = bbXP + pbXP + golfXP + dgXP + hikeXP + ttXP + chessXP + vbXP + sbXP + poolXP
 
+  // Nutrition XP: 10/meal capped 4/day + 25/full day (3+ meals) — mirrors XP_RATES
+  const mealsByDate: Record<string, number> = {}
+  for (const m of r.mealRows) mealsByDate[m.date] = (mealsByDate[m.date] ?? 0) + 1
+  const mealCounts = Object.values(mealsByDate)
+  const nutritionXP = mealCounts.reduce((s, c) => s + Math.min(c, 4) * 10, 0)
+    + mealCounts.filter(c => c >= 3).length * 25
+
   return {
-    lifting:  Math.round(liftingXP),
-    sports:   Math.round(sportsXP),
-    reading:  Math.round(readingXP),
-    fortnite: Math.round(fnXP),
-    sleep:    Math.round(sleepXP),
-    cardio:   Math.round(cardioXP),
+    lifting:   Math.round(liftingXP),
+    sports:    Math.round(sportsXP),
+    reading:   Math.round(readingXP),
+    fortnite:  Math.round(fnXP),
+    sleep:     Math.round(sleepXP),
+    cardio:    Math.round(cardioXP),
+    nutrition: Math.round(nutritionXP),
   }
 }
 
@@ -160,7 +155,7 @@ export function buildSkillStates(xpMap: Record<SkillKey, number>): SkillState[] 
       xp,
       level,
       progress: skillProgress(xp),
-      title:    getSkillTitle(level),
+      title:    getSkillTitle(level, key),
       nextXP:   skillXPForLevel(level + 1) - xp,
     }
   })

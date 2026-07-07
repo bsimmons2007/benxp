@@ -4,6 +4,7 @@ import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
 import { Toast } from '../components/ui/Toast'
 import { TrophyIcon, CrownIcon, ZapIcon, PersonIcon } from '../components/ui/Icon'
+import { ErrorState } from '../components/ui/ErrorState'
 import { supabase } from '../lib/supabase'
 import { getLevelTitle } from '../lib/xp'
 import { useStore } from '../store/useStore'
@@ -63,6 +64,7 @@ export function Leaderboard() {
   const [ownProfile,  setOwnProfile]  = useState<PublicProfile | null>(null)
   const [loading,     setLoading]     = useState(true)
   const [unavailable, setUnavailable] = useState(false)
+  const [loadError,   setLoadError]   = useState(false)
   const [editName,    setEditName]    = useState('')
   const [saving,      setSaving]      = useState(false)
   const [syncing,     setSyncing]     = useState(false)
@@ -70,6 +72,7 @@ export function Leaderboard() {
   const [nameError,   setNameError]   = useState<string | null>(null)
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
@@ -84,13 +87,24 @@ export function Leaderboard() {
       return
     }
 
+    if (ownRes.error || boardRes.error) {
+      setLoadError(true)
+      setLoading(false)
+      return
+    }
+
     setOwnProfile(ownRes.data ?? null)
     setEditName(ownRes.data?.display_name ?? userName ?? '')
     setLeaderboard(boardRes.data ?? [])
     setLoading(false)
+
+    if (ownRes.data && (ownRes.data.total_xp !== totalXP || ownRes.data.level !== level)) {
+      const { error } = await supabase.from('public_profiles').update({ total_xp: totalXP, level }).eq('user_id', user.id)
+      if (!error) setOwnProfile({ ...ownRes.data, total_xp: totalXP, level })
+    }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [])   // eslint-disable-line react-hooks/exhaustive-deps
 
   async function saveProfile(patch: Partial<PublicProfile>) {
     setSaving(true)
@@ -141,6 +155,13 @@ export function Leaderboard() {
           <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 60 }}>
             <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading…</p>
           </div>
+        ) : loadError ? (
+          <ErrorState
+            icon={<TrophyIcon size={48} color="var(--text-muted)" />}
+            title="Could not load leaderboard"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
         ) : unavailable ? (
           <Card className="text-center" style={{ padding: 32 }}>
             <TrophyIcon size={48} color="var(--text-muted)" />

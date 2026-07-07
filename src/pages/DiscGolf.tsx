@@ -50,6 +50,7 @@ interface DgForm {
 function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
   const { register, handleSubmit, reset, watch, setValue, formState: { isSubmitting } } = useForm<DgForm>({
@@ -67,7 +68,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
     const score = parseInt(data.score)
     const par   = parseInt(data.par) || defaultPar(parseInt(data.holes) || 18)
     const diff  = score - par
-    const { error } = await supabase.from('disc_golf_rounds').insert({
+    const { data: inserted, error } = await supabase.from('disc_golf_rounds').insert({
       user_id: user.id,
       date:    data.date,
       course:  data.course,
@@ -75,10 +76,15 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
       score,
       par,
       notes:   data.notes || null,
-    })
-    if (error) { setToast('Failed to save — try again'); return }
+    }).select('id').single()
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.disc_golf_under_par : 0
     const xp = XP_RATES.disc_golf_round + underParBonus
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('disc_golf_rounds').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} Under par!`) }
     else          { playXPGain(); setToast(`+${xp} XP — Round logged (${vsParLabel(diff)})`) }
     await refreshXP(); refreshActivity()
@@ -117,7 +123,7 @@ function LogDiscGolfPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }

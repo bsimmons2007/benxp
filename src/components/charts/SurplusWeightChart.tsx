@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ComposedChart, Area, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { CHART_TOOLTIP_STYLE, formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
+import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK_COLOR, formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
 import { useStore } from '../../store/useStore'
 
 interface DayPoint {
@@ -16,7 +16,6 @@ const RANGE_DAYS = 90
 export function SurplusWeightChart({ target }: { target: number | null }) {
   const rawRows = useStore(s => s.rawRows)
   const [weights, setWeights] = useState<{ date: string; weight_lbs: number }[]>([])
-  const tickColor = () => getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#888'
 
   useEffect(() => {
     let cancelled = false
@@ -96,14 +95,14 @@ export function SurplusWeightChart({ target }: { target: number | null }) {
         <XAxis
           dataKey="date"
           tickFormatter={formatDate}
-          tick={{ fill: tickColor(), fontSize: 9 }}
+          tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
           axisLine={false}
           tickLine={false}
           minTickGap={24}
         />
         <YAxis
           yAxisId="left"
-          tick={{ fill: tickColor(), fontSize: 9 }}
+          tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
           axisLine={false}
           tickLine={false}
           width={48}
@@ -113,7 +112,7 @@ export function SurplusWeightChart({ target }: { target: number | null }) {
           yAxisId="right"
           orientation="right"
           domain={['auto', 'auto']}
-          tick={{ fill: tickColor(), fontSize: 9 }}
+          tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
           axisLine={false}
           tickLine={false}
           width={40}

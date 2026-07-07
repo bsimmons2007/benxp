@@ -72,19 +72,19 @@ export function ResetPassword() {
         className="fade-in w-full"
         style={{
           maxWidth: 380, borderRadius: 20, padding: '30px 28px',
-          background: 'rgba(13,17,40,0.88)', border: '1px solid var(--border)',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.55)',
+          background: 'var(--card-bg)', border: '1px solid var(--border)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
         }}
       >
-        <h2 style={{ color: '#e0e0e0', fontSize: 19, fontWeight: 700, marginBottom: 6 }}>
+        <h2 style={{ color: 'var(--text-primary)', fontSize: 19, fontWeight: 700, marginBottom: 6 }}>
           Set New Password
         </h2>
-        <p style={{ color: '#555', fontSize: 13, marginBottom: 24 }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 24 }}>
           Choose a strong password for your account.
         </p>
 
         {!ready && (
-          <p style={{ color: '#555', fontSize: 13, textAlign: 'center' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center' }}>
             Verifying reset link…
           </p>
         )}
@@ -142,10 +142,11 @@ export function ResetPassword() {
             {error && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 9, padding: '10px 14px', borderRadius: 10,
-                background: 'rgba(233,69,96,0.10)', border: '1px solid rgba(233,69,96,0.22)',
+                background: 'color-mix(in srgb, var(--red) 10%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--red) 22%, transparent)',
               }}>
                 <span style={{ fontSize: 14 }}>⚠</span>
-                <p style={{ color: '#E94560', fontSize: 13, margin: 0 }}>{error}</p>
+                <p style={{ color: 'var(--red)', fontSize: 13, margin: 0 }}>{error}</p>
               </div>
             )}
 
@@ -167,13 +168,18 @@ export function ResetPassword() {
 
         {status === 'done' && (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 56, height: 56, borderRadius: 16, background: 'rgba(46,204,113,0.12)', border: '1px solid rgba(46,204,113,0.3)', margin: '0 auto 12px' }}>
-              <svg width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="#2ECC71" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10l5 5 9-9" /></svg>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', width: 56, height: 56, borderRadius: 16,
+              background: 'color-mix(in srgb, var(--green) 12%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--green) 30%, transparent)',
+              margin: '0 auto 12px',
+            }}>
+              <svg width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10l5 5 9-9" /></svg>
             </div>
-            <p style={{ color: '#4caf50', fontWeight: 700, fontSize: 15 }}>
+            <p style={{ color: 'var(--green)', fontWeight: 700, fontSize: 15 }}>
               Password updated!
             </p>
-            <p style={{ color: '#555', fontSize: 13, marginTop: 6 }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 6 }}>
               Redirecting you home…
             </p>
           </div>

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
-import { CHART_TOOLTIP_STYLE } from '../../lib/utils'
+import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK_COLOR } from '../../lib/utils'
 import { mondayKey } from '../../lib/nutrition'
 import { useStore } from '../../store/useStore'
 
@@ -17,7 +17,6 @@ function formatWeekLabel(weekKey: string): string {
 
 export function CalorieVolumeChart() {
   const rawRows = useStore(s => s.rawRows)
-  const tickColor = () => getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#888'
 
   const data = useMemo<WeekPoint[]>(() => {
     if (!rawRows) return []
@@ -64,13 +63,13 @@ export function CalorieVolumeChart() {
         <CartesianGrid strokeDasharray="3 6" stroke="var(--border-subtle)" vertical={false} />
         <XAxis
           dataKey="week"
-          tick={{ fill: tickColor(), fontSize: 9 }}
+          tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
           yAxisId="left"
-          tick={{ fill: tickColor(), fontSize: 9 }}
+          tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
           axisLine={false}
           tickLine={false}
           width={44}
@@ -79,7 +78,7 @@ export function CalorieVolumeChart() {
         <YAxis
           yAxisId="right"
           orientation="right"
-          tick={{ fill: tickColor(), fontSize: 9 }}
+          tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
           axisLine={false}
           tickLine={false}
           width={40}

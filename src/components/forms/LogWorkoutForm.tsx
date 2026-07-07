@@ -8,6 +8,7 @@ import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { Toast } from '../ui/Toast'
 import { useStore } from '../../store/useStore'
+import { getLastUsed, setLastUsed } from '../../lib/lastUsed'
 import type { LiftType } from '../../types'
 
 interface WorkoutForm {
@@ -54,7 +55,13 @@ const selectStyle: React.CSSProperties = {
 
 export function LogWorkoutForm() {
   const { register, handleSubmit, watch, reset, setValue, formState: { errors, isSubmitting } } = useForm<WorkoutForm>({
-    defaultValues: { date: today(), lift: 'Bench', sets: '', reps: '', weight: '', bodyweight: '', equipment: 'Barbell', grip: 'Standard' },
+    defaultValues: {
+      date: today(),
+      lift: getLastUsed('workout-lift', 'Bench') as LiftType,
+      sets: '', reps: '', weight: '', bodyweight: '',
+      equipment: getLastUsed('workout-equipment', 'Barbell'),
+      grip: getLastUsed('workout-grip', 'Standard'),
+    },
   })
   const [toast,         setToast]         = useState<string | null>(null)
   const [bwLoggedToday, setBwLoggedToday] = useState(false)
@@ -116,6 +123,9 @@ export function LogWorkoutForm() {
 
     if (error || !inserted) { setToast(`Error: ${error?.message ?? 'Insert failed'}`); return }
     saveVariantsForLift(inserted.id, data.equipment, data.grip)
+    setLastUsed('workout-lift', data.lift)
+    setLastUsed('workout-equipment', data.equipment)
+    setLastUsed('workout-grip', data.grip)
 
     if (data.bodyweight && parseFloat(data.bodyweight) > 0 && !bwLoggedToday) {
       const { error: bwErr } = await supabase.from('bodyweight_log').insert({

@@ -8,6 +8,21 @@ export const CHART_TOOLTIP_STYLE = {
   boxShadow:    'var(--shadow-lg)',
 } as const
 
+/** Shared Recharts axis tick color — CSS vars work fine as SVG fill values.
+ *  Font size varies per chart, so it isn't baked in here. */
+export const CHART_AXIS_TICK_COLOR = 'var(--text-tertiary)'
+
+/** Detects a Postgres "relation does not exist" error (missing table —
+ *  usually a migration that hasn't been run yet). Covers both the
+ *  structured error code and the PostgREST schema-cache message shape. */
+export function isMissingTableError(err: unknown): boolean {
+  if (!err || typeof err !== 'object') return false
+  const e = err as { code?: string; message?: string }
+  if (e.code === '42P01') return true
+  const msg = (e.message ?? '').toLowerCase()
+  return msg.includes('does not exist') || msg.includes('schema cache')
+}
+
 export function toRoman(n: number): string {
   if (n <= 0) return String(n)
   const vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1]

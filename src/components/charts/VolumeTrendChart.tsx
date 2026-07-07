@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { CHART_TOOLTIP_STYLE } from '../../lib/utils'
+import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK_COLOR } from '../../lib/utils'
 
 interface WeekPoint {
   week:   string
@@ -42,7 +42,6 @@ function CustomBar(props: any) {
 
 export function VolumeTrendChart() {
   const [data, setData] = useState<WeekPoint[]>([])
-  const tickColor = () => getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#888'
 
   useEffect(() => {
     supabase
@@ -81,12 +80,12 @@ export function VolumeTrendChart() {
       <BarChart data={data} barSize={20} margin={{ left: -10, top: 4 }}>
         <XAxis
           dataKey="week"
-          tick={{ fill: tickColor(), fontSize: 9 }}
+          tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: tickColor(), fontSize: 9 }}
+          tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 9 }}
           axisLine={false}
           tickLine={false}
           width={44}

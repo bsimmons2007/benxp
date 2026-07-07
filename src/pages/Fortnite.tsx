@@ -259,6 +259,7 @@ interface NormalForm {
 function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
   const [open,     setOpen]     = useState(false)
   const [toast,    setToast]    = useState<string | null>(null)
+  const [undo,     setUndo]     = useState<(() => void) | null>(null)
   const [isWin,    setIsWin]    = useState(true)
   const [isRanked, setIsRanked] = useState(false)
   const [rankName, setRankName] = useState<FnRank>('Gold')
@@ -271,7 +272,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: NormalForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error } = await supabase.from('fortnite_games').insert({
+    const { data: inserted, error } = await supabase.from('fortnite_games').insert({
       user_id:   user.id,
       date:      data.date,
       mode:      data.mode,
@@ -282,8 +283,13 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
       win:       isWin,
       is_ranked: isRanked,
       rank_name: isRanked ? rankName : null,
+    }).select('id').single()
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('fortnite_games').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
     })
-    if (error) { setToast('Failed to save — try again'); return }
     if (isWin) {
       playPR()
       setToast(`+${XP_RATES.fortnite_win} XP — Victory Royale!${isRanked ? ` (Ranked ${rankName})` : ''}`)
@@ -374,7 +380,7 @@ function LogNormalPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }
@@ -392,6 +398,7 @@ interface BlitzForm {
 function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const [isWin, setIsWin] = useState(true)
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<BlitzForm>({
     defaultValues: { date: today(), blitzMode: 'Solos', placement: '', kills: '', accuracy: '' },
@@ -402,7 +409,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
   const onSubmit = async (data: BlitzForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error } = await supabase.from('fortnite_games').insert({
+    const { data: inserted, error } = await supabase.from('fortnite_games').insert({
       user_id:   user.id,
       date:      data.date,
       mode:      `Blitz ${data.blitzMode}`,   // e.g. "Blitz Solos"
@@ -412,8 +419,13 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
       win:       isWin,
       is_ranked: false,
       rank_name: null,
+    }).select('id').single()
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('fortnite_games').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
     })
-    if (error) { setToast('Failed to save — try again'); return }
     if (isWin) {
       playPR()
       setToast(`+${XP_RATES.fortnite_blitz_win} XP — Blitz Victory!`)
@@ -473,7 +485,7 @@ function LogBlitzPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }

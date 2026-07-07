@@ -1,40 +1,32 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
-import { fetchSkillXP, buildSkillStates } from '../lib/skills'
+import { useMemo } from 'react'
+import { skillXPFromRawRows, buildSkillStates } from '../lib/skills'
 import type { SkillState } from '../lib/skills'
 import { useStore } from '../store/useStore'
 
 // Module-level cache keyed by userId + totalXP to prevent cross-user contamination
 let skillCache: { userId: string; xp: number; skills: SkillState[] } | null = null
 
-export function useSkills() {
+export function useSkills(): { skills: SkillState[]; loading: boolean } {
   const totalXP     = useStore(s => s.totalXP)
   const initialized = useStore(s => s.initialized)
   const userId      = useStore(s => s.userId)
+  const rawRows     = useStore(s => s.rawRows)
 
-  const cacheValid = skillCache?.userId === userId && skillCache?.xp === totalXP
-  const [skills,  setSkills]  = useState<SkillState[]>(cacheValid ? skillCache!.skills : [])
-  const [loading, setLoading] = useState(!cacheValid)
-
-  useEffect(() => {
-    if (!initialized || !userId) return
-    if (skillCache?.userId === userId && skillCache?.xp === totalXP) {
-      setSkills(skillCache.skills)
-      setLoading(false)
-      return
+  return useMemo(() => {
+    if (!initialized || !userId || !rawRows) {
+      if (skillCache?.userId === userId && skillCache?.xp === totalXP) {
+        return { skills: skillCache.skills, loading: false }
+      }
+      return { skills: [], loading: true }
     }
 
-    let cancelled = false
-    fetchSkillXP(supabase, userId).then(xpMap => {
-      if (cancelled) return
-      const result = buildSkillStates(xpMap)
-      skillCache = { userId, xp: totalXP, skills: result }
-      setSkills(result)
-      setLoading(false)
-    })
+    if (skillCache?.userId === userId && skillCache?.xp === totalXP) {
+      return { skills: skillCache.skills, loading: false }
+    }
 
-    return () => { cancelled = true }
-  }, [initialized, totalXP, userId])
-
-  return { skills, loading }
+    const xpMap  = skillXPFromRawRows(rawRows)
+    const result = buildSkillStates(xpMap)
+    skillCache = { userId, xp: totalXP, skills: result }
+    return { skills: result, loading: false }
+  }, [initialized, totalXP, userId, rawRows])
 }

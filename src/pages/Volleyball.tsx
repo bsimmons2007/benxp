@@ -76,6 +76,7 @@ interface IndoorForm {
 function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const [win, setWin] = useState<boolean | null>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
@@ -87,7 +88,7 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
     if (win === null) return
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error } = await supabase.from('volleyball_sessions').insert({
+    const { data: inserted, error } = await supabase.from('volleyball_sessions').insert({
       user_id:   user.id,
       date:      data.date,
       format:    'Indoor',
@@ -101,9 +102,14 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
       assists:   data.assists   ? parseInt(data.assists)   : null,
       opponent:  data.opponent  || null,
       notes:     data.notes     || null,
-    })
-    if (error) { setToast('Failed to save — try again'); return }
+    }).select('id').single()
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.volleyball_game + (win ? XP_RATES.volleyball_win : 0)
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('volleyball_sessions').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     if (win) { playPR();     setToast(`+${xp} XP — Spike!`) }
     else      { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
@@ -145,7 +151,7 @@ function LogIndoorPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }
@@ -164,6 +170,7 @@ interface SandForm {
 function LogSandPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const [win, setWin] = useState<boolean | null>(null)
   const refreshXP       = useStore(s => s.refreshXP)
   const refreshActivity = useStore(s => s.refreshActivity)
@@ -175,7 +182,7 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
     if (win === null) return
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error } = await supabase.from('volleyball_sessions').insert({
+    const { data: inserted, error } = await supabase.from('volleyball_sessions').insert({
       user_id:   user.id,
       date:      data.date,
       format:    'Sand',
@@ -185,9 +192,14 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
       partner:   data.partner   || null,
       opponent:  data.opponent  || null,
       notes:     data.notes     || null,
-    })
-    if (error) { setToast('Failed to save — try again'); return }
+    }).select('id').single()
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
     const xp = XP_RATES.volleyball_game + (win ? XP_RATES.volleyball_win : 0)
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('volleyball_sessions').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     if (win) { playPR();     setToast(`+${xp} XP — Beach winner!`) }
     else      { playXPGain(); setToast(`+${xp} XP — Keep grinding!`) }
     await refreshXP(); refreshActivity()
@@ -223,7 +235,7 @@ function LogSandPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }

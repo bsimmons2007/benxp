@@ -43,6 +43,11 @@ function saveScorecardForRound(id: string, holes: number[]) {
   m[id] = holes
   localStorage.setItem(SCORECARDS_KEY, JSON.stringify(m))
 }
+function deleteScorecardForRound(id: string) {
+  const m = getScorecardsMap()
+  delete m[id]
+  localStorage.setItem(SCORECARDS_KEY, JSON.stringify(m))
+}
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -76,6 +81,7 @@ interface GolfForm {
 function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const [showScorecard, setShowScorecard] = useState(false)
   const [holeScores, setHoleScores] = useState<(number | '')[]>(Array(18).fill(''))
   const [savedCourses, setSavedCourses] = useState<string[]>(() => getSavedCourses())
@@ -119,15 +125,21 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
       fairways_possible: data.fairways_possible ? parseInt(data.fairways_possible) : null,
       notes:             data.notes             || null,
     }).select('id').single()
-    if (error) { setToast('Failed to save — try again'); return }
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
     saveCourse(data.course)
     setSavedCourses(getSavedCourses())
-    if (inserted && showScorecard) {
+    if (showScorecard) {
       const filled = holeScores.map(v => typeof v === 'number' ? v : 0)
       saveScorecardForRound(inserted.id, filled)
     }
     const underParBonus = diff < 0 ? Math.abs(diff) * XP_RATES.golf_under_par : 0
     const xp = XP_RATES.golf_round + underParBonus
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('golf_rounds').delete().eq('id', insertedId)
+      deleteScorecardForRound(insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
     if (diff < 0) { playPR(); setToast(`+${xp} XP — ${vsParLabel(diff)} Under par!`) }
     else          { playXPGain(); setToast(`+${xp} XP — Round logged (${vsParLabel(diff)})`) }
     await refreshXP(); refreshActivity()
@@ -245,7 +257,7 @@ function LogGolfPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </div>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }

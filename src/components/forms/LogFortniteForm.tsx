@@ -7,6 +7,7 @@ import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { Toast } from '../ui/Toast'
 import { useStore } from '../../store/useStore'
+import { getLastUsed, setLastUsed } from '../../lib/lastUsed'
 
 interface FortniteForm {
   date: string
@@ -20,7 +21,7 @@ interface FortniteForm {
 
 export function LogFortniteForm() {
   const { register, handleSubmit, watch, reset, formState: { isSubmitting } } = useForm<FortniteForm>({
-    defaultValues: { date: today(), mode: 'Solos', season: '', placement: '', kills: '', accuracy: '', win: false },
+    defaultValues: { date: today(), mode: getLastUsed('fortnite-mode', 'Solos') as FortniteForm['mode'], season: '', placement: '', kills: '', accuracy: '', win: false },
   })
   const [toast, setToast] = useState<string | null>(null)
   const refreshXP = useStore((s) => s.refreshXP)
@@ -42,10 +43,11 @@ export function LogFortniteForm() {
     })
     if (error) { setToast('Failed to save — try again'); return }
 
+    setLastUsed('fortnite-mode', data.mode)
     const xp = data.win ? XP_RATES.fortnite_win : 0
     setToast(data.win ? `+${xp} XP — Victory Royale!` : 'Game logged!')
     await refreshXP()
-    reset({ date: today(), mode: 'Solos', season: '', placement: '', kills: '', accuracy: '', win: false })
+    reset({ date: today(), mode: data.mode, season: '', placement: '', kills: '', accuracy: '', win: false })
   }
 
   return (

@@ -470,10 +470,11 @@ function WellnessWidget() {
   if (w.loading || !w.hasSomeData) return null
 
   const COMPONENTS = [
-    { label: 'Sleep',    value: w.sleep,    max: 40, color: '#818cf8' },
-    { label: 'Activity', value: w.activity, max: 30, color: 'var(--accent)' },
+    { label: 'Sleep',    value: w.sleep,    max: 35, color: '#818cf8' },
+    { label: 'Activity', value: w.activity, max: 25, color: 'var(--accent)' },
     { label: 'Mood',     value: w.mood,     max: 20, color: '#f472b6' },
     { label: 'Water',    value: w.water,    max: 10, color: '#34d399' },
+    { label: 'Meals',    value: w.nutrition, max: 10, color: '#fbbf24' },
   ]
 
   const pct   = w.total / 100
@@ -499,7 +500,7 @@ function WellnessWidget() {
       </div>
 
       {/* Component breakdown */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {COMPONENTS.map(c => (
           <div key={c.label} className="flex flex-col items-center gap-1">
             <div style={{ height: 28, width: '100%', background: 'var(--input-bg)', borderRadius: 4, overflow: 'hidden', display: 'flex', alignItems: 'flex-end' }}>

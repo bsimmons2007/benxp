@@ -12,7 +12,7 @@ import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
 import { playGoalComplete } from '../lib/sounds'
 import type { Goal } from '../types'
-import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, TrophyIcon, TrashIcon, MoonIcon, ArrowUpRightIcon } from '../components/ui/Icon'
+import { DumbbellIcon, SkateIcon, RunIcon, BookIcon, GamepadIcon, TargetIcon, TrophyIcon, TrashIcon, MoonIcon, ArrowUpRightIcon, UtensilsIcon, BasketballIcon, ChessIcon, GolfIcon, MountainIcon } from '../components/ui/Icon'
 import { localDateStr } from '../lib/utils'
 import { usePageTitle } from '../hooks/usePageTitle'
 
@@ -26,6 +26,14 @@ const GOAL_PRESETS = [
   { key: 'books_read',         label: 'Books Read',      unit: 'books', defaultTarget: 20  },
   { key: 'fn_wins',            label: 'Fortnite Wins',   unit: 'wins',  defaultTarget: 10  },
   { key: 'avg_sleep',          label: 'Avg Sleep',       unit: 'hrs',   defaultTarget: 7   },
+  { key: 'meal_log_days',      label: 'Log Meals (days)',       unit: 'days',  defaultTarget: 20  },
+  { key: 'nutrition_full_days',label: 'Full Days (3+ meals)',   unit: 'days',  defaultTarget: 10  },
+  { key: 'bb_games',           label: 'Basketball Games',       unit: 'games', defaultTarget: 10  },
+  { key: 'bb_points',          label: 'Basketball Points',      unit: 'pts',   defaultTarget: 200 },
+  { key: 'chess_rating',       label: 'Chess Rating',           unit: 'elo',   defaultTarget: 1200 },
+  { key: 'golf_best_vs_par',   label: 'Golf: Beat Par By',      unit: 'strokes', defaultTarget: 5 },
+  { key: 'pb_wins',            label: 'Pickleball Wins',        unit: 'wins',  defaultTarget: 20  },
+  { key: 'hike_miles',         label: 'Hiking Miles',           unit: 'miles', defaultTarget: 50  },
   { key: 'manual',             label: 'Custom Goal',     unit: '',      defaultTarget: 1   },
 ] as const
 
@@ -42,6 +50,12 @@ function GoalIcon({ metricKey, size = 18, color = 'var(--text-muted)' }: { metri
   if (metricKey === 'books_read') return <BookIcon size={size} color={color} />
   if (metricKey === 'fn_wins') return <GamepadIcon size={size} color={color} />
   if (metricKey === 'avg_sleep') return <MoonIcon size={size} color={color} />
+  if (metricKey === 'meal_log_days' || metricKey === 'nutrition_full_days') return <UtensilsIcon size={size} color={color} />
+  if (metricKey === 'bb_games' || metricKey === 'bb_points') return <BasketballIcon size={size} color={color} />
+  if (metricKey === 'chess_rating') return <ChessIcon size={size} color={color} />
+  if (metricKey === 'golf_best_vs_par') return <GolfIcon size={size} color={color} />
+  if (metricKey === 'pb_wins') return <TargetIcon size={size} color={color} />
+  if (metricKey === 'hike_miles') return <MountainIcon size={size} color={color} />
   return <TargetIcon size={size} color={color} />
 }
 
@@ -55,6 +69,14 @@ interface MetricValues {
   books_read:         number
   fn_wins:            number
   avg_sleep:          number
+  meal_log_days:      number
+  nutrition_full_days: number
+  bb_games:           number
+  bb_points:          number
+  chess_rating:       number
+  golf_best_vs_par:   number
+  pb_wins:            number
+  hike_miles:         number
 }
 
 function useMetricValues() {
@@ -68,13 +90,19 @@ function useMetricValues() {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
       const cutoff = localDateStr(thirtyDaysAgo)
 
-      const [prs, skate, cardio, books, wins, sleep] = await Promise.all([
+      const [prs, skate, cardio, books, wins, sleep, meals, basketball, chess, golf, pickleball, hiking] = await Promise.all([
         supabase.from('pr_history').select('lift, est_1rm').eq('user_id', user.id),
         supabase.from('skate_sessions').select('miles').eq('user_id', user.id),
         supabase.from('cardio_sessions').select('distance_miles').eq('user_id', user.id),
         supabase.from('books').select('id').eq('user_id', user.id).not('date_finished', 'is', null),
         supabase.from('fortnite_games').select('id').eq('user_id', user.id).eq('win', true),
         supabase.from('sleep_log').select('hours_slept').eq('user_id', user.id).eq('is_nap', false).gte('date', cutoff),
+        supabase.from('meals').select('date').eq('user_id', user.id),
+        supabase.from('basketball_sessions').select('points').eq('user_id', user.id),
+        supabase.from('chess_games').select('rating_after').eq('user_id', user.id),
+        supabase.from('golf_rounds').select('score, par').eq('user_id', user.id),
+        supabase.from('pickleball_games').select('id').eq('user_id', user.id).eq('win', true),
+        supabase.from('hiking_sessions').select('distance_miles').eq('user_id', user.id),
       ])
 
       const bestPR = (lift: string) =>
@@ -87,6 +115,18 @@ function useMetricValues() {
         ? sleepRows.reduce((s: number, r: { hours_slept: number }) => s + (r.hours_slept ?? 0), 0) / sleepRows.length
         : 0
 
+      // meals table may not exist yet (phase7 migration) — error -> empty rows, degrades silently
+      const mealsByDate: Record<string, number> = {}
+      for (const r of (meals.data ?? []) as { date: string }[]) mealsByDate[r.date] = (mealsByDate[r.date] ?? 0) + 1
+      const mealLogDays  = Object.keys(mealsByDate).length
+      const fullDays     = Object.values(mealsByDate).filter(c => c >= 3).length
+
+      const chessRatings = (chess.data ?? []).map((r: { rating_after: number | null }) => r.rating_after).filter((r): r is number => r != null)
+      const bestChessRating = chessRatings.length ? Math.max(...chessRatings) : 0
+
+      const golfVsPar = (golf.data ?? []).map((r: { score: number; par: number }) => r.par - r.score)
+      const bestGolfVsPar = golfVsPar.length ? Math.max(...golfVsPar) : 0
+
       setVals({
         squat_1rm:          bestPR('Squat'),
         bench_1rm:          bestPR('Bench'),
@@ -96,6 +136,14 @@ function useMetricValues() {
         books_read:         books.data?.length ?? 0,
         fn_wins:            wins.data?.length ?? 0,
         avg_sleep:          Math.round(avgSleep * 10) / 10,
+        meal_log_days:      mealLogDays,
+        nutrition_full_days: fullDays,
+        bb_games:           basketball.data?.length ?? 0,
+        bb_points:          (basketball.data ?? []).reduce((s: number, r: { points: number }) => s + (r.points ?? 0), 0),
+        chess_rating:       bestChessRating,
+        golf_best_vs_par:   bestGolfVsPar,
+        pb_wins:            pickleball.data?.length ?? 0,
+        hike_miles:         (hiking.data ?? []).reduce((s: number, r: { distance_miles: number }) => s + (r.distance_miles ?? 0), 0),
       })
     }
     load()
@@ -112,7 +160,7 @@ function currentFor(key: string, vals: MetricValues | null): number {
 // ── Add Goal form ────────────────────────────────────────────
 interface GoalForm { metric_key: MetricKey; target_value: string; title: string; xp_reward: string }
 
-function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
+function AddGoalPanel({ onAdded, onToast }: { onAdded: () => void; onToast: (message: string, undo?: () => void) => void }) {
   const [open, setOpen] = useState(false)
   const { register, handleSubmit, watch, setValue, reset, formState: { isSubmitting } } = useForm<GoalForm>({
     defaultValues: { metric_key: 'squat_1rm', target_value: '315', title: '', xp_reward: '500' },
@@ -132,18 +180,22 @@ function AddGoalPanel({ onAdded }: { onAdded: () => void }) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const p = presetFor(data.metric_key)
-    const { error } = await supabase.from('goals').insert({
+    const { data: inserted, error } = await supabase.from('goals').insert({
       user_id: user.id,
       title: data.title || `${p.label} goal`,
       metric_key: data.metric_key,
       target_value: parseFloat(data.target_value),
       target_unit: p.unit,
       xp_reward: parseInt(data.xp_reward) || 500,
-    })
-    if (error) return
+    }).select('id').single()
+    if (error || !inserted) { onToast('Failed to save — try again'); return }
+    const insertedId = inserted.id
     reset()
     setOpen(false)
     onAdded()
+    onToast('Goal added', () => {
+      supabase.from('goals').delete().eq('id', insertedId).then(() => onAdded())
+    })
   }
 
   return (
@@ -214,6 +266,14 @@ const METRIC_LINK: Record<string, string> = {
   total_cardio_miles: '/cardio',
   books_read:         '/books',
   fn_wins:            '/fortnite',
+  meal_log_days:       '/nutrition',
+  nutrition_full_days: '/nutrition',
+  bb_games:            '/basketball',
+  bb_points:           '/basketball',
+  chess_rating:        '/chess',
+  golf_best_vs_par:    '/golf',
+  pb_wins:             '/pickleball',
+  hike_miles:          '/hiking',
 }
 
 // ── Goal card ────────────────────────────────────────────────
@@ -315,8 +375,14 @@ export function Goals() {
   const navigate = useNavigate()
   const [goals, setGoals] = useState<Goal[]>([])
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const vals = useMetricValues()
   const refreshXP = useStore(s => s.refreshXP)
+
+  function showToast(message: string, undoFn?: () => void) {
+    setToast(message)
+    setUndo(() => undoFn ?? null)
+  }
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -331,7 +397,7 @@ export function Goals() {
     const { error } = await supabase.from('goals').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', goal.id)
     if (error) return
     playGoalComplete()
-    setToast(`+${goal.xp_reward} XP — Goal complete!`)
+    showToast(`+${goal.xp_reward} XP — Goal complete!`)
     await refreshXP()
     await load()  // P1-11: must await so goal list reflects completion immediately
   }
@@ -363,7 +429,7 @@ export function Goals() {
           ))}
         </div>
 
-        <AddGoalPanel onAdded={load} />
+        <AddGoalPanel onAdded={load} onToast={showToast} />
 
         {/* Active goals */}
         {active.length === 0 ? (
@@ -382,13 +448,18 @@ export function Goals() {
                   onClick={async () => {
                     const { data: { user } } = await supabase.auth.getUser()
                     if (!user) return
-                    const { error } = await supabase.from('goals').insert({
+                    const { data: inserted, error } = await supabase.from('goals').insert({
                       user_id: user.id, title: t.label,
                       metric_key: t.metric, target_value: t.target,
                       target_unit: t.unit, xp_reward: t.xp,        // P1-10: required fields
                       status: 'active',
+                    }).select('id').single()
+                    if (error || !inserted) { showToast('Failed to add — try again'); return }
+                    await load()  // P1-11: await so list refreshes immediately
+                    const insertedId = inserted.id
+                    showToast('Goal added', () => {
+                      supabase.from('goals').delete().eq('id', insertedId).then(() => load())
                     })
-                    if (!error) await load()  // P1-11: await so list refreshes immediately
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,
@@ -447,7 +518,7 @@ export function Goals() {
           </>
         )}
       </PageWrapper>
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </>
   )
 }

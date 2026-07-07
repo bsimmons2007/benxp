@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { CHART_TOOLTIP_STYLE, formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
+import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK_COLOR, formatDate, formatDateTooltip, localDateStr } from '../../lib/utils'
 
 const BW_GOAL_KEY = 'youxp-bw-goal'
 
@@ -31,7 +31,6 @@ function CustomDot(props: any) {
 
 export function BodyweightChart() {
   const [data, setData]       = useState<DataPoint[]>([])
-  const tickColor = () => getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#888'
   const [goal, setGoal]       = useState<number | null>(() => {
     const v = localStorage.getItem(BW_GOAL_KEY)
     return v ? parseFloat(v) : null
@@ -148,13 +147,13 @@ export function BodyweightChart() {
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
-            tick={{ fill: tickColor(), fontSize: 10 }}
+            tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 10 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             domain={['auto', 'auto']}
-            tick={{ fill: tickColor(), fontSize: 10 }}
+            tick={{ fill: CHART_AXIS_TICK_COLOR, fontSize: 10 }}
             axisLine={false}
             tickLine={false}
             width={40}

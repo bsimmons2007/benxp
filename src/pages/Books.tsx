@@ -484,6 +484,7 @@ interface BookForm {
 function LogBookPanel({ onLogged }: { onLogged: () => void }) {
   const [open,  setOpen]  = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undo,  setUndo]  = useState<(() => void) | null>(null)
   const [extraGenres, setExtraGenres] = useState<string[]>(() => {
     try {
       const stored = localStorage.getItem(EXTRA_GENRES_KEY)
@@ -522,8 +523,14 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
       date_finished: isFinished ? data.date_finished : null,
       rating:        isFinished && data.rating ? parseFloat(data.rating) : null,
     }).select('id').single()
-    if (error) { setToast('Failed to save — try again'); return }
-    if (inserted && data.series.trim()) setSeriesForBook(inserted.id, data.series)
+    if (error || !inserted) { setToast('Failed to save — try again'); return }
+    if (data.series.trim()) setSeriesForBook(inserted.id, data.series)
+
+    const insertedId = inserted.id
+    setUndo(() => async () => {
+      await supabase.from('books').delete().eq('id', insertedId)
+      await refreshXP(); refreshActivity(); onLogged()
+    })
 
     if (isFinished) {
       setToast(`+${XP_RATES.book_finished} XP — Book logged!`)
@@ -599,7 +606,7 @@ function LogBookPanel({ onLogged }: { onLogged: () => void }) {
           </form>
         </Card>
       )}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
     </div>
   )
 }

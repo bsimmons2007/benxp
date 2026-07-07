@@ -7,6 +7,7 @@ import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { Toast } from '../ui/Toast'
 import { useStore } from '../../store/useStore'
+import { getLastUsed, setLastUsed } from '../../lib/lastUsed'
 
 interface BookForm {
   date_finished: string
@@ -22,7 +23,7 @@ const BASE_GENRES = ['Fiction', 'Fantasy', 'Sci-Fi', 'Non-Fiction', 'Classic', '
 
 export function LogBookForm() {
   const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm<BookForm>({
-    defaultValues: { date_finished: today(), title: '', author: '', genre: 'Fiction', customGenre: '', pages: '', rating: '' },
+    defaultValues: { date_finished: today(), title: '', author: '', genre: getLastUsed('book-genre', 'Fiction'), customGenre: '', pages: '', rating: '' },
   })
   const [toast, setToast] = useState<string | null>(null)
   const [extraGenres, setExtraGenres] = useState<string[]>([])
@@ -57,9 +58,10 @@ export function LogBookForm() {
     })
     if (error) { setToast('Failed to save — try again'); return }
 
+    setLastUsed('book-genre', finalGenre)
     setToast(`+${XP_RATES.book_finished} XP — Book finished!`)
     await refreshXP()
-    reset({ date_finished: today(), title: '', author: '', genre: 'Fiction', customGenre: '', pages: '', rating: '' })
+    reset({ date_finished: today(), title: '', author: '', genre: finalGenre, customGenre: '', pages: '', rating: '' })
   }
 
   const allGenres = [...BASE_GENRES.filter(g => g !== 'Other'), ...extraGenres, 'Other']

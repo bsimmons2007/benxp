@@ -7,11 +7,13 @@ import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Toast } from '../components/ui/Toast'
 import { EmptyState } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
 import { RulerIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { CHART_TOOLTIP_STYLE, today, formatDate, formatDateTooltip } from '../lib/utils'
 import { XP_RATES } from '../lib/xp'
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
+import { useStore } from '../store/useStore'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 // ── Types ─────────────────────────────────────────────────────
@@ -134,24 +136,30 @@ export function Measurements() {
   usePageTitle('Measurements')
   const [rows, setRows]         = useState<Measurement[]>([])
   const [loading, setLoading]   = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving]     = useState(false)
   const [toast, setToast]       = useState('')
+  const [toastUndo, setToastUndo] = useState<(() => void) | undefined>(undefined)
   const [activeChart, setActiveChart] = useState<keyof Measurement>('weight_lbs')
+  const refreshXP       = useStore(s => s.refreshXP)
+  const refreshActivity = useStore(s => s.refreshActivity)
 
   const { register, handleSubmit, reset } = useForm<MeasureForm>({
     defaultValues: { date: today() },
   })
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('body_measurements')
       .select('*')
       .eq('user_id', user.id)
       .order('date', { ascending: false })
       .limit(60)
+    if (error) { setLoadError(true); setLoading(false); return }
     setRows((data ?? []) as Measurement[])
     setLoading(false)
   }
@@ -185,23 +193,38 @@ export function Measurements() {
     const existingRow = existing?.[0] as { id: string } | undefined
     let error: unknown
     let isUpdate = false
+    let insertedId: string | undefined
 
     if (existingRow) {
       isUpdate = true
       const { error: e } = await supabase.from('body_measurements').update(payload).eq('id', existingRow.id)
       error = e
     } else {
-      const { error: e } = await supabase.from('body_measurements').insert(payload)
+      const { data: inserted, error: e } = await supabase.from('body_measurements').insert(payload).select('id').single()
       error = e
+      insertedId = inserted?.id
     }
 
-    if (error) { setToast('Failed to save — try again'); setSaving(false); return }
+    if (error) { setToast('Failed to save — try again'); setToastUndo(undefined); setSaving(false); return }
     reset({ date: today() })
     setShowForm(false)
-    setToast(isUpdate
-      ? 'Measurements updated'
-      : `+${XP_RATES.measurement_log} XP — Measurements logged!`
-    )
+    if (isUpdate) {
+      setToast('Measurements updated')
+      setToastUndo(undefined)
+    } else {
+      setToast(`+${XP_RATES.measurement_log} XP — Measurements logged!`)
+      if (insertedId) {
+        const idToDelete = insertedId
+        setToastUndo(() => async () => {
+          await supabase.from('body_measurements').delete().eq('id', idToDelete)
+          await load()
+          refreshXP()
+          refreshActivity()
+        })
+      }
+      refreshXP()
+      refreshActivity()
+    }
     load()
     setSaving(false)
   }
@@ -274,7 +297,14 @@ export function Measurements() {
           </Card>
         )}
 
-        {loading ? null : rows.length === 0 ? (
+        {loading ? null : loadError && rows.length === 0 ? (
+          <ErrorState
+            icon={<RulerIcon size={64} color="var(--text-muted)" />}
+            title="Could not load measurements"
+            sub="Check your connection and try again."
+            onRetry={load}
+          />
+        ) : rows.length === 0 ? (
           <EmptyState
             icon={<RulerIcon size={64} color="var(--text-muted)" />}
             title="No measurements yet"
@@ -362,7 +392,7 @@ export function Measurements() {
           </>
         )}
 
-        {toast && <Toast message={toast} onDone={() => setToast('')} />}
+        {toast && <Toast message={toast} onUndo={toastUndo} onDone={() => { setToast(''); setToastUndo(undefined) }} />}
       </PageWrapper>
     </>
   )

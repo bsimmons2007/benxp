@@ -14,6 +14,7 @@ import { formatDate, today } from '../lib/utils'
 import { checkForPR, getMilestoneHit, LIFT_MILESTONES, XP_RATES, epleyEst1RM } from '../lib/xp'
 import { MilestoneOverlay } from '../components/ui/MilestoneOverlay'
 import { EmptyState } from '../components/ui/EmptyState'
+import { ErrorState } from '../components/ui/ErrorState'
 import { DumbbellIcon, RunIcon, ActivityIcon, ZapIcon, GridIcon, BookmarkIcon, CloseIcon } from '../components/ui/Icon'
 import { useStore } from '../store/useStore'
 import type { LiftType, LiftingLog, PrHistory } from '../types'
@@ -433,6 +434,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
   const [entries,    setEntries]    = useState<SessionEntry[]>([newEntry()])
   const [submitting, setSubmitting] = useState(false)
   const [toast,      setToast]      = useState<string | null>(null)
+  const [undo,       setUndo]       = useState<(() => void) | null>(null)
   const [milestone,      setMilestone]      = useState<import('../lib/xp').StrengthMilestone | null>(null)
   const [milestoneLift,  setMilestoneLift]  = useState('')
   const refreshXP       = useStore(s => s.refreshXP)
@@ -529,7 +531,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
 
     // ── Step 3: PR checks sequentially to prevent duplicate pr_history rows ──
     // (parallel checks all read before any write — two sets same lift = double PR)
-    type RowResult = { isPR: boolean; xp: number; milestone: import('../lib/xp').StrengthMilestone | null; liftName: string }
+    type RowResult = { isPR: boolean; xp: number; milestone: import('../lib/xp').StrengthMilestone | null; liftName: string; rowId: string; prKey: { lift: string; est_1rm: number; date: string } | null }
 
     const rowResults: RowResult[] = []
     for (let i = 0; i < inserted.length; i++) {
@@ -559,6 +561,8 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
           xp:       XP_RATES.per_set + (isPR ? XP_RATES.new_pr : 0),
           milestone,
           liftName: entry.liftName,
+          rowId:    row.id,
+          prKey:    isPR && est1rm ? { lift: entry.liftName, est_1rm: est1rm, date } : null,
         })
       })()
     }
@@ -576,6 +580,16 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
       setMilestone(hitMilestone.milestone)
       setMilestoneLift(liftNameForOverlay)
     }
+
+    const rowIds = rowResults.map(r => r.rowId)
+    const prKeys = rowResults.map(r => r.prKey).filter((k): k is { lift: string; est_1rm: number; date: string } => k !== null)
+    setUndo(() => async () => {
+      await supabase.from('lifting_log').delete().in('id', rowIds)
+      await Promise.all(prKeys.map(k =>
+        supabase.from('pr_history').delete().eq('lift', k.lift).eq('est_1rm', k.est_1rm).eq('date', k.date)
+      ))
+      await refreshXP(); refreshActivity(); onLogged()
+    })
 
     await refreshXP()
     refreshActivity()
@@ -840,7 +854,7 @@ function LogWorkoutPanel({ onLogged, exercises }: { onLogged: () => void; exerci
         </form>
       )}
 
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && <Toast message={toast} onUndo={undo ?? undefined} onDone={() => { setToast(null); setUndo(null) }} />}
       {milestone && (
         <MilestoneOverlay
           milestone={milestone}
@@ -1160,6 +1174,8 @@ function LiftCard({ lift, pr, history, onSaved }: { lift: LiftType; pr: PrHistor
                       )}
                       <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{formatDate(row.date)}</span>
                       <button
+                        type="button"
+                        aria-label="Edit set"
                         onClick={e => { e.stopPropagation(); setEditing(row) }}
                         style={{
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -1239,8 +1255,10 @@ export function Records() {
   const [history,         setHistory]       = useState<LiftingLog[]>([])
   const [exercises,       setExercises]     = useState<ExerciseMeta[]>([])
   const [muscleFilter,    setMuscleFilter]  = useState<string | null>(null)
+  const [loadError,       setLoadError]     = useState(false)
 
   async function load() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
@@ -1249,6 +1267,8 @@ export function Records() {
       supabase.from('lifting_log').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(200),
       supabase.from('exercises').select('name,muscle_group,equipment,type').order('muscle_group').order('name'),
     ])
+
+    if (historyData.error) { setLoadError(true); return }
 
     const prMap: Record<string, PrHistory> = {}
     prData.data?.forEach((r: PrHistory) => { if (!prMap[r.lift]) prMap[r.lift] = r })
@@ -1351,7 +1371,16 @@ export function Records() {
             <LiftCard key={lift} lift={lift} pr={prs[lift]} history={history} onSaved={load} />
           ))}
 
-          {allLoggedLifts.length === 0 && (
+          {loadError && allLoggedLifts.length === 0 && (
+            <ErrorState
+              icon={<DumbbellIcon size={64} color="var(--text-muted)" />}
+              title="Could not load lifts"
+              sub="Check your connection and try again."
+              onRetry={load}
+            />
+          )}
+
+          {!loadError && allLoggedLifts.length === 0 && (
             <EmptyState
               icon={<DumbbellIcon size={64} color="var(--text-muted)" />}
               title="No lifts logged yet"

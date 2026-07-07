@@ -19,6 +19,7 @@ import { HeartIcon, ZapIcon, ActivityIcon, EditIcon } from '../components/ui/Ico
 import { MoodFaceGauge, moodFaceColor } from '../components/ui/MoodFace'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { EditModal } from '../components/ui/EditModal'
+import { ErrorState } from '../components/ui/ErrorState'
 import { ChartSkeleton, ChartEmptyState } from '../components/ui/Skeleton'
 
 interface MoodForm {
@@ -95,20 +96,25 @@ export function Mood() {
   })
   const [recent,       setRecent]       = useState<MoodLog[]>([])
   const [toast,        setToast]        = useState<string | null>(null)
+  const [toastUndo,    setToastUndo]    = useState<(() => void) | undefined>(undefined)
   const [editEntry,    setEditEntry]    = useState<MoodLog | null>(null)
   const [editVals,     setEditVals]     = useState({ mood: '7', energy: '7', stress: '5', activities: '', notes: '' })
   const [saving,       setSaving]       = useState(false)
   const [chartLoading, setChartLoading] = useState(true)
+  const [loadError,    setLoadError]    = useState(false)
   const [visibleLines, setVisibleLines] = useState({ mood: true, energy: true, stress: true })
-  const refreshXP = useStore(s => s.refreshXP)
+  const refreshXP       = useStore(s => s.refreshXP)
+  const refreshActivity = useStore(s => s.refreshActivity)
 
   const moodVal   = parseInt(watch('mood')   ?? '7')
   const energyVal = parseInt(watch('energy') ?? '7')
 
   async function loadRecent() {
+    setLoadError(false)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setChartLoading(false); return }
-    const { data } = await supabase.from('mood_log').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(30)
+    const { data, error } = await supabase.from('mood_log').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(30)
+    if (error) { setLoadError(true); setChartLoading(false); return }
     setRecent(data ?? [])
     setChartLoading(false)
   }
@@ -146,7 +152,7 @@ export function Mood() {
   const onSubmit = async (data: MoodForm) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error } = await supabase.from('mood_log').insert({
+    const { data: inserted, error } = await supabase.from('mood_log').insert({
       user_id: user.id,
       date: data.date,
       mood: parseInt(data.mood),
@@ -154,11 +160,19 @@ export function Mood() {
       stress: parseInt(data.stress),
       activities: data.activities || null,
       notes: data.notes || null,
-    })
-    if (error) { setToast('Failed to save — try again'); return }
+    }).select('id').single()
+    if (error || !inserted) { setToast('Failed to save — try again'); setToastUndo(undefined); return }
     playXPGain()
     setToast(`+${XP_RATES.mood_log} XP · Check-in logged ${moodLabel(parseInt(data.mood))}`)
+    const insertedId = inserted.id
+    setToastUndo(() => async () => {
+      await supabase.from('mood_log').delete().eq('id', insertedId)
+      await loadRecent()
+      refreshXP()
+      refreshActivity()
+    })
     refreshXP()
+    refreshActivity()
     reset({ date: today(), mood: '7', energy: '7', stress: '5', activities: '', notes: '' })
     loadRecent()
   }
@@ -205,7 +219,15 @@ export function Mood() {
 
         {/* Trend chart */}
         {chartLoading && <ChartSkeleton height={160} title="Mood Trends" />}
-        {!chartLoading && recent.length === 0 && (
+        {!chartLoading && loadError && recent.length === 0 && (
+          <ErrorState
+            icon={<HeartIcon size={40} color="var(--text-muted)" />}
+            title="Could not load mood history"
+            sub="Check your connection and try again."
+            onRetry={loadRecent}
+          />
+        )}
+        {!chartLoading && !loadError && recent.length === 0 && (
           <ChartEmptyState title="Mood Trends" message="Log your first mood entry to start tracking trends" color="#f472b6" />
         )}
         {!chartLoading && chartData.length > 0 && chartData.length < 3 && (
@@ -371,7 +393,7 @@ export function Mood() {
           </Card>
         )}
 
-        {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+        {toast && <Toast message={toast} onUndo={toastUndo} onDone={() => { setToast(null); setToastUndo(undefined) }} />}
       </PageWrapper>
 
       {editEntry && (
