@@ -213,7 +213,15 @@ async function markSent(sub: Sub, type: string, date: string): Promise<void> {
   await admin.from('push_subscriptions').update({ last_sent: last }).eq('id', sub.id)
 }
 
-Deno.serve(async () => {
+Deno.serve(async (req: Request) => {
+  // JWT verification is disabled at the platform level so pg_cron can call
+  // this; verify the shared secret ourselves. The cron job sends the
+  // service-role key as its bearer token (phase5-cron.sql).
+  const auth = req.headers.get('Authorization') ?? ''
+  if (auth !== `Bearer ${SERVICE_ROLE}`) {
+    return new Response('unauthorized', { status: 401 })
+  }
+
   const { data: subs } = await admin.from('push_subscriptions').select('*')
   if (!subs) return new Response('no subs', { status: 200 })
 
@@ -222,6 +230,7 @@ Deno.serve(async () => {
   let sent = 0
 
   for (const sub of subs as Sub[]) {
+    try {
     let settings = settingsCache.get(sub.user_id)
     if (!settings) {
       const { data: pref } = await admin.from('user_preferences').select('prefs')
@@ -271,6 +280,10 @@ Deno.serve(async () => {
         await send(sub, 'Log your day', "You haven't logged anything today. Keep the momentum going!", '/', 'evening')
         await markSent(sub, 'evening', date); sent++
       }
+    }
+    } catch (err) {
+      // One bad subscription/user must not abort the whole run
+      console.error(`[send-notifications] sub ${sub.id} failed:`, err)
     }
   }
 
