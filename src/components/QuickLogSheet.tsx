@@ -304,11 +304,11 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
       const { data, error } = await supabase.from('meals')
         .insert({
           user_id: uid, date: today(), meal_type: mealType, name: mealName || null,
-          calories: cals, protein_g: protein ? parseFloat(protein) : null,
-          carbs_g: carbs ? parseFloat(carbs) : null, fat_g: fat ? parseFloat(fat) : null,
+          calories: Math.round(cals), protein_g: protein ? Math.round(parseFloat(protein)) : null,
+          carbs_g: carbs ? Math.round(parseFloat(carbs)) : null, fat_g: fat ? Math.round(parseFloat(fat)) : null,
         }).select('id').single()
       if (error || !data) return
-      finish(`+${cals} cal logged`, 'meals', data.id, false)
+      finish(`+${Math.round(cals)} cal logged`, 'meals', data.id, false)
     })
   }
 

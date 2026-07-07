@@ -11,7 +11,7 @@ export interface Badge {
     | 'lifting' | 'skate' | 'books' | 'fortnite' | 'sleep' | 'general' | 'challenges'
     | 'basketball' | 'pickleball' | 'golf' | 'disc_golf' | 'hiking'
     | 'table_tennis' | 'chess' | 'pool' | 'volleyball' | 'spikeball' | 'cardio'
-    | 'consistency' | 'wellness' | 'multisport'
+    | 'consistency' | 'wellness' | 'multisport' | 'nutrition'
   earned: boolean
   earnedDate?: string
   secret?: boolean
@@ -38,6 +38,7 @@ interface RawData {
   cardioRows:     { date: string; distance_miles: number; activity: string }[]
   moodRows:       { date: string; mood?: number | null }[]
   waterRows:      { date: string; oz: number }[]
+  mealRows:       { date: string; meal_type: string; name: string | null; calories: number }[]
   totalXP:        number
   level:          number
 }
@@ -48,7 +49,7 @@ function evaluate(data: RawData): Badge[] {
     gameRows, sleepRows, challengeRows, totalXP, level,
     bbRows, pbRows, golfRows, dgRows, hikeRows,
     ttRows, chessRows, poolRows, vbRows, sbRows, cardioRows,
-    moodRows, waterRows,
+    moodRows, waterRows, mealRows,
   } = data
 
   // ── Existing calculations ──────────────────────────────────────
@@ -248,6 +249,14 @@ function evaluate(data: RawData): Badge[] {
   for (const r of waterRows) { waterByDate[r.date] = (waterByDate[r.date] ?? 0) + Number(r.oz) }
   const waterGoalDates = Object.keys(waterByDate).filter(d => waterByDate[d] >= 64)
   const waterGoalStreak = longestStreak(waterGoalDates)
+
+  // ── Nutrition ──────────────────────────────────────────────
+  const totalMeals = mealRows.length
+  const mealsByDate: Record<string, number> = {}
+  for (const r of mealRows) { mealsByDate[r.date] = (mealsByDate[r.date] ?? 0) + 1 }
+  const fullNutritionDays = Object.values(mealsByDate).filter(n => n >= 3).length
+  const mealLogStreak = longestStreak(Object.keys(mealsByDate))
+  const firstMealDate = mealRows.length ? [...mealRows].sort((a, b) => a.date.localeCompare(b.date))[0].date : undefined
 
   return [
     // ── GENERAL — First Step & XP ────────────────────────────
@@ -518,6 +527,14 @@ function evaluate(data: RawData): Badge[] {
     { id: 'mood_avg_8',      icon: 'Rocket', name: 'Thriving',           description: 'Maintain a 30-day mood average of 8 or higher.', category: 'wellness', earned: moodAvg30badge >= 8 },
     { id: 'water_streak_7',  icon: 'Zap',    name: 'Hydration Streak',   description: 'Hit the 64 oz water goal 7 days in a row.',   category: 'wellness', earned: waterGoalStreak >= 7 },
     { id: 'water_streak_30', icon: 'Crown',  name: 'Hydration Master',   description: 'Hit the 64 oz water goal 30 days in a row.',  category: 'wellness', earned: waterGoalStreak >= 30, secret: true },
+
+    // ── NUTRITION ────────────────────────────────────────────
+    { id: 'meal_first',      icon: 'Star',   name: 'First Bite',        description: 'Log your first meal.',                        category: 'nutrition', earned: totalMeals >= 1, earnedDate: firstMealDate },
+    { id: 'meal_50',         icon: 'Chart',  name: 'Meal Tracker',      description: 'Log 50 total meals.',                         category: 'nutrition', earned: totalMeals >= 50 },
+    { id: 'meal_250',        icon: 'Trophy', name: 'Food Journal Pro',  description: 'Log 250 total meals.',                        category: 'nutrition', earned: totalMeals >= 250 },
+    { id: 'nutrition_full_10', icon: 'Target', name: 'Balanced Plate',  description: 'Log 3+ meals in a day, 10 times.',            category: 'nutrition', earned: fullNutritionDays >= 10 },
+    { id: 'nutrition_full_50', icon: 'Crown',  name: 'Nutrition Master',description: 'Log 3+ meals in a day, 50 times.',            category: 'nutrition', earned: fullNutritionDays >= 50, secret: true },
+    { id: 'meal_streak_7',   icon: 'Fire',   name: 'Fueled Up',         description: 'Log at least one meal 7 days in a row.',      category: 'nutrition', earned: mealLogStreak >= 7 },
   ] as Badge[]
 }
 
@@ -581,6 +598,7 @@ export function useAchievements() {
       cardioRows:    rawRows.cardioRows,
       moodRows:      rawRows.moodRows,
       waterRows:     rawRows.waterRows ?? [],
+      mealRows:      rawRows.mealRows ?? [],
       totalXP,
       level,
     })

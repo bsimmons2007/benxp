@@ -190,21 +190,14 @@ export function Mood() {
             ] as { label: string; value: string; color: string; icon: ReactNode }[]).map(s => (
               <div
                 key={s.label}
-                className="card-animate"
-                style={{
-                  background: 'var(--surface-1)',
-                  border: '1px solid var(--border-subtle)', borderRadius: 14,
-                  padding: '12px 10px', textAlign: 'center',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
+                className="rounded-xl p-3 text-center card-animate"
+                style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}
               >
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 3 }}>{s.icon}</div>
-                <p style={{ color: s.color, fontSize: 24, fontWeight: 700, lineHeight: 1 }}>
+                <p className="font-mono" style={{ color: s.color, fontSize: 22, fontWeight: 700, lineHeight: 1 }}>
                   {s.value}
                 </p>
-                <p style={{ color: 'var(--text-tertiary)', fontSize: 10, marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
-                  {s.label}
-                </p>
+                <p className="section-label mt-1">{s.label}</p>
               </div>
             ))}
           </div>
@@ -217,7 +210,7 @@ export function Mood() {
         )}
         {!chartLoading && chartData.length > 0 && chartData.length < 3 && (
           <Card className="mb-5">
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 8 }}>Mood Trends</p>
+            <p className="card-title mb-2">Mood Trends</p>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
               {chartData.map(d => (
                 <div key={d.date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -233,9 +226,7 @@ export function Mood() {
         )}
         {!chartLoading && chartData.length >= 3 && (
           <Card className="mb-5">
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 12 }}>
-              Mood Trends
-            </p>
+            <p className="card-title mb-3">Mood Trends</p>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
                 <defs>
@@ -301,20 +292,18 @@ export function Mood() {
           <div style={{
             display: 'flex', alignItems: 'center', gap: 18,
             padding: '18px 18px 14px',
-            background: `linear-gradient(180deg, ${moodFaceColor(moodVal)}1c, transparent)`,
+            background: `color-mix(in srgb, ${moodFaceColor(moodVal)} 11%, transparent)`,
             transition: 'background 0.25s ease',
           }}>
             <div key={moodVal} style={{ flexShrink: 0, animation: 'facepop 0.28s ease both' }}>
               <MoodFaceGauge value={moodVal} size={88} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 4 }}>
-                Daily Check-in
-              </p>
+              <p className="section-label" style={{ marginBottom: 4 }}>Daily Check-in</p>
               <p style={{ fontWeight: 800, fontSize: 26, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 6, letterSpacing: '-0.02em' }}>
                 {MOOD_WORDS[moodVal]}
               </p>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-tertiary)' }}>
+              <p className="font-mono" style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
                 Mood <span style={{ color: moodFaceColor(moodVal), fontWeight: 700 }}>{moodVal}</span> / 10
               </p>
             </div>
@@ -351,9 +340,7 @@ export function Mood() {
         {/* Recent entries */}
         {recent.length > 0 && (
           <Card>
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em', marginBottom: 12 }}>
-              Recent Entries
-            </p>
+            <p className="card-title mb-3">Recent Entries</p>
             <div className="flex flex-col gap-1">
               {recent.slice(0, 14).map(r => (
                 <div

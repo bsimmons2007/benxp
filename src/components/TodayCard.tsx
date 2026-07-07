@@ -5,7 +5,7 @@ import { useStore } from '../store/useStore'
 import { useNavStore } from '../store/useNavStore'
 import { today } from '../lib/utils'
 import { getProgress } from '../lib/challenges'
-import { CheckIcon, MoonIcon, DropletIcon, BrainIcon, ZapIcon, ChevronRightIcon, type IconComponent } from './ui/Icon'
+import { CheckIcon, MoonIcon, DropletIcon, BrainIcon, ZapIcon, UtensilsIcon, ChevronRightIcon, type IconComponent } from './ui/Icon'
 
 const WATER_GOAL = 64
 
@@ -36,6 +36,7 @@ export function TodayCard() {
 
     const sleepDone = loggedToday((r?.sleepRows ?? []).map(x => x.date))
     const moodDone  = loggedToday((r?.moodRows ?? []).map(x => x.date))
+    const mealsDone = loggedToday((r?.mealRows ?? []).map(x => x.date))
     const waterOz   = (r?.waterRows ?? []).filter(x => x.date === todayStr).reduce((s, x) => s + Number(x.oz), 0) + waterBump
 
     // "Any activity" today across the movement/game tables.
@@ -67,6 +68,7 @@ export function TodayCard() {
         quickAdd: waterOz >= WATER_GOAL ? undefined : addWater8, target: 'water',
       },
       { id: 'mood', label: 'Check in mood', Icon: BrainIcon, done: moodDone, target: 'mood' },
+      { id: 'meals', label: 'Log a meal', Icon: UtensilsIcon, done: mealsDone, target: 'nutrition' },
       { id: 'activity', label: 'Log an activity', Icon: ZapIcon, done: activityDone, target: 'open' },
     ]
   }, [rawRows, waterBump, todayStr, refreshXP, refreshActivity])

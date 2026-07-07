@@ -14,7 +14,7 @@ import { UtensilsIcon, EditIcon, ChevronIcon, FlameIcon } from '../components/ui
 import { CalorieVolumeChart } from '../components/charts/CalorieVolumeChart'
 import { SurplusWeightChart } from '../components/charts/SurplusWeightChart'
 import { supabase } from '../lib/supabase'
-import { localDateStr, today as appToday, formatDate } from '../lib/utils'
+import { today as appToday, formatDate } from '../lib/utils'
 import { getLastUsed, setLastUsed } from '../lib/lastUsed'
 import { playXPGain } from '../lib/sounds'
 import { XP_RATES } from '../lib/xp'
@@ -133,7 +133,7 @@ export function Nutrition() {
     setSubmitting(true)
     const row = {
       user_id:   userId,
-      date:      localDateStr(new Date()),
+      date:      appToday(),
       meal_type: mealType,
       name:      name.trim() || null,
       calories:  Math.round(cals),
@@ -183,7 +183,7 @@ export function Nutrition() {
     const { error } = await supabase.from('meals').update({
       meal_type: editVals.meal_type,
       name:      editVals.name.trim() || null,
-      calories:  Math.round(parseFloat(editVals.calories) || editMeal.calories),
+      calories:  (() => { const c = parseFloat(editVals.calories); return Math.round(isFinite(c) ? c : editMeal.calories) })(),
       protein_g: editVals.protein_g ? Math.round(parseFloat(editVals.protein_g)) : null,
       carbs_g:   editVals.carbs_g   ? Math.round(parseFloat(editVals.carbs_g))   : null,
       fat_g:     editVals.fat_g     ? Math.round(parseFloat(editVals.fat_g))     : null,

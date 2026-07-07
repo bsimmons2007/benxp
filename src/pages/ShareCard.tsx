@@ -10,7 +10,6 @@ import { useSkills } from '../hooks/useSkills'
 import { getLevelTitle, xpForLevel } from '../lib/xp'
 import { toRoman } from '../lib/utils'
 import { getPref } from '../lib/prefs'
-import { loadTheme } from '../lib/theme'
 import {
   SectionIcon, StarIcon, ZapIcon, FlameIcon, TrophyIcon, CheckIcon,
   SwordIcon, DumbbellIcon, SkateIcon, BookIcon, GamepadIcon, MoonIcon,
@@ -58,6 +57,40 @@ function badgeIconSm(badge: Badge, accentColor: string): ReactNode {
   }
 }
 
+// Fixed brand palette — hardcoded because html2canvas exports don't reliably
+// resolve CSS custom properties, and the card should always render on-brand
+// regardless of the viewer's active in-app theme.
+const CARD_CORAL   = '#e5443f'
+const CARD_PAPER   = '#f3efe6'
+const CARD_INK     = '#0d0d1a'
+const CARD_SURFACE = '#ffffff'
+const CARD_RAISED  = '#ede8df'
+const CARD_BORDER  = 'rgba(13,13,26,0.10)'
+const CARD_TEXT_2  = '#6e6e73'
+const CARD_TEXT_3  = '#aeaeb2'
+const CARD_FONT_SANS = '"Space Grotesk", system-ui, sans-serif'
+const CARD_FONT_MONO = '"JetBrains Mono", "Cascadia Code", monospace'
+
+// XP-only pulse path, mirrors components/brand/Wordmark.tsx (replicated inline
+// so it survives html2canvas export without depending on that component tree)
+const WORDMARK_PULSE_PATH = 'M 0 11 L 192 11 L 204 11 L 214 4 L 224 18 L 234 0 L 244 22 L 254 11 L 320 11'
+
+function CardWordmark() {
+  return (
+    <span style={{ display: 'inline-block', lineHeight: 1 }}>
+      <span style={{
+        display: 'block', fontFamily: CARD_FONT_SANS, fontWeight: 700,
+        fontSize: 20, letterSpacing: '-0.08em', lineHeight: 0.9, color: CARD_INK,
+      }}>
+        you<span style={{ color: CARD_CORAL }}>xp</span>
+      </span>
+      <svg width="70" height="5" viewBox="0 -2 320 28" preserveAspectRatio="none" style={{ display: 'block', marginTop: 2 }}>
+        <path d={WORDMARK_PULSE_PATH} stroke={CARD_CORAL} strokeWidth={3} fill="none" strokeLinejoin="miter" strokeLinecap="square" />
+      </svg>
+    </span>
+  )
+}
+
 // ── The card itself — rendered as a fixed-size div for screenshotting
 function Card() {
   const { totalXP, level, progress } = useXP()
@@ -65,7 +98,6 @@ function Card() {
   const stats     = useStore(s => s.stats)
   const { earned } = useAchievements()
   const { skills } = useSkills()
-  const theme     = loadTheme()
   const title     = getLevelTitle(level)
   const levelStyle = getPref<'number' | 'roman'>('levelStyle', 'number')
   const displayLevel = levelStyle === 'roman' ? toRoman(level) : String(level)
@@ -81,44 +113,33 @@ function Card() {
   return (
     <div style={{
       width: 360,
-      background: `linear-gradient(145deg, ${theme.bgDeep} 0%, ${theme.baseBg} 100%)`,
+      background: CARD_PAPER,
       borderRadius: 24,
       padding: 28,
-      border: `1px solid ${theme.accent}44`,
-      boxShadow: `0 0 60px ${theme.accent}22, 0 20px 60px rgba(0,0,0,0.6)`,
-      fontFamily: 'system-ui, sans-serif',
+      border: `1px solid ${CARD_BORDER}`,
+      fontFamily: CARD_FONT_SANS,
       position: 'relative',
-      overflow: 'hidden',
     }}>
-      {/* Background orbs */}
-      <div style={{ position: 'absolute', width: 180, height: 180, borderRadius: '50%', background: theme.orb1, top: -40, right: -40, filter: 'blur(50px)', opacity: 0.5, pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', width: 140, height: 140, borderRadius: '50%', background: theme.orb2, bottom: -30, left: -30, filter: 'blur(40px)', opacity: 0.4, pointerEvents: 'none' }} />
-
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, position: 'relative' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
-          <p style={{ color: theme.accent, fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: 2 }}>YouXP</p>
-          <p style={{ color: 'var(--text-primary)', fontSize: 18, fontWeight: 700, margin: 0 }}>{userName || 'Player'}</p>
+          <CardWordmark />
+          <p style={{ color: CARD_INK, fontSize: 16, fontWeight: 700, margin: '8px 0 0' }}>{userName || 'Player'}</p>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <p style={{ color: theme.accent, fontSize: 36, fontWeight: 700, lineHeight: 1, margin: 0, textShadow: `0 0 20px ${theme.accent}` }}>{displayLevel}</p>
-          <p style={{ color: theme.accent, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', opacity: 0.85, margin: 0 }}>{title}</p>
+          <p style={{ color: CARD_CORAL, fontSize: 36, fontWeight: 700, lineHeight: 1, margin: 0 }}>{displayLevel}</p>
+          <p style={{ color: CARD_CORAL, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: CARD_FONT_MONO, margin: 0 }}>{title}</p>
         </div>
       </div>
 
       {/* XP bar */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-          <span style={{ color: '#888', fontSize: 10 }}>{totalXP.toLocaleString()} XP</span>
-          <span style={{ color: theme.accent, fontSize: 10 }}>{toNext.toLocaleString()} to next</span>
+          <span style={{ color: CARD_TEXT_2, fontSize: 10, fontFamily: CARD_FONT_MONO }}>{totalXP.toLocaleString()} XP</span>
+          <span style={{ color: CARD_CORAL, fontSize: 10, fontFamily: CARD_FONT_MONO }}>{toNext.toLocaleString()} to next</span>
         </div>
-        <div style={{ height: 8, background: 'var(--input-bg)', borderRadius: 999, overflow: 'hidden' }}>
-          <div style={{
-            height: '100%', borderRadius: 999,
-            width: `${pct}%`,
-            background: `linear-gradient(90deg, ${theme.accent}88, ${theme.accent})`,
-            boxShadow: `0 0 8px ${theme.accent}`,
-          }} />
+        <div style={{ height: 8, background: CARD_RAISED, borderRadius: 999, overflow: 'hidden' }}>
+          <div style={{ height: '100%', borderRadius: 999, width: `${pct}%`, background: CARD_CORAL }} />
         </div>
       </div>
 
@@ -133,12 +154,12 @@ function Card() {
           stats.booksThisYear  ? { label: 'Books',  value: String(stats.booksThisYear) }           : null,
         ].filter(Boolean).slice(0, 6).map((s, i) => s && (
           <div key={i} style={{
-            background: 'var(--input-bg)',
+            background: CARD_SURFACE,
             borderRadius: 10, padding: '8px 10px',
-            border: '1px solid var(--border-faint)',
+            border: `1px solid ${CARD_BORDER}`,
           }}>
-            <p style={{ color: theme.accent, fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1 }}>{s.value}</p>
-            <p style={{ color: '#888', fontSize: 9, margin: '3px 0 0', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>{s.label}</p>
+            <p style={{ color: CARD_CORAL, fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1, fontFamily: CARD_FONT_MONO }}>{s.value}</p>
+            <p style={{ color: CARD_TEXT_3, fontSize: 9, margin: '3px 0 0', textTransform: 'uppercase', fontFamily: CARD_FONT_MONO, letterSpacing: '0.06em' }}>{s.label}</p>
           </div>
         ))}
       </div>
@@ -146,7 +167,7 @@ function Card() {
       {/* Top skills */}
       {topSkills.length > 0 && (
         <div style={{ marginBottom: 20 }}>
-          <p style={{ color: '#444', fontSize: 9, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', marginBottom: 8, fontWeight: 700 }}>Skill Mastery</p>
+          <p style={{ color: CARD_TEXT_3, fontSize: 9, textTransform: 'uppercase', fontFamily: CARD_FONT_MONO, letterSpacing: '0.15em', marginBottom: 8, fontWeight: 700 }}>Skill Mastery</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {topSkills.map(s => {
               const pctS = Math.min(Math.max(s.progress * 100, 0), 100)
@@ -156,16 +177,16 @@ function Card() {
                     <SectionIcon
                       sectionKey={s.key === 'sports' ? 'basketball' : s.key === 'reading' ? 'books' : s.key === 'sleep' ? 'sleep' : s.key === 'cardio' ? 'cardio' : s.key}
                       size={14}
-                      color={theme.accent}
+                      color={CARD_CORAL}
                     />
                   </span>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <span style={{ color: '#ccc', fontSize: 10 }}>{s.title}</span>
-                      <span style={{ color: theme.accent, fontSize: 10, fontWeight: 700 }}>Lvl {s.level}</span>
+                      <span style={{ color: CARD_TEXT_2, fontSize: 10 }}>{s.title}</span>
+                      <span style={{ color: CARD_CORAL, fontSize: 10, fontWeight: 700, fontFamily: CARD_FONT_MONO }}>Lvl {s.level}</span>
                     </div>
-                    <div style={{ height: 4, background: 'var(--input-bg)', borderRadius: 999, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${pctS}%`, background: theme.accent, borderRadius: 999 }} />
+                    <div style={{ height: 4, background: CARD_RAISED, borderRadius: 999, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${pctS}%`, background: CARD_CORAL, borderRadius: 999 }} />
                     </div>
                   </div>
                 </div>
@@ -178,16 +199,16 @@ function Card() {
       {/* Badges */}
       {topBadges.length > 0 && (
         <div style={{ marginBottom: 20 }}>
-          <p style={{ color: '#444', fontSize: 9, textTransform: 'uppercase', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', marginBottom: 8, fontWeight: 700 }}>Badges</p>
+          <p style={{ color: CARD_TEXT_3, fontSize: 9, textTransform: 'uppercase', fontFamily: CARD_FONT_MONO, letterSpacing: '0.15em', marginBottom: 8, fontWeight: 700 }}>Badges</p>
           <div style={{ display: 'flex', gap: 6 }}>
             {topBadges.map(b => (
               <div key={b.id} style={{
                 width: 36, height: 36, borderRadius: 9,
-                background: 'var(--input-bg)',
-                border: '1px solid var(--border)',
+                background: CARD_SURFACE,
+                border: `1px solid ${CARD_BORDER}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                {badgeIconSm(b, theme.accent)}
+                {badgeIconSm(b, CARD_CORAL)}
               </div>
             ))}
           </div>
@@ -195,9 +216,9 @@ function Card() {
       )}
 
       {/* Footer */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, borderTop: '1px solid var(--border-faint)' }}>
-        <p style={{ color: '#444', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', margin: 0 }}>you-xp.com</p>
-        <p style={{ color: '#444', fontSize: 9, margin: 0 }}>{new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, borderTop: `1px solid ${CARD_BORDER}` }}>
+        <p style={{ color: CARD_TEXT_3, fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: CARD_FONT_MONO, margin: 0 }}>you-xp.com</p>
+        <p style={{ color: CARD_TEXT_3, fontSize: 9, margin: 0, fontFamily: CARD_FONT_MONO }}>{new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
       </div>
     </div>
   )
@@ -245,7 +266,7 @@ export function ShareCard() {
     <>
       <TopBar title="Share" />
       <PageWrapper>
-        <p className="text-xs uppercase tracking-widest font-mono text-center mb-6" style={{ color: '#555' }}>
+        <p className="section-label text-center mb-6" style={{ letterSpacing: '0.1em' }}>
           Your Progress Card
         </p>
 
@@ -260,21 +281,21 @@ export function ShareCard() {
         <div className="flex flex-col gap-3 px-4">
           <button
             onClick={copyToClipboard}
-            className="w-full py-3 rounded-xl font-bold text-sm transition-all"
+            className="w-full py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"
             style={{
-              background: copied ? '#4ade80' : 'var(--accent)',
+              background: copied ? 'var(--green)' : 'var(--accent)',
               color: 'var(--base-bg)',
               border: 'none', cursor: 'pointer',
-              boxShadow: copied ? '0 0 20px #4ade8066' : '0 0 20px var(--accent-dim)',
-              transition: 'all 0.2s ease',
+              transition: 'background 0.2s ease',
             }}
           >
-            {copied ? '✓ Copied to Clipboard!' : 'Copy as Image'}
+            {copied && <CheckIcon size={16} color="var(--base-bg)" />}
+            {copied ? 'Copied to Clipboard!' : 'Copy as Image'}
           </button>
 
           {hint && (
             <div className="rounded-xl px-4 py-3 text-center pop-in" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-faint)' }}>
-              <p style={{ color: '#444', fontSize: 12 }}>
+              <p style={{ color: 'var(--text-tertiary)', fontSize: 12 }}>
                 Or take a screenshot of the card above to share directly.
               </p>
             </div>

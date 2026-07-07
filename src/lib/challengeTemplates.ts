@@ -5,7 +5,7 @@ export type ActivitySection =
   | 'sleep' | 'water' | 'books' | 'mood'
   | 'chess' | 'disc_golf' | 'fortnite' | 'golf' | 'hiking'
   | 'basketball' | 'pickleball' | 'pool' | 'spikeball'
-  | 'table_tennis' | 'volleyball'
+  | 'table_tennis' | 'volleyball' | 'nutrition'
 
 export type DisplayMode = 'count' | 'sum' | 'avg'
 
@@ -31,6 +31,7 @@ export interface UserStats {
   spikeball:    { avgPerWeek: number; winRate: number }
   table_tennis: { avgPerWeek: number; winRate: number }
   volleyball:   { avgPerWeek: number; winRate: number }
+  nutrition:    { avgMealsPerWeek: number; avgFullDaysPerWeek: number }
 }
 
 export interface ChallengeTemplate {
@@ -51,7 +52,7 @@ export const SECTION_DISPLAY: Record<ActivitySection, string> = {
   books: 'Reading', mood: 'Mood', chess: 'Chess', disc_golf: 'Disc Golf',
   fortnite: 'Gaming', golf: 'Golf', hiking: 'Hiking', basketball: 'Basketball',
   pickleball: 'Pickleball', pool: 'Pool', spikeball: 'Spikeball',
-  table_tennis: 'Table Tennis', volleyball: 'Volleyball',
+  table_tennis: 'Table Tennis', volleyball: 'Volleyball', nutrition: 'Nutrition',
 }
 
 // ── Helpers ──────────────────────────────────────────────────────
@@ -289,6 +290,13 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
   ...gameSportTemplates({ section: 'table_tennis', displayName: 'table tennis', gamesKey: 'table_tennis_games', winsKey: 'table_tennis_wins', statsGetter: (s) => ({ avgPerWeek: s.table_tennis.avgPerWeek, winRate: s.table_tennis.winRate }) }),
   // ── VOLLEYBALL (via factory) ──
   ...gameSportTemplates({ section: 'volleyball', displayName: 'volleyball', gamesKey: 'volleyball_sessions', winsKey: 'volleyball_wins', statsGetter: (s) => ({ avgPerWeek: s.volleyball.avgPerWeek, winRate: s.volleyball.winRate }) }),
+  // ── NUTRITION WEEKLY ──
+  { key: 'nutrition_days_w1', section: 'nutrition', period: 'weekly', name: (n) => `Log meals ${n} day${n === 1 ? '' : 's'} this week`, unit: 'days', progressKey: 'nutrition_days', displayMode: 'count', scaleTarget: (s) => Math.min(7, Math.max(3, cr(s.nutrition.avgMealsPerWeek > 0 ? s.nutrition.avgFullDaysPerWeek * 1.5 + 1 : 3))), xpForTarget: (n) => n * 18 },
+  { key: 'nutrition_meals_w1', section: 'nutrition', period: 'weekly', name: (n) => `Log ${n} meals this week`, unit: 'meals', progressKey: 'nutrition_meals', displayMode: 'count', scaleTarget: (s) => sc(s.nutrition.avgMealsPerWeek, 1.5, 6), xpForTarget: (n) => n * 6 },
+  { key: 'nutrition_full_days_w1', section: 'nutrition', period: 'weekly', name: (n) => `Hit 3+ meals logged ${n} day${n === 1 ? '' : 's'} this week`, unit: 'days', progressKey: 'nutrition_full_days', displayMode: 'count', scaleTarget: (s) => Math.min(7, Math.max(2, cr(s.nutrition.avgFullDaysPerWeek * 1.5 + 1))), xpForTarget: (n) => n * 30 },
+  // ── NUTRITION MONTHLY ──
+  { key: 'nutrition_days_m1', section: 'nutrition', period: 'monthly', name: (n) => `Log meals ${n} day${n === 1 ? '' : 's'} this month`, unit: 'days', progressKey: 'nutrition_days', displayMode: 'count', scaleTarget: (s) => Math.min(30, Math.max(10, cr(s.nutrition.avgFullDaysPerWeek * 4 * 1.4 + 4))), xpForTarget: (n) => n * 6 },
+  { key: 'nutrition_full_days_m1', section: 'nutrition', period: 'monthly', name: (n) => `Hit 3+ meals logged ${n} day${n === 1 ? '' : 's'} this month`, unit: 'days', progressKey: 'nutrition_full_days', displayMode: 'count', scaleTarget: (s) => Math.min(28, Math.max(6, cr(s.nutrition.avgFullDaysPerWeek * 4 * 1.4))), xpForTarget: (n) => n * 20 },
 ]
 
 // ── Progress functions ────────────────────────────────────────────
@@ -474,5 +482,20 @@ export const PROGRESS_FNS: Record<string, (sb: SupabaseClient, since: string, us
   volleyball_wins: async (sb, since, userId) => {
     const { count } = await sb.from('volleyball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('win', true).gte('date', since)
     return count ?? 0
+  },
+  nutrition_days: async (sb, since, userId) => {
+    const { data } = await sb.from('meals').select('date').eq('user_id', userId).gte('date', since)
+    return new Set((data ?? []).map((r: { date: string }) => r.date)).size
+  },
+  nutrition_meals: async (sb, since, userId) => {
+    const { count } = await sb.from('meals').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('date', since)
+    return count ?? 0
+  },
+  nutrition_full_days: async (sb, since, userId) => {
+    const { data } = await sb.from('meals').select('date').eq('user_id', userId).gte('date', since)
+    if (!data || data.length === 0) return 0
+    const byDate: Record<string, number> = {}
+    for (const r of data as { date: string }[]) byDate[r.date] = (byDate[r.date] ?? 0) + 1
+    return Object.values(byDate).filter(n => n >= 3).length
   },
 }

@@ -22,7 +22,7 @@ import {
   TrendingIcon, GridIcon, HeartIcon,
   BasketballIcon, GolfIcon, DiscIcon, TableTennisIcon, ChessIcon,
   VolleyballIcon, SpikeballIcon, PoolIcon,
-  SwimIcon, SproutIcon, BirdIcon,
+  SwimIcon, SproutIcon, BirdIcon, UtensilsIcon,
   type IconComponent,
 } from '../components/ui/Icon'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -46,13 +46,14 @@ const CATEGORY_LABELS: Record<Badge['category'], string> = {
   volleyball:   'Volleyball',
   spikeball:    'Spikeball',
   cardio:       'Cardio',
+  nutrition:    'Nutrition',
   consistency:  'Consistency',
   wellness:     'Wellness',
   multisport:   'Multi-Sport',
 }
 
 const CATEGORY_ORDER: Badge['category'][] = [
-  'general', 'lifting', 'skate', 'cardio', 'books', 'sleep', 'challenges',
+  'general', 'lifting', 'skate', 'cardio', 'nutrition', 'books', 'sleep', 'challenges',
   'consistency', 'wellness', 'multisport',
   'fortnite', 'basketball', 'pickleball', 'golf', 'disc_golf', 'hiking',
   'table_tennis', 'chess', 'pool', 'volleyball', 'spikeball',
@@ -319,6 +320,7 @@ const CATEGORY_DEFAULT: Record<Badge['category'], IconComponent> = {
   volleyball:   VolleyballIcon,
   spikeball:    SpikeballIcon,
   cardio:       ActivityIcon,
+  nutrition:    UtensilsIcon,
   consistency:  CalendarIcon,
   wellness:     BrainIcon,
   multisport:   TrophyIcon,

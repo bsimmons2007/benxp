@@ -136,6 +136,7 @@ export async function detectActiveSections(supabase: SupabaseClient, userId: str
     ['spikeball',    () => supabase.from('spikeball_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
     ['table_tennis', () => supabase.from('table_tennis_games').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
     ['volleyball',   () => supabase.from('volleyball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
+    ['nutrition',    () => supabase.from('meals').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(r => r.count ?? 0)],
   ]
 
   const results = await Promise.all(checks.map(([, fn]) => Promise.resolve(fn()).catch(() => 0)))
@@ -166,6 +167,7 @@ export async function fetchUserStats(supabase: SupabaseClient, userId: string): 
     spikeballGames,
     tableTennisGames,
     volleyballSessions,
+    mealRows,
   ] = await Promise.all([
     supabase.from('lifting_log').select('date').eq('user_id', userId).then(r => r.data ?? []),
     supabase.from('cardio_sessions').select('date, activity, distance_miles').eq('user_id', userId).then(r => r.data ?? []),
@@ -185,6 +187,7 @@ export async function fetchUserStats(supabase: SupabaseClient, userId: string): 
     supabase.from('spikeball_games').select('date, win').eq('user_id', userId).then(r => r.data ?? []),
     supabase.from('table_tennis_games').select('date, win').eq('user_id', userId).then(r => r.data ?? []),
     supabase.from('volleyball_sessions').select('date, win').eq('user_id', userId).then(r => r.data ?? []),
+    supabase.from('meals').select('date').eq('user_id', userId).then(r => r.data ?? []),
   ])
 
   function weeksSpan(rows: { date: string }[]): number {
@@ -278,6 +281,13 @@ export async function fetchUserStats(supabase: SupabaseClient, userId: string): 
   const discMonths = monthsSpan(discGolfRounds as { date: string }[])
   const golfMonths = monthsSpan(golfRounds as { date: string }[])
 
+  // nutrition
+  type MealRow = { date: string }
+  const mealWeeks = weeksSpan(mealRows as MealRow[])
+  const mealDayCounts: Record<string, number> = {}
+  for (const r of mealRows as MealRow[]) mealDayCounts[r.date] = (mealDayCounts[r.date] ?? 0) + 1
+  const fullMealDays = Object.values(mealDayCounts).filter(n => n >= 3).length
+
   return {
     lifting:      { avgDaysPerWeek: liftAvgDays, avgSetsPerWeek: liftAvgSets },
     run:          { avgMilesPerWeek: runRows.reduce((s, r) => s + (r.distance_miles ?? 0), 0) / runWeeks, avgSessionsPerWeek: runRows.length / runWeeks },
@@ -300,6 +310,7 @@ export async function fetchUserStats(supabase: SupabaseClient, userId: string): 
     spikeball:    { avgPerWeek: (spikeballGames as { date: string }[]).length / spikeWeeks, winRate: winRate(spikeballGames as WinRow[]) },
     table_tennis: { avgPerWeek: (tableTennisGames as { date: string }[]).length / ttWeeks, winRate: winRate(tableTennisGames as WinRow[]) },
     volleyball:   { avgPerWeek: (volleyballSessions as { date: string }[]).length / vbWeeks, winRate: winRate(volleyballSessions as WinRow[]) },
+    nutrition:    { avgMealsPerWeek: (mealRows as MealRow[]).length / mealWeeks, avgFullDaysPerWeek: fullMealDays / mealWeeks },
   }
 }
 
