@@ -266,6 +266,19 @@ export interface PickleballGame {
   notes: string | null
 }
 
+export interface Meal {
+  id: string
+  created_at: string
+  date: string
+  meal_type: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'
+  name: string | null
+  calories: number
+  protein_g: number | null
+  carbs_g: number | null
+  fat_g: number | null
+  notes: string | null
+}
+
 export interface PoolGame {
   id: string
   created_at: string

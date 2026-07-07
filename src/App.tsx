@@ -28,6 +28,7 @@ const XPHistory    = lazy(() => import('./pages/XPHistory').then(m => ({ default
 const Goals        = lazy(() => import('./pages/Goals').then(m => ({ default: m.Goals })))
 const Cardio       = lazy(() => import('./pages/Cardio').then(m => ({ default: m.Cardio })))
 const Water        = lazy(() => import('./pages/Water').then(m => ({ default: m.Water })))
+const Nutrition    = lazy(() => import('./pages/Nutrition').then(m => ({ default: m.Nutrition })))
 const PRFeed       = lazy(() => import('./pages/PRFeed').then(m => ({ default: m.PRFeed })))
 const Strength     = lazy(() => import('./pages/Strength').then(m => ({ default: m.Strength })))
 const Measurements = lazy(() => import('./pages/Measurements').then(m => ({ default: m.Measurements })))
@@ -380,6 +381,7 @@ function AppInner() {
         <Route path="/goals"      element={<ProtectedRoute><Goals /></ProtectedRoute>} />
         <Route path="/cardio"     element={<ProtectedRoute><Cardio /></ProtectedRoute>} />
         <Route path="/water"      element={<ProtectedRoute><Water /></ProtectedRoute>} />
+        <Route path="/nutrition"  element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
         <Route path="/pr-feed"    element={<ProtectedRoute><PRFeed /></ProtectedRoute>} />
         <Route path="/strength"      element={<ProtectedRoute><Strength /></ProtectedRoute>} />
         <Route path="/measurements" element={<ProtectedRoute><Measurements /></ProtectedRoute>} />

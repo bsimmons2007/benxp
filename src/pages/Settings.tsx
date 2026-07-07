@@ -9,10 +9,11 @@ import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme, isLightMode, setLightMode, applyTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
 import { logAuditEvent } from '../lib/audit'
-import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, SunIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon, ChevronIcon, CloseIcon } from '../components/ui/Icon'
+import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, SunIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon, ChevronIcon, CloseIcon, UtensilsIcon } from '../components/ui/Icon'
 import { getNotifPrefs, saveNotifPrefs, requestPermission, permissionGranted, notificationsSupported } from '../lib/notifications'
 import { toRoman } from '../lib/utils'
 import { getPref, setPref } from '../lib/prefs'
+import { getNutritionProfile, setNutritionProfile, ACTIVITY_LABELS, type ActivityLevel } from '../lib/nutrition'
 import { PushNotificationsSection } from '../components/settings/PushNotificationsSection'
 import {
   SECTION_DEFS, DEFAULT_ORDER,
@@ -55,7 +56,7 @@ const ALL_TABLES = [
   'mood_log', 'body_measurements', 'cardio_sessions', 'goals',
   'basketball_sessions', 'pickleball_games', 'golf_rounds', 'disc_golf_rounds',
   'hiking_sessions', 'table_tennis_games', 'chess_games', 'pool_games',
-  'volleyball_sessions', 'spikeball_games', 'water_log',
+  'volleyball_sessions', 'spikeball_games', 'water_log', 'meals',
 ]
 
 function toCSV(rows: Record<string, unknown>[]): string {
@@ -178,6 +179,13 @@ export function Settings() {
   const [notifTime, setNotifTime]       = useState(() => getNotifPrefs().time)
   const [notifPerm, setNotifPerm]       = useState(() => permissionGranted())
   const [changelogOpen, setChangelogOpen] = useState(false)
+  const [nutritionOpen, setNutritionOpen] = useState(false)
+  const [nutrition, setNutritionState] = useState(getNutritionProfile)
+
+  function patchNutrition(patch: Partial<ReturnType<typeof getNutritionProfile>>) {
+    setNutritionState(prev => ({ ...prev, ...patch }))
+    setNutritionProfile(patch)
+  }
 
   async function saveName() {
     if (!nameInput.trim()) return
@@ -226,7 +234,8 @@ export function Settings() {
     const results = await Promise.all(
       ALL_TABLES.map(t => supabase.from(t).delete().eq('user_id', user.id))
     )
-    const failed = results.filter(r => r.error)
+    // 42P01 = table missing (phase7 migration not run yet) — nothing to delete there
+    const failed = results.filter(r => r.error && r.error.code !== '42P01')
     if (failed.length > 0) {
       console.error('[deleteAccount] Some deletions failed:', failed.map(r => r.error))
       setDeleting(false)
@@ -584,6 +593,204 @@ export function Settings() {
                     )
                   })}
                 </div>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        {/* ── Nutrition profile card ───────────────────────────────── */}
+        <Card className="mb-2">
+          <button onClick={() => setNutritionOpen(o => !o)} className="w-full flex items-center justify-between py-2">
+            <div className="flex items-center gap-3">
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}><UtensilsIcon size={18} color="var(--text-secondary)" /></span>
+              <div className="text-left">
+                <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>Nutrition Profile</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>
+                  {nutrition.goal}
+                  {nutrition.height_in && nutrition.age && nutrition.sex
+                    ? ` · ${Math.floor(nutrition.height_in / 12)}'${nutrition.height_in % 12} · ${nutrition.age} · ${nutrition.sex}`
+                    : ' · not set up'}
+                </p>
+              </div>
+            </div>
+            <Chevron open={nutritionOpen} />
+          </button>
+
+          {nutritionOpen && (
+            <div className="pb-1 pop-in">
+              {/* Height */}
+              <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <div className="flex items-center gap-3">
+                  <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><RulerIcon size={16} color="var(--text-muted)" /></span>
+                  <div>
+                    <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500 }}>Height</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Inches — e.g. 72 = 6'0</p>
+                  </div>
+                </div>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={nutrition.height_in ?? ''}
+                  onChange={e => patchNutrition({ height_in: e.target.value === '' ? null : Number(e.target.value) })}
+                  placeholder="72"
+                  className="font-mono"
+                  style={{
+                    width: 72, padding: '6px 10px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    color: 'var(--text-primary)', outline: 'none', textAlign: 'right', flexShrink: 0,
+                  }}
+                />
+              </div>
+
+              {/* Age */}
+              <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <div className="flex items-center gap-3">
+                  <span style={{ width: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CalendarIcon size={16} color="var(--text-muted)" /></span>
+                  <div>
+                    <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500 }}>Age</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Years</p>
+                  </div>
+                </div>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={nutrition.age ?? ''}
+                  onChange={e => patchNutrition({ age: e.target.value === '' ? null : Number(e.target.value) })}
+                  placeholder="30"
+                  className="font-mono"
+                  style={{
+                    width: 72, padding: '6px 10px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    color: 'var(--text-primary)', outline: 'none', textAlign: 'right', flexShrink: 0,
+                  }}
+                />
+              </div>
+
+              {/* Sex */}
+              <div className="py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500, marginBottom: 8 }}>Sex</p>
+                <div className="flex gap-3">
+                  {(['male', 'female'] as const).map(s => (
+                    <button
+                      key={s}
+                      onClick={() => patchNutrition({ sex: s })}
+                      className="flex-1 py-2 rounded-xl font-semibold text-sm capitalize"
+                      style={{
+                        background: nutrition.sex === s ? 'var(--accent)' : 'var(--input-bg)',
+                        color: nutrition.sex === s ? 'var(--base-bg)' : 'var(--text-muted)',
+                        border: `1px solid ${nutrition.sex === s ? 'var(--accent)' : 'var(--border)'}`,
+                      }}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Activity level */}
+              <div className="py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500, marginBottom: 8 }}>Activity level</p>
+                <select
+                  value={nutrition.activity}
+                  onChange={e => patchNutrition({ activity: e.target.value as ActivityLevel })}
+                  style={{
+                    width: '100%', padding: '9px 12px', borderRadius: 8,
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    color: 'var(--text-primary)', fontSize: 13, fontWeight: 600, outline: 'none',
+                  }}
+                >
+                  {(Object.keys(ACTIVITY_LABELS) as ActivityLevel[]).map(key => (
+                    <option key={key} value={key}>{ACTIVITY_LABELS[key]}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Goal */}
+              <div className="py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500, marginBottom: 8 }}>Goal</p>
+                <div className="flex gap-2">
+                  {(['bulk', 'cut', 'maintain'] as const).map(g => (
+                    <button
+                      key={g}
+                      onClick={() => patchNutrition({ goal: g })}
+                      className="flex-1 py-2 rounded-xl font-semibold text-sm capitalize"
+                      style={{
+                        background: nutrition.goal === g ? 'var(--accent)' : 'var(--input-bg)',
+                        color: nutrition.goal === g ? 'var(--base-bg)' : 'var(--text-muted)',
+                        border: `1px solid ${nutrition.goal === g ? 'var(--accent)' : 'var(--border)'}`,
+                      }}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bulk surplus */}
+              <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <div>
+                  <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500 }}>Bulk surplus</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Calories added on top of TDEE</p>
+                </div>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={nutrition.bulkSurplus}
+                  onChange={e => patchNutrition({ bulkSurplus: e.target.value === '' ? 0 : Number(e.target.value) })}
+                  className="font-mono"
+                  style={{
+                    width: 80, padding: '6px 10px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    color: 'var(--text-primary)', outline: 'none', textAlign: 'right', flexShrink: 0,
+                  }}
+                />
+              </div>
+
+              {/* Cut deficit */}
+              <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <div>
+                  <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500 }}>Cut deficit</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Calories subtracted from TDEE</p>
+                </div>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={nutrition.cutDeficit}
+                  onChange={e => patchNutrition({ cutDeficit: e.target.value === '' ? 0 : Number(e.target.value) })}
+                  className="font-mono"
+                  style={{
+                    width: 80, padding: '6px 10px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    color: 'var(--text-primary)', outline: 'none', textAlign: 'right', flexShrink: 0,
+                  }}
+                />
+              </div>
+
+              {/* Protein target */}
+              <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <div>
+                  <p style={{ color: "var(--text-primary)", fontSize: "0.875rem", fontWeight: 500 }}>Protein target</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 11 }}>Grams per lb bodyweight</p>
+                </div>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step={0.1}
+                  value={nutrition.proteinPerLb}
+                  onChange={e => patchNutrition({ proteinPerLb: e.target.value === '' ? 0 : Number(e.target.value) })}
+                  className="font-mono"
+                  style={{
+                    width: 80, padding: '6px 10px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    color: 'var(--text-primary)', outline: 'none', textAlign: 'right', flexShrink: 0,
+                  }}
+                />
+              </div>
+
+              <div className="pt-2.5" style={{ borderTop: '1px solid var(--border-faint)' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: 11, lineHeight: 1.5 }}>
+                  When a body-fat % is logged in Measurements, the calorie formula uses it directly (Katch-McArdle) and height/age/sex are not needed. Otherwise these fields are required for the fallback formula.
+                </p>
               </div>
             </div>
           )}

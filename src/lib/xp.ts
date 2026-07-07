@@ -95,6 +95,8 @@ export const XP_RATES = {
   pool_game:            10,   // per game logged
   pool_win:             15,   // win bonus
   pool_break_and_run:   25,   // bonus for break and run
+  meal_logged:          10,   // per meal, capped at 4/day (anti-farming)
+  nutrition_full_day:   25,   // bonus per day with >= 3 meals logged
 }
 
 // ── Leveling curve ────────────────────────────────────────────
@@ -171,6 +173,7 @@ export interface XPAggregates {
   vb_games: number;             vb_wins: number
   sb_games: number;             sb_wins: number
   pool_games: number;           pool_wins: number;        pool_bnr: number
+  meals_logged: number;         nutrition_full_days: number
 }
 
 /** Total XP from aggregates × XP_RATES — the single source of XP truth. */
@@ -220,6 +223,8 @@ export function xpFromAggregates(a: XPAggregates): number {
     + a.pool_games    * XP_RATES.pool_game
     + a.pool_wins     * XP_RATES.pool_win
     + a.pool_bnr      * XP_RATES.pool_break_and_run
+    + a.meals_logged         * XP_RATES.meal_logged
+    + a.nutrition_full_days  * XP_RATES.nutrition_full_day
   )
 }
 
@@ -247,6 +252,7 @@ export function seasonAggregatesFromRpc(raw: Record<string, number>): XPAggregat
     hike_miles: 0, hike_elev_buckets: 0, tt_games: 0, tt_wins: 0,
     chess_games: 0, chess_wins: 0, chess_draws: 0, vb_games: 0, vb_wins: 0,
     sb_games: 0, sb_wins: 0, pool_games: 0, pool_wins: 0, pool_bnr: 0,
+    meals_logged: s('meals_logged'), nutrition_full_days: s('nutrition_full_days'),
   }
 }
 
@@ -273,9 +279,13 @@ export function aggregatesFromRawRows(r: RawActivityData, since?: string): XPAgg
   const hike = r.hikeRows.filter(x => on(x.date)); const tt = r.ttRows.filter(x => on(x.date))
   const chess = r.chessRows.filter(x => on(x.date)); const vb = r.vbRows.filter(x => on(x.date))
   const sb = r.sbRows.filter(x => on(x.date)); const pool = r.poolRows.filter(x => on(x.date))
+  const meals = r.mealRows.filter(x => on(x.date))
 
   const waterByDate: Record<string, number> = {}
   for (const w of water) waterByDate[w.date] = (waterByDate[w.date] ?? 0) + Number(w.oz)
+
+  const mealsByDate: Record<string, number> = {}
+  for (const m of meals) mealsByDate[m.date] = (mealsByDate[m.date] ?? 0) + 1
 
   return {
     set_count: lift.length,
@@ -315,6 +325,8 @@ export function aggregatesFromRawRows(r: RawActivityData, since?: string): XPAgg
     sb_games: sb.length, sb_wins: sb.filter(x => x.win).length,
     pool_games: pool.length, pool_wins: pool.filter(x => x.win).length,
     pool_bnr: pool.filter(x => x.break_and_run).length,
+    meals_logged: Object.values(mealsByDate).reduce((s, c) => s + Math.min(c, 4), 0),
+    nutrition_full_days: Object.values(mealsByDate).filter(c => c >= 3).length,
   }
 }
 
@@ -373,6 +385,7 @@ export interface RawActivityData {
   sbRows:        { date: string; win: boolean }[]
   moodRows:      { date: string; mood?: number | null }[]
   waterRows:     { date: string; oz: number }[]
+  mealRows:      { date: string; meal_type: string; name: string | null; calories: number; protein_g: number | null; carbs_g: number | null; fat_g: number | null }[]
 }
 
 // ── localStorage cache (stale-while-revalidate, keyed per user) ──
@@ -412,7 +425,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient, userId: string):
   // back to computing XP from rawRows below — same numbers, more bytes.
   const aggPromise = supabase.rpc('get_xp_aggregates', { uid: userId })
 
-  const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess, volleyball, spikeball, pool] = await Promise.all([
+  const [lifting, skate, prs, books, games, challenges, sleepLogs, cardio, goals, moodLogs, measurements, waterLog, basketball, pickleball, golf, discGolf, hiking, tableTennis, chess, volleyball, spikeball, pool, mealLog] = await Promise.all([
     supabase.from('lifting_log').select('date, lift, est_1rm, weight, sets, reps').eq('user_id', userId),
     supabase.from('skate_sessions').select('miles, date').eq('user_id', userId),
     supabase.from('pr_history').select('lift, est_1rm, date').eq('user_id', userId),
@@ -435,6 +448,8 @@ export async function fetchXPAndStats(supabase: SupabaseClient, userId: string):
     supabase.from('volleyball_sessions').select('win, date, format, kills').eq('user_id', userId),
     supabase.from('spikeball_games').select('win, date').eq('user_id', userId),
     supabase.from('pool_games').select('win, break_and_run, date, game_type').eq('user_id', userId),
+    // meals table may not exist yet (phase7 migration) — error → empty rows below
+    supabase.from('meals').select('date, meal_type, name, calories, protein_g, carbs_g, fat_g').eq('user_id', userId),
   ])
 
   // Rows reused by the Stats section below
@@ -466,6 +481,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient, userId: string):
     sbRows:        (spikeball.data ?? []) as RawActivityData['sbRows'],
     moodRows:      (moodLogs.data ?? []) as RawActivityData['moodRows'],
     waterRows:     (waterLog.data ?? []) as RawActivityData['waterRows'],
+    mealRows:      (mealLog.data ?? []) as RawActivityData['mealRows'],
   }
 
   // ── XP: prefer server-side aggregates, fall back to rawRows ────
@@ -497,6 +513,7 @@ export async function fetchXPAndStats(supabase: SupabaseClient, userId: string):
       vb_games: Number(raw.vb_games ?? 0), vb_wins: Number(raw.vb_wins ?? 0),
       sb_games: Number(raw.sb_games ?? 0), sb_wins: Number(raw.sb_wins ?? 0),
       pool_games: Number(raw.pool_games ?? 0), pool_wins: Number(raw.pool_wins ?? 0), pool_bnr: Number(raw.pool_bnr ?? 0),
+      meals_logged: Number(raw.meals_logged ?? 0), nutrition_full_days: Number(raw.nutrition_full_days ?? 0),
     }
     totalXP  = xpFromAggregates(allAgg)
     seasonXP = xpFromAggregates(seasonAggregatesFromRpc(raw))
@@ -639,6 +656,9 @@ export function deriveActivityFromRawRows(rawRows: RawActivityData): ActivityEnt
     })),
     ...top(rawRows.sbRows, 2).map(r => ({
       type: 'spikeball', label: `Spikeball — ${r.win ? 'Win' : 'Loss'}`, date: r.date, icon: 'spikeball',
+    })),
+    ...top(rawRows.mealRows, 2).map(r => ({
+      type: 'meal', label: `${r.name || r.meal_type} — ${r.calories} cal`, date: r.date, icon: 'nutrition',
     })),
   ]
   entries.sort((a, b) => b.date.localeCompare(a.date))

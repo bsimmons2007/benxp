@@ -10,6 +10,7 @@ import {
   Mountain, Snowflake, Terminal, Volleyball, Flag,
   Disc3, Sparkles, Grid3x3, Sun, Sprout, Bird,
   Orbit, Crosshair, Radio, Table2, RefreshCw, Circle, ArrowUpRight, Lightbulb,
+  UtensilsCrossed,
 } from 'lucide-react'
 
 export type IconProps = { size?: number; color?: string; style?: CSSProperties; className?: string }
@@ -84,6 +85,7 @@ export const RefreshCwIcon   = adapt(RefreshCw)
 export const CircleIcon      = adapt(Circle)
 export const ArrowUpRightIcon = adapt(ArrowUpRight)
 export const LightbulbIcon   = adapt(Lightbulb)
+export const UtensilsIcon    = adapt(UtensilsCrossed)
 
 // ── Map: section key → icon component ─────────────────────────
 
@@ -99,6 +101,7 @@ const SECTION_ICON_MAP: Record<string, IconComponent> = {
   water:      DropletIcon,
   basketball: BasketballIcon,
   hobbies:    HobbiesIcon,
+  nutrition:  UtensilsIcon,
 }
 
 const ACTIVITY_ICON_MAP: Record<string, IconComponent> = {
@@ -121,6 +124,8 @@ const ACTIVITY_ICON_MAP: Record<string, IconComponent> = {
   pool:         PoolIcon,
   volleyball:   VolleyballIcon,
   spikeball:    SpikeballIcon,
+  nutrition:    UtensilsIcon,
+  meal:         UtensilsIcon,
 }
 
 export function SectionIcon({ sectionKey, size = 20, color = 'currentColor', style }: {

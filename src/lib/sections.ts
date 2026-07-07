@@ -1,4 +1,4 @@
-export type SectionKey = 'lifting' | 'books' | 'skate' | 'sleep' | 'fortnite' | 'challenges' | 'mood' | 'cardio' | 'water' | 'basketball' | 'hobbies'
+export type SectionKey = 'lifting' | 'books' | 'skate' | 'sleep' | 'fortnite' | 'challenges' | 'mood' | 'cardio' | 'water' | 'basketball' | 'hobbies' | 'nutrition'
 
 export interface SectionDef {
   label: string
@@ -19,11 +19,12 @@ export const SECTION_DEFS: Record<SectionKey, SectionDef> = {
   water:      { label: 'Water',    icon: 'water',      path: '/water',      categories: ['Health'] },
   basketball: { label: 'Hoops',    icon: 'basketball', path: '/basketball', categories: ['Basketball'] },
   hobbies:    { label: 'Hobbies',  icon: 'hobbies',    path: '/hobbies',    categories: ['Basketball', 'Gaming'] },
+  nutrition:  { label: 'Nutrition', icon: 'nutrition',  path: '/nutrition',  categories: ['Health'] },
 }
 
 // Skate is a subsection of Cardio — removed from nav
 // Basketball + Fortnite live under /hobbies — excluded from standalone nav
-export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'books', 'cardio', 'sleep', 'challenges', 'mood', 'water', 'hobbies']
+export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'books', 'cardio', 'sleep', 'challenges', 'mood', 'water', 'nutrition', 'hobbies']
 
 export function loadSectionOrder(): SectionKey[] {
   try {

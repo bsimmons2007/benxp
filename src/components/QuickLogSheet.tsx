@@ -11,14 +11,14 @@ import {
   DumbbellIcon, RunIcon, MoonIcon, BrainIcon, DropletIcon, BookIcon,
   GamepadIcon, BasketballIcon, TargetIcon, PoolIcon, TableTennisIcon,
   VolleyballIcon, SpikeballIcon, ChessIcon, GolfIcon, DiscIcon,
-  MountainIcon, SkateIcon, ChevronRightIcon,
+  MountainIcon, SkateIcon, ChevronRightIcon, UtensilsIcon,
   type IconComponent,
 } from './ui/Icon'
 
 // ── Activity registry ─────────────────────────────────────────────
 // `kind` drives which inline form renders. `link` activities navigate out.
 
-type ActivityKind = 'water' | 'mood' | 'sleep' | 'cardio' | 'winloss' | 'skate' | 'hiking' | 'link'
+type ActivityKind = 'water' | 'mood' | 'sleep' | 'cardio' | 'winloss' | 'skate' | 'hiking' | 'nutrition' | 'link'
 
 interface QuickActivity {
   id: string
@@ -48,6 +48,8 @@ const CARDIO_TYPES = [
   { key: 'walk', label: 'Walk', rate: XP_RATES.cardio_walk_per_mile },
 ]
 
+const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
+
 export function useQuickActivities(): QuickActivity[] {
   const rawRows = useStore(s => s.rawRows)
 
@@ -61,6 +63,8 @@ export function useQuickActivities(): QuickActivity[] {
         recencyDates: () => dates(r?.waterRows) },
       { id: 'mood', label: 'Mood', Icon: BrainIcon, color: 'var(--cat-mood)', kind: 'mood',
         recencyDates: () => dates(r?.moodRows) },
+      { id: 'nutrition', label: 'Meal', Icon: UtensilsIcon, color: 'var(--cat-wellness)', kind: 'nutrition',
+        recencyDates: () => dates(r?.mealRows) },
       { id: 'sleep', label: 'Sleep', Icon: MoonIcon, color: 'var(--cat-sleep)', kind: 'sleep',
         recencyDates: () => dates(r?.sleepRows) },
       { id: 'cardio', label: 'Cardio', Icon: RunIcon, color: 'var(--cat-cardio)', kind: 'cardio',
@@ -187,6 +191,12 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
   const [hours, setHours]       = useState('')
   const [bedtime, setBedtime]   = useState('')
   const [wake, setWake]         = useState('')
+  const [mealType, setMealType] = useState(() => getLastUsed('meal_type', 'Lunch'))
+  const [calories, setCalories] = useState('')
+  const [mealName, setMealName] = useState('')
+  const [protein, setProtein]   = useState('')
+  const [carbs, setCarbs]       = useState('')
+  const [fat, setFat]           = useState('')
 
   async function withUser(fn: (uid: string) => Promise<void>) {
     setSaving(true)
@@ -282,6 +292,23 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
         .insert({ user_id: uid, date: today(), distance_miles: m }).select('id').single()
       if (error || !data) return
       finish(`+${Math.round(m * XP_RATES.hiking_per_mile)} XP - ${m} mi hiked`, 'hiking_sessions', data.id, false)
+    })
+  }
+
+  // ── Nutrition ──
+  async function saveMeal() {
+    const cals = parseFloat(calories)
+    if (!isFinite(cals) || cals <= 0) return
+    setLastUsed('meal_type', mealType)
+    await withUser(async uid => {
+      const { data, error } = await supabase.from('meals')
+        .insert({
+          user_id: uid, date: today(), meal_type: mealType, name: mealName || null,
+          calories: cals, protein_g: protein ? parseFloat(protein) : null,
+          carbs_g: carbs ? parseFloat(carbs) : null, fat_g: fat ? parseFloat(fat) : null,
+        }).select('id').single()
+      if (error || !data) return
+      finish(`+${cals} cal logged`, 'meals', data.id, false)
     })
   }
 
@@ -415,6 +442,46 @@ function InlineForm({ act, onSaved }: { act: QuickActivity; onSaved: (msg: strin
           <input value={miles} onChange={e => setMiles(e.target.value)} type="number" step="0.01" inputMode="decimal" placeholder="3.0" style={inputStyle} />
         </div>
         <SaveBtn saving={saving} onClick={save} disabled={!miles} />
+      </div>
+    )
+  }
+
+  if (act.kind === 'nutrition') {
+    return (
+      <div className="flex flex-col gap-3 pt-1">
+        <div className="grid grid-cols-4 gap-2">
+          {MEAL_TYPES.map(m => {
+            const on = mealType === m
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMealType(m)}
+                style={{ padding: '9px 0', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: on ? 700 : 500,
+                  background: on ? 'var(--accent-subtle)' : 'var(--input-bg)', border: `1px solid ${on ? 'var(--accent)' : 'var(--border)'}`,
+                  color: on ? 'var(--accent)' : 'var(--text-muted)' }}
+              >
+                {m}
+              </button>
+            )
+          })}
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className={labelCls}>Calories</span>
+          <input value={calories} onChange={e => setCalories(e.target.value)} type="number" inputMode="numeric" placeholder="600" style={inputStyle} />
+        </div>
+        <DetailsToggle open={showDetails} onToggle={() => setShowDetails(v => !v)} />
+        {showDetails && (
+          <div className="flex flex-col gap-2">
+            <input value={mealName} onChange={e => setMealName(e.target.value)} placeholder="Meal name (optional)" style={inputStyle} />
+            <div className="grid grid-cols-3 gap-2">
+              <input value={protein} onChange={e => setProtein(e.target.value)} type="number" inputMode="decimal" placeholder="Protein g" style={inputStyle} />
+              <input value={carbs} onChange={e => setCarbs(e.target.value)} type="number" inputMode="decimal" placeholder="Carbs g" style={inputStyle} />
+              <input value={fat} onChange={e => setFat(e.target.value)} type="number" inputMode="decimal" placeholder="Fat g" style={inputStyle} />
+            </div>
+          </div>
+        )}
+        <SaveBtn saving={saving} onClick={saveMeal} disabled={!calories || parseFloat(calories) <= 0} />
       </div>
     )
   }
