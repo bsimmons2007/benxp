@@ -118,12 +118,12 @@ function WeekDotStrip({ streak }: {
 
   return (
     <div className="flex items-center justify-between mb-5 px-1">
-      {/* Day squares */}
-      <div ref={dotsRef} className="flex gap-1">
+      {/* Day squares — flexible so the strip never overflows narrow screens */}
+      <div ref={dotsRef} className="flex gap-1" style={{ flex: 1, minWidth: 0 }}>
         {days.map((day, i) => (
-          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1, maxWidth: 38, minWidth: 0 }}>
             <div style={{
-              width: 34, height: 34, borderRadius: 8,
+              width: '100%', maxWidth: 34, aspectRatio: '1', borderRadius: 8,
               background: day.isActive
                 ? 'var(--accent)'
                 : day.isToday
@@ -146,7 +146,7 @@ function WeekDotStrip({ streak }: {
 
       {/* Streak info */}
       {!streak.loading && (
-        <div style={{ textAlign: 'right', paddingLeft: 10 }}>
+        <div style={{ textAlign: 'right', paddingLeft: 10, flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', lineHeight: 1 }}>
             <span style={{ fontSize: 22, fontWeight: 700,
               color: streak.current > 0 ? 'var(--accent)' : 'var(--text-muted)',

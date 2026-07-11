@@ -149,6 +149,11 @@ html, body, #root {
   background: var(--surface-0);
 }
 
+/* Guard: a too-wide component should clip, never give the page a side-scroll */
+html, body {
+  overflow-x: clip;
+}
+
 body {
   overscroll-behavior: none;
 }

@@ -16,10 +16,14 @@ export function BottomNav() {
     return () => window.removeEventListener('sections-updated', onUpdate)
   }, [])
 
+  // Core sections only — the top of the user's section order. Everything else
+  // stays reachable via the hamburger drawer (SideNav) and More.
+  const CORE_TABS = 3
   const tabs = [
     { to: '/',     label: 'Home', iconKey: '__home' },
     ...order
       .filter(key => !hidden.includes(key))
+      .slice(0, CORE_TABS)
       .map(key => ({ to: SECTION_DEFS[key].path, label: SECTION_DEFS[key].label, iconKey: key })),
     { to: '/more', label: 'More', iconKey: '__more' },
   ]
