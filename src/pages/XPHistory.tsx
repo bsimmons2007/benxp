@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { PageWrapper } from '../components/layout/PageWrapper'
-import { TopBar } from '../components/layout/TopBar'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { useXP } from '../hooks/useXP'
@@ -11,7 +9,6 @@ import {
   ChessIcon, PoolIcon, VolleyballIcon, SpikeballIcon, BrainIcon, DropletIcon, RulerIcon,
   ZapIcon,
 } from '../components/ui/Icon'
-import { usePageTitle } from '../hooks/usePageTitle'
 
 const CAT_COLORS = {
   lift:      { icon: 'var(--accent)',  bg: 'color-mix(in srgb, var(--accent) 14%, transparent)' },
@@ -372,8 +369,7 @@ function formatDate(iso: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export function XPHistory() {
-  usePageTitle('XP History')
+export function XPHistoryContent() {
   const [events,       setEvents]       = useState<XPEvent[]>([])
   const [loading,      setLoading]      = useState(true)
   const [loadError,    setLoadError]    = useState(false)
@@ -412,9 +408,6 @@ export function XPHistory() {
 
   return (
     <>
-      <TopBar title="XP History" />
-      <PageWrapper>
-
         {/* Hero */}
         <div className="mb-5 rounded-2xl p-5" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
           <p className="section-label mb-1">All-Time XP</p>
@@ -506,7 +499,6 @@ export function XPHistory() {
             )}
           </div>
         )}
-      </PageWrapper>
     </>
   )
 }

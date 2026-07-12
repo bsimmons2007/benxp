@@ -63,6 +63,8 @@ src/
 │   ├── GameLogPage.tsx      # Config-driven W/L sport page (see "GameLogPage" section)
 │   ├── QuickLogSheet.tsx    # Universal quick-log bottom sheet (TopBar + button)
 │   ├── TodayCard.tsx        # Home: today checklist (sleep/water/mood/meals/activity)
+│   ├── OnboardingPicker.tsx # First-run interest picker (new accounts, before tutorial) —
+│   │                        #   seeds section order/hidden + homeStatPicks
 │   ├── OnThisDayCard.tsx    # Home: events exactly 1/2/3 years ago (renders nothing if none)
 │   ├── BodyMap.tsx          # SVG muscle diagram — colored by rank/recency
 │   ├── StrengthTab.tsx      # Lifting log UI (sets table, PRs, trends)
@@ -104,6 +106,7 @@ src/
 │   ├── theme.ts             # 40+ themes; auto-switch by hour; persisted via prefs (synced)
 │   ├── notifications.ts     # In-app daily reminder + streak-break warning (token-aware)
 │   ├── offlineQueue.ts      # Queues writes made offline
+│   ├── publicProfile.ts     # Auto-sync leaderboard XP after refreshXP (public profiles only)
 │   ├── animations.ts / sounds.ts / muscleScore.ts / skills.ts / tutorial.ts / utils.ts
 │   ├── audit.ts / sentry.ts / validation.ts / changelog.ts / strengthData.ts
 │   └── supabase.ts          # Supabase client
@@ -111,9 +114,10 @@ src/
 │   ├── Home.tsx             # XP hero (level ring, season line, progress), TodayCard,
 │   │                        #   OnThisDayCard, week dots + FreezeTokens, widgets, feed
 │   ├── Records.tsx          # Lifting log — route /lifting (/records redirects)
-│   ├── Yearly.tsx           # /yearly — 53×7 activity heatmap, year totals, month bars,
-│   │                        #   year switcher (linked from More)
-│   ├── Weekly.tsx / Monthly.tsx / XPHistory.tsx / PRFeed.tsx
+│   ├── Progress.tsx         # /progress — Week/Month/Year/History/PRs tabs (?tab= deep link;
+│   │                        #   /weekly /monthly /yearly /xp-history /pr-feed redirect here)
+│   ├── Weekly / Monthly / Yearly / XPHistory / PRFeed  # export *Content components
+│   │                        #   rendered as Progress tabs (no page shells of their own)
 │   ├── Pickleball / Pool / Spikeball / TableTennis  # thin configs over GameLogPage
 │   ├── Basketball / Chess / Golf / DiscGolf / Volleyball  # bespoke (box scores, ELO,
 │   │                        #   scorecards, dual formats) but share all conventions

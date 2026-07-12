@@ -883,7 +883,7 @@ export function Home() {
             <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em' }}>
               Recent Activity
             </p>
-            <Link to="/xp-history" style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)' }}>
+            <Link to="/progress?tab=history" style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)' }}>
               See all →
             </Link>
           </div>

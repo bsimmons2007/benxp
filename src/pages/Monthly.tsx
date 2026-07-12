@@ -1,14 +1,11 @@
 ﻿import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { PageWrapper } from '../components/layout/PageWrapper'
-import { TopBar } from '../components/layout/TopBar'
 import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { XP_RATES } from '../lib/xp'
 import { useCountUp } from '../hooks/useCountUp'
 import { localDateStr } from '../lib/utils'
 import { DumbbellIcon, SkateIcon, GamepadIcon, MoonIcon, TrophyIcon, BookIcon, StarIcon } from '../components/ui/Icon'
-import { usePageTitle } from '../hooks/usePageTitle'
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
@@ -40,8 +37,7 @@ interface MonthlyData {
   avgSleep:    number
 }
 
-export function Monthly() {
-  usePageTitle('Monthly Reel')
+export function MonthlyContent() {
   const now    = new Date()
   const [year,  setYear]  = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth())
@@ -156,9 +152,6 @@ export function Monthly() {
 
   return (
     <>
-      <TopBar title="Monthly" />
-      <PageWrapper>
-
         {/* Month navigator */}
         <div className="flex items-center justify-between mb-5">
           <button onClick={prevMonth} style={{ color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: '4px 8px' }}>‹</button>
@@ -245,7 +238,6 @@ export function Monthly() {
             )}
           </>
         )}
-      </PageWrapper>
     </>
   )
 }

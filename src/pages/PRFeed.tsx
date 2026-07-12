@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { TopBar } from '../components/layout/TopBar'
-import { PageWrapper } from '../components/layout/PageWrapper'
 import { EmptyState } from '../components/ui/EmptyState'
 import { TrophyIcon, SearchIcon, DumbbellIcon, ZapIcon } from '../components/ui/Icon'
 import { supabase } from '../lib/supabase'
 import { formatDate } from '../lib/utils'
 import type { PrHistory, LiftType } from '../types'
-import { usePageTitle } from '../hooks/usePageTitle'
 
 const LIFT_ORDER: LiftType[] = ['Bench', 'Squat', 'Deadlift', 'PullUps', 'PushUps']
 
@@ -115,8 +112,7 @@ function BestLiftRanking({ prs }: { prs: PrHistory[] }) {
   )
 }
 
-export function PRFeed() {
-  usePageTitle('PR Feed')
+export function PRFeedContent() {
   const navigate = useNavigate()
   const [prs,     setPrs]     = useState<PrHistory[]>([])
   const [loading, setLoading] = useState(true)
@@ -147,9 +143,6 @@ export function PRFeed() {
 
   return (
     <>
-      <TopBar title="PR Feed" />
-      <PageWrapper>
-
         {/* Best lift ranking */}
         {!loading && prs.length > 0 && <BestLiftRanking prs={prs} />}
 
@@ -251,7 +244,6 @@ export function PRFeed() {
             )}
           </div>
         )}
-      </PageWrapper>
     </>
   )
 }

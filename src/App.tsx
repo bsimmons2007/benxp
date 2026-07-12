@@ -18,18 +18,14 @@ const Fortnite     = lazy(() => import('./pages/Fortnite').then(m => ({ default:
 const More         = lazy(() => import('./pages/More').then(m => ({ default: m.More })))
 const Settings     = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })))
 const Profile      = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })))
-const Weekly       = lazy(() => import('./pages/Weekly').then(m => ({ default: m.Weekly })))
-const Monthly      = lazy(() => import('./pages/Monthly').then(m => ({ default: m.Monthly })))
-const Yearly       = lazy(() => import('./pages/Yearly').then(m => ({ default: m.Yearly })))
+const Progress     = lazy(() => import('./pages/Progress').then(m => ({ default: m.Progress })))
 const Mood         = lazy(() => import('./pages/Mood').then(m => ({ default: m.Mood })))
 const DevSettings  = lazy(() => import('./pages/DevSettings').then(m => ({ default: m.DevSettings })))
 const ShareCard    = lazy(() => import('./pages/ShareCard').then(m => ({ default: m.ShareCard })))
-const XPHistory    = lazy(() => import('./pages/XPHistory').then(m => ({ default: m.XPHistory })))
 const Goals        = lazy(() => import('./pages/Goals').then(m => ({ default: m.Goals })))
 const Cardio       = lazy(() => import('./pages/Cardio').then(m => ({ default: m.Cardio })))
 const Water        = lazy(() => import('./pages/Water').then(m => ({ default: m.Water })))
 const Nutrition    = lazy(() => import('./pages/Nutrition').then(m => ({ default: m.Nutrition })))
-const PRFeed       = lazy(() => import('./pages/PRFeed').then(m => ({ default: m.PRFeed })))
 const Strength     = lazy(() => import('./pages/Strength').then(m => ({ default: m.Strength })))
 const Measurements = lazy(() => import('./pages/Measurements').then(m => ({ default: m.Measurements })))
 const Basketball   = lazy(() => import('./pages/Basketball').then(m => ({ default: m.Basketball })))
@@ -49,10 +45,12 @@ const Leaderboard  = lazy(() => import('./pages/Leaderboard').then(m => ({ defau
 const NotFound     = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })))
 const LevelUpOverlay  = lazy(() => import('./components/ui/LevelUpOverlay').then(m => ({ default: m.LevelUpOverlay })))
 const TutorialOverlay = lazy(() => import('./components/ui/TutorialOverlay').then(m => ({ default: m.TutorialOverlay })))
+const OnboardingPicker = lazy(() => import('./components/OnboardingPicker').then(m => ({ default: m.OnboardingPicker })))
 const QuickLogSheet   = lazy(() => import('./components/QuickLogSheet').then(m => ({ default: m.QuickLogSheet })))
 import { applyTimeOrSavedTheme } from './lib/theme'
 import { setupOfflineQueue } from './lib/offlineQueue'
 import { isTutorialDone } from './lib/tutorial'
+import { getPref } from './lib/prefs'
 import { checkDailyReminder } from './lib/notifications'
 import { autoSubscribeIfGranted } from './lib/push'
 import { useAuth } from './hooks/useAuth'
@@ -303,6 +301,13 @@ function AppInner() {
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/reset-password'
   const refreshXP  = useStore(s => s.refreshXP)
   const initialized = useStore(s => s.initialized)
+  const totalXP    = useStore(s => s.totalXP)
+
+  // First-run interest picker: brand-new accounts only (no XP, tutorial not
+  // done, never completed onboarding). Shows before the tutorial.
+  const [onboardDone, setOnboardDone] = useState<boolean>(() => getPref('onboardingDone', false))
+  const showOnboarding = !isAuthRoute && initialized && totalXP === 0
+    && !onboardDone && !isTutorialDone() && location.pathname === '/'
 
   // Refresh data when network comes back online
   const lastOnlineAt = useRef<number>(0)
@@ -347,7 +352,12 @@ function AppInner() {
       <OfflineBanner />
       <TopLoadBar />
       <Suspense fallback={null}><LevelUpOverlay /></Suspense>
-      {showTutorial && !isAuthRoute && (
+      {showOnboarding && (
+        <Suspense fallback={null}>
+          <OnboardingPicker onDone={() => setOnboardDone(true)} />
+        </Suspense>
+      )}
+      {showTutorial && !isAuthRoute && !showOnboarding && (
         <Suspense fallback={null}>
           <TutorialOverlay onDone={() => setShowTutorial(false)} />
         </Suspense>
@@ -370,18 +380,19 @@ function AppInner() {
         <Route path="/more"       element={<ProtectedRoute><More /></ProtectedRoute>} />
         <Route path="/settings"   element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/profile"    element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/weekly"     element={<ProtectedRoute><Weekly /></ProtectedRoute>} />
-        <Route path="/monthly"    element={<ProtectedRoute><Monthly /></ProtectedRoute>} />
-        <Route path="/yearly"     element={<ProtectedRoute><Yearly /></ProtectedRoute>} />
+        <Route path="/progress"   element={<ProtectedRoute><Progress /></ProtectedRoute>} />
+        <Route path="/weekly"     element={<Navigate to="/progress?tab=week" replace />} />
+        <Route path="/monthly"    element={<Navigate to="/progress?tab=month" replace />} />
+        <Route path="/yearly"     element={<Navigate to="/progress?tab=year" replace />} />
         <Route path="/mood"       element={<ProtectedRoute><Mood /></ProtectedRoute>} />
         <Route path="/dev"        element={<ProtectedRoute><DevSettings /></ProtectedRoute>} />
         <Route path="/share"      element={<ProtectedRoute><ShareCard /></ProtectedRoute>} />
-        <Route path="/xp-history" element={<ProtectedRoute><XPHistory /></ProtectedRoute>} />
+        <Route path="/xp-history" element={<Navigate to="/progress?tab=history" replace />} />
         <Route path="/goals"      element={<ProtectedRoute><Goals /></ProtectedRoute>} />
         <Route path="/cardio"     element={<ProtectedRoute><Cardio /></ProtectedRoute>} />
         <Route path="/water"      element={<ProtectedRoute><Water /></ProtectedRoute>} />
         <Route path="/nutrition"  element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
-        <Route path="/pr-feed"    element={<ProtectedRoute><PRFeed /></ProtectedRoute>} />
+        <Route path="/pr-feed"    element={<Navigate to="/progress?tab=prs" replace />} />
         <Route path="/strength"      element={<ProtectedRoute><Strength /></ProtectedRoute>} />
         <Route path="/measurements" element={<ProtectedRoute><Measurements /></ProtectedRoute>} />
         <Route path="/basketball"   element={<ProtectedRoute><Basketball /></ProtectedRoute>} />

@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { TopBar } from '../components/layout/TopBar'
-import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
-import { usePageTitle } from '../hooks/usePageTitle'
 import { useStore } from '../store/useStore'
 import type { RawActivityData } from '../store/useStore'
 import { XP_RATES } from '../lib/xp'
@@ -160,8 +157,7 @@ function longestStreakInYear(activeDates: Set<string>, year: number): number {
   return best
 }
 
-export function Yearly() {
-  usePageTitle('Yearly')
+export function YearlyContent() {
   const rawRows = useStore(s => s.rawRows)
 
   const events = useMemo(() => (rawRows ? collectEvents(rawRows) : []), [rawRows])
@@ -217,9 +213,6 @@ export function Yearly() {
 
   return (
     <>
-      <TopBar title="Yearly" back backTo="/more" />
-      <PageWrapper>
-
         {/* Year switcher */}
         {years.length > 1 && (
           <div className="flex gap-2 mb-4">
@@ -351,8 +344,6 @@ export function Yearly() {
             sub="Log anything — a set, a mile, a night of sleep — and it lights up here."
           />
         )}
-
-      </PageWrapper>
     </>
   )
 }

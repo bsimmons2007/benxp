@@ -9,10 +9,10 @@ import { Mark } from '../brand/Mark'
 import { Wordmark } from '../brand/Wordmark'
 
 const SECONDARY_LINKS = [
-  { to: '/profile', label: 'Profile',  iconKey: '__person'   },
-  { to: '/goals',   label: 'Goals',    iconKey: '__target'   },
-  { to: '/weekly',  label: 'Weekly',   iconKey: '__calendar' },
-  { to: '/more',    label: 'More',     iconKey: '__more'     },
+  { to: '/profile',  label: 'Profile',  iconKey: '__person'   },
+  { to: '/goals',    label: 'Goals',    iconKey: '__target'   },
+  { to: '/progress', label: 'Progress', iconKey: '__calendar' },
+  { to: '/more',     label: 'More',     iconKey: '__more'     },
 ]
 
 

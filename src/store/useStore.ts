@@ -3,6 +3,7 @@ import { calculateLevel, levelProgress, fetchXPAndStats, getCachedXPData, setCac
 import type { AppStats, RawActivityData, ActivityEntry } from '../lib/xp'
 import { supabase } from '../lib/supabase'
 import { invalidateBadgeCache } from '../hooks/useAchievements'
+import { syncPublicProfileXP } from '../lib/publicProfile'
 
 export type { AppStats, RawActivityData, ActivityEntry }
 
@@ -170,6 +171,7 @@ export const useStore = create<AppState>((set, get) => ({
         lastUpdated:    now,
         ...userData,
       })
+      void syncPublicProfileXP(supabase, userId, totalXP, level)
     } catch (err) {
       clearTimeout(safetyTimer)
       console.error('[useStore] init() failed:', err)
@@ -204,6 +206,7 @@ export const useStore = create<AppState>((set, get) => ({
         ...(level > lastSeen ? { levelUpPending: level } : {}),
         _refreshingXP: false,
       })
+      void syncPublicProfileXP(supabase, user.id, totalXP, level)
     } catch (err) {
       console.error('[useStore] refreshXP() failed:', err)
       set({ _refreshingXP: false })
