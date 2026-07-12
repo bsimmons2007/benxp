@@ -488,7 +488,7 @@ export function Settings() {
           {sectionsOpen && (
             <div className="pb-1 pop-in">
               <p style={{ color: 'var(--text-muted)', fontSize: 11, lineHeight: 1.5, marginBottom: 10 }}>
-                The top 3 visible sections appear in the bottom tab bar. Every section stays available in the side menu.
+                The top 4 visible sections appear in the bottom tab bar. Every section stays available in the side menu.
               </p>
               <div className="flex flex-col gap-2 mb-2">
                 {sectionOrder.map((key, idx) => {

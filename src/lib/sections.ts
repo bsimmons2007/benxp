@@ -24,7 +24,8 @@ export const SECTION_DEFS: Record<SectionKey, SectionDef> = {
 
 // Skate is a subsection of Cardio — removed from nav
 // Basketball + Fortnite live under /hobbies — excluded from standalone nav
-export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'books', 'cardio', 'sleep', 'challenges', 'mood', 'water', 'nutrition', 'hobbies']
+// First 4 are the bottom-nav core tabs (see BottomNav CORE_TABS)
+export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'cardio', 'sleep', 'nutrition', 'challenges', 'mood', 'water', 'books', 'hobbies']
 
 export function loadSectionOrder(): SectionKey[] {
   try {

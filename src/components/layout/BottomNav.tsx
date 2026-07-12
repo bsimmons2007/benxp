@@ -18,7 +18,7 @@ export function BottomNav() {
 
   // Core sections only — the top of the user's section order. Everything else
   // stays reachable via the hamburger drawer (SideNav) and More.
-  const CORE_TABS = 3
+  const CORE_TABS = 4
   const tabs = [
     { to: '/',     label: 'Home', iconKey: '__home' },
     ...order
