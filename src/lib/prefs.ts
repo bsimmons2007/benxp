@@ -91,6 +91,8 @@ export async function hydratePrefs(): Promise<void> {
     // Merge: server values win where present, local-only keys kept.
     const merged = { ...local, ...server }
     writeCache(merged)
+    // Components that read prefs at mount (nav sections, etc.) re-read on this.
+    window.dispatchEvent(new Event('prefs-hydrated'))
     // If local had keys the server didn't, push them back.
     if (Object.keys(local).some(k => !(k in server))) void flushPrefs()
   } catch { /* offline */ }

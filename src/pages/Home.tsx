@@ -370,95 +370,113 @@ function AddPanel({ picks, onAdd, onClose }: {
   )
 }
 
-// ── Active Quest cycling card ─────────────────────────────────
+// ── Quest card — single surface for claimable + in-progress quests ──
 const TIER_COLORS = {
   Weekly:  'var(--accent)',
   Monthly: '#7c3aed',
   Boss:    '#f5a623',
 } as const
 
-function ActiveQuestCard() {
-  const [quests, setQuests] = useState<Array<{
-    id: string
-    tier: 'Weekly' | 'Monthly' | 'Boss'
-    challenge_name: string
-    xp_reward: number
-  }>>([])
-  const [activeIdx, setActiveIdx] = useState(0)
+function QuestCard() {
   const [loaded,    setLoaded]    = useState(false)
+  const [claimable, setClaimable] = useState(0)
+  const [best, setBest] = useState<{
+    name: string; tier: 'Weekly' | 'Monthly'; pct: number; xp: number
+  } | null>(null)
 
   useEffect(() => {
-    async function fetchQuests() {
+    let cancelled = false
+    async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       const { data } = await supabase
         .from('challenges')
-        .select('id, tier, challenge_name, xp_reward')
+        .select('challenge_name, notes, tier, target, xp_reward')
         .eq('user_id', user.id)
-        .in('tier', ['Weekly', 'Monthly', 'Boss'])
+        .in('tier', ['Weekly', 'Monthly'])
         .eq('status', 'active')
-        .order('created_at', { ascending: false })
       if (!data?.length) return
-      // One per tier — most recent each
-      const tiers = ['Weekly', 'Monthly', 'Boss'] as const
-      const picked = tiers
-        .map(t => data.find((q: { tier: string }) => q.tier === t))
-        .filter(Boolean) as typeof quests
-      setQuests(picked)
-      setLoaded(true)
+      const progresses = await Promise.all(
+        data.map((c: { notes: string | null; tier: string }) =>
+          getProgress(supabase, c.notes ?? '', c.tier as 'Weekly' | 'Monthly', user.id))
+      )
+      let done = 0
+      let top: typeof best = null
+      data.forEach((c: { challenge_name: string; tier: string; target: string | null; xp_reward: number }, i: number) => {
+        const target = parseFloat(c.target ?? '1') || 1
+        const pct = Math.min(1, progresses[i] / target)
+        if (pct >= 1) done++
+        else if (!top || pct > top.pct) top = { name: c.challenge_name, tier: c.tier as 'Weekly' | 'Monthly', pct, xp: c.xp_reward }
+      })
+      if (!cancelled) { setClaimable(done); setBest(top); setLoaded(true) }
     }
-    fetchQuests()
+    load()
+    return () => { cancelled = true }
   }, [])
 
-  useEffect(() => {
-    if (quests.length <= 1) return
-    const id = setInterval(() => setActiveIdx(i => (i + 1) % quests.length), 4000)
-    return () => clearInterval(id)
-  }, [quests.length])
+  if (!loaded) return null
 
-  if (!loaded || quests.length === 0) return null
+  if (claimable > 0) return (
+    <Link to="/challenges" style={{ textDecoration: 'none', display: 'block', marginBottom: 20 }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '12px 16px', borderRadius: 14,
+        background: 'linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, var(--surface-1)), color-mix(in srgb, var(--accent) 8%, var(--surface-1)))',
+        border: '1px solid color-mix(in srgb, var(--accent) 40%, transparent)',
+        boxShadow: '0 2px 14px color-mix(in srgb, var(--accent) 18%, transparent)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <ZapIcon size={17} color="var(--accent)" />
+          </div>
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+              {claimable} quest{claimable !== 1 ? 's' : ''} ready to claim
+            </p>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Tap to collect your XP</p>
+          </div>
+        </div>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+          <path d="M1 1l5 5-5 5" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
+    </Link>
+  )
 
-  const quest = quests[activeIdx]
-  const color = TIER_COLORS[quest.tier]
+  if (!best) return null
 
+  const color = TIER_COLORS[best.tier]
   return (
-    <Link to="/challenges" style={{ textDecoration: 'none', display: 'block', marginBottom: 16 }}>
+    <Link to="/challenges" style={{ textDecoration: 'none', display: 'block', marginBottom: 20 }}>
       <div style={{
         padding: '12px 14px', borderRadius: 14,
         background: 'var(--surface-1)',
-        border: `1px solid ${color}33`,
+        border: `1px solid color-mix(in srgb, ${color} 20%, transparent)`,
         borderLeft: `3px solid ${color}`,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
           <span style={{
             fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
-            color, background: `${color}18`, padding: '2px 8px', borderRadius: 4,
+            color, background: `color-mix(in srgb, ${color} 10%, transparent)`, padding: '2px 8px', borderRadius: 4,
             fontFamily: 'var(--font-mono)',
           }}>
-            {quest.tier}
+            {best.tier} quest
           </span>
           <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-            +{quest.xp_reward} XP
+            +{best.xp} XP
           </span>
         </div>
-        <p key={activeIdx} className="pop-in" style={{
-          fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.3, marginBottom: 8,
-        }}>
-          {quest.challenge_name}
+        <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.3, marginBottom: 8 }}>
+          {best.name}
         </p>
-        {quests.length > 1 && (
-          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-            {quests.map((_, i) => (
-              <div key={i} style={{
-                height: 5, borderRadius: 3,
-                width: i === activeIdx ? 14 : 5,
-                background: i === activeIdx ? color : 'var(--border-default)',
-                transition: 'all 0.35s ease',
-              }} />
-            ))}
-            <span style={{ fontSize: 9, color: 'var(--text-disabled)', marginLeft: 4 }}>active quest</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ flex: 1, height: 4, borderRadius: 3, background: 'var(--input-bg)', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${Math.round(best.pct * 100)}%`, background: color, borderRadius: 3, transition: 'width 0.5s ease' }} />
           </div>
-        )}
+          <span className="font-mono" style={{ fontSize: 11, fontWeight: 700, color, flexShrink: 0 }}>
+            {Math.round(best.pct * 100)}%
+          </span>
+        </div>
       </div>
     </Link>
   )
@@ -546,7 +564,6 @@ export function Home() {
   const widgetsAnimated = useRef(false)
   const [showBreakdown,  setShowBreakdown]  = useState(false)
   const [showUpdatedChip, setShowUpdatedChip] = useState(false)
-  const [claimableCount, setClaimableCount]   = useState(0)
 
   // Show auto-dismiss "Data updated" chip after background refresh
   const isFirstUpdate = useRef(true)
@@ -597,31 +614,6 @@ export function Home() {
     const cards = Array.from(widgetGridRef.current.children) as HTMLElement[]
     animateWidgets(cards)
   }, [loading])
-
-  useEffect(() => {
-    async function checkClaimable() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data: challenges } = await supabase
-        .from('challenges')
-        .select('notes, tier, target')
-        .eq('user_id', user.id)
-        .in('tier', ['Weekly', 'Monthly'])
-        .eq('status', 'active')
-      if (!challenges?.length) return
-      const progresses = await Promise.all(
-        challenges.map((c: { notes: string | null; tier: string }) =>
-          getProgress(supabase, c.notes ?? '', c.tier as 'Weekly' | 'Monthly', user.id)
-        )
-      )
-      const count = challenges.filter((c: { target: string | null }, i: number) => {
-        const target = parseFloat(c.target ?? '1') || 1
-        return progresses[i] >= target
-      }).length
-      setClaimableCount(count)
-    }
-    checkClaimable()
-  }, [])
 
   const toNext       = xpForLevel(level + 1) - totalXP
   const { refreshing, pullDistance, threshold } = usePullToRefresh(async () => {
@@ -679,7 +671,7 @@ export function Home() {
 
   return (
     <>
-      <TopBar logButton />
+      <TopBar />
       <PageWrapper>
 
         {/* ── Pull-to-refresh indicator ── */}
@@ -728,34 +720,6 @@ export function Home() {
             ✓ Data updated
           </div>
         </div>
-
-        {/* ── Claimable challenges banner ── */}
-        {claimableCount > 0 && (
-          <Link to="/challenges" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '12px 16px', borderRadius: 14,
-              background: 'linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, var(--surface-1)), color-mix(in srgb, var(--accent) 8%, var(--surface-1)))',
-              border: '1px solid color-mix(in srgb, var(--accent) 40%, transparent)',
-              boxShadow: '0 2px 14px color-mix(in srgb, var(--accent) 18%, transparent)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 34, height: 34, borderRadius: 10, background: 'color-mix(in srgb, var(--accent) 20%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <ZapIcon size={17} color="var(--accent)" />
-                </div>
-                <div>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
-                    {claimableCount} challenge{claimableCount !== 1 ? 's' : ''} ready to claim
-                  </p>
-                  <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Tap to collect your XP</p>
-                </div>
-              </div>
-              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
-                <path d="M1 1l5 5-5 5" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-          </Link>
-        )}
 
         {/* ── XP Hero Card ── */}
         <div className="rounded-2xl mb-5" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
@@ -858,14 +822,14 @@ export function Home() {
         {/* ── Today checklist ── */}
         <TodayCard />
 
+        {/* ── Quest: claimable banner or nearest-to-done ── */}
+        <QuestCard />
+
         {/* ── On This Day ── */}
         <OnThisDayCard />
 
         {/* ── Weekly Wellness ── */}
         <WellnessWidget />
-
-        {/* ── Active Quest ── */}
-        <ActiveQuestCard />
 
         {/* ── Widget grid ── */}
         <div className="mb-5">
@@ -919,7 +883,7 @@ export function Home() {
             <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.015em' }}>
               Recent Activity
             </p>
-            <Link to="/more" style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)' }}>
+            <Link to="/xp-history" style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)' }}>
               See all →
             </Link>
           </div>

@@ -1,11 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useStore } from '../store/useStore'
 import { useNavStore } from '../store/useNavStore'
 import { today } from '../lib/utils'
-import { getProgress } from '../lib/challenges'
-import { CheckIcon, MoonIcon, DropletIcon, BrainIcon, ZapIcon, UtensilsIcon, ChevronRightIcon, type IconComponent } from './ui/Icon'
+import { CheckIcon, MoonIcon, DropletIcon, BrainIcon, ZapIcon, UtensilsIcon, type IconComponent } from './ui/Icon'
 
 const WATER_GOAL = 64
 
@@ -26,7 +24,6 @@ export function TodayCard() {
   const openQuickLog    = useNavStore(s => s.openQuickLog)
 
   const [waterBump, setWaterBump] = useState(0) // optimistic oz added inline
-  const [topQuest, setTopQuest]   = useState<{ name: string; pct: number } | null>(null)
 
   const todayStr = today()
 
@@ -73,40 +70,11 @@ export function TodayCard() {
     ]
   }, [rawRows, waterBump, todayStr, refreshXP, refreshActivity])
 
-  // Closest-to-completion active weekly/monthly quest (single query set).
-  useEffect(() => {
-    let cancelled = false
-    async function loadTopQuest() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data } = await supabase
-        .from('challenges')
-        .select('challenge_name, notes, tier, target')
-        .eq('user_id', user.id)
-        .in('tier', ['Weekly', 'Monthly'])
-        .eq('status', 'active')
-      if (!data?.length) return
-      const progresses = await Promise.all(
-        data.map((c: { notes: string | null; tier: string }) =>
-          getProgress(supabase, c.notes ?? '', c.tier as 'Weekly' | 'Monthly', user.id))
-      )
-      let best: { name: string; pct: number } | null = null
-      data.forEach((c: { challenge_name: string; target: string | null }, i: number) => {
-        const target = parseFloat(c.target ?? '1') || 1
-        const pct = Math.min(1, progresses[i] / target)
-        if (pct < 1 && (!best || pct > best.pct)) best = { name: c.challenge_name, pct }
-      })
-      if (!cancelled) setTopQuest(best)
-    }
-    loadTopQuest()
-    return () => { cancelled = true }
-  }, [])
-
   const remaining = items.filter(i => !i.done).length
   const afterSix  = new Date().getHours() >= 18
 
-  // Nothing to nudge — everything done and no quest to surface.
-  if (remaining === 0 && !topQuest) return null
+  // Nothing to nudge — everything done.
+  if (remaining === 0) return null
 
   return (
     <div className="mb-5 rounded-2xl" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
@@ -180,29 +148,6 @@ export function TodayCard() {
         ))}
       </div>
 
-      {topQuest && (
-        <Link
-          to="/challenges"
-          style={{
-            width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-            padding: '10px 16px', textDecoration: 'none',
-            borderTop: '1px solid var(--border-subtle)',
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {topQuest.name}
-            </p>
-            <div style={{ height: 4, borderRadius: 3, background: 'var(--input-bg)', marginTop: 5, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${Math.round(topQuest.pct * 100)}%`, background: 'var(--accent)', borderRadius: 3, transition: 'width 0.5s ease' }} />
-            </div>
-          </div>
-          <span className="font-mono" style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent)', flexShrink: 0 }}>
-            {Math.round(topQuest.pct * 100)}%
-          </span>
-          <ChevronRightIcon size={14} color="var(--text-muted)" />
-        </Link>
-      )}
     </div>
   )
 }

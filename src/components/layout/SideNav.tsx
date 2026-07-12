@@ -4,7 +4,7 @@ import { SECTION_DEFS, loadSectionOrder, loadHiddenSections } from '../../lib/se
 import { useStore } from '../../store/useStore'
 import { useNavStore } from '../../store/useNavStore'
 import { getLevelTitle } from '../../lib/xp'
-import { SectionIcon, HomeIcon, PersonIcon, TargetIcon, CalendarIcon, DotsIcon } from '../ui/Icon'
+import { SectionIcon, HomeIcon, PersonIcon, TargetIcon, CalendarIcon, DotsIcon, SettingsIcon } from '../ui/Icon'
 import { Mark } from '../brand/Mark'
 import { Wordmark } from '../brand/Wordmark'
 
@@ -71,7 +71,11 @@ export function SideNav() {
       setHidden(loadHiddenSections())
     }
     window.addEventListener('sections-updated', onUpdate)
-    return () => window.removeEventListener('sections-updated', onUpdate)
+    window.addEventListener('prefs-hydrated', onUpdate)
+    return () => {
+      window.removeEventListener('sections-updated', onUpdate)
+      window.removeEventListener('prefs-hydrated', onUpdate)
+    }
   }, [])
 
   useEffect(() => { closeNav() }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -104,7 +108,7 @@ export function SideNav() {
         {/* Logo mark */}
         <div className="sidenav-item" style={{ marginBottom: 2 }}>
           <button
-            onClick={() => navigate('/monthly')}
+            onClick={() => navigate('/')}
             aria-label="YouXP home"
             className="sidenav-icon-btn"
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
@@ -146,10 +150,7 @@ export function SideNav() {
             })}
           >
             {({ isActive }) => (
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ color: isActive ? 'var(--accent)' : 'var(--text-secondary)' }}>
-                <path d="M9 11.5A2.5 2.5 0 1 0 9 6.5a2.5 2.5 0 0 0 0 5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                <path d="M14.7 7.3l-.6-1.4.9-1.7-1.2-1.2-1.7.9-1.4-.6L10 1.5H8l-.7 1.8-1.4.6-1.7-.9L3 4.2l.9 1.7-.6 1.4L1.5 8v2l1.8.7.6 1.4-.9 1.7 1.2 1.2 1.7-.9 1.4.6.7 1.8h2l.7-1.8 1.4-.6 1.7.9 1.2-1.2-.9-1.7.6-1.4 1.8-.7V8l-1.8-.7Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-              </svg>
+              <SettingsIcon size={18} color={isActive ? 'var(--accent)' : 'var(--text-secondary)'} />
             )}
           </NavLink>
           <span className="sidenav-flyout">Settings</span>
@@ -184,7 +185,7 @@ export function SideNav() {
       >
         {/* Brand */}
         <button
-          onClick={() => { navigate('/monthly'); closeNav() }}
+          onClick={() => { navigate('/'); closeNav() }}
           style={{
             background: 'none', border: 'none', textAlign: 'left',
             padding: '20px 20px 16px', cursor: 'pointer',
@@ -233,10 +234,7 @@ export function SideNav() {
           <NavLink to="/settings" style={({ isActive }) => mobileLink(isActive)}>
             {({ isActive }) => (
               <>
-                <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0, color: isActive ? 'var(--accent)' : 'var(--text-secondary)' }}>
-                  <path d="M9 11.5A2.5 2.5 0 1 0 9 6.5a2.5 2.5 0 0 0 0 5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  <path d="M14.7 7.3l-.6-1.4.9-1.7-1.2-1.2-1.7.9-1.4-.6L10 1.5H8l-.7 1.8-1.4.6-1.7-.9L3 4.2l.9 1.7-.6 1.4L1.5 8v2l1.8.7.6 1.4-.9 1.7 1.2 1.2 1.7-.9 1.4.6.7 1.8h2l.7-1.8 1.4-.6 1.7.9 1.2-1.2-.9-1.7.6-1.4 1.8-.7V8l-1.8-.7Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-                </svg>
+                <SettingsIcon size={16} color={isActive ? 'var(--accent)' : 'var(--text-secondary)'} />
                 <span>Settings</span>
               </>
             )}

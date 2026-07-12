@@ -5,6 +5,7 @@ import { Card } from '../components/ui/Card'
 import {
   PersonIcon, TargetIcon, RulerIcon, CalendarIcon, GridIcon,
   TrophyIcon, ShareIcon, TrendingIcon, ChevronRightIcon, TerminalIcon, CrownIcon, FlameIcon,
+  SettingsIcon,
 } from '../components/ui/Icon'
 import type { CSSProperties } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -22,6 +23,7 @@ const NAV_LINKS: { to: string; Icon: IconFn; label: string; sub: string; sidebar
   { to: '/share',        Icon: ShareIcon,    label: 'Share Card',         sub: 'Export your progress card'    },
   { to: '/xp-history',   Icon: TrendingIcon, label: 'XP History',        sub: 'Every XP event, ever'         },
   { to: '/leaderboard',  Icon: CrownIcon,    label: 'Leaderboard',        sub: 'See how you rank globally'    },
+  { to: '/settings',     Icon: SettingsIcon, label: 'Settings',           sub: 'Themes, sections & account'   },
   // Dev tools only visible in local development
   ...(import.meta.env.DEV ? [
     { to: '/dev', Icon: TerminalIcon, label: 'Dev Tools', sub: 'XP engine & diagnostics' },

@@ -1,3 +1,5 @@
+import { getPref, setPref } from './prefs'
+
 export type SectionKey = 'lifting' | 'books' | 'skate' | 'sleep' | 'fortnite' | 'challenges' | 'mood' | 'cardio' | 'water' | 'basketball' | 'hobbies' | 'nutrition'
 
 export interface SectionDef {
@@ -27,34 +29,39 @@ export const SECTION_DEFS: Record<SectionKey, SectionDef> = {
 // First 4 are the bottom-nav core tabs (see BottomNav CORE_TABS)
 export const DEFAULT_ORDER: SectionKey[] = ['lifting', 'cardio', 'sleep', 'nutrition', 'challenges', 'mood', 'water', 'books', 'hobbies']
 
-export function loadSectionOrder(): SectionKey[] {
+// Order + hidden are synced via prefs; legacy youxp-order/youxp-hidden
+// localStorage keys are read as a fallback so existing devices keep their nav.
+function legacyArray(key: string): SectionKey[] | null {
   try {
-    const saved = JSON.parse(localStorage.getItem('youxp-order') ?? 'null') as SectionKey[]
-    if (Array.isArray(saved)) {
-      // Drop removed/merged keys; basketball + fortnite are now inside /hobbies
-      const dropped = new Set(['skate', 'energy', 'strength', 'basketball', 'fortnite'])
-      const validSaved = saved.filter((k): k is SectionKey => k in SECTION_DEFS && !dropped.has(k as string))
-      const missing = DEFAULT_ORDER.filter(k => !validSaved.includes(k))
-      return [...validSaved, ...missing]
-    }
-  } catch { /* ignore */ }
+    const saved = JSON.parse(localStorage.getItem(key) ?? 'null')
+    return Array.isArray(saved) ? saved as SectionKey[] : null
+  } catch { return null }
+}
+
+export function loadSectionOrder(): SectionKey[] {
+  const saved = getPref<SectionKey[] | null>('sectionOrder', null) ?? legacyArray('youxp-order')
+  if (Array.isArray(saved)) {
+    // Drop removed/merged keys; basketball + fortnite are now inside /hobbies
+    const dropped = new Set(['skate', 'energy', 'strength', 'basketball', 'fortnite'])
+    const validSaved = saved.filter((k): k is SectionKey => k in SECTION_DEFS && !dropped.has(k as string))
+    const missing = DEFAULT_ORDER.filter(k => !validSaved.includes(k))
+    return [...validSaved, ...missing]
+  }
   return DEFAULT_ORDER
 }
 
 export function saveSectionOrder(order: SectionKey[]): void {
-  localStorage.setItem('youxp-order', JSON.stringify(order))
+  setPref('sectionOrder', order)
   window.dispatchEvent(new Event('sections-updated'))
 }
 
 export function loadHiddenSections(): SectionKey[] {
-  try {
-    const saved = JSON.parse(localStorage.getItem('youxp-hidden') ?? 'null') as SectionKey[]
-    if (Array.isArray(saved)) return saved
-  } catch { /* ignore */ }
+  const saved = getPref<SectionKey[] | null>('hiddenSections', null) ?? legacyArray('youxp-hidden')
+  if (Array.isArray(saved)) return saved
   return ['mood']
 }
 
 export function saveHiddenSections(hidden: SectionKey[]): void {
-  localStorage.setItem('youxp-hidden', JSON.stringify(hidden))
+  setPref('hiddenSections', hidden)
   window.dispatchEvent(new Event('sections-updated'))
 }

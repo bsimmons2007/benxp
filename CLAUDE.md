@@ -17,7 +17,7 @@ A personal life-tracking PWA for one user (Ben). Everything real-life earns XP �
 | Routing | react-router-dom v7 |
 | Icons | lucide-react 1.16.0 (via `ui/Icon.tsx` wrappers only) |
 | Animation | animejs (`lib/animations.ts`) |
-| PWA | vite-plugin-pwa (generateSW) + `public/push-sw.js` for push |
+| PWA | vite-plugin-pwa (generateSW, autoUpdate SW) + `public/push-sw.js` for push |
 | Errors | Sentry (behind `VITE_SENTRY_DSN`) |
 | Hosting | Vercel (auto-deploys `main`) |
 
@@ -62,7 +62,7 @@ src/
 ├── components/
 │   ├── GameLogPage.tsx      # Config-driven W/L sport page (see "GameLogPage" section)
 │   ├── QuickLogSheet.tsx    # Universal quick-log bottom sheet (TopBar + button)
-│   ├── TodayCard.tsx        # Home: today checklist (sleep/water/mood/activity) + top quest
+│   ├── TodayCard.tsx        # Home: today checklist (sleep/water/mood/meals/activity)
 │   ├── OnThisDayCard.tsx    # Home: events exactly 1/2/3 years ago (renders nothing if none)
 │   ├── BodyMap.tsx          # SVG muscle diagram — colored by rank/recency
 │   ├── StrengthTab.tsx      # Lifting log UI (sets table, PRs, trends)
@@ -80,7 +80,6 @@ src/
 │   │   ├── EmptyState.tsx / Badge / Button / Card / Input (auto inputMode) / ProgressBar
 │   │   ├── Skeleton / SkillCard / StatCard / StreakFire / XPCoins / MoodFace / Confetti
 │   │   └── LevelUpOverlay / MilestoneOverlay / BossConqueredOverlay / TutorialOverlay
-│   ├── forms/               # LogBookForm, LogFortniteForm, LogSkateForm, LogSleepForm, LogWorkoutForm
 │   └── charts/              # BodyweightChart, LiftTrendChart, VolumeTrendChart
 ├── hooks/
 │   ├── useXP.ts             # store init(); totalXP/seasonXP/level/progress
@@ -100,7 +99,8 @@ src/
 │   ├── lastUsed.ts          # getLastUsed/setLastUsed form defaults (youxp-lastused-*)
 │   ├── challenges.ts        # Quest sync; rerolls + seen templates via prefs (synced)
 │   ├── challengeTemplates.ts# Quest template defs — scaleTarget(), xpForTarget(), PROGRESS_FNS
-│   ├── sections.ts          # SectionKey defs + order/hide persistence (drives QuickLogSheet)
+│   ├── sections.ts          # SectionKey defs + order/hide (synced via prefs; first 4 visible
+│   │                        #   = bottom-nav core tabs; drives QuickLogSheet)
 │   ├── theme.ts             # 40+ themes; auto-switch by hour; persisted via prefs (synced)
 │   ├── notifications.ts     # In-app daily reminder + streak-break warning (token-aware)
 │   ├── offlineQueue.ts      # Queues writes made offline
@@ -119,7 +119,7 @@ src/
 │   │                        #   scorecards, dual formats) but share all conventions
 │   ├── Cardio / Sleep / Books / Water / Mood / Skate / Hiking / Fortnite / Measurements
 │   ├── Challenges.tsx       # /challenges (/quests redirects) — quests + tutorial mode
-│   ├── Goals / Hobbies / Profile / Leaderboard (public_profiles) / More / Log / Strength
+│   ├── Goals / Hobbies / Profile / Leaderboard (public_profiles) / More / Strength
 │   ├── Settings.tsx         # Theme grid, sections, PushNotificationsSection, XP rates,
 │   │                        #   privacy, CSV export (all tables), account deletion
 │   ├── DevSettings.tsx      # /dev — XP engine debugger, PIN 1337
@@ -198,7 +198,7 @@ Config-driven page for win/loss sports. A sport page is just a `GameLogConfig<Ro
 ## Prefs — cross-device sync (`src/lib/prefs.ts`)
 Single JSONB doc per user in `user_preferences`, mirrored in localStorage (`youxp-prefs-cache`) for instant load. `getPref`/`setPref` are synchronous; writes debounce (1.5s) then upsert (last-write-wins). Missing table (migration not run) → localStorage-only, silently. `seedPrefsFromLegacy()` runs once (flag `youxp-prefs-seeded`) migrating old `youxp-*` keys; `hydratePrefs()` merges the server doc on boot (both called in `main.tsx`).
 
-**Synced through prefs**: theme/mode/time-theme, Home stat picks + level style, quest rerolls + seen templates, streak-freeze spent dates, notification settings. **Device-local by design**: `youxp-lastused-*` form defaults, tutorial-done, nav hints, XP cache.
+**Synced through prefs**: theme/mode/time-theme, Home stat picks + level style, quest rerolls + seen templates, streak-freeze spent dates, notification settings, section order + hidden sections (legacy `youxp-order`/`youxp-hidden` read as fallback). **Device-local by design**: `youxp-lastused-*` form defaults, tutorial-done, nav hints, XP cache, workout templates.
 
 ---
 

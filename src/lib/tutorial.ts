@@ -87,9 +87,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id:              'settings',
     title:           'Make It Yours',
-    body:            'Tap the gear to customize your experience: choose from 40+ color themes, show or hide sections you don\'t use, and reorder your nav tabs. Everything is saved automatically.',
+    body:            'Open the menu and tap Settings to customize your experience: choose from 40+ color themes, show or hide sections you don\'t use, and reorder your nav tabs. Everything is saved automatically.',
     tip:             'Try Auto Theme — it switches colors based on time of day automatically.',
-    target:          '[data-tutorial="settings-btn"]',
+    target:          '[data-tutorial="menu-btn"]',
     tooltipPosition: 'below',
     navigateTo:      '/',
   },

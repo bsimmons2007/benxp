@@ -10,7 +10,7 @@ import {
   Mountain, Snowflake, Terminal, Volleyball, Flag,
   Disc3, Sparkles, Grid3x3, Sun, Sprout, Bird,
   Orbit, Crosshair, Radio, Table2, RefreshCw, Circle, ArrowUpRight, Lightbulb,
-  UtensilsCrossed,
+  UtensilsCrossed, Settings,
 } from 'lucide-react'
 
 export type IconProps = { size?: number; color?: string; style?: CSSProperties; className?: string }
@@ -24,6 +24,7 @@ function adapt(LucideIcon: FC<LucideProps>): IconComponent {
 }
 
 export const HomeIcon        = adapt(Home)
+export const SettingsIcon    = adapt(Settings)
 export const DumbbellIcon    = adapt(Dumbbell)
 export const BookIcon        = adapt(BookOpen)
 export const MoonIcon        = adapt(Moon)

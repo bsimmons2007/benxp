@@ -6,14 +6,12 @@ import { Wordmark } from '../brand/Wordmark'
 const LOGO_ANIMATED_KEY = 'youxp-logo-animated'
 
 interface TopBarProps {
-  title?:        string
-  hideSettings?: boolean
-  back?:         boolean
-  backTo?:       string
-  logButton?:    boolean
+  title?:  string
+  back?:   boolean
+  backTo?: string
 }
 
-export function TopBar({ title, hideSettings = false, back = false, backTo, logButton = false }: TopBarProps) {
+export function TopBar({ title, back = false, backTo }: TopBarProps) {
   const navigate      = useNavigate()
   const toggleNav     = useNavStore(s => s.toggleNav)
   const openQuickLog  = useNavStore(s => s.openQuickLog)
@@ -67,6 +65,7 @@ export function TopBar({ title, hideSettings = false, back = false, backTo, logB
           }} />
         )}
         <button
+          data-tutorial="menu-btn"
           onClick={handleLeft}
           aria-label={back ? 'Go back' : 'Open menu'}
           className="flex items-center justify-center rounded-lg transition-colors"
@@ -94,7 +93,7 @@ export function TopBar({ title, hideSettings = false, back = false, backTo, logB
       {/* Center — absolutely positioned to stay centered */}
       <button
         data-tutorial="topbar-logo"
-        onClick={() => logoClickable && navigate('/monthly')}
+        onClick={() => logoClickable && navigate('/')}
         style={{
           background: 'none', border: 'none', padding: 0,
           cursor: logoClickable ? 'pointer' : 'default',
@@ -130,45 +129,21 @@ export function TopBar({ title, hideSettings = false, back = false, backTo, logB
         )}
       </button>
 
-      {/* Right */}
-      {logButton ? (
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <button
-            data-tutorial="log-btn"
-            onClick={() => openQuickLog('open')}
-            aria-label="Quick log activity"
-            style={{
-              width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'var(--accent)', border: 'none', cursor: 'pointer', borderRadius: 10,
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 3v10M3 8h10" stroke="var(--base-bg)" strokeWidth="2.2" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
-      ) : !hideSettings ? (
-        <button
-          data-tutorial="settings-btn"
-          onClick={() => navigate('/settings')}
-          aria-label="Settings"
-          className="flex items-center justify-center rounded-lg transition-colors"
-          style={{
-            width: 36, height: 36, flexShrink: 0,
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: 'var(--text-muted)',
-          }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)')}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'var(--text-muted)')}
-        >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M9 11.5A2.5 2.5 0 1 0 9 6.5a2.5 2.5 0 0 0 0 5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M14.7 7.3l-.6-1.4.9-1.7-1.2-1.2-1.7.9-1.4-.6L10 1.5H8l-.7 1.8-1.4.6-1.7-.9L3 4.2l.9 1.7-.6 1.4L1.5 8v2l1.8.7.6 1.4-.9 1.7 1.2 1.2 1.7-.9 1.4.6.7 1.8h2l.7-1.8 1.4-.6 1.7.9 1.2-1.2-.9-1.7.6-1.4 1.8-.7V8l-1.8-.7Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-          </svg>
-        </button>
-      ) : (
-        <div style={{ width: 36 }} />
-      )}
+      {/* Right — quick log, on every page */}
+      <button
+        data-tutorial="log-btn"
+        onClick={() => openQuickLog('open')}
+        aria-label="Quick log activity"
+        style={{
+          width: 36, height: 36, flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'var(--accent)', border: 'none', cursor: 'pointer', borderRadius: 10,
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 3v10M3 8h10" stroke="var(--base-bg)" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      </button>
     </header>
   )
 }

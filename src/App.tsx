@@ -46,7 +46,6 @@ const Volleyball   = lazy(() => import('./pages/Volleyball').then(m => ({ defaul
 const Spikeball    = lazy(() => import('./pages/Spikeball').then(m => ({ default: m.Spikeball })))
 const Pool         = lazy(() => import('./pages/Pool').then(m => ({ default: m.Pool })))
 const Leaderboard  = lazy(() => import('./pages/Leaderboard').then(m => ({ default: m.Leaderboard })))
-const Log          = lazy(() => import('./pages/Log').then(m => ({ default: m.Log })))
 const NotFound     = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })))
 const LevelUpOverlay  = lazy(() => import('./components/ui/LevelUpOverlay').then(m => ({ default: m.LevelUpOverlay })))
 const TutorialOverlay = lazy(() => import('./components/ui/TutorialOverlay').then(m => ({ default: m.TutorialOverlay })))
@@ -399,7 +398,6 @@ function AppInner() {
         <Route path="/spikeball"    element={<ProtectedRoute><Spikeball /></ProtectedRoute>} />
         <Route path="/pool"         element={<ProtectedRoute><Pool /></ProtectedRoute>} />
         <Route path="/leaderboard"  element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-        <Route path="/log"           element={<ProtectedRoute><Log /></ProtectedRoute>} />
         <Route path="*"              element={<NotFound />} />
       </Routes>
       </Suspense>

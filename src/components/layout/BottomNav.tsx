@@ -13,7 +13,11 @@ export function BottomNav() {
       setHidden(loadHiddenSections())
     }
     window.addEventListener('sections-updated', onUpdate)
-    return () => window.removeEventListener('sections-updated', onUpdate)
+    window.addEventListener('prefs-hydrated', onUpdate)
+    return () => {
+      window.removeEventListener('sections-updated', onUpdate)
+      window.removeEventListener('prefs-hydrated', onUpdate)
+    }
   }, [])
 
   // Core sections only — the top of the user's section order. Everything else
