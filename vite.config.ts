@@ -8,15 +8,17 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'prompt',
+      // autoUpdate: no prompt UI exists, so a waiting SW would never activate
+      // and installed PWAs would run stale builds indefinitely after deploys.
+      registerType: 'autoUpdate',
       manifest: false,
       includeAssets: ['favicon.svg', 'icons.svg', 'favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       workbox: {
         // Push + notificationclick handlers, imported into the generated SW.
         importScripts: ['push-sw.js'],
         globPatterns: ['**/*.{css,html,ico,png,svg}', 'assets/*.js'],
-        skipWaiting: false,
-        clientsClaim: false,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
