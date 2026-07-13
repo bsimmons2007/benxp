@@ -45,6 +45,21 @@ Always run `npm run typecheck` before pushing (bare `tsc --noEmit` from root che
 
 ---
 
+## Session practices (read this — it saves a lot of rediscovery)
+
+- **You cannot log into Ben's account.** The browser preview only reaches `/login`. Verify changes with `npm run typecheck` + `npm run build`, targeted greps, and construction; ask Ben to eyeball authed UI after deploy. Never claim you visually verified an authenticated page.
+- **Before pushing a follow-up commit**, confirm the previous Vercel build landed: pick a hashed chunk name from that build's output and check
+  `(Invoke-WebRequest -Uri "https://you-xp.com/sw.js" -UseBasicParsing).Content -match "<ChunkName->"`.
+  If a Vercel build fails: stop, ask Ben to paste the error — don't self-diagnose blind.
+- **Mobile-first**: audit new UI at 375px. `html/body` have `overflow-x: clip` (a too-wide component clips instead of side-scrolling — so overflow bugs hide; check widths deliberately). Bottom nav = Home + first 4 visible sections + More (`CORE_TABS` in BottomNav.tsx).
+- **BACKLOG.md is the canonical future-work list.** Add newly discovered issues there (with file refs, Effort/Impact); check items off when fixed. Don't keep parallel lists.
+- **Subagents are rarely token-optimal here** — they start cold and re-read the codebase. Work inline unless tasks are truly parallel and independent.
+- **PowerShell quirks**: `npx` isn't on PATH (use `npm run …` or the Bash tool). Git commit messages via here-string must not contain double quotes (breaks native arg passing) — and the closing `'@` must be at column 0.
+- **The service worker is autoUpdate** (`skipWaiting`+`clientsClaim`). Deploys reach installed PWAs on next open; `main.tsx` reloads on `vite:preloadError` for stale lazy chunks. Never switch back to `registerType: 'prompt'` without building the prompt UI (`useRegisterSW`) — that combination strands users on stale builds (caused a broken-login incident, July 2026).
+- **New-user lens**: since the multi-user pivot (July 2026), evaluate every change for a zero-data account, not just Ben's. First-run flow: OnboardingPicker (zero XP only) → TutorialOverlay.
+
+---
+
 ## Repository layout
 ```
 migrations/                  # SQL files for Supabase SQL Editor (numbered by phase)
@@ -55,8 +70,9 @@ public/
 ├── manifest.webmanifest     # PWA manifest incl. shortcuts (Quick Log, Water, Workout, Today)
 └── push-sw.js               # push + notificationclick handlers (importScripts'd into Workbox SW)
 src/
-├── App.tsx                  # Router, auth guard, TutorialOverlay, LevelUpOverlay, QuickLogHost
-│                            #   (?quicklog=<id|open> deep-link), auto-subscribe push on load
+├── App.tsx                  # Router, auth guard, OnboardingPicker → TutorialOverlay ordering,
+│                            #   LevelUpOverlay, QuickLogHost (?quicklog=<id|open> deep-link),
+│                            #   auto-subscribe push on load
 ├── index.css                # All CSS variables, keyframes, utility classes, :focus-visible
 ├── main.tsx                 # seedPrefsFromLegacy() before first paint, then hydratePrefs()
 ├── components/
@@ -89,7 +105,7 @@ src/
 │   ├── useStreak.ts         # Pure useMemo over rawRows; freeze-token-aware streak walk,
 │   │                        #   returns freezeTokens + tokenSaving
 │   ├── useAchievements.ts   # 100+ badges — pure useMemo over rawRows
-│   ├── useSkills.ts         # 6 skill trees; module cache keyed userId+XP
+│   ├── useSkills.ts         # 7 skill trees — pure useMemo over rawRows
 │   ├── useWellnessScore.ts  # 0–100 composite (still does its own small fetch)
 │   └── useAuth / useCountUp / usePageTitle / usePullToRefresh / useUserName
 ├── lib/
@@ -111,8 +127,10 @@ src/
 │   ├── audit.ts / sentry.ts / validation.ts / changelog.ts / strengthData.ts
 │   └── supabase.ts          # Supabase client
 ├── pages/                   # All lazy-loaded in App.tsx
-│   ├── Home.tsx             # XP hero (level ring, season line, progress), TodayCard,
-│   │                        #   OnThisDayCard, week dots + FreezeTokens, widgets, feed
+│   ├── Home.tsx             # XP hero (level ring, season line, progress), week dots +
+│   │                        #   FreezeTokens, TodayCard, QuestCard (claimable banner OR
+│   │                        #   nearest-to-done quest — single fetch), OnThisDayCard,
+│   │                        #   WellnessWidget, stat widgets, activity feed
 │   ├── Records.tsx          # Lifting log — route /lifting (/records redirects)
 │   ├── Progress.tsx         # /progress — Week/Month/Year/History/PRs tabs (?tab= deep link;
 │   │                        #   /weekly /monthly /yearly /xp-history /pr-feed redirect here)
@@ -222,7 +240,7 @@ Single JSONB doc per user in `user_preferences`, mirrored in localStorage (`youx
 ---
 
 ## Skills system (`src/lib/skills.ts`, `useSkills.ts`)
-6 independent trees — Lifting, Skating, Reading, Fortnite, Sleep, Cardio — each `level = floor(sqrt(xp / 50))` with its own title progression. Displayed on Profile via `SkillCard`.
+7 independent trees — Lifting, Sports, Reading, Fortnite, Sleep, Cardio, Nutrition — each `level = floor(sqrt(xp / 50))` with its own title progression. `useSkills` derives XP purely from the store's `rawRows` (no queries). Displayed on Profile via `SkillCard`.
 
 ## Achievements (`useAchievements.ts`)
 100+ badges evaluated client-side from rawRows. Pure useMemo, 5-min TTL cache keyed on `totalXP + revision`. Profile page.
@@ -280,7 +298,7 @@ user_audit_log, user_privacy_settings, user_follows, user_blocks, public_profile
 ## State architecture
 - **`useStore`**: `totalXP`, `seasonXP`, `level`, `stats`, `rawRows`, `activity[]`, `levelUpPending`; `init()` loads cache instantly then revalidates via `fetchXPAndStats()`; `refreshXP`/`refreshActivity` after writes.
 - **`useNavStore`**: sidebar + quick-log sheet open/target.
-- `useStreak`/`useAchievements`/trends are pure derivations over `rawRows` — zero extra queries. `useSkills` fetches once per userId+XP. `useWellnessScore` still fetches its own.
+- `useStreak`/`useAchievements`/`useSkills`/trends are pure derivations over `rawRows` — zero extra queries. `useWellnessScore` still fetches its own.
 
 ---
 
