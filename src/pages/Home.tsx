@@ -373,8 +373,8 @@ function AddPanel({ picks, onAdd, onClose }: {
 // ── Quest card — single surface for claimable + in-progress quests ──
 const TIER_COLORS = {
   Weekly:  'var(--accent)',
-  Monthly: '#7c3aed',
-  Boss:    '#f5a623',
+  Monthly: 'var(--tier-monthly)',
+  Boss:    'var(--tier-boss)',
 } as const
 
 function QuestCard() {

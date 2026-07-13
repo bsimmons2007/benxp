@@ -20,7 +20,7 @@ const INTERESTS: { key: SectionKey; label: string; sub: string; stats: string[] 
   { key: 'hobbies',   label: 'Sports & Games', sub: 'Pickleball, golf, chess…',  stats: [] },
 ]
 
-export function OnboardingPicker({ onDone }: { onDone: () => void }) {
+export function OnboardingPicker({ onDone, preview = false }: { onDone: () => void; preview?: boolean }) {
   const [picked, setPicked] = useState<SectionKey[]>([])
 
   function toggle(key: SectionKey) {
@@ -28,6 +28,8 @@ export function OnboardingPicker({ onDone }: { onDone: () => void }) {
   }
 
   function finish(selection: SectionKey[]) {
+    // preview (from /dev): render-only — never touch prefs or section config
+    if (preview) { onDone(); return }
     if (selection.length > 0) {
       const rest = DEFAULT_ORDER.filter(k => !selection.includes(k))
       saveSectionOrder([...selection, ...rest])

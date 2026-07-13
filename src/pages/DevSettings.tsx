@@ -5,6 +5,7 @@ import { Card } from '../components/ui/Card'
 import { supabase } from '../lib/supabase'
 import { XP_RATES, calculateLevel, xpForLevel } from '../lib/xp'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { OnboardingPicker } from '../components/OnboardingPicker'
 
 const DEV_PIN = '1337'
 const SESSION_KEY = 'youxp-dev-unlocked'
@@ -306,6 +307,7 @@ export function DevSettings() {
   usePageTitle('Dev Tools')
   const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem(SESSION_KEY) === '1')
   const [activeTab, setActiveTab] = useState<'xp'>('xp')
+  const [previewOnboarding, setPreviewOnboarding] = useState(false)
 
   return (
     <>
@@ -348,9 +350,30 @@ export function DevSettings() {
             </div>
 
             {activeTab === 'xp' && <XPEngine />}
+
+            {/* Preview surfaces that real accounts can't reach */}
+            <Card className="mt-4">
+              <p className="text-xs uppercase tracking-widest font-mono mb-2" style={{ color: 'var(--text-muted)' }}>Previews</p>
+              <button
+                onClick={() => setPreviewOnboarding(true)}
+                style={{
+                  width: '100%', padding: '10px 0', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                  background: 'var(--input-bg)', border: '1px solid var(--border)',
+                  color: 'var(--text-primary)', cursor: 'pointer',
+                }}
+              >
+                Preview onboarding interest picker
+              </button>
+              <p style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 6 }}>
+                Render-only — selections here never touch your prefs or nav.
+              </p>
+            </Card>
           </>
         )}
       </PageWrapper>
+      {previewOnboarding && (
+        <OnboardingPicker preview onDone={() => setPreviewOnboarding(false)} />
+      )}
     </>
   )
 }

@@ -81,6 +81,10 @@
   --cat-gaming:   #a78bfa;
   --cat-nutrition: #fbbf24;
 
+  /* Quest tier accents (Weekly uses --accent) */
+  --tier-monthly: #7c3aed;
+  --tier-boss:    #f5a623;
+
   /* Badge category colors */
   --badge-gym:      #27ae60;
   --badge-skate:    #1abc9c;

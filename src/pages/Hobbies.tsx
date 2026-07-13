@@ -1,8 +1,8 @@
-﻿import { useEffect, useState, type ReactNode } from 'react'
+﻿import { useMemo, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopBar } from '../components/layout/TopBar'
 import { PageWrapper } from '../components/layout/PageWrapper'
-import { supabase } from '../lib/supabase'
+import { useStore } from '../store/useStore'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { BasketballIcon, GamepadIcon, TargetIcon, GolfIcon, DiscIcon, MountainIcon, TableTennisIcon, ChessIcon, VolleyballIcon, SpikeballIcon, PoolIcon } from '../components/ui/Icon'
 
@@ -80,50 +80,39 @@ function HobbyCard({ icon, label, sub, path, statLabel, statValue, accentColor }
 
 export function Hobbies() {
   usePageTitle('Hobbies')
-  const [bbSessions,   setBbSessions]   = useState<number | null>(null)
-  const [fnWins,       setFnWins]       = useState<number | null>(null)
-  const [pbWins,       setPbWins]       = useState<number | null>(null)
-  const [golfRounds,   setGolfRounds]   = useState<number | null>(null)
-  const [dgRounds,     setDgRounds]     = useState<number | null>(null)
-  const [hikeMiles,    setHikeMiles]    = useState<number | null>(null)
-  const [ttWins,       setTtWins]       = useState<number | null>(null)
-  const [chessGames,   setChessGames]   = useState<number | null>(null)
-  const [vbWins,       setVbWins]       = useState<number | null>(null)
-  const [sbWins,       setSbWins]       = useState<number | null>(null)
-  const [poolWins,     setPoolWins]     = useState<number | null>(null)
+  const rawRows = useStore(s => s.rawRows)
 
-  useEffect(() => {
-    async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const [bb, fn, pb, golf, dg, hike, tt, chess, vb, sb, pool] = await Promise.all([
-        supabase.from('basketball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('fortnite_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
-        supabase.from('pickleball_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
-        supabase.from('golf_rounds').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('disc_golf_rounds').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('hiking_sessions').select('distance_miles').eq('user_id', user.id),
-        supabase.from('table_tennis_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
-        supabase.from('chess_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('volleyball_sessions').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
-        supabase.from('spikeball_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
-        supabase.from('pool_games').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('win', true),
-      ])
-      setBbSessions(bb.count ?? 0)
-      setFnWins(fn.count ?? 0)
-      setPbWins(pb.count ?? 0)
-      setGolfRounds(golf.count ?? 0)
-      setDgRounds(dg.count ?? 0)
-      const miles = (hike.data ?? []).reduce((s: number, r: { distance_miles: number }) => s + Number(r.distance_miles), 0)
-      setHikeMiles(Math.round(miles * 10) / 10)
-      setTtWins(tt.count ?? 0)
-      setChessGames(chess.count ?? 0)
-      setVbWins(vb.count ?? 0)
-      setSbWins(sb.count ?? 0)
-      setPoolWins(pool.count ?? 0)
+  // Derived from the store's rawRows — no per-page queries (null = still loading)
+  const stats = useMemo(() => {
+    if (!rawRows) return null
+    const wins = (rows: { win: boolean }[]) => rows.filter(r => r.win).length
+    const hikeMiles = rawRows.hikeRows.reduce((s, r) => s + Number(r.distance_miles), 0)
+    return {
+      bbSessions: rawRows.bbRows.length,
+      fnWins:     wins(rawRows.gameRows),
+      pbWins:     wins(rawRows.pbRows),
+      golfRounds: rawRows.golfRows.length,
+      dgRounds:   rawRows.dgRows.length,
+      hikeMiles:  Math.round(hikeMiles * 10) / 10,
+      ttWins:     wins(rawRows.ttRows),
+      chessGames: rawRows.chessRows.length,
+      vbWins:     wins(rawRows.vbRows),
+      sbWins:     wins(rawRows.sbRows),
+      poolWins:   wins(rawRows.poolRows),
     }
-    load()
-  }, [])
+  }, [rawRows])
+
+  const bbSessions = stats?.bbSessions ?? null
+  const fnWins     = stats?.fnWins     ?? null
+  const pbWins     = stats?.pbWins     ?? null
+  const golfRounds = stats?.golfRounds ?? null
+  const dgRounds   = stats?.dgRounds   ?? null
+  const hikeMiles  = stats?.hikeMiles  ?? null
+  const ttWins     = stats?.ttWins     ?? null
+  const chessGames = stats?.chessGames ?? null
+  const vbWins     = stats?.vbWins     ?? null
+  const sbWins     = stats?.sbWins     ?? null
+  const poolWins   = stats?.poolWins   ?? null
 
   return (
     <>
