@@ -619,7 +619,7 @@ const PRIORITY_COLORS = { High: '#E94560', Medium: '#F5A623', Low: '#27AE60' }
 function ToReadSection() {
   const [books, setBooks]     = useState<ToRead[]>([])
   const [showForm, setShowForm] = useState(false)
-  const { register, handleSubmit, reset } = useForm<ToReadForm>({
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<ToReadForm>({
     defaultValues: { title: '', author: '', genre: '', priority: 'Medium' },
   })
 
@@ -671,7 +671,7 @@ function ToReadSection() {
               </select>
             </div>
           </div>
-          <Button type="submit" fullWidth>Add to List</Button>
+          <Button type="submit" fullWidth loading={isSubmitting} disabled={isSubmitting}>{isSubmitting ? 'Adding…' : 'Add to List'}</Button>
         </form>
         </Card>
       )}

@@ -24,6 +24,7 @@ export function TodayCard() {
   const openQuickLog    = useNavStore(s => s.openQuickLog)
 
   const [waterBump, setWaterBump] = useState(0) // optimistic oz added inline
+  const [addingWater, setAddingWater] = useState(false)
 
   const todayStr = today()
 
@@ -49,9 +50,12 @@ export function TodayCard() {
     const activityDone = loggedToday(activityDates)
 
     async function addWater8() {
+      if (addingWater) return
+      setAddingWater(true)
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) { setAddingWater(false); return }
       const { error } = await supabase.from('water_log').insert({ user_id: user.id, date: todayStr, oz: 8 })
+      setAddingWater(false)
       if (error) return
       setWaterBump(b => b + 8)
       await refreshXP(); refreshActivity()
@@ -68,7 +72,7 @@ export function TodayCard() {
       { id: 'meals', label: 'Log a meal', Icon: UtensilsIcon, done: mealsDone, target: 'nutrition' },
       { id: 'activity', label: 'Log an activity', Icon: ZapIcon, done: activityDone, target: 'open' },
     ]
-  }, [rawRows, waterBump, todayStr, refreshXP, refreshActivity])
+  }, [rawRows, waterBump, todayStr, refreshXP, refreshActivity, addingWater])
 
   const remaining = items.filter(i => !i.done).length
   const afterSix  = new Date().getHours() >= 18
@@ -132,13 +136,15 @@ export function TodayCard() {
             {item.quickAdd && !item.done && (
               <button
                 type="button"
+                disabled={addingWater}
                 onClick={item.quickAdd}
                 aria-label="Add 8 ounces of water"
                 className="font-mono"
                 style={{
                   flexShrink: 0, padding: '5px 10px', borderRadius: 8, fontSize: 12, fontWeight: 700,
                   background: 'var(--accent-subtle)', border: '1px solid var(--accent-dim)',
-                  color: 'var(--accent)', cursor: 'pointer',
+                  color: 'var(--accent)', cursor: addingWater ? 'default' : 'pointer',
+                  opacity: addingWater ? 0.6 : 1,
                 }}
               >
                 +8oz

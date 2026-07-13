@@ -155,6 +155,7 @@ export function Water() {
   usePageTitle('Water')
   const [entries,     setEntries]     = useState<WaterEntry[]>([])
   const [customOz,    setCustomOz]    = useState('')
+  const [adding,      setAdding]      = useState(false)
   const [toast,       setToast]       = useState<string | null>(null)
   const [toastUndo,   setToastUndo]   = useState<(() => void) | undefined>(undefined)
   const [userId,      setUserId]      = useState<string | null>(null)
@@ -237,9 +238,11 @@ export function Water() {
   }, [historyFiltered])
 
   async function addWater(oz: number) {
-    if (!userId || oz <= 0) return
+    if (!userId || oz <= 0 || adding) return
+    setAdding(true)
     const wasGoalMet = totalOz >= goalOz
     const { data: inserted, error } = await supabase.from('water_log').insert({ user_id: userId, date: todayStr, oz }).select('id').single()
+    setAdding(false)
     if (error || !inserted) { setToast('Failed to log — try again'); setToastUndo(undefined); return }
     const insertedId = inserted.id
     setToastUndo(() => async () => {
@@ -321,6 +324,7 @@ export function Water() {
             {QUICK_ADDS.map(oz => (
               <button
                 key={oz}
+                disabled={adding}
                 onClick={(e) => {
                   addWater(oz)
                   const btn = e.currentTarget
@@ -331,7 +335,8 @@ export function Water() {
                   position: 'relative', overflow: 'hidden',
                   padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 700,
                   background: 'var(--accent-subtle)', border: '1.5px solid var(--accent-dim)',
-                  color: 'var(--accent)', cursor: 'pointer', transition: 'all 0.12s ease',
+                  color: 'var(--accent)', cursor: adding ? 'default' : 'pointer', transition: 'all 0.12s ease',
+                  opacity: adding ? 0.6 : 1,
                 }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 25%, transparent)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent-subtle)')}
@@ -353,7 +358,7 @@ export function Water() {
             />
             <button
               onClick={() => { addWater(parseFloat(customOz) || 0); setCustomOz('') }}
-              disabled={!customOz || parseFloat(customOz) <= 0}
+              disabled={!customOz || parseFloat(customOz) <= 0 || adding}
               style={{
                 padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 700,
                 background: customOz && parseFloat(customOz) > 0 ? 'color-mix(in srgb, var(--accent) 20%, transparent)' : 'var(--input-bg)',
