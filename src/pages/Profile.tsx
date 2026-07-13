@@ -23,8 +23,10 @@ import {
   BasketballIcon, GolfIcon, DiscIcon, TableTennisIcon, ChessIcon,
   VolleyballIcon, SpikeballIcon, PoolIcon,
   SwimIcon, SproutIcon, BirdIcon, UtensilsIcon,
+  EditIcon, CloseIcon,
   type IconComponent,
 } from '../components/ui/Icon'
+import { useStore } from '../store/useStore'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const CATEGORY_LABELS: Record<Badge['category'], string> = {
@@ -459,17 +461,17 @@ function ActivityHeatmap() {
     if (date > today) return 'var(--border-subtle)'
     const n = counts[date] ?? 0
     if (n === 0) return 'var(--border-subtle)'
-    if (n === 1) return 'rgba(245,166,35,0.30)'
-    if (n === 2) return 'rgba(245,166,35,0.55)'
-    if (n === 3) return 'rgba(245,166,35,0.75)'
-    return 'rgba(245,166,35,0.95)'
+    if (n === 1) return 'color-mix(in srgb, var(--accent) 30%, transparent)'
+    if (n === 2) return 'color-mix(in srgb, var(--accent) 55%, transparent)'
+    if (n === 3) return 'color-mix(in srgb, var(--accent) 75%, transparent)'
+    return 'var(--accent)'
   }
 
   function cellGlow(date: string | null): string | undefined {
     if (!date || date > today) return undefined
     const n = counts[date] ?? 0
-    if (n >= 3) return '0 0 6px rgba(245,166,35,0.5)'
-    if (n >= 2) return '0 0 4px rgba(245,166,35,0.3)'
+    if (n >= 3) return '0 0 6px color-mix(in srgb, var(--accent) 50%, transparent)'
+    if (n >= 2) return '0 0 4px color-mix(in srgb, var(--accent) 30%, transparent)'
     return undefined
   }
 
@@ -514,7 +516,7 @@ function ActivityHeatmap() {
                       style={{
                         width: CELL, height: CELL, borderRadius: 3, flexShrink: 0,
                         background: cellBg(date),
-                        outline: isToday ? '1.5px solid rgba(245,166,35,0.9)' : 'none',
+                        outline: isToday ? '1.5px solid var(--accent)' : 'none',
                         outlineOffset: '-1px',
                         boxShadow: cellGlow(date),
                         transition: 'background 0.2s ease',
@@ -699,6 +701,19 @@ export function Profile() {
   const [avatarError,     setAvatarError]     = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const refreshUser = useStore(s => s.refreshUser)
+  const [editingName, setEditingName] = useState(false)
+  const [nameInput,   setNameInput]   = useState('')
+  const [nameSaving,  setNameSaving]  = useState(false)
+
+  async function saveName() {
+    if (!nameInput.trim()) return
+    setNameSaving(true)
+    const { error } = await supabase.auth.updateUser({ data: { name: nameInput.trim() } })
+    setNameSaving(false)
+    if (!error) { setEditingName(false); refreshUser() }
+  }
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setAvatarUrl(user?.user_metadata?.avatar_url ?? null)
@@ -812,10 +827,57 @@ export function Profile() {
 
             {/* Name + title + member since */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 700,
-                color: 'var(--text-primary)', lineHeight: 1.1, marginBottom: 3 }}>
-                {userName ?? 'Player'}
-              </h2>
+              {editingName ? (
+                <div className="flex items-center gap-2" style={{ marginBottom: 3 }}>
+                  <input
+                    autoFocus
+                    value={nameInput}
+                    onChange={e => setNameInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditingName(false) }}
+                    placeholder="Your name"
+                    style={{
+                      flex: 1, minWidth: 0, padding: '4px 10px', borderRadius: 8,
+                      fontSize: 16, fontWeight: 700, outline: 'none',
+                      background: 'var(--input-bg)', border: '1px solid var(--accent)',
+                      color: 'var(--text-primary)',
+                    }}
+                  />
+                  <button
+                    onClick={saveName}
+                    disabled={nameSaving}
+                    style={{ padding: '5px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, background: 'var(--accent)', color: 'var(--base-bg)', border: 'none', cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    {nameSaving ? '…' : 'Save'}
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Cancel"
+                    onClick={() => setEditingName(false)}
+                    style={{ padding: 5, borderRadius: 8, background: 'var(--input-bg)', border: 'none', cursor: 'pointer', flexShrink: 0, display: 'flex' }}
+                  >
+                    <CloseIcon size={13} color="var(--text-muted)" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2" style={{ marginBottom: 3 }}>
+                  <h2 style={{ fontSize: 20, fontWeight: 700,
+                    color: 'var(--text-primary)', lineHeight: 1.1,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {userName || 'Player'}
+                  </h2>
+                  <button
+                    aria-label="Edit name"
+                    onClick={() => { setNameInput(userName || ''); setEditingName(true) }}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      width: 24, height: 24, borderRadius: 6, flexShrink: 0,
+                      background: 'var(--input-bg)', border: 'none', cursor: 'pointer',
+                    }}
+                  >
+                    <EditIcon size={11} color="var(--text-muted)" />
+                  </button>
+                </div>
+              )}
               <p style={{ fontSize: 13, fontWeight: 700,
                 color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)', marginBottom: 4 }}>
                 {title}

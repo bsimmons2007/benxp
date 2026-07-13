@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useRef, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { PageWrapper } from '../components/layout/PageWrapper'
 import { Card } from '../components/ui/Card'
 import { useXP } from '../hooks/useXP'
@@ -9,7 +9,7 @@ import { XP_RATES } from '../lib/xp'
 import { THEMES, saveTheme, loadTheme, isLightMode, setLightMode, applyTheme } from '../lib/theme'
 import { supabase } from '../lib/supabase'
 import { logAuditEvent } from '../lib/audit'
-import { EditIcon, TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, SunIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon, ChevronIcon, CloseIcon, UtensilsIcon } from '../components/ui/Icon'
+import { TrashIcon, DumbbellIcon, TrophyIcon, BookIcon, SkateIcon, RunIcon, GamepadIcon, MoonIcon, SunIcon, RulerIcon, TargetIcon, SwordIcon, CalendarIcon, ActivityIcon, StarIcon, DotsIcon, ShareIcon, SectionIcon, AmbientSceneIcon, ShieldIcon, BellIcon, ChevronIcon, UtensilsIcon } from '../components/ui/Icon'
 import { getNotifPrefs, saveNotifPrefs, requestPermission, permissionGranted, notificationsSupported } from '../lib/notifications'
 import { toRoman } from '../lib/utils'
 import { getPref, setPref } from '../lib/prefs'
@@ -78,28 +78,6 @@ function triggerDownload(filename: string, content: string) {
   setTimeout(() => URL.revokeObjectURL(url), 100)
 }
 
-async function compressAvatar(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 96; canvas.height = 96
-    const ctx = canvas.getContext('2d')!
-    const img = new Image()
-    const objectUrl = URL.createObjectURL(file)
-    img.onload = () => {
-      const size = Math.min(img.width, img.height)
-      ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 96, 96)
-      URL.revokeObjectURL(objectUrl)
-      resolve(canvas.toDataURL('image/jpeg', 0.82))
-    }
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl)
-      reject(new Error('Failed to load image'))
-    }
-    img.src = objectUrl
-  })
-}
-
-
 function ThemeSwatch({ theme, active, onSelect }: { theme: Theme; active: boolean; onSelect: () => void }) {
   return (
     <button
@@ -138,18 +116,8 @@ export function Settings() {
   const navigate = useNavigate()
   const { totalXP, level } = useXP()
   const userName      = useUserName()
-  const refreshUser   = useStore(s => s.refreshUser)
   const resetStore    = useStore(s => s.reset)
   const storeAvatar   = useStore(s => s.avatarUrl)
-
-  const [editingName, setEditingName] = useState(false)
-  const [nameInput, setNameInput] = useState('')
-  const [nameSaving, setNameSaving] = useState(false)
-  const nameRef = useRef<HTMLInputElement>(null)
-
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(storeAvatar)
-  const [avatarLoading, setAvatarLoading] = useState(false)
-  const avatarInputRef = useRef<HTMLInputElement>(null)
 
   const [activeTheme, setActiveTheme]   = useState<Theme>(loadTheme)
   const [lightMode, setLightModeState]  = useState(isLightMode)
@@ -185,30 +153,6 @@ export function Settings() {
   function patchNutrition(patch: Partial<ReturnType<typeof getNutritionProfile>>) {
     setNutritionState(prev => ({ ...prev, ...patch }))
     setNutritionProfile(patch)
-  }
-
-  async function saveName() {
-    if (!nameInput.trim()) return
-    setNameSaving(true)
-    const { error } = await supabase.auth.updateUser({ data: { name: nameInput.trim() } })
-    setNameSaving(false)
-    if (!error) { setEditingName(false); refreshUser() }
-  }
-
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setAvatarLoading(true)
-    try {
-      const base64 = await compressAvatar(file)
-      await supabase.auth.updateUser({ data: { avatar_url: base64 } })
-      setAvatarUrl(base64)
-      refreshUser()
-    } catch (err) {
-      console.error('Avatar upload failed:', err)
-    } finally {
-      setAvatarLoading(false)
-    }
   }
 
   async function handleExportCSV() {
@@ -337,59 +281,33 @@ export function Settings() {
 
       <PageWrapper>
 
-        {/* ── Profile hero ─────────────────────────────────────────── */}
+        {/* ── Profile summary — identity edits (name, avatar) live on Profile ── */}
         <Card className="mb-2">
-          <div className="flex items-center gap-4">
-            {/* Avatar */}
-            <div className="relative flex-shrink-0">
-              <button
-                onClick={() => avatarInputRef.current?.click()}
-                className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center text-2xl font-bold relative"
-                style={{ background: avatarUrl ? 'transparent' : 'var(--accent)', color: 'var(--base-bg)' }}
-              >
-                {avatarUrl
-                  ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
-                  : (userName ? userName[0].toUpperCase() : '?')
-                }
-                {avatarLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-full" style={{ background: 'var(--overlay)' }}>
-                    <span style={{ color: "var(--text-primary)", fontSize: "0.75rem" }}>...</span>
-                  </div>
-                )}
-              </button>
-              <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center pointer-events-none" style={{ background: 'var(--accent)', color: 'var(--base-bg)', fontSize: 10 }}>+</div>
-              <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-full flex items-center gap-4 text-left"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
+            <div
+              className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center text-2xl font-bold flex-shrink-0"
+              style={{ background: storeAvatar ? 'transparent' : 'var(--accent)', color: 'var(--base-bg)' }}
+            >
+              {storeAvatar
+                ? <img src={storeAvatar} alt="avatar" className="w-full h-full object-cover" />
+                : (userName ? userName[0].toUpperCase() : '?')
+              }
             </div>
-
-            {/* Name + stats */}
             <div className="flex-1 min-w-0">
-              {editingName ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    ref={nameRef} autoFocus value={nameInput}
-                    onChange={e => setNameInput(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditingName(false) }}
-                    className="flex-1 px-3 py-1.5 rounded-lg outline-none text-base"
-                    style={{ background: 'var(--input-bg)', border: '1px solid var(--accent)', color: 'var(--text-primary)' }}
-                    placeholder="Your name"
-                  />
-                  <button onClick={saveName} disabled={nameSaving} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{ background: 'var(--accent)', color: 'var(--base-bg)' }}>
-                    {nameSaving ? '...' : 'Save'}
-                  </button>
-                  <button type="button" aria-label="Cancel" onClick={() => setEditingName(false)} className="px-2 py-1.5 rounded-lg text-xs inline-flex items-center" style={{ color: 'var(--text-muted)', background: 'var(--input-bg)' }}><CloseIcon size={13} /></button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "1.25rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userName || '—'}</p>
-                  <button onClick={() => { setNameInput(userName); setEditingName(true) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: 6, background: 'var(--input-bg)', border: 'none', cursor: 'pointer', flexShrink: 0 }}><EditIcon size={12} color="var(--text-muted)" /></button>
-                </div>
-              )}
+              <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "1.25rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userName || '—'}</p>
               <p className="mt-0.5" style={{ color: 'var(--accent)', fontSize: 13 }}>
-                Level {displayLevel}
+                Level {displayLevel} · {totalXP.toLocaleString()} XP
               </p>
-              <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>{totalXP.toLocaleString()} XP total</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>Edit name & avatar on your Profile</p>
             </div>
-          </div>
+            <span style={{ transform: 'rotate(-90deg)', display: 'flex', flexShrink: 0 }}>
+              <ChevronIcon size={14} color="var(--text-muted)" />
+            </span>
+          </button>
         </Card>
 
         {/* ── Appearance card ───────────────────────────────────────── */}

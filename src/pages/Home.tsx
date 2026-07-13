@@ -488,16 +488,16 @@ function WellnessWidget() {
   if (w.loading || !w.hasSomeData) return null
 
   const COMPONENTS = [
-    { label: 'Sleep',    value: w.sleep,    max: 35, color: '#818cf8' },
+    { label: 'Sleep',    value: w.sleep,    max: 35, color: 'var(--cat-sleep)' },
     { label: 'Activity', value: w.activity, max: 25, color: 'var(--accent)' },
-    { label: 'Mood',     value: w.mood,     max: 20, color: '#f472b6' },
-    { label: 'Water',    value: w.water,    max: 10, color: '#34d399' },
-    { label: 'Meals',    value: w.nutrition, max: 10, color: '#fbbf24' },
+    { label: 'Mood',     value: w.mood,     max: 20, color: 'var(--cat-mood)' },
+    { label: 'Water',    value: w.water,    max: 10, color: 'var(--cat-wellness)' },
+    { label: 'Meals',    value: w.nutrition, max: 10, color: 'var(--cat-nutrition)' },
   ]
 
   const pct   = w.total / 100
   const grade = w.total >= 80 ? 'Great' : w.total >= 60 ? 'Good' : w.total >= 40 ? 'Fair' : 'Low'
-  const gradeColor = w.total >= 80 ? '#34d399' : w.total >= 60 ? 'var(--accent)' : w.total >= 40 ? '#fbbf24' : '#f87171'
+  const gradeColor = w.total >= 80 ? 'var(--green)' : w.total >= 60 ? 'var(--accent)' : w.total >= 40 ? 'var(--gold)' : 'var(--red)'
 
   return (
     <div className="mb-5 rounded-xl p-4" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
@@ -508,7 +508,7 @@ function WellnessWidget() {
         <div className="flex items-baseline gap-1">
           <span style={{ fontSize: 22, fontWeight: 700, color: gradeColor }}>{w.total}</span>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>/100</span>
-          <span className="ml-1 text-xs font-bold px-2 py-1 rounded-full" style={{ background: gradeColor + '22', color: gradeColor }}>{grade}</span>
+          <span className="ml-1 text-xs font-bold px-2 py-1 rounded-full" style={{ background: `color-mix(in srgb, ${gradeColor} 13%, transparent)`, color: gradeColor }}>{grade}</span>
         </div>
       </div>
 
