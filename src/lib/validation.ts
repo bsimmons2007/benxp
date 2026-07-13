@@ -17,7 +17,8 @@ export function containsProfanity(text: string): boolean {
 export function sanitizeText(text: string): string {
   return text
     .replace(/<[^>]*>/g, '')    // strip HTML tags
-    .replace(/\x00/g, '')       // strip null bytes
+    // eslint-disable-next-line no-control-regex -- stripping null bytes is the point
+    .replace(/\x00/g, '')
     .trim()
 }
 

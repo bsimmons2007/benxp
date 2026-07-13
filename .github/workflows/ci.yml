@@ -22,4 +22,3 @@ jobs:
       - run: npm run test
 
       - run: npm run lint
-        continue-on-error: true

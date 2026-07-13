@@ -83,7 +83,7 @@ function LogSleepPanel({ onLogged }: { onLogged: () => void }) {
     if (watchedBedtime && watchedWakeTime) {
       const [bh, bm] = watchedBedtime.split(':').map(Number)
       const [wh, wm] = watchedWakeTime.split(':').map(Number)
-      let bedMins  = bh * 60 + bm
+      const bedMins  = bh * 60 + bm
       let wakeMins = wh * 60 + wm
       if (wakeMins <= bedMins) wakeMins += 24 * 60   // crossed midnight
       setValue('hours_slept', ((wakeMins - bedMins) / 60).toFixed(1))

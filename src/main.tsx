@@ -25,7 +25,7 @@ document.addEventListener('paste', (e) => {
   const target = e.target as HTMLInputElement
   if (target.tagName !== 'INPUT' || target.type !== 'number') return
   const text = e.clipboardData?.getData('text') ?? ''
-  const cleaned = text.replace(/[^0-9.\-]/g, '')
+  const cleaned = text.replace(/[^0-9.-]/g, '')
   if (cleaned !== text) {
     e.preventDefault()
     const start = target.selectionStart ?? 0

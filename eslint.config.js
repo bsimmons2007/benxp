@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', '.claude']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -18,6 +18,19 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+    },
+    rules: {
+      // `_`-prefixed = intentionally unused (codebase-wide convention)
+      '@typescript-eslint/no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      }],
+      // Empty catch = deliberate graceful degradation (missing-migration fallbacks)
+      'no-empty': ['error', { allowEmptyCatch: true }],
+      // Several files export a hook alongside their component (useQuickActivities,
+      // useStrengthSnapshot, …) — HMR hint only, not a correctness issue
+      'react-refresh/only-export-components': 'warn',
     },
   },
 ])

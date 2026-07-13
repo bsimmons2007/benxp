@@ -17,7 +17,7 @@ export function XPCoins({ xp }: { xp: number }) {
       duration: 1300 + Math.random() * 900,       // 1.3–2.2s fall
       size:     0.7 + Math.random() * 0.6,        // 0.7–1.3× scale
     })),
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   [count])
 
   useEffect(() => {

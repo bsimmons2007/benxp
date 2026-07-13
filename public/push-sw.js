@@ -1,7 +1,7 @@
 // Custom push handlers imported into the Workbox-generated service worker via
 // vite-plugin-pwa workbox.importScripts. Kept separate so generateSW keeps
 // managing precache/runtime caching untouched.
-/* eslint-disable no-undef */
+ 
 
 self.addEventListener('push', (event) => {
   let payload = {}

@@ -146,7 +146,7 @@ export function WeeklyContent() {
     }
     load()
     return () => { cancelled = true }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [monday, sunday])
 
   const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
